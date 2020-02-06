@@ -6,7 +6,7 @@ class Slurm_Job():
         try:
             j = pyslurm.job()
             data = j.get()
-            json_data = ["data"] = data
+            json_data["data"] = data
         except Exception as e:
             error = {
                 "title": "Python Exception",
@@ -24,7 +24,7 @@ class Slurm_JobStep():
         try:
             js = pyslurm.jobstep()
             data = js.get()
-            json_data = ["data"] = data
+            json_data["data"] = data
         except Exception as e:
             error = {
                 "title": "Python Exception",
@@ -42,7 +42,7 @@ class Slurm_Node():
         try:
             n = pyslurm.node()
             data = n.get()
-            json_data = ["data"] = data
+            json_data["data"] = data
         except Exception as e:
             error = {
                 "title": "Python Exception",
@@ -59,7 +59,7 @@ class Slurm_Statistics():
         try:
             s = pyslurm.statistics()
             data = s.get()
-            json_data = ["data"] = data
+            json_data["data"] = data
         except Exception as e:
             error = {
                 "title": "Python Exception",
