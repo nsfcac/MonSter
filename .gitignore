@@ -1,0 +1,6 @@
+# Ignore files
+.DS_Store
+
+# Ignore folders
+env/
+__pycache__/
