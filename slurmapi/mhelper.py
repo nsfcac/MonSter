@@ -12,8 +12,7 @@ def printHelp():
     Options:
     
         --job, -j           Get Job metrics                 [boolean]
-        --jobstep, -s       Get JobStep metrics             [boolean]
         --node, -n          Get Node metrics                [boolean]
-        --statistic, -t     Get Statistic metrics           [boolean]
+        --statistic, -s     Get Statistic metrics           [boolean]
         --help, -h          Show help                       [boolean]
     """)                                          

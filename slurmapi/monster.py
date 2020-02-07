@@ -8,8 +8,8 @@ from slurmapi import Slurm_Job, Slurm_JobStep, Slurm_Node, Slurm_Statistics
 def main(argv):
     try:
         opts, args = getopt.getopt(
-            argv, "ajsnth",
-            ["job", "jobstep", "node", "statistic", "help"]
+            argv, "jnsh",
+            ["job", "node", "statistic", "help"]
         )
     except getopt.GetoptError:
         print("Arguments Error!")
@@ -22,18 +22,21 @@ def main(argv):
             print("Job information: ")
             job= Slurm_Job()
             job_data = job.get()
+            last_update = job.lastUpdate()
+            ids = job.ids()
+            print("Updated time: ", last_update)
+            print("Job IDs: ", ids)
             print(json.dumps(job_data, indent=2))
-        elif opt in ("-s", "--jobstep"):
-            print("Job Step information: ")
-            job_step = Slurm_JobStep()
-            job_step_data = job_step.get()
-            print(json.dumps(job_step_data, indent=2))
         elif opt in ("-n", "--node"):
             print("Node information: ")
             node = Slurm_Node()
             node_data = node.get()
+            last_update = node.lastUpdate()
+            ids = node.ids()
+            print("Updated time: ", last_update)
+            print("Node IDs: ", ids)
             print(json.dumps(node_data, indent=2))
-        elif opt in ("-t", "--statistic"):
+        elif opt in ("-s", "--statistic"):
             print("Statistic: ")
             statistic = Slurm_Statistics()
             statistic_data = statistic.get()
