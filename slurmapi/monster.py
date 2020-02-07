@@ -2,7 +2,7 @@ import json
 import getopt
 import sys
 from mhelper import printLogo, printHelp
-from slurmapi import Slurm_Job, Slurm_JobStep, Slurm_Node, Slurm_Statistics
+from slurmapi import Slurm_Job, Slurm_Node, Slurm_Statistics
 
 
 def main(argv):
