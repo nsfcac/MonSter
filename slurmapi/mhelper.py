@@ -4,4 +4,16 @@ def printLogo():
     print("""  / /|_/ / __ \/ __ \\__ \ / / / _ \/ ___/""")
     print(""" / /  / / /_/ / / / /__/ // / /  __/ /    """)
     print("""/_/  /_/\____/_/ /_/____//_/  \___/_/     """)
-                                          
+
+
+def printHelp():
+    print(
+    """
+    Options:
+    
+        --job, -j           Get Job metrics                 [boolean]
+        --jobstep, -s       Get JobStep metrics             [boolean]
+        --node, -n          Get Node metrics                [boolean]
+        --statistic, -t     Get Statistic metrics           [boolean]
+        --help, -h          Show help                       [boolean]
+    """)                                          
