@@ -1,4 +1,4 @@
-cython==0.29.15
+Cython==0.29.15
 pyslurm==18.8.1.1
 influxdb==5.2.3
-pyyaml==5.3
+PyYAML==5.3
