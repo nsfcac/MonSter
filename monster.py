@@ -22,12 +22,15 @@ def main():
 
         # Write points into influxdb
         for item in slurm_info["job_info"]:
-            client.write_points(item)
+            print(item)
+            client.write_points([item])
         for item in slurm_info["node_info"]:
-            client.write_points(item)
+            print(item)
+            client.write_points([item])
         for item in slurm_info["stat_info"]:
-            client.write_points(item)
-            
+            print(item)
+            client.write_points([item])
+
         print("Done!")
     except Exception as err:
         print(err)
