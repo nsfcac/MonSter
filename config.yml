@@ -25,7 +25,8 @@ metrics:
     - real_memory
     - cpu_load
     - threads
-    - energy
+    - current_watts
+    - consumed_energy
     - state
   statistics:
     - jobs_submitted
