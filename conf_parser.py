@@ -15,9 +15,9 @@ def parse_conf() -> object:
 def check_metrics(cfg: object) -> bool:
     try:
         # Monitoring metrics specification
-        job = cfg["metrics"]["job"]
-        node = cfg["metrics"]["node"]
-        statistics = cfg["metrics"]["statistics"]
+        job = cfg["slurm_metrics"]["job"]
+        node = cfg["slurm_metrics"]["node"]
+        statistics = cfg["slurm_metrics"]["statistics"]
 
         # Sanity check
         valid_job = {

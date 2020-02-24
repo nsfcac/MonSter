@@ -8,9 +8,9 @@ from slurmapi.fetch_slurm import fetch_slurm
 
 def main():
     config = parse_conf()
-    
+
     # Check sanity
-    if not check_metrics(config["metrics"]):
+    if not check_metrics(config):
         print("Error: metrics in configuration wrong!")
         return
     
@@ -24,7 +24,7 @@ def main():
         client = InfluxDBClient(host, port, user, password, dbname)
 
         # Fetch slurm information
-        slurm_info = fetch_slurm(config["metrics"])
+        slurm_info = fetch_slurm(config["slurm_metrics"])
 
         # Write points into influxdb
         client.write_points(slurm_info["job_info"])
