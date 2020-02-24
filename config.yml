@@ -2,10 +2,8 @@ influxdb:
   host: 'localhost'
   port: '8086'
   user: 'root'
-  password: 'root'
-  dbname: 'example'
-  dbuser: 'user'
-  dbuser_password: 'mypassword'
+  password: '1234'
+  dbname: 'slurmdb'
 
 metrics:
   job:
