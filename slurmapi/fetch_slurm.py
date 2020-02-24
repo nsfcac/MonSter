@@ -1,6 +1,6 @@
 import json
 import time
-from slurmapi import Slurm_Job, Slurm_Node, Slurm_Statistics
+from slurmapi.slurmapi import Slurm_Job, Slurm_Node, Slurm_Statistics
 
 
 def fetch_slurm(metrics: object) -> object:
@@ -10,19 +10,18 @@ def fetch_slurm(metrics: object) -> object:
     slurm_info = {}
     
     try:
+        epoch_time = int(time.time())
+
         job = Slurm_Job()
         job_data = job.get()
-        epoch_time = int(time.time())
         job_info = process_job(metrics["job"], job_data, epoch_time)
 
         node = Slurm_Node()
         node_data = node.get()
-        epoch_time = int(time.time())
         node_info = process_node(metrics["node"], node_data, epoch_time)
 
         stat = Slurm_Statistics()
         stat_data = stat.get()
-        epoch_time = int(time.time())
         stat_info = process_stat(metrics["statistics"], stat_data, epoch_time)
 
         slurm_info.update({
@@ -37,6 +36,9 @@ def fetch_slurm(metrics: object) -> object:
 
 
 def process_job(job_metrics: list, job_data: object, time: int) -> list:
+    """
+    Generate data point for job informaiton
+    """
     job_info = []
     jobid_arr = job_data["data"].keys()
     for j in jobid_arr:
@@ -60,6 +62,9 @@ def process_job(job_metrics: list, job_data: object, time: int) -> list:
 
 
 def process_node(node_metrics: list, node_data: object, time: int) -> list:
+    """
+    Generate data point for node informaiton
+    """
     node_info = []
     node_arr = node_data["data"].keys()
     for n in node_arr:
@@ -83,6 +88,9 @@ def process_node(node_metrics: list, node_data: object, time: int) -> list:
     return node_info
 
 def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
+    """
+    Generate data point for statistics informaiton
+    """
     stat_info = []
     s_data = stat_data["data"]
     stat_point = {
