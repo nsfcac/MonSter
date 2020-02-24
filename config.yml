@@ -1,0 +1,38 @@
+influxdb:
+  host: 'localhost'
+  port: '8086'
+  user: 'root'
+  password: 'root'
+  dbname: 'example'
+  dbuser: 'user'
+  dbuser_password: 'mypassword'
+
+metrics:
+  job:
+    - submit_time
+    - start_time
+    - suspend_time
+    - end_time
+    - run_time
+    - job_state
+    - nodes
+    - num_cpus
+    - num_nodes
+  node:
+    - cpus
+    - cores
+    - sockets
+    - cores_per_socket
+    - free_mem
+    - real_memory
+    - cpu_load
+    - threads
+    - current_watts
+    - consumed_energy
+    - state
+  statistics:
+    - jobs_submitted
+    - jobs_started
+    - jobs_completed
+    - jobs_canceled
+    - jobs_failed
