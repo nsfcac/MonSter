@@ -73,6 +73,7 @@ def process_job(job_metrics: list, job_data: object, time: int) -> list:
                 m: j_data[m]
             })
         job_info.append(job_point)
+    print(job_info)
     return job_info
 
 
@@ -96,6 +97,7 @@ def process_node(node_metrics: list, node_data: object, time: int) -> list:
                 m: n_data[m]
             })
         node_info.append(node_point)
+    print(node_info)
     return node_info
 
 def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
@@ -112,6 +114,7 @@ def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
         })
 
     stat_info.append(stat_point)
+    print(stat_info)
     return stat_info
 
-print(fetch_slurm(metrics))
+fetch_slurm(metrics)
