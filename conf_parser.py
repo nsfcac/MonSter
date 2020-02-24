@@ -18,7 +18,6 @@ def check_metrics(cfg: object) -> bool:
         job = cfg["slurm_metrics"]["job"]
         node = cfg["slurm_metrics"]["node"]
         statistics = cfg["slurm_metrics"]["statistics"]
-        print(job)
         # Sanity check
         valid_job = {
             "submit_time", "start_time", "suspend_time", "end_time", 
