@@ -30,7 +30,7 @@ def main():
         client.write_points(slurm_info["job_info"])
         client.write_points(slurm_info["node_info"])
         client.write_points(slurm_info["stat_info"])
-
+        print("DONE!")
     except Exception as err:
         print(err)
     return 
