@@ -11,7 +11,7 @@ def main():
 
     # Check sanity
     if not check_metrics(config):
-        print("Error: metrics in configuration wrong!")
+        print("Error: Bad configuration!")
         return
     
     try:
