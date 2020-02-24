@@ -1,6 +1,6 @@
 import json
 import time
-from slurmapi.slurmapi import Slurm_Job, Slurm_Node, Slurm_Statistics
+from slurmapi import Slurm_Job, Slurm_Node, Slurm_Statistics
 
 valid_job = [
             "submit_time", "start_time", "suspend_time", "end_time", 
@@ -21,8 +21,6 @@ metrics = {
     "node": valid_node,
     "statistics": valid_stat
 }
-
-fetch_slurm(metrics)
 
 def fetch_slurm(metrics: object) -> object:
     """
@@ -116,3 +114,5 @@ def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
 
     stat_info.append(stat_point)
     return stat_info
+
+fetch_slurm(metrics)
