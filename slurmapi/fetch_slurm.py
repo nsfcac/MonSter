@@ -15,11 +15,11 @@ valid_stat = [
     "jobs_completed", "jobs_canceled", "jobs_failed"
 ]
 
-metrics = {
+metrics = [
     "job": valid_job,
     "node": valid_node,
     "statistics": valid_stat
-}
+]
 
 def fetch_slurm(metrics: object) -> object:
     """
@@ -41,7 +41,6 @@ def fetch_slurm(metrics: object) -> object:
         stat = Slurm_Statistics()
         stat_data = stat.get()
         epoch_time = int(time.time())
-        print(stat_data)
         stat_info = process_node(metrics["statistics"], stat_data, epoch_time)
 
         slurm_info.update({
@@ -113,7 +112,6 @@ def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
         stat_point["fields"].update({
             m: s_data[m]
         })
-
     stat_info.append(stat_point)
     print(stat_info)
     return stat_info
