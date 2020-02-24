@@ -21,9 +21,12 @@ def main():
         slurm_info = fetch_slurm(config["metrics"])
 
         # Write points into influxdb
-        client.write_points(slurm_info["job_info"])
-        client.write_points(slurm_info["node_info"])
-        client.write_points(slurm_info["stat_info"])
+        if slurm_info["job_info"]:
+            client.write_points(slurm_info["job_info"])
+        if slurm_info["node_info"]:
+            client.write_points(slurm_info["node_info"])
+        if slurm_info["stat_info"]:
+            client.write_points(slurm_info["stat_info"])
 
         print("DONE!")
     except Exception as err:
