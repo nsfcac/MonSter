@@ -8,6 +8,12 @@ from slurmapi.fetch_slurm import fetch_slurm
 
 def main():
     config = parse_conf()
+    
+    # Check sanity
+    if not check_metrics(config["metrics"]):
+        print("Error: metrics in configuration wrong!")
+        return
+    
     try:
         # Initialize influxdb
         host = config["influxdb"]["host"]
