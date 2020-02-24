@@ -41,6 +41,7 @@ def fetch_slurm(metrics: object) -> object:
         stat = Slurm_Statistics()
         stat_data = stat.get()
         epoch_time = int(time.time())
+        print(stat_data)
         stat_info = process_node(metrics["statistics"], stat_data, epoch_time)
 
         slurm_info.update({
@@ -73,7 +74,7 @@ def process_job(job_metrics: list, job_data: object, time: int) -> list:
                 m: j_data[m]
             })
         job_info.append(job_point)
-    print(job_info)
+    # print(job_info)
     return job_info
 
 
@@ -97,7 +98,7 @@ def process_node(node_metrics: list, node_data: object, time: int) -> list:
                 m: n_data[m]
             })
         node_info.append(node_point)
-    print(node_info)
+    # print(node_info)
     return node_info
 
 def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
