@@ -108,5 +108,4 @@ def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
             m: s_data[m]
         })
     stat_info.append(stat_point)
-    print(stat_info)
     return stat_info
