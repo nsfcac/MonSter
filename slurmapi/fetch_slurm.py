@@ -83,7 +83,7 @@ def process_node(node_metrics: list, node_data: object, time: int) -> list:
     for n in node_arr:
         n_data = node_data["data"][n]
         node_point = {
-            "measurement": "job",
+            "measurement": "node",
             "tags": {
                 "node_hostname": n_data["node_hostname"],
                 "node_addr": n_data["node_addr"],
@@ -102,7 +102,7 @@ def process_node(node_metrics: list, node_data: object, time: int) -> list:
 
 def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
     stat_info = []
-    stat_data = stat_data["data"]
+    s_data = stat_data["data"]
     stat_point = {
         "measurement": "statistics",
         "time": time,
@@ -110,7 +110,7 @@ def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
     }
     for m in stat_metrics:
         stat_point["fields"].update({
-            m: stat_data[m]
+            m: s_data[m]
         })
 
     stat_info.append(stat_point)
