@@ -4,8 +4,8 @@ COPY . /monster
 WORKDIR  /monster
 RUN yum update -y && \
     yum install -y gcc python3-pip python3-devel
-RUN pip3 install -y cython
-RUN pip3 install -y pyslurm
+RUN pip3 install Cython
+RUN pip3 install pyslurm
 RUN pip3 install -r requirements.txt
 ENTRYPOINT [ "python3" ]
 CMD [ "monster.py" ]
