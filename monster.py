@@ -9,6 +9,7 @@ from slurmapi.fetch_slurm import fetch_slurm
 def main():
     config = parse_conf()
 
+    print(config)
     # Check sanity
     if not check_metrics(config):
         print("Error: Bad configuration!")
