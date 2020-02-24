@@ -2,24 +2,6 @@ import json
 import time
 from slurmapi import Slurm_Job, Slurm_Node, Slurm_Statistics
 
-valid_job = [
-            "submit_time", "start_time", "suspend_time", "end_time", 
-            "run_time", "job_state", "nodes", "num_cpus", "num_nodes"
-]  
-valid_node = [
-    "cpus", "cores", "sockets", "cores_per_socket", "free_mem",
-    "real_memory", "cpu_load", "threads", "energy", "state"
-]
-valid_stat = [
-    "jobs_submitted", "jobs_started", 
-    "jobs_completed", "jobs_canceled", "jobs_failed"
-]
-
-metrics = {
-    "job": valid_job,
-    "node": valid_node,
-    "statistics": valid_stat
-}
 
 def fetch_slurm(metrics: object) -> object:
     """
@@ -114,5 +96,3 @@ def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
         })
     stat_info.append(stat_point)
     return stat_info
-
-print(fetch_slurm(metrics))
