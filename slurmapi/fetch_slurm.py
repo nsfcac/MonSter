@@ -8,8 +8,7 @@ valid_job = [
 ]  
 valid_node = [
     "cpus", "cores", "sockets", "cores_per_socket", "free_mem",
-    "real_memory", "cpu_load", "threads", "current_watts",
-    "consumed_energy", "state"
+    "real_memory", "cpu_load", "threads", "energy", "state"
 ]
 valid_stat = [
     "jobs_submitted", "jobs_started", 
@@ -115,4 +114,4 @@ def process_stat(stat_metrics: list, stat_data: object, time: int) -> list:
     stat_info.append(stat_point)
     return stat_info
 
-fetch_slurm(metrics)
+print(fetch_slurm(metrics))
