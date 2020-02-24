@@ -5,7 +5,7 @@ influxdb:
   password: '1234'
   dbname: 'slurmdb'
 
-metrics:
+slurm_metrics:
   job:
     - submit_time
     - start_time
