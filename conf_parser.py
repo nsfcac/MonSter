@@ -49,4 +49,4 @@ def check_metrics(cfg: object) -> bool:
         return True
     except Exception as err:
         print(err)
-        return False
+    return False
