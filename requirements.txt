@@ -1,4 +1,4 @@
-Cython
-pyslurm
+# Cython
+# pyslurm
 influxdb
 PyYAML
