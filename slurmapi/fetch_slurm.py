@@ -80,9 +80,14 @@ def process_node(node_metrics: list, node_data: object, time: int) -> list:
             "fields": {}
         }
         for m in node_metrics:
-            node_point["fields"].update({
-                m: n_data[m]
-            })
+            if m != "consumed_energy" and m != "consumed_energy":
+                node_point["fields"].update({
+                    m: n_data[m]
+                })
+            else:
+                node_point["fields"].update({
+                    m: n_data["energy"][m]
+                })
         node_info.append(node_point)
     # print(node_info)
     return node_info
