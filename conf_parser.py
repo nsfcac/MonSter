@@ -12,7 +12,7 @@ def parse_conf() -> object:
         print(err)
     return cfg
 
-def check_metrics(cfg: object) -> bool:
+def check_config(cfg: object) -> bool:
     try:
         # Monitoring metrics specification
         job = cfg["slurm_metrics"]["job"]
