@@ -32,6 +32,6 @@ Modify `config.yml` to match your infuxdb port and credentials. You may also spe
 
 In __MonSter__ folder:
 
-Start by: `bash run.sh`. `Ctrl + c` to cancel the script. You may close the terminal, the monitoring script will be running on background.
+Start by: `bash run.sh`. You may close the terminal, the monitoring script will be running on the background.
 
 Stop by: `bash kill.sh`
