@@ -2,11 +2,9 @@ FROM centos:7
 
 RUN yum -y update && \
     yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-RUN yum -y install rh-python36
-RUN scl enable rh-python36 bash
 RUN yum -y groupinstall "Development Tools"
-RUN yum -y install git make python3-devel python3-libs python3-pip
-RUN pip3 install Cython
+RUN yum -y install git make python36u python36u-devel python36u-libs python36u-pip
+RUN pip3.6 install Cython
 
 RUN mkdir /usr/include/slurm
 
@@ -24,6 +22,6 @@ RUN cd /usr/src && \
 COPY . /monster
 WORKDIR  /monster
 
-RUN pip3 install -r requirements.txt
+RUN pip3.6 install -r requirements.txt
 ENTRYPOINT [ "python3" ]
 CMD [ "monster.py" ]
