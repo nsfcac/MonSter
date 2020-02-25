@@ -1,5 +1,3 @@
-# Cython
-# pyslurm
 influxdb
 PyYAML
 schedule
