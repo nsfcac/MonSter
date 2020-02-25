@@ -1,3 +1,4 @@
+pyslurm
 influxdb
 PyYAML
 schedule

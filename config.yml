@@ -6,7 +6,7 @@ influxdb:
   dbname: 'slurmdb'
 
 slurm_freq:
-  0.5
+  1
 
 slurm_metrics:
   job:
