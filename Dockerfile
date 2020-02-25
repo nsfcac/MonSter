@@ -6,10 +6,8 @@ COPY /slurmdata/slurmheader /usr/include/slurm
 COPY /slurmdata/libslurm.so /usr/lib64/
 
 RUN yum update -y && \
-    yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-RUN yum -y install wget bzip2 perl gcc vim-enhanced git make munge munge-devel \
-    supervisor python3-devel python3-pip
-RUN pip install Cython
+    yum -y install gcc git make python3-devel python3-pip
+RUN pip3 install Cython
 
 ENV SLURM_VER=18.08.0
 RUN cd /usr/src && \
