@@ -18,7 +18,7 @@ To install, clone this repo:
 
 `git clone https://github.com/nsfcac/MonSter.git`
 
-Set up conda env with the following commands:
+Set up __conda__ env with the following commands:
 
 ```bash
 conda create --prefix env python=3 --yes
