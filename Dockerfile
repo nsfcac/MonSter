@@ -16,7 +16,8 @@ RUN cd /usr/src && \
     git clone https://github.com/PySlurm/pyslurm.git && \
     cd pyslurm && \
     git checkout $SLURM_VER && \
-    python3.6 setup.py build --slurm-lib=/usr/lib64/libslurm.so --slurm-inc=/usr/include/slurm && \
+    python3.6 setup.py build --slurm-lib=/usr/lib64/libslurm.so --slurm-inc=/usr/include/slurm
+RUN cd /usr/src/pyslurm && \
     python3.6 setup.py install
     
 COPY . /monster
