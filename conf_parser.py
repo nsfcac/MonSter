@@ -1,6 +1,6 @@
 import yaml
 
-def parse_conf() -> object:
+def parse_config() -> object:
     """
     Read configuration file
     """
