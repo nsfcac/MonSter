@@ -1,9 +1,9 @@
 import json
-import schedule
 import time
+import schedule
 from influxdb import InfluxDBClient
 
-from conf_parser import parse_conf, check_metrics
+from conf_parser import parse_conf, check_config
 from slurmapi.fetch_slurm import fetch_slurm
 
 
@@ -11,7 +11,7 @@ def main():
     config = parse_conf()
 
     # Check sanity
-    if not check_metrics(config):
+    if not check_config(config):
         print("Error: Bad configuration!")
         return
     
