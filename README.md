@@ -30,6 +30,7 @@ pip install -r requirements.txt
 
 Modify `config.yml` to match your infuxdb port and credentials. You may also specify the frequency(in seconds) for retrieving the slurm data, the default is set to 1, which means the slurm data is read and saved into influxdb every 1 second. Comment out the attributes under slurm_metrics if you do not want to keep them.
 
+### Quickstart
 In __MonSter__ folder:
 
 Start by: `bash run.sh`. You may close the terminal, the monitoring script will be running on the background.
