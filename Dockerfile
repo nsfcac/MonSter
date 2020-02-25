@@ -16,12 +16,12 @@ RUN cd /usr/src && \
     git clone https://github.com/PySlurm/pyslurm.git && \
     cd pyslurm && \
     git checkout $SLURM_VER && \
-    python3 setup.py build --slurm-lib=/usr/lib64/libslurm.so --slurm-inc=/usr/include/slurm && \
-    python3 setup.py install
+    python3.6 setup.py build --slurm-lib=/usr/lib64/libslurm.so --slurm-inc=/usr/include/slurm && \
+    python3.6 setup.py install
     
 COPY . /monster
 WORKDIR  /monster
 
 RUN pip3.6 install -r requirements.txt
-ENTRYPOINT [ "python3" ]
+ENTRYPOINT [ "python3.6" ]
 CMD [ "monster.py" ]
