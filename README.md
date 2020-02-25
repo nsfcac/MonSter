@@ -32,5 +32,10 @@ Modify `config.yml` to match your infuxdb port and credentials. You may also spe
 
 In __MonSter__ folder:
 
-Start the monioring script by:
+Start by:
+
 `bash run.sh`
+
+Stop by:
+
+`bash kill.sh`
