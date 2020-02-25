@@ -12,7 +12,7 @@ ENV SLURM_VER=18.08.0
 RUN cd /usr/src && \
     git clone https://github.com/PySlurm/pyslurm.git && \
     cd pyslurm && \
-    git checkout -b $SLURM_VER && \
+    git checkout $SLURM_VER && \
     python3 setup.py build --slurm-lib=/usr/lib64/libslurm.so --slurm-inc=/usr/include/slurm && \
     python3 setup.py install
     
