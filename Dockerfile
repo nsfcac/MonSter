@@ -2,8 +2,8 @@ FROM centos:7
 
 RUN yum -y update && \
     yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-RUN yum -y install rh-python36 && \
-    scl enable rh-python36 bash
+RUN yum -y install rh-python36
+RUN scl enable rh-python36 bash
 RUN yum -y groupinstall "Development Tools"
 RUN yum -y install git make python3-devel python3-libs python3-pip
 RUN pip3 install Cython
