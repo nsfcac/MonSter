@@ -31,4 +31,4 @@ Modify `config.yml` to match your infuxdb port and credentials. You may also spe
 
 In __MonSter__ folder:
 
-`run.sh`
+`bash run.sh`
