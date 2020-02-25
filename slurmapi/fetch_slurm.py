@@ -10,7 +10,7 @@ def fetch_slurm(metrics: object) -> object:
     slurm_info = {}
     
     try:
-        epoch_time = int(round(time.time() * 1000))
+        epoch_time = int(time.time())
 
         job = Slurm_Job()
         job_data = job.get()
