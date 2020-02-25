@@ -6,6 +6,7 @@ This is a monitoring tool for fetching Slurm-related data and saving the data in
 * [Python](https://www.python.org)
 * [Cython](https://cython.org)
 * [PySlurm](https://pyslurm.github.io)
+
 This branch has been tested with:
 * Slurm 18.08.0
 * Python 3.7.4
@@ -31,4 +32,5 @@ Modify `config.yml` to match your infuxdb port and credentials. You may also spe
 
 In __MonSter__ folder:
 
+Start the monioring script by:
 `bash run.sh`
