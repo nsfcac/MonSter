@@ -2,8 +2,8 @@ FROM centos:7
 
 RUN mkdir /usr/include/slurm
 
-COPY /usr/include/slurm /usr/include/slurm
-COPY /usr/lib64/libslurm.so /usr/lib64/
+COPY /slurmdata/slurmheader /usr/include/slurm
+COPY /slurmdata/libslurm.so /usr/lib64/
 
 RUN yum update -y && \
     yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
