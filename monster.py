@@ -46,6 +46,7 @@ def repeat(client, config: object) -> None:
     client.write_points(slurm_info["job_info"])
     client.write_points(slurm_info["node_info"])
     client.write_points(slurm_info["stat_info"])
+    return
 
 if __name__ == '__main__':
     main()

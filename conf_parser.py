@@ -21,7 +21,7 @@ def check_metrics(cfg: object) -> bool:
         slurm_freq = cfg["slurm_freq"]
 
         # Sanity check
-        if not isinstance(slurm_freq, int) or not isinstance(slurm_freq, float):
+        if not isinstance(slurm_freq, int) and not isinstance(slurm_freq, float):
             print(f"Error: {slurm_freq} in slurm_freq is not a valid frequency!")
             return False
 
