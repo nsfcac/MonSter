@@ -1,7 +1,7 @@
 FROM centos:7
 
 RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-RUN yum -y group install "Development Tools"
+RUN yum -y groupinstall "Development Tools"
 RUN yum -y install git make python3-devel python3-libs python3-pip
 RUN pip3 install Cython
 
