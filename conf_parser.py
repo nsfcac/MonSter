@@ -18,7 +18,13 @@ def check_metrics(cfg: object) -> bool:
         job = cfg["slurm_metrics"]["job"]
         node = cfg["slurm_metrics"]["node"]
         statistics = cfg["slurm_metrics"]["statistics"]
+        slurm_freq = cfg["slurm_freq"]
+
         # Sanity check
+        if not isinstance(slurm_freq, int) or not isinstance(slurm_freq, float):
+            print(f"Error: {slurm_freq} in slurm_freq is not a valid frequency!")
+            return False
+
         valid_job = {
             "submit_time", "start_time", "suspend_time", "end_time", 
             "run_time", "job_state", "nodes", "num_cpus", "num_nodes"
