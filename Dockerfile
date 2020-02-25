@@ -3,7 +3,7 @@ FROM centos:7
 RUN yum -y update && \
     yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 RUN yum -y groupinstall "Development Tools"
-RUN yum -y install git make python36u python36u-devel python36u-libs python36u-pip
+RUN yum -y install git make python36 python36-devel python36-libs python36-pip
 RUN python3.6 -m pip install Cython
 
 RUN mkdir /usr/include/slurm
