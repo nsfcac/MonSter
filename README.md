@@ -1,38 +1,56 @@
 # MonSter
-This is a monitoring tool for fetching Slurm-related data and saving the data into influxdb.
+This is a monitoring tool for fetching Slurm-related data and saving data into influxDB.
+
+Currenty it only supports running locally, since it utilizes the SLURM lib and header files.
 
 ### Prerequisites
 * [Slurm](https://www.schedmd.com)
-* [Python](https://www.python.org)
-* [Cython](https://cython.org)
-* [PySlurm](https://pyslurm.github.io)
+* [Conda Package Manager](https://docs.conda.io/en/latest/)
 
 This branch has been tested with:
 * Slurm 18.08.0
-* Python 3.7.4
-* Cython 0.29.15
-* PySlurm 18.8.1.1
 
-### Installation
-To install, clone this repo:
+### Running MonSter locally
+1. Clone this repo and `cd` into it:
 
-`git clone https://github.com/nsfcac/MonSter.git`
-
-Set up __conda__ env with the following commands:
+``` bash
+$ git clone https://github.com/nsfcac/MonSter.git
+$ cd MonSter
+```
+2. Set up __conda__ env with the following commands:
 
 ```bash
-conda create --prefix env python=3 --yes
-source activate env/
-conda install cython --yes
-conda install -c anaconda gcc --yes
-pip install -r requirements.txt
+$ conda create --prefix env python=3 --yes
+$ source activate env/
+$ conda install cython --yes
+$ conda install -c anaconda gcc --yes
+$ pip install -r requirements.txt
 ```
 
-Modify `config.yml` to match your infuxdb port and credentials. You may also specify the frequency(in seconds) for retrieving the slurm data, the default is set to 1, which means the slurm data is read and saved into influxdb every 1 second. Comment out the attribute under slurm_metrics if you do not want to keep it.
+3. Modify `config.yml` to match your infuxdb port and credentials. 
 
-### Quickstart
-In __MonSter__ folder:
+You may also specify the frequency(in seconds) for retrieving the slurm data. The default is set to 1, which means the slurm data is read and saved into influxdb every 1 second. 
 
-Start by: `bash run.sh`. You may close the terminal, the monitoring script will be running on the background.
+Comment out the attribute under slurm_metrics if you do not want to keep it.
 
-Stop by: `bash kill.sh`
+4. Run:
+
+ ```bash
+ $ python3 monster.py
+ ```
+ Stop:
+
+ ```bash
+ ctrl + c
+ ```
+ You may also want to run the monitoring script in background, in terminal:
+
+ ```bash
+ $ bash run.sh
+ ```
+
+ To kill the monitoring process:
+
+ ```bash
+ $ bash kill.sh
+ ```
