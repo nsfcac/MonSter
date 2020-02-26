@@ -27,6 +27,16 @@ $ conda install -c anaconda gcc --yes
 $ pip install -r requirements.txt
 ```
 
+   Install pyslurm:
+
+```bash
+$ git clone https://github.com/PySlurm/pyslurm.git
+$ cd pyslurm
+$ git checkout 18.08.0
+$ python setup.py build
+$ python setup.py install
+```
+
 3. Modify `config.yml` to match your infuxdb port, credentials and the database where the data will be stored. You may also specify the frequency(in seconds) for retrieving the slurm data. The default is set to 1, which means the slurm data is read and saved into influxdb every 1 second. Comment out the attribute under slurm_metrics if you do not want to keep it.
 
 4. Run: `$ python3 monster.py`, stop: `ctrl + c`. Run the monitoring script in background, in terminal: `$ bash run.sh`,
