@@ -33,12 +33,12 @@ $ pip install -r requirements.txt
 
    You may also want to run the monitoring script in background, in terminal:
 
-   ```bash
-   $ bash run.sh
-   ```
+```bash
+$ bash run.sh
+```
 
-   To kill the monitoring process:
+To kill the monitoring process:
 
-   ```bash
-   $ bash kill.sh
-   ```
+```bash
+$ bash kill.sh
+```
