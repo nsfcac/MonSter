@@ -7,5 +7,4 @@
 #SBATCH --time=1:00
 #SBATCH --mem-per-cpu=100
 
-module load OpenMPI
 srun hello.mpi
