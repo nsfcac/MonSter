@@ -37,7 +37,7 @@ $ pip install -r requirements.txt
 $ bash run.sh
 ```
 
-To kill the monitoring process:
+   To kill the monitoring process:
 
 ```bash
 $ bash kill.sh
