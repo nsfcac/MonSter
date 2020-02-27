@@ -23,7 +23,7 @@ $ cd MonSter
 
 ```bash
 $ conda create --prefix env python=3 --yes
-$ source activate env/
+$ conda activate env/
 $ conda install cython --yes
 $ conda install -c anaconda gcc --yes
 $ pip install -r requirements.txt
