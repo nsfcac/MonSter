@@ -27,7 +27,7 @@ def main():
         # SLURM monitoring frequency
         freq = config["slurm_freq"]
 
-        schedule.every(freq).seconds.do(repeat, client, config)
+        schedule.every(freq).seconds.do(write_db, client, config)
 
         while 1:
             schedule.run_pending()
@@ -38,7 +38,7 @@ def main():
         print(err)
     return 
 
-def repeat(client, config: object) -> None:
+def write_db(client, config: object) -> None:
     # Fetch slurm information
     slurm_info = fetch_slurm(config["slurm_metrics"])
 
