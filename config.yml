@@ -3,7 +3,7 @@ influxdb:
     port: '8086'
     user: 'root'
     password: '1234'
-    dbname: 'slurmdb'
+    database: 'slurmdb'
   
 slurm_freq:
   1

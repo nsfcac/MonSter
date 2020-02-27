@@ -21,7 +21,7 @@ def main():
         port = config["influxdb"]["port"]
         user = config["influxdb"]["user"]
         password = config["influxdb"]["password"]
-        dbname = config["influxdb"]["dbname"]
+        dbname = config["influxdb"]["database"]
         client = InfluxDBClient(host, port, user, password, dbname)
 
         # SLURM monitoring frequency
