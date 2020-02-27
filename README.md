@@ -17,7 +17,7 @@ This branch has been tested with:
 $ git clone https://github.com/nsfcac/MonSter.git
 $ cd MonSter
 ```
-2. Change the pyslurm version in __requirements.txt__ according to the version of Slurm running on your host, pyslurm history version can be [here](https://pypi.org/project/pyslurm/#history).
+2. Change the pyslurm version in __requirements.txt__ according to the version of Slurm running on your host, pyslurm history version can be found [here](https://pypi.org/project/pyslurm/#history).
 
 3. Set up __conda__ env with the following commands:
 
@@ -31,5 +31,4 @@ $ pip install -r requirements.txt
 
 4. Modify `config.yml` to match your infuxdb __port__, __credentials__ and the __database__ where the data will be stored. You may also specify the frequency(in seconds) for retrieving the slurm data. The default is set to 1, which means the slurm data is read and saved into influxdb every 1 second. Comment out the attribute under slurm_metrics if you do not want to keep it.
 
-5. Run: `$ python3 monster.py`, stop: `ctrl + c`. Run the monitoring script in background, in terminal: `$ bash run.sh`,
-   to kill the monitoring process: `$ bash kill.sh`.
+5. Run: `$ python3 monster.py`, stop: `ctrl + c`. Run the monitoring script in background: `$ bash run.sh`, kill the monitoring process: `$ bash kill.sh`.
