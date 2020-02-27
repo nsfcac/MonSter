@@ -1,7 +1,7 @@
 # MonSter
 This is a monitoring tool for fetching Slurm-related data and saving data into influxDB.
 
-Currenty it only supports running locally, since it utilizes the Slurm libraries and header files.
+Currenty it only supports running locally, since it utilizes the Slurm libraries and header files and calls SlurmAPI.
 
 ### Prerequisites
 * [Slurm](https://www.schedmd.com)
