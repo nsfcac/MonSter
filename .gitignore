@@ -1,6 +1,5 @@
 # Ignore files
 .DS_Store
-Dockerfile
 
 # Ignore folders
 env/
