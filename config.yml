@@ -19,6 +19,7 @@ slurm_metrics:
     - nodes
     - num_cpus
     - num_nodes
+    - user_id
   node:
     - cpus
     - cores
