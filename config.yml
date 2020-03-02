@@ -1,92 +1,120 @@
 influxdb:
-    host: 'localhost'
-    port: '8086'
-    user: 'root'
-    password: '1234'
-    database: 'slurmdb'
+  host: 'localhost'
+  port: '8086'
+  user: 'root'
+  password: '1234'
+  database: 'slurmdb'
 
 redfish:
-  user: 'root'
-  password: 'nivipnut'
-  
+user: 'root'
+password: 'nivipnut'
+
+scheduler: slurm      # Specify the scheduler used in your system: slurm or uge
+scheduler_freq: 1     # Specify the frequency (in seconds) fetch information from schuduler
+scheduler_metrics:    # Specify the metrics you want to keep in database
+job:              # job_id as tags in influxdb
+  - submit_time     # In uge: "/jobs/{jobId}" - timeStamp - submitEpoch
+  - start_time      # In uge: "/jobs/{jobId}" - timeStamp - startEpoch
+  - end_time        # NOT available in uge
+  - nodes           # In uge: need reverse node-job to job-node
+  - num_nodes       # length of nodes       
+  - cpus_allocated  # In uge: get this based info from "/hostsummary/{hostId}" - jobList
+  - num_cpus        # In uge: get this from cpus_allocated
+  - user_id         # In uge: "/jobs/{jobId}" - user
+node:             # node_addr as tags in influxdb
+  # - cpus          # Total cpus
+  - cores           # Total cores. In uge: "/hostsummary/{hostId}" - m_core; In slurm, multiply "cores"("Cores per socket") by "sockets", 
+  - sockets         # In uge: "/hostsummary/{hostId}" - resourceNumericValues - m_socket
+  # - threads       # Threads per core
+  - total_mem       # In uge: "/hostsummary/{hostId}" - resourceNumericValues - m_mem_total; In slurm: real_memory
+  - used_mem        # In uge: "/hostsummary/{hostId}" - resourceNumericValues - m_mem_used; In slurm: real_memory - free_mem
+  - cpu_load        # In uge: "/hostsummary/{hostId}" - resourceNumericValues - load_avg
+  - current_watts   # Not available in uge
+  - consumed_energy # Not available in uge
+  - state           # Not available in uge
+statistics:
+
+
+
 slurm_freq: 1
 
 slurm_metrics:
-  job:
-    - submit_time
-    - start_time
-    - suspend_time
-    - end_time
-    - run_time
-    - job_state
-    - nodes
-    - num_cpus
-    - num_nodes
-    - user_id
-  node:
-    - cpus
-    - cores
-    - sockets
-    - free_mem
-    - real_memory
-    - cpu_load
-    - threads
-    - current_watts
-    - consumed_energy
-    - state
-  statistics:
-    - jobs_submitted
-    - jobs_started
-    - jobs_completed
-    - jobs_canceled
-    - jobs_failed
+job:
+  - submit_time
+  - start_time
+  # - suspend_time
+  - end_time
+  # - run_time
+  # - job_state
+  - nodes
+  - num_cpus
+  - num_nodes
+  - user_id
+node:
+  - cpus
+  - cores
+  - sockets
+  - free_mem
+  - real_memory
+  - cpu_load
+  # - threads
+  - current_watts
+  - consumed_energy
+  - state
+statistics:
+  - jobs_submitted
+  - jobs_started
+  - jobs_completed
+  - jobs_canceled
+  - jobs_failed
 
 uge_freq: 1
 
 uge_metrics:
-  host:
-    # - hostname # IP addresses should be used as tags in influxdb
-    - load_avg  # under hostValues, get cpu usage from load_avg and num_proc/cores
-    - mem_total # under hostValues
-    - mem_used  # under hostValues
-    - num_proc  # under hostValues
-    - job_list # jobList, id + '.' + taskId
-  job:
-    - jobid # job ID should be used as tags in influxdb
-    - start_time  # timeStamp - startEpoch
-    - submit_time # timeStamp - submitEpoch
-    - user
-    - tasks
+host:
+  # - hostname # IP addresses should be used as tags in influxdb
+  - load_avg  # under hostValues, get cpu usage from load_avg and num_proc/cores
+  - mem_total # under hostValues
+  - mem_used  # under hostValues
+  - num_proc  # under hostValues
+  - job_list  # jobList, id + '.' + taskId
+job:
+  - job_id # jobid in UGE, job ID should be used as tags in influxdb
+  - start_time  # timeStamp - startEpoch
+  - submit_time # timeStamp - submitEpoch
+  - user_id     # user in UGE
+  # - job_state   # state in UGE
+  - tasks       # Array
 
 
 bmc_freq: 5
 
 bmc_metrics:
-  # bmc_health:
-  #   status:
-  #     - state
-  #     - health
-  # system_health:
-  power: power_consumed_watts
-  thermal:
-    - fans:
-      - name # FAN_1, FAN_2, FAN_3, FAN_4 
-      - reading_rpm
-      # - lower_threshold_critical
-      # - upper_threshold_critical
-      # - lower_threshold_non_critical
-      # - upper_threshold_non_critical
-      # - lower_threshold_fatal
-      # - upper_threshold_fatal
-    - temperatures:
-      - name # CPU1 Temp, CPU2 Temp, Inlet Temp
-      - reading_celsius
-      # - lower_threshold_critical
-      # - upper_threshold_critical
-      # - lower_threshold_non_critical
-      # - upper_threshold_non_critical
-      # - lower_threshold_fatal
-      # - upper_threshold_fatal
+# bmc_health:
+#   status:
+#     - state
+#     - health
+# system_health:
+power: power_consumed_watts
+thermal:
+  - fans:
+    - name # FAN_1, FAN_2, FAN_3, FAN_4 
+    - reading_rpm
+    # - lower_threshold_critical
+    # - upper_threshold_critical
+    # - lower_threshold_non_critical
+    # - upper_threshold_non_critical
+    # - lower_threshold_fatal
+    # - upper_threshold_fatal
+  - temperatures:
+    - name # CPU1 Temp, CPU2 Temp, Inlet Temp
+    - reading_celsius
+    # - lower_threshold_critical
+    # - upper_threshold_critical
+    # - lower_threshold_non_critical
+    # - upper_threshold_non_critical
+    # - lower_threshold_fatal
+    # - upper_threshold_fatal
 
 
 
