@@ -4,9 +4,12 @@ influxdb:
     user: 'root'
     password: '1234'
     database: 'slurmdb'
+
+redfish:
+  user: 'root'
+  password: 'nivipnut'
   
-slurm_freq:
-  1
+slurm_freq: 1
 
 slurm_metrics:
   job:
@@ -19,6 +22,7 @@ slurm_metrics:
     - nodes
     - num_cpus
     - num_nodes
+    - user_id
   node:
     - cpus
     - cores
@@ -36,3 +40,53 @@ slurm_metrics:
     - jobs_completed
     - jobs_canceled
     - jobs_failed
+
+uge_freq: 1
+
+uge_metrics:
+  host:
+    # - hostname # IP addresses should be used as tags in influxdb
+    - load_avg  # under hostValues, get cpu usage from load_avg and num_proc/cores
+    - mem_total # under hostValues
+    - mem_used  # under hostValues
+    - num_proc  # under hostValues
+    - job_list # jobList, id + '.' + taskId
+  job:
+    - jobid # job ID should be used as tags in influxdb
+    - start_time  # timeStamp - startEpoch
+    - submit_time # timeStamp - submitEpoch
+    - user
+    - tasks
+
+
+bmc_freq: 5
+
+bmc_metrics:
+  # bmc_health:
+  #   status:
+  #     - state
+  #     - health
+  # system_health:
+  power: power_consumed_watts
+  thermal:
+    - fans:
+      - name # FAN_1, FAN_2, FAN_3, FAN_4 
+      - reading_rpm
+      # - lower_threshold_critical
+      # - upper_threshold_critical
+      # - lower_threshold_non_critical
+      # - upper_threshold_non_critical
+      # - lower_threshold_fatal
+      # - upper_threshold_fatal
+    - temperatures:
+      - name # CPU1 Temp, CPU2 Temp, Inlet Temp
+      - reading_celsius
+      # - lower_threshold_critical
+      # - upper_threshold_critical
+      # - lower_threshold_non_critical
+      # - upper_threshold_non_critical
+      # - lower_threshold_fatal
+      # - upper_threshold_fatal
+
+
+
