@@ -26,8 +26,8 @@ def check_config(cfg: object) -> bool:
             return False
 
         valid_job = {
-            "submit_time", "start_time", "suspend_time", "end_time", 
-            "run_time", "job_state", "nodes", "num_cpus", "num_nodes"
+            "submit_time", "start_time", "suspend_time", "end_time", "run_time", 
+            "job_state", "nodes", "num_cpus", "num_nodes", "user_id"
         }
         valid_node = {
             "cpus", "cores", "sockets", "cores_per_socket", "free_mem",
