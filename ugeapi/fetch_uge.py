@@ -23,9 +23,11 @@ def fetch_uge(config: object, session: object, ugeapi_adapter: object) -> object
     """
     # Get executing hosts and jobs running on the cluster
     # exechost = get_exechosts(config, session, ugeapi_adapter)
-    jobs = get_jobs(config, session, ugeapi_adapter)
-    job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
-    print(job)
+    host = get_host_detail(config, session, ugeapi_adapter, exechost[0])
+    print(host)
+    # jobs = get_jobs(config, session, ugeapi_adapter)
+    # job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
+    # print(job)
 
 def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> list:
     """
@@ -39,10 +41,28 @@ def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> li
             exechosts_url, verify = config["ssl_verify"], 
             timeout = (config["timeout"][0], config["timeout"][1])
         )
-        exechosts = [get_hostip(h) for h in exechosts_response.json() if '-' in h]
+        # exechosts = [get_hostip(h) for h in exechosts_response.json() if '-' in h]
+        exechosts = [host for host in exechosts_response.json()]
     except ConnectionError as err:
         print(err)
     return exechosts
+
+def get_host_detail(config: object, session: object, ugeapi_adapter: object, host: str) -> object:
+    """
+    Get host details
+    """
+    host = {}
+    host_url = "http://" + config["host"] + ":" + config["port"] + "/hostsummary" + "/" + host
+    session.mount(host_url, ugeapi_adapter)
+    try:
+        host_response = session.get(
+            host_url, verify = config["ssl_verify"], 
+            timeout = (config["timeout"][0], config["timeout"][1])
+        )
+        host = host_response.json()
+    except ConnectionError as err:
+        print(err)
+    return host
 
 def get_jobs(config: object, session: object, ugeapi_adapter: object) -> list:
     """
