@@ -2,6 +2,8 @@ import requests
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
+from ugeapi.convert import get_hostip
+
 config = {
     "host": "129.118.104.35",
     "port": "8182",
@@ -27,7 +29,8 @@ def fetch_uge(config: object, session: object) -> object:
             exechosts_url, verify = config["ssl_verify"], 
             timeout = (config["timeout"][0], config["timeout"][1])
         )
-        print(exechosts_response)
+        exehosts = [get_hostip(h) for h in exechosts_response.json()]
+        print(exehosts)
     except ConnectionError as err:
         print(err)
 
