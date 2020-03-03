@@ -20,28 +20,28 @@ def fetch_uge(config: object) -> object:
     """
     # Get cpu counts
     cpu_count = multiprocessing.cpu_count()
-
+    uge_url = "http://" + config["host"] + ":" + config["port"]
     ugeapi_adapter = HTTPAdapter(config["max_retries"])
-    session = requests.Session()
 
-    # Get executing hosts and jobs running on the cluster
-    exechosts = get_exechosts(config, session, ugeapi_adapter)
-    # jobs = get_jobs(config, session, ugeapi_adapter)
-    args = zip(repeat((config, session, ugeapi_adapter)), exechosts)
-    print(args)
-    # with multiprocessing.Pool(processes=cpu_count) as pool:
-    #     results = pool.starmap(get_host_detail, zip(repeat(config, session, ugeapi_adapter)), exechosts)
-    # host = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
-    # print(host)
-    # job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
-    # print(job)
+    with requests.Session() as session:
+        # Get executing hosts and jobs running on the cluster
+        exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
+        # jobs = get_jobs(config, session, ugeapi_adapter)
+        args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), exechosts)
+        print(list(args)[0])
+        # with multiprocessing.Pool(processes=cpu_count) as pool:
+        #     results = pool.starmap(get_host_detail, zip(repeat(config, session, ugeapi_adapter)), exechosts)
+        # host = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
+        # print(host)
+        # job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
+        # print(job)
 
-def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> list:
+def get_exechosts(uge_url: str, session: object, ugeapi_adapter: object) -> list:
     """
     Get executing hosts
     """
     exechosts = []
-    exechosts_url = "http://" + config["host"] + ":" + config["port"] + "/exechosts" 
+    exechosts_url = uge_url + "/exechosts" 
     session.mount(exechosts_url, ugeapi_adapter)
     try:
         exechosts_response = session.get(
@@ -54,12 +54,12 @@ def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> li
         print(err)
     return exechosts
 
-def get_host_detail(config: object, session: object, ugeapi_adapter: object, host_id: str) -> object:
+def get_host_detail(uge_url: str, session: object, ugeapi_adapter: object, host_id: str) -> object:
     """
     Get host details
     """
     host = {}
-    host_url = "http://" + config["host"] + ":" + config["port"] + "/hostsummary" + "/" + host_id
+    host_url = uge_url + "/hostsummary" + "/" + host_id
     session.mount(host_url, ugeapi_adapter)
     try:
         host_response = session.get(
@@ -71,12 +71,12 @@ def get_host_detail(config: object, session: object, ugeapi_adapter: object, hos
         print(err)
     return host
 
-def get_jobs(config: object, session: object, ugeapi_adapter: object) -> list:
+def get_jobs(uge_url: str, session: object, ugeapi_adapter: object) -> list:
     """
     Get running job list
     """
     jobs = []
-    jobs_url = "http://" + config["host"] + ":" + config["port"] + "/jobs" 
+    jobs_url = uge_url + "/jobs" 
     session.mount(jobs_url, ugeapi_adapter)
     try:
         jobs_response = session.get(
@@ -88,12 +88,12 @@ def get_jobs(config: object, session: object, ugeapi_adapter: object) -> list:
         print(err)
     return jobs
 
-def get_job_detail(config: object, session: object, ugeapi_adapter: object, job_id: str) -> object:
+def get_job_detail(uge_url: str, session: object, ugeapi_adapter: object, job_id: str) -> object:
     """
     Get job details
     """
     job = {}
-    job_url = "http://" + config["host"] + ":" + config["port"] + "/jobs" + "/" + job_id
+    job_url = uge_url + "/jobs" + "/" + job_id
     session.mount(job_url, ugeapi_adapter)
     try:
         job_response = session.get(
