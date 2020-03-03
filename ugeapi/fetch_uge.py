@@ -1,4 +1,6 @@
 import requests
+import multiprocessing
+from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
@@ -9,23 +11,30 @@ config = {
     "password": "password",
     "timeout": [2, 6],
     "max_retries": 3,
-    "ssl_verify": False
+    "ssl_verify": False,
 }
 
 def fetch_uge(config: object) -> object:
     """
     Fetch metrics from UGE api
     """
+    # Get cpu counts
+    cpu_count = multiprocessing.cpu_count()
+
     ugeapi_adapter = HTTPAdapter(config["max_retries"])
     session = requests.Session()
 
     # Get executing hosts and jobs running on the cluster
     exechosts = get_exechosts(config, session, ugeapi_adapter)
-    host = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
-    print(host)
-    jobs = get_jobs(config, session, ugeapi_adapter)
-    job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
-    print(job)
+    # jobs = get_jobs(config, session, ugeapi_adapter)
+    args = zip(repeat(config, session, ugeapi_adapter), exechosts)
+    print(args)
+    # with multiprocessing.Pool(processes=cpu_count) as pool:
+    #     results = pool.starmap(get_host_detail, zip(repeat(config, session, ugeapi_adapter)), exechosts)
+    # host = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
+    # print(host)
+    # job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
+    # print(job)
 
 def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> list:
     """
@@ -96,4 +105,4 @@ def get_job_detail(config: object, session: object, ugeapi_adapter: object, job_
         print(err)
     return job
 
-fetch_uge(config, session, ugeapi_adapter)
+fetch_uge(config)
