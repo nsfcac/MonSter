@@ -30,3 +30,5 @@ def fetch_uge(config: object, session: object) -> object:
         print(exechosts_response)
     except ConnectionError as err:
         print(err)
+
+fetch_uge(config, session)
