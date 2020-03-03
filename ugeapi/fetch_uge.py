@@ -21,11 +21,13 @@ def fetch_uge(config: object, session: object, ugeapi_adapter: object) -> object
     """
     Fetch metrics from UGE api
     """
-    # Get executing hosts
+    # Get executing hosts and jobs running on the cluster
     # exechost = get_exechosts(config, session, ugeapi_adapter)
-    get_jobs(config, session, ugeapi_adapter)
+    jobs = get_jobs(config, session, ugeapi_adapter)
+    job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
+    print(job)
 
-def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> object:
+def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> list:
     """
     Get executing hosts
     """
@@ -38,14 +40,13 @@ def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> ob
             timeout = (config["timeout"][0], config["timeout"][1])
         )
         exechosts = [get_hostip(h) for h in exechosts_response.json() if '-' in h]
-
     except ConnectionError as err:
         print(err)
     return exechosts
 
 def get_jobs(config: object, session: object, ugeapi_adapter: object) -> list:
     """
-    Get job list
+    Get running job list
     """
     jobs = []
     jobs_url = "http://" + config["host"] + ":" + config["port"] + "/jobs" 
@@ -56,9 +57,25 @@ def get_jobs(config: object, session: object, ugeapi_adapter: object) -> list:
             timeout = (config["timeout"][0], config["timeout"][1])
         )
         jobs = [job for job in jobs_response.json()]
-        print(jobs)
-        print(len(jobs))
     except ConnectionError as err:
         print(err)
+    return jobs
+
+def get_job_detail(config: object, session: object, ugeapi_adapter: object, job_id: str) -> object:
+    """
+    Get job details
+    """
+    job = {}
+    job_url = "http://" + config["host"] + ":" + config["port"] + "/jobs" + "/" + job_id
+    session.mount(job_url, ugeapi_adapter)
+    try:
+        job_response = session.get(
+            job_url, verify = config["ssl_verify"], 
+            timeout = (config["timeout"][0], config["timeout"][1])
+        )
+        job = job_response.json()
+    except ConnectionError as err:
+        print(err)
+    return job
 
 fetch_uge(config, session, ugeapi_adapter)
