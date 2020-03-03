@@ -56,7 +56,7 @@ def get_jobs(config: object, session: object, ugeapi_adapter: object) -> object:
             jobs_url, verify = config["ssl_verify"], 
             timeout = (config["timeout"][0], config["timeout"][1])
         )
-        jobs = jobs_response.json()
+        jobs = [job for job in jobs_response.json()]
         print(jobs)
     except ConnectionError as err:
         print(err)
