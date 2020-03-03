@@ -23,8 +23,7 @@ def fetch_uge(config: object, session: object, ugeapi_adapter: object) -> object
     """
     # Get executing hosts
     # exechost = get_exechosts(config, session, ugeapi_adapter)
-    jobs = get_jobs(config, session, ugeapi_adapter)
-    print(len(jobs))
+    get_jobs(config, session, ugeapi_adapter)
 
 def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> object:
     """
@@ -44,7 +43,7 @@ def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> ob
         print(err)
     return exechosts
 
-def get_jobs(config: object, session: object, ugeapi_adapter: object) -> object:
+def get_jobs(config: object, session: object, ugeapi_adapter: object) -> list:
     """
     Get job list
     """
@@ -58,6 +57,7 @@ def get_jobs(config: object, session: object, ugeapi_adapter: object) -> object:
         )
         jobs = [job for job in jobs_response.json()]
         print(jobs)
+        print(len(jobs))
     except ConnectionError as err:
         print(err)
 
