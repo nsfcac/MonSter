@@ -17,11 +17,22 @@ config = {
 ugeapi_adapter = HTTPAdapter(config["max_retries"])
 session = requests.Session()
 
-def fetch_uge(config: object, session: object) -> object:
+def fetch_uge(config: object, session: object, ugeapi_adapter: object) -> object:
     """
     Fetch metrics from UGE api
     """
     # Get executing hosts
+    # exechost = get_exechosts(config, session)
+    jobs = get_jobs(config, session, ugeapi_adapter)
+    print(len(jobs))
+
+fetch_uge(config, session, ugeapi_adapter)
+
+def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> object:
+    """
+    Get executing hosts
+    """
+    exechosts = []
     exechosts_url = "http://" + config["host"] + ":" + config["port"] + "/exechosts" 
     session.mount(exechosts_url, ugeapi_adapter)
     try:
@@ -29,9 +40,25 @@ def fetch_uge(config: object, session: object) -> object:
             exechosts_url, verify = config["ssl_verify"], 
             timeout = (config["timeout"][0], config["timeout"][1])
         )
-        exehosts = [get_hostip(h) for h in exechosts_response.json() if '-' in h]
-        print(exehosts)
+        exechosts = [get_hostip(h) for h in exechosts_response.json() if '-' in h]
+
     except ConnectionError as err:
         print(err)
+    return exechosts
 
-fetch_uge(config, session)
+def get_jobs(config: object, session: object, ugeapi_adapter: object) -> object:
+    """
+    Get job list
+    """
+    jobs = []
+    jobs_url = "http://" + config["host"] + ":" + config["port"] + "/jobs" 
+    session.mount(jobs_url, ugeapi_adapter)
+    try:
+        jobs_response = session.get(
+            jobs_url, verify = config["ssl_verify"], 
+            timeout = (config["timeout"][0], config["timeout"][1])
+        )
+        jobs = jobs_response.json()
+        print(jobs)
+    except ConnectionError as err:
+        print(err)
