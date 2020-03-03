@@ -27,10 +27,17 @@ def fetch_uge(config: object) -> object:
         # Get executing hosts and jobs running on the cluster
         exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
         # jobs = get_jobs(config, session, ugeapi_adapter)
-        pool_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), exechosts)
-        with multiprocessing.Pool(processes=cpu_count) as pool:
-            results = pool.starmap(get_host_detail, pool_args)
-        print(results[0])
+
+        # Get nodes detail in parallel 
+        # pool_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), exechosts)
+        # with multiprocessing.Pool(processes=cpu_count) as pool:
+        #     results = pool.starmap(get_host_detail, pool_args)
+
+        # Get nodes detail in sequential
+        results = []
+        for host in exechosts:
+            results.append(get_host_detail(uge_url, session, ugeapi_adapter, host))
+
         # host = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
         # print(host)
         # job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
