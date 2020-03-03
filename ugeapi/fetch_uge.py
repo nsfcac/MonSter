@@ -2,8 +2,6 @@ import requests
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-from convert import get_hostip
-
 config = {
     "host": "129.118.104.35",
     "port": "8182",
@@ -14,20 +12,20 @@ config = {
     "ssl_verify": False
 }
 
-ugeapi_adapter = HTTPAdapter(config["max_retries"])
-session = requests.Session()
-
-def fetch_uge(config: object, session: object, ugeapi_adapter: object) -> object:
+def fetch_uge(config: object) -> object:
     """
     Fetch metrics from UGE api
     """
+    ugeapi_adapter = HTTPAdapter(config["max_retries"])
+    session = requests.Session()
+
     # Get executing hosts and jobs running on the cluster
     exechosts = get_exechosts(config, session, ugeapi_adapter)
     host = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
     print(host)
-    # jobs = get_jobs(config, session, ugeapi_adapter)
-    # job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
-    # print(job)
+    jobs = get_jobs(config, session, ugeapi_adapter)
+    job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
+    print(job)
 
 def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> list:
     """
