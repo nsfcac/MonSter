@@ -26,7 +26,7 @@ def fetch_uge(config: object) -> object:
     with requests.Session() as session:
         # Get executing hosts and jobs running on the cluster
         exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
-        jobs = get_jobs(config, session, ugeapi_adapter)
+        jobs = get_jobs(uge_url, session, ugeapi_adapter)
 
         # Get hosts detail in parallel 
         pool_host_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), exechosts)
