@@ -23,8 +23,8 @@ def fetch_uge(config: object, session: object, ugeapi_adapter: object) -> object
     """
     # Get executing hosts and jobs running on the cluster
     exechosts = get_exechosts(config, session, ugeapi_adapter)
-    host_detail = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
-    print(host_detail)
+    host = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
+    print(host)
     # jobs = get_jobs(config, session, ugeapi_adapter)
     # job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
     # print(job)
@@ -47,13 +47,12 @@ def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> li
         print(err)
     return exechosts
 
-def get_host_detail(config: object, session: object, ugeapi_adapter: object, host: str) -> object:
+def get_host_detail(config: object, session: object, ugeapi_adapter: object, host_id: str) -> object:
     """
     Get host details
     """
     host = {}
-    host_url = "http://" + config["host"] + ":" + config["port"] + "/hostsummary" + "/" + host
-    print(host_url)
+    host_url = "http://" + config["host"] + ":" + config["port"] + "/hostsummary" + "/" + host_id
     session.mount(host_url, ugeapi_adapter)
     try:
         host_response = session.get(
