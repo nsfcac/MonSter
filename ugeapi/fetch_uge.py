@@ -26,22 +26,30 @@ def fetch_uge(config: object) -> object:
     with requests.Session() as session:
         # Get executing hosts and jobs running on the cluster
         exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
-        # jobs = get_jobs(config, session, ugeapi_adapter)
+        jobs = get_jobs(config, session, ugeapi_adapter)
 
-        # Get nodes detail in parallel 
-        # pool_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), exechosts)
-        # with multiprocessing.Pool(processes=cpu_count) as pool:
-        #     results = pool.starmap(get_host_detail, pool_args)
+        # Get hosts detail in parallel 
+        pool_host_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), exechosts)
+        with multiprocessing.Pool(processes=cpu_count) as pool:
+            host_data = pool.starmap(get_host_detail, pool_host_args)
 
+        # Get jobs detail in parallel
+        pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
+        with multiprocessing.Pool(processes=cpu_count) as pool:
+            job_data = pool.starmap(get_job_detail, pool_job_args)
+
+        #-----------------------------------------------------------------------
         # Get nodes detail in sequential
-        results = []
-        for host in exechosts:
-            results.append(get_host_detail(uge_url, session, ugeapi_adapter, host))
+        # host_data = []
+        # for host in exechosts:
+        #     host_data.append(get_host_detail(uge_url, session, ugeapi_adapter, host))
 
-        # host = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
-        # print(host)
-        # job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
-        # print(job)
+        # Get jobs detail in sequential
+        # job_data = []
+        # for job in jobs:
+        #     job_data.append(get_job_detail(uge_url, session, ugeapi_adapter, job))
+        #-----------------------------------------------------------------------
+
 
 def get_exechosts(uge_url: str, session: object, ugeapi_adapter: object) -> list:
     """
@@ -61,6 +69,7 @@ def get_exechosts(uge_url: str, session: object, ugeapi_adapter: object) -> list
         print(err)
     return exechosts
 
+
 def get_host_detail(uge_url: str, session: object, ugeapi_adapter: object, host_id: str) -> object:
     """
     Get host details
@@ -78,6 +87,7 @@ def get_host_detail(uge_url: str, session: object, ugeapi_adapter: object, host_
         print(err)
     return host
 
+
 def get_jobs(uge_url: str, session: object, ugeapi_adapter: object) -> list:
     """
     Get running job list
@@ -94,6 +104,7 @@ def get_jobs(uge_url: str, session: object, ugeapi_adapter: object) -> list:
     except ConnectionError as err:
         print(err)
     return jobs
+
 
 def get_job_detail(uge_url: str, session: object, ugeapi_adapter: object, job_id: str) -> object:
     """
