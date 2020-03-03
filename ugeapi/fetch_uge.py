@@ -22,11 +22,9 @@ def fetch_uge(config: object, session: object, ugeapi_adapter: object) -> object
     Fetch metrics from UGE api
     """
     # Get executing hosts
-    # exechost = get_exechosts(config, session)
+    # exechost = get_exechosts(config, session, ugeapi_adapter)
     jobs = get_jobs(config, session, ugeapi_adapter)
     print(len(jobs))
-
-fetch_uge(config, session, ugeapi_adapter)
 
 def get_exechosts(config: object, session: object, ugeapi_adapter: object) -> object:
     """
@@ -62,3 +60,5 @@ def get_jobs(config: object, session: object, ugeapi_adapter: object) -> object:
         print(jobs)
     except ConnectionError as err:
         print(err)
+
+fetch_uge(config, session, ugeapi_adapter)
