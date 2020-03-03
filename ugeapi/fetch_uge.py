@@ -2,7 +2,7 @@ import requests
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-from ugeapi.convert import get_hostip
+from convert import get_hostip
 
 config = {
     "host": "129.118.104.35",
