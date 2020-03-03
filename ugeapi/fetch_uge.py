@@ -29,7 +29,7 @@ def fetch_uge(config: object, session: object) -> object:
             exechosts_url, verify = config["ssl_verify"], 
             timeout = (config["timeout"][0], config["timeout"][1])
         )
-        exehosts = [get_hostip(h) for h in exechosts_response.json()]
+        exehosts = [get_hostip(h) for h in exechosts_response.json() if '-' in h]
         print(exehosts)
     except ConnectionError as err:
         print(err)
