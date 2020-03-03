@@ -23,8 +23,8 @@ def fetch_uge(config: object, session: object, ugeapi_adapter: object) -> object
     """
     # Get executing hosts and jobs running on the cluster
     exechosts = get_exechosts(config, session, ugeapi_adapter)
-    host = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
-    print(host)
+    host_detail = get_host_detail(config, session, ugeapi_adapter, exechosts[0])
+    print(host_detail)
     # jobs = get_jobs(config, session, ugeapi_adapter)
     # job = get_job_detail(config, session, ugeapi_adapter, jobs[0])
     # print(job)
