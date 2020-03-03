@@ -1,3 +1,4 @@
+import json
 import requests
 import multiprocessing
 from itertools import repeat
@@ -32,25 +33,14 @@ def fetch_uge(config: object) -> object:
         pool_host_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), exechosts)
         with multiprocessing.Pool(processes=cpu_count) as pool:
             host_data = pool.starmap(get_host_detail, pool_host_args)
-
+        print(json.dumps(host_data[0], indent=2))
         # Get jobs detail in parallel
         pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
         with multiprocessing.Pool(processes=cpu_count) as pool:
             job_data = pool.starmap(get_job_detail, pool_job_args)
+        print(json.dumps(job_data[0], indent=2))
 
-        #-----------------------------------------------------------------------
-        # Get nodes detail in sequential
-        # host_data = []
-        # for host in exechosts:
-        #     host_data.append(get_host_detail(uge_url, session, ugeapi_adapter, host))
-
-        # Get jobs detail in sequential
-        # job_data = []
-        # for job in jobs:
-        #     job_data.append(get_job_detail(uge_url, session, ugeapi_adapter, job))
-        #-----------------------------------------------------------------------
-
-
+        
 def get_exechosts(uge_url: str, session: object, ugeapi_adapter: object) -> list:
     """
     Get executing hosts
