@@ -19,7 +19,7 @@ config = {
 
 def fetch_uge(config: object) -> object:
     """
-    Fetch metrics from UGE api
+    Fetch metrics from UGE api, average query time is: 0.8850s
     """
     # Get cpu counts
     cpu_count = multiprocessing.cpu_count()
@@ -28,7 +28,7 @@ def fetch_uge(config: object) -> object:
 
     with requests.Session() as session:
 
-        query_start = time.time()
+        # query_start = time.time()
 
         # Get executing hosts and jobs running on the cluster
         exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
@@ -39,8 +39,8 @@ def fetch_uge(config: object) -> object:
         with multiprocessing.Pool(processes=cpu_count) as pool:
             host_data = pool.starmap(get_host_detail, pool_host_args)
 
-        # print(exechosts[0])
-        # print(json.dumps(host_data[0], indent=2))
+        print(exechosts[0])
+        print(json.dumps(host_data[0], indent=2))
         
         # Get jobs detail in parallel
         pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
@@ -50,9 +50,9 @@ def fetch_uge(config: object) -> object:
         # print(jobs[0])
         # print(json.dumps(job_data[0], indent=2))
 
-        total_elapsed = float("{0:.4f}".format(time.time() - query_start))
+        # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
 
-        print(total_elapsed)
+        # print(total_elapsed)
 
 
 def get_exechosts(uge_url: str, session: object, ugeapi_adapter: object) -> list:
