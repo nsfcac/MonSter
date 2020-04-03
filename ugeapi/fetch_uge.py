@@ -33,12 +33,17 @@ def fetch_uge(config: object) -> object:
         pool_host_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), exechosts)
         with multiprocessing.Pool(processes=cpu_count) as pool:
             host_data = pool.starmap(get_host_detail, pool_host_args)
-        # print(json.dumps(host_data[0], indent=2))
+
+        print(exechosts[0])
+        print(json.dumps(host_data[0], indent=2))
+        
         # Get jobs detail in parallel
         pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
         with multiprocessing.Pool(processes=cpu_count) as pool:
             job_data = pool.starmap(get_job_detail, pool_job_args)
-        # print(json.dumps(job_data[0], indent=2))
+
+        print(jobs[0])
+        print(json.dumps(job_data[0], indent=2))
 
 
 def get_exechosts(uge_url: str, session: object, ugeapi_adapter: object) -> list:
