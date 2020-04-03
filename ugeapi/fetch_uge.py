@@ -1,4 +1,6 @@
 import json
+import time
+
 import requests
 import multiprocessing
 from itertools import repeat
@@ -25,6 +27,9 @@ def fetch_uge(config: object) -> object:
     ugeapi_adapter = HTTPAdapter(config["max_retries"])
 
     with requests.Session() as session:
+
+        query_start = time.time()
+
         # Get executing hosts and jobs running on the cluster
         exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
         jobs = get_jobs(uge_url, session, ugeapi_adapter)
@@ -34,16 +39,20 @@ def fetch_uge(config: object) -> object:
         with multiprocessing.Pool(processes=cpu_count) as pool:
             host_data = pool.starmap(get_host_detail, pool_host_args)
 
-        print(exechosts[0])
-        print(json.dumps(host_data[0], indent=2))
+        # print(exechosts[0])
+        # print(json.dumps(host_data[0], indent=2))
         
         # Get jobs detail in parallel
         pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
         with multiprocessing.Pool(processes=cpu_count) as pool:
             job_data = pool.starmap(get_job_detail, pool_job_args)
 
-        print(jobs[0])
-        print(json.dumps(job_data[0], indent=2))
+        # print(jobs[0])
+        # print(json.dumps(job_data[0], indent=2))
+
+        total_elapsed = float("{0:.4f}".format(time.time() - query_start))
+
+        print(f"Time for Query UGE: {total_elapsed}")
 
 
 def get_exechosts(uge_url: str, session: object, ugeapi_adapter: object) -> list:
