@@ -52,7 +52,7 @@ def fetch_uge(config: object) -> object:
 
         total_elapsed = float("{0:.4f}".format(time.time() - query_start))
 
-        print(f"Time for Query UGE: {total_elapsed}")
+        print(total_elapsed)
 
 
 def get_exechosts(uge_url: str, session: object, ugeapi_adapter: object) -> list:
