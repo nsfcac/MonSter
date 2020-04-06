@@ -101,13 +101,13 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
         
     return joblist_point
 
-def process_node_jobs(host_id:str, node_jobs: dict) -> dict:
-    host_ip = get_hostip(host_id)
+def process_node_jobs(host:str, node_jobs: dict) -> dict:
+    host_ip = get_hostip(host)
     jobset = []
     job_data = {}
 
     try:
-        joblist = node_jobs[host_ip]
+        joblist = node_jobs[host]
         if joblist:
             for job in joblist:
                 if job not in jobset:
