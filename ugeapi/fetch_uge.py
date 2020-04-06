@@ -46,7 +46,7 @@ def fetch_uge(config: object) -> object:
             exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
             exechosts = [host for host in exechosts if '-' in host]
 
-            jobs = get_jobs(uge_url, session, ugeapi_adapter)
+            # jobs = get_jobs(uge_url, session, ugeapi_adapter)
 
             epoch_time = int(round(time.time() * 1000000000))
 
@@ -84,6 +84,7 @@ def fetch_uge(config: object) -> object:
             
             aggregated_node_jobs = aggregate_node_jobs(processed_node_jobs)
 
+            jobs = list(aggregate_node_jobs.keys())
             # Get jobs detail in parallel
             pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
             with multiprocessing.Pool(processes=cpu_count) as pool:
@@ -101,20 +102,18 @@ def fetch_uge(config: object) -> object:
                 job_detail[job] = processed_job_info[index]
 
             for job in jobs:
-                if job in aggregated_node_jobs:
-                    print("True")
-                    # try:
-                    #     job_detail[job]["fields"].update({
-                    #         "totalnodes": aggregated_node_jobs[job]["totalnodes"],
-                    #         "nodelist": aggregated_node_jobs[job]["nodelist"],
-                    #         "cpucores": aggregated_node_jobs[job]["cpucores"]
-                    #     })
-                    # except:
-                    #     pass
+                try:
+                    job_detail[job]["fields"].update({
+                        "totalnodes": aggregated_node_jobs[job]["totalnodes"],
+                        "nodelist": aggregated_node_jobs[job]["nodelist"],
+                        "cpucores": aggregated_node_jobs[job]["cpucores"]
+                    })
+                except:
+                    pass
             
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
 
-            # print(json.dumps(job_detail, indent=4))
+            print(json.dumps(job_detail, indent=4))
 #---------------------------- End Job Points -----------------------------------
     except Exception as err:
         print(err)
