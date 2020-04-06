@@ -133,24 +133,24 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
             if item:
                 job = list(item.keys())
                 job = job[0]
-                print(job)
-                # if job not in jobset:
-                #     jobset.append(job)
-                #     job_data[job] = item[job]
-                # else:
-                #     pre_totalnodes = job_data[job]["totalnodes"]
-                #     pre_nodelist = job_data[job]["nodelist"]
-                #     pre_cpucores = job_data[job]["cpucores"]
+                # print(job)
+                if job not in jobset:
+                    jobset.append(job)
+                    job_data[job] = item[job]
+                else:
+                    pre_totalnodes = job_data[job]["totalnodes"]
+                    pre_nodelist = job_data[job]["nodelist"]
+                    pre_cpucores = job_data[job]["cpucores"]
 
-                #     all_totalnodes = pre_totalnodes + item[job]["totalnodes"]
-                #     all_nodelist = pre_nodelist.extend(item[job]["nodelist"])
-                #     all_cpucores = pre_cpucores + item[job]["cpucores"]
+                    all_totalnodes = pre_totalnodes + item[job]["totalnodes"]
+                    all_nodelist = pre_nodelist.extend(item[job]["nodelist"])
+                    all_cpucores = pre_cpucores + item[job]["cpucores"]
 
-                #     job_data[job].update({
-                #         "totalnodes": all_totalnodes,
-                #         "nodelist": all_nodelist,
-                #         "cpucores": all_cpucores
-                #     })
+                    job_data[job].update({
+                        "totalnodes": all_totalnodes,
+                        "nodelist": all_nodelist,
+                        "cpucores": all_cpucores
+                    })
     except Exception as err:
         print(err)
     
