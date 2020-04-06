@@ -144,17 +144,20 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
                         
                     # print(pre_nodelist)
 
-                    # all_totalnodes = pre_totalnodes + item[job]["totalnodes"]
-                    # all_nodelist = pre_nodelist.extend(item[job]["nodelist"])
-                    # all_cpucores = pre_cpucores + item[job]["cpucores"]
+                    all_totalnodes = pre_totalnodes + item[job]["totalnodes"]
+                    all_cpucores = pre_cpucores + item[job]["cpucores"]
+                
+                    if pre_nodelist:
+                        all_nodelist = pre_nodelist.extend(item[job]["nodelist"])
+                    else:
+                        all_nodelist = item[job]["nodelist"]
 
-                    # job_data[job].update({
-                    #     "totalnodes": all_totalnodes,
-                    #     "nodelist": all_nodelist,
-                    #     "cpucores": all_cpucores
-                    # })
+                    job_data[job].update({
+                        "totalnodes": all_totalnodes,
+                        "nodelist": all_nodelist,
+                        "cpucores": all_cpucores
+                    })
     except Exception as err:
         print(err)
     
-    print(len(jobset))
     return job_data
