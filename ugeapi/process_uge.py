@@ -79,9 +79,13 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
             try:
                 starttime = job_data["timeStamp"]["startEpoch"]
                 submittime = job_data["timeStamp"]["submitEpoch"]
+                jobname = job_data["name"]
+                user = job_data["user"]
             except:
                 starttime = None
                 submittime = None
+                jobname = None
+                user = None
 
             jobname = job_data["name"]
             user = job_data["user"]
