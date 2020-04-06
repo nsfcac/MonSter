@@ -65,9 +65,8 @@ def fetch_uge(config: object) -> object:
 
             for index, host in enumerate(exechosts):
                 try:
-                    host_ip = get_hostip(host)
                     all_host_points.extend(processed_host_info[index]["dpoints"])
-                    node_jobs[host_ip] = processed_host_info[index]["joblist"]
+                    node_jobs[host] = processed_host_info[index]["joblist"]
                 except Exception:
                     pass
             
