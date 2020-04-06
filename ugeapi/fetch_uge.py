@@ -62,9 +62,9 @@ def fetch_uge(config: object) -> object:
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 processed_host_info = pool.starmap(process_host, process_host_args)
 
-            for index, host in enumerate(exechosts):
-                all_host_points.extend(processed_host_info[index]["dpoints"])
-                node_jobs[host] = processed_host_info[index]["joblist"]
+            # for index, host in enumerate(exechosts):
+            #     all_host_points.extend(processed_host_info[index]["dpoints"])
+            #     node_jobs[host] = processed_host_info[index]["joblist"]
 
             print(json.dumps(processed_host_info, indent=4))
 #----------------------------- End Host Points ---------------------------------
