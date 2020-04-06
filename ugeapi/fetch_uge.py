@@ -44,6 +44,10 @@ def fetch_uge(config: object) -> object:
 
             # Get executing hostsZ and jobs running on the cluster
             exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
+
+            exechosts = [host for host in exechosts if '-' not in host]
+            print(exechosts)
+            
             hosts = []
             for host in exechosts:
                 if '-' in host:
@@ -53,35 +57,29 @@ def fetch_uge(config: object) -> object:
 
             epoch_time = int(round(time.time() * 1000000000))
 
-            # hostlist = []
-            # for host in exechosts:
-            #     host_ip = 
-            #     hostlist.append(get_hostip(host))
-            print(hosts)
-
 #--------------------------------- Host Points ---------------------------------
-            # # Get hosts detail in parallel 
-            # pool_host_args = zip(repeat(uge_url), repeat(session), 
-            #                      repeat(ugeapi_adapter), exechosts)
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     host_data = pool.starmap(get_host_detail, pool_host_args)
+            # Get hosts detail in parallel 
+            pool_host_args = zip(repeat(uge_url), repeat(session), 
+                                 repeat(ugeapi_adapter), exechosts)
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                host_data = pool.starmap(get_host_detail, pool_host_args)
             
-            # for index, host in enumerate(exechosts):
-            #     host_info[host] = host_data[index]
+            for index, host in enumerate(exechosts):
+                host_info[host] = host_data[index]
 
-            # # Process host info
-            # process_host_args = zip(exechosts, repeat(host_info), repeat(epoch_time))
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     processed_host_info = pool.starmap(process_host, process_host_args)
+            # Process host info
+            process_host_args = zip(exechosts, repeat(host_info), repeat(epoch_time))
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                processed_host_info = pool.starmap(process_host, process_host_args)
 
-            # for index, host in enumerate(exechosts):
-            #     try:
-            #         all_host_points.extend(processed_host_info[index]["dpoints"])
-            #         node_jobs[host] = processed_host_info[index]["joblist"]
-            #     except Exception:
-            #         pass
+            for index, host in enumerate(exechosts):
+                try:
+                    all_host_points.extend(processed_host_info[index]["dpoints"])
+                    node_jobs[host] = processed_host_info[index]["joblist"]
+                except Exception:
+                    pass
             
-            # # print(json.dumps(node_jobs, indent=4))
+            # print(json.dumps(node_jobs, indent=4))
 
 #----------------------------- End Host Points ---------------------------------
 
