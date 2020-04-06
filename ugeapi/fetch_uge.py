@@ -84,7 +84,7 @@ def fetch_uge(config: object) -> object:
             
             aggregated_node_jobs = aggregate_node_jobs(processed_node_jobs)
 
-            jobs = list(aggregate_node_jobs.keys())
+            jobs = list(aggregated_node_jobs.keys())
             # Get jobs detail in parallel
             pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
             with multiprocessing.Pool(processes=cpu_count) as pool:
