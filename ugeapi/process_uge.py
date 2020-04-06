@@ -104,11 +104,11 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
 
 def process_node_jobs(host_id:str, node_jobs: dict) -> dict:
     host_ip = get_hostip(host_id)
-    joblist = node_jobs[host_ip]
     jobset = []
     job_data = {}
 
     try:
+        joblist = node_jobs[host_ip]
         if joblist:
             for job in joblist:
                 if job not in jobset:
@@ -120,7 +120,6 @@ def process_node_jobs(host_id:str, node_jobs: dict) -> dict:
                     }
                 else:
                     job_data[job]["cpucores"] += 1
-            print(json.dumps(job_data, indent=4))
     except Exception as err:
         print(err)
 
