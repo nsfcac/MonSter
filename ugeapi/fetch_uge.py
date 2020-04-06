@@ -95,7 +95,7 @@ def fetch_uge(config: object) -> object:
             #     job_point[job] = processed_job_info[index]
 
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
-            print(json.dumps(node_jobs, indent=4))
+            print(json.dumps(processed_host_info, indent=4))
 #---------------------------- End Job Points -----------------------------------
     except Exception as err:
         print(err)
