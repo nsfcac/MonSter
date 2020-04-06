@@ -102,12 +102,15 @@ def fetch_uge(config: object) -> object:
                 job_detail[job] = processed_job_info[index]
 
             for job in jobs:
-                job_detail[job]["fields"].update({
-                    "totalnodes": aggregated_node_jobs[job]["totalnodes"],
-                    "nodelist": aggregated_node_jobs[job]["nodelist"],
-                    "cpucores": aggregated_node_jobs[job]["cpucores"]
-                })
-                all_job_points.append(job_detail[job])
+                try:
+                    job_detail[job]["fields"].update({
+                        "totalnodes": aggregated_node_jobs[job]["totalnodes"],
+                        "nodelist": aggregated_node_jobs[job]["nodelist"],
+                        "cpucores": aggregated_node_jobs[job]["cpucores"]
+                    })
+                    all_job_points.append(job_detail[job])
+                except:
+                    pass
 
             
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
