@@ -8,7 +8,7 @@ from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
 from convert import get_hostip
-from process_uge import process_host, process_job
+from process_uge import process_host, process_job, process_node_jobs
 
 config = {
     "host": "129.118.104.35",
@@ -74,6 +74,10 @@ def fetch_uge(config: object) -> object:
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
+            process_node_jobs_args = zip(exechosts, repeat(node_jobs))
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
+
             # Get jobs detail in parallel
             pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
             with multiprocessing.Pool(processes=cpu_count) as pool:
@@ -91,7 +95,7 @@ def fetch_uge(config: object) -> object:
                 job_point[job] = processed_job_info[index]
 
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
-            print(json.dumps(job_point, indent=4))
+            print(json.dumps(processed_node_jobs, indent=4))
 #---------------------------- End Job Points -----------------------------------
     except Exception as err:
         print(err)
