@@ -69,7 +69,6 @@ def fetch_uge(config: object) -> object:
                     all_host_points.extend(processed_host_info[index]["dpoints"])
                     node_jobs[host_ip] = processed_host_info[index]["joblist"]
                 except Exception:
-                    # print(err)
                     pass
             
             # print(json.dumps(node_jobs, indent=4))
