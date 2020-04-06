@@ -121,7 +121,5 @@ def process_node_jobs(host:str, node_jobs: dict) -> dict:
                     job_data[job]["cpucores"] += 1
     except Exception:
         pass
-        # print(err)
     
-    # print(json.dumps(job_data, indent=4))
     return job_data
