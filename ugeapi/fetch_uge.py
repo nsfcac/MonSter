@@ -86,9 +86,9 @@ def fetch_uge(config: object) -> object:
             for host in exechosts:
                 hostlist.append(get_hostip(host))
 
-            print(f"Exe hosts:")
+            print("Exe hosts:")
             print(len(exechosts))
-            print(f"Host IPs :")
+            print("Host IPs :")
             print(len(len(hostlist)))
             # # Get jobs detail in parallel
             # pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
