@@ -137,6 +137,7 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
                 if job not in jobset:
                     jobset.append(job)
                     job_data[job] = item[job]
+                    print(item[job]["nodelist"])
                 else:
                     pre_totalnodes = job_data[job]["totalnodes"]
                     pre_nodelist = job_data[job]["nodelist"]
@@ -146,9 +147,9 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
 
                     all_totalnodes = pre_totalnodes + item[job]["totalnodes"]
                     all_cpucores = pre_cpucores + item[job]["cpucores"]
-                    
-                    all_nodelist = [].extend(pre_nodelist)
-                    all_nodelist = all_nodelist.extend(item[job]["nodelist"])
+
+                    # all_nodelist = [].extend(pre_nodelist)
+                    # all_nodelist = all_nodelist.extend(item[job]["nodelist"])
                     # if pre_nodelist:
                     #     print("Has node!")
                     #     all_nodelist = pre_nodelist.extend(item[job]["nodelist"])
@@ -157,7 +158,7 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
 
                     job_data[job].update({
                         "totalnodes": all_totalnodes,
-                        "nodelist": all_nodelist,
+                        # "nodelist": all_nodelist,
                         "cpucores": all_cpucores
                     })
     except Exception as err:
