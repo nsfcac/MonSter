@@ -148,6 +148,7 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
                     all_cpucores = pre_cpucores + item[job]["cpucores"]
                 
                     if pre_nodelist:
+                        print("Has node!")
                         all_nodelist = pre_nodelist.extend(item[job]["nodelist"])
                     else:
                         all_nodelist = item[job]["nodelist"]
