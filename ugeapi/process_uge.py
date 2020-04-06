@@ -1,4 +1,4 @@
-from convert import get_hostip, purify_joblist
+from convert import get_hostip
 
 def process_host(host_id:str, host_info: object, time: int) -> list:
     """
