@@ -45,7 +45,6 @@ def fetch_uge(config: object) -> object:
             # Get executing hostsZ and jobs running on the cluster
             exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
             exechosts = [host for host in exechosts if '-' in host]
-            print(exechosts)
 
             jobs = get_jobs(uge_url, session, ugeapi_adapter)
 
@@ -78,12 +77,12 @@ def fetch_uge(config: object) -> object:
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
-            # # process_node_jobs(host_id:str, node_jobs: dict)
-            # process_node_jobs_args = zip(exechosts, repeat(node_jobs))
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
-            # # print(processed_node_jobs)
-            # # print(json.dumps(processed_node_jobs, indent=4))
+            # process_node_jobs(host_id:str, node_jobs: dict)
+            process_node_jobs_args = zip(exechosts, repeat(node_jobs))
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
+
+            print(json.dumps(processed_node_jobs, indent=4))
 
             
             # # Get jobs detail in parallel
