@@ -60,8 +60,8 @@ def process_host(host_id:str, host_info: object, time: int) -> list:
             "dpoints": points,
             "joblist": joblist
         }
-    except Exception as err:
-        print(err)
+    except Exception:
+        pass
     
     return all_data
 
