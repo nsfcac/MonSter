@@ -44,7 +44,7 @@ def fetch_uge(config: object) -> object:
 
             # Get executing hosts and jobs running on the cluster
             exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
-            hosts = [get_hostip[hostname] for hostname in exechosts if "-" in hostname]
+            hosts = [get_hostip[hostname] for hostname in exechosts]
             jobs = get_jobs(uge_url, session, ugeapi_adapter)
 
             epoch_time = int(round(time.time() * 1000000000))
