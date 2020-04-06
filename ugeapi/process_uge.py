@@ -131,7 +131,7 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
     try:
         for item in processed_node_jobs:
             job = list(item.keys())
-            job = job[0]
+            print(job)
             if job not in jobset:
                 jobset.append(job)
                 jobset[job] = item[job]
