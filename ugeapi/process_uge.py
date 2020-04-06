@@ -74,26 +74,30 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
     joblist_point = {}
     try:
         job_data = jobs_info[job_id]
-        
-        if job_data:
+
+        try:
             starttime = job_data["timeStamp"]["startEpoch"]
             submittime = job_data["timeStamp"]["submitEpoch"]
-            jobname = job_data["name"]
-            user = job_data["user"]
+        except:
+            starttime = None
+            submittime = None
+            
+        jobname = job_data["name"]
+        user = job_data["user"]
 
-            joblist_point = {
-                "measurement": "JobsInfo",
-                "tags": {
-                    "JobId": job_id,
-                },
-                "time": time,
-                "fields": {
-                    "StartTime": starttime,
-                    "SubmitTime": submittime,
-                    "JobName": jobname,
-                    "User": user
-                }
+        joblist_point = {
+            "measurement": "JobsInfo",
+            "tags": {
+                "JobId": job_id,
+            },
+            "time": time,
+            "fields": {
+                "StartTime": starttime,
+                "SubmitTime": submittime,
+                "JobName": jobname,
+                "User": user
             }
+        }
     except Exception as err:
         print(err)
         
