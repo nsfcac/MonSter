@@ -72,14 +72,16 @@ def fetch_uge(config: object) -> object:
                     # print(err)
                     pass
             
-            print(json.dumps(node_jobs, indent=4))
+            # print(json.dumps(node_jobs, indent=4))
 
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
-            # process_node_jobs_args = zip(exechosts, repeat(node_jobs))
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
+            process_node_jobs_args = zip(exechosts, repeat(node_jobs))
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
+
+            print(json.dumps(processed_node_jobs, indent=4))
 
             # # Get jobs detail in parallel
             # pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
@@ -97,9 +99,9 @@ def fetch_uge(config: object) -> object:
             # for index, job in enumerate(jobs):
             #     job_point[job] = processed_job_info[index]
 
-            # # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
+            # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
 
-            # # print(json.dumps(processed_host_info, indent=4))
+            # print(json.dumps(processed_host_info, indent=4))
 #---------------------------- End Job Points -----------------------------------
     except Exception as err:
         print(err)
