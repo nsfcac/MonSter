@@ -80,7 +80,10 @@ def fetch_uge(config: object) -> object:
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
             # print(processed_node_jobs)
-            print(json.dumps(processed_node_jobs, indent=4))
+            # print(json.dumps(processed_node_jobs, indent=4))
+
+            for host in exechosts:
+                print(get_hostip(host))
 
             # # Get jobs detail in parallel
             # pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
