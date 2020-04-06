@@ -137,16 +137,18 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
                 if job not in jobset:
                     jobset.append(job)
                     job_data[job] = item[job]
-                    print(type(item[job]["nodelist"]))
+                    # print(type(item[job]["nodelist"]))
                 else:
                     pre_totalnodes = job_data[job]["totalnodes"]
                     pre_nodelist = job_data[job]["nodelist"]
                     pre_cpucores = job_data[job]["cpucores"]
-                        
+                    
+                    print(type(pre_nodelist))
                     # print(pre_nodelist)
 
-                    all_totalnodes = pre_totalnodes + item[job]["totalnodes"]
-                    all_cpucores = pre_cpucores + item[job]["cpucores"]
+                    # all_totalnodes = pre_totalnodes + item[job]["totalnodes"]
+                    # all_nodelist = pre_nodelist.extend(item[job]["nodelist"])
+                    # all_cpucores = pre_cpucores + item[job]["cpucores"]
 
                     # all_nodelist = [].extend(pre_nodelist)
                     # all_nodelist = all_nodelist.extend(item[job]["nodelist"])
