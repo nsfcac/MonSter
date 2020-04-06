@@ -79,7 +79,7 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
         # totalnodes
         # nodelist
         # cpucores
-        jobname = job_id["name"]
+        jobname = job_data["name"]
         user = job_data["user"]
 
         joblist_point = {
