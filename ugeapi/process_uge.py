@@ -87,9 +87,6 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
                 jobname = None
                 user = None
 
-            jobname = job_data["name"]
-            user = job_data["user"]
-
             joblist_point = {
                 "measurement": "JobsInfo",
                 "tags": {
