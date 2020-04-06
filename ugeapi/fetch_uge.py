@@ -69,7 +69,7 @@ def fetch_uge(config: object) -> object:
                 except:
                     pass
 
-            print(json.dumps(all_host_points, indent=4))
+            print(json.dumps(node_jobs, indent=4))
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
