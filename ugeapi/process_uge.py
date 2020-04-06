@@ -63,7 +63,11 @@ def process_host(host_id:str, host_info: object, time: int) -> list:
                 "joblist": joblist
             }
     except Exception as err:
-        print("process_host error!")
+        # print("process_host error!")
+        all_data = {
+            "dpoints": None,
+            "joblist": None
+        }
         print(err)
     
     return all_data
