@@ -72,8 +72,8 @@ def fetch_uge(config: object) -> object:
                     # print(err)
                     pass
             
-            print(json.dumps(processed_host_info, indent=4))
-            
+            print(json.dumps(node_jobs, indent=4))
+
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
