@@ -120,9 +120,10 @@ def process_node_jobs(host_id:str, node_jobs: dict) -> dict:
                     }
                 else:
                     job_data[job]["cpucores"] += 1
+        return job_data
     except Exception:
-        pass
+        return job_data
         # print(err)
 
     # print(json.dumps(job_data, indent=4))
-    return job_data
+    
