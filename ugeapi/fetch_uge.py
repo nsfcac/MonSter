@@ -97,28 +97,28 @@ def fetch_uge(config: object) -> object:
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 processed_job_info = pool.starmap(process_job, process_job_args)
 
-            for index, job in enumerate(jobs):
-                job_detail[job] = processed_job_info[index]
+            # for index, job in enumerate(jobs):
+            #     job_detail[job] = processed_job_info[index]
 
-                print(type(job))
-                if job in aggregated_node_jobs:
-                    print("True")
+            #     print(type(job))
+            #     if job in aggregated_node_jobs:
+            #         print("True")
 
-                    job_detail[job]["fields"].update({
-                        "totalnodes": aggregated_node_jobs[job]["totalnodes"],
-                        "nodelist": aggregated_node_jobs[job]["nodelist"],
-                        "cpucores": aggregated_node_jobs[job]["cpucores"]
-                    })
-                else:
-                    job_detail[job]["fields"].update({
-                        "totalnodes": None,
-                        "nodelist": None,
-                        "cpucores": None
-                    })
+            #         job_detail[job]["fields"].update({
+            #             "totalnodes": aggregated_node_jobs[job]["totalnodes"],
+            #             "nodelist": aggregated_node_jobs[job]["nodelist"],
+            #             "cpucores": aggregated_node_jobs[job]["cpucores"]
+            #         })
+            #     else:
+            #         job_detail[job]["fields"].update({
+            #             "totalnodes": None,
+            #             "nodelist": None,
+            #             "cpucores": None
+            #         })
             
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
 
-            # print(json.dumps(aggregated_node_jobs, indent=4))
+            print(json.dumps(processed_job_info, indent=4))
 #---------------------------- End Job Points -----------------------------------
     except Exception as err:
         print(err)
