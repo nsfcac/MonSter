@@ -99,18 +99,19 @@ def fetch_uge(config: object) -> object:
 
             for index, job in enumerate(jobs):
                 job_detail[job] = processed_job_info[index]
-                # if job in aggregated_node_jobs:
-                #     job_detail[job]["fields"].update({
-                #         "totalnodes": aggregated_node_jobs[job]["totalnodes"],
-                #         "nodelist": aggregated_node_jobs[job]["nodelist"],
-                #         "cpucores": aggregated_node_jobs[job]["cpucores"]
-                #     })
-                # else:
-                #     job_detail[job]["fields"].update({
-                #         "totalnodes": None,
-                #         "nodelist": None,
-                #         "cpucores": None
-                #     })
+                
+                if job in aggregated_node_jobs:
+                    job_detail[job]["fields"].update({
+                        "totalnodes": aggregated_node_jobs[job]["totalnodes"],
+                        "nodelist": aggregated_node_jobs[job]["nodelist"],
+                        "cpucores": aggregated_node_jobs[job]["cpucores"]
+                    })
+                else:
+                    job_detail[job]["fields"].update({
+                        "totalnodes": None,
+                        "nodelist": None,
+                        "cpucores": None
+                    })
             
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
 
