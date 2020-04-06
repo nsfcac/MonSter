@@ -57,7 +57,7 @@ def process_host(host_id:str, host_info: object, time: int) -> list:
         points = [cpuusage_point, memusage_point, joblist_point]
 
         all_data = {
-            "points": points,
+            "dpoints": points,
             "joblist": joblist
         }
     except Exception as err:
