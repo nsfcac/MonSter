@@ -44,14 +44,8 @@ def fetch_uge(config: object) -> object:
 
             # Get executing hostsZ and jobs running on the cluster
             exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
-
-            exechosts = [host for host in exechosts if '-' not in host]
+            exechosts = [host for host in exechosts if '-' in host]
             print(exechosts)
-            
-            hosts = []
-            for host in exechosts:
-                if '-' in host:
-                    hosts.append(get_hostip(host))
 
             jobs = get_jobs(uge_url, session, ugeapi_adapter)
 
