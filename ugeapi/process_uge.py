@@ -158,11 +158,11 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
                     # else:
                     #     all_nodelist = item[job]["nodelist"]
 
-                    job_data[job].update({
-                        "totalnodes": all_totalnodes,
-                        # "nodelist": all_nodelist,
-                        "cpucores": all_cpucores
-                    })
+                    # job_data[job].update({
+                    #     "totalnodes": all_totalnodes,
+                    #     # "nodelist": all_nodelist,
+                    #     "cpucores": all_cpucores
+                    # })
     except Exception as err:
         print(err)
     
