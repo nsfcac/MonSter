@@ -100,7 +100,7 @@ def fetch_uge(config: object) -> object:
             for index, job in enumerate(jobs):
                 job_detail[job] = processed_job_info[index]
 
-                print(job)
+                print(type(job))
                 if job in aggregated_node_jobs:
                     print("True")
 
