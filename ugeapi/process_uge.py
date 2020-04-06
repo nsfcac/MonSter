@@ -106,6 +106,8 @@ def process_node_jobs(host_id:str, node_jobs: dict) -> dict:
     joblist = node_jobs[host_ip]
     jobset = []
     job_data = {}
+    
+    print(joblist)
 
     try:
         for job in joblist:
