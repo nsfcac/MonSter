@@ -110,6 +110,7 @@ def fetch_uge(config: object) -> object:
                     all_job_points.append(job_detail[job])
             
             total_elapsed = float("{0:.4f}".format(time.time() - query_start))
+            print(total_elapsed)
 #---------------------------- End Job Points -----------------------------------
         uge_info = {
             "all_job_points": all_job_points,
