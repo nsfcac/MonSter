@@ -28,7 +28,7 @@ fields:
 
 # Dummy data points in "Power" measurement
 measurement: Power           
-time: 1583792296000000000             
+time: 1583792296000000000
 tags: 
     - Label: "NodePower"
     - NodeId: "101.10.1.1"
