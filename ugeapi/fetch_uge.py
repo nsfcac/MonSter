@@ -37,6 +37,7 @@ def fetch_uge(config: object) -> object:
         job_detail = {}
 
         all_host_points = []
+        all_job_points = []
 
         with requests.Session() as session:
 
@@ -45,8 +46,6 @@ def fetch_uge(config: object) -> object:
             # Get executing hostsZ and jobs running on the cluster
             exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
             exechosts = [host for host in exechosts if '-' in host]
-
-            # jobs = get_jobs(uge_url, session, ugeapi_adapter)
 
             epoch_time = int(round(time.time() * 1000000000))
 
@@ -85,6 +84,7 @@ def fetch_uge(config: object) -> object:
             aggregated_node_jobs = aggregate_node_jobs(processed_node_jobs)
 
             jobs = list(aggregated_node_jobs.keys())
+
             # Get jobs detail in parallel
             pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
             with multiprocessing.Pool(processes=cpu_count) as pool:
@@ -102,18 +102,17 @@ def fetch_uge(config: object) -> object:
                 job_detail[job] = processed_job_info[index]
 
             for job in jobs:
-                try:
-                    job_detail[job]["fields"].update({
-                        "totalnodes": aggregated_node_jobs[job]["totalnodes"],
-                        "nodelist": aggregated_node_jobs[job]["nodelist"],
-                        "cpucores": aggregated_node_jobs[job]["cpucores"]
-                    })
-                except:
-                    pass
+                job_detail[job]["fields"].update({
+                    "totalnodes": aggregated_node_jobs[job]["totalnodes"],
+                    "nodelist": aggregated_node_jobs[job]["nodelist"],
+                    "cpucores": aggregated_node_jobs[job]["cpucores"]
+                })
+                all_job_points.append(job_detail[job])
+
             
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
 
-            print(json.dumps(job_detail, indent=4))
+            print(json.dumps(all_job_points, indent=4))
 #---------------------------- End Job Points -----------------------------------
     except Exception as err:
         print(err)
@@ -155,24 +154,6 @@ def get_host_detail(uge_url: str, session: object, ugeapi_adapter: object, host_
     except ConnectionError as err:
         print(err)
     return host
-
-
-def get_jobs(uge_url: str, session: object, ugeapi_adapter: object) -> list:
-    """
-    Get running job list
-    """
-    jobs = []
-    jobs_url = uge_url + "/jobs" 
-    session.mount(jobs_url, ugeapi_adapter)
-    try:
-        jobs_response = session.get(
-            jobs_url, verify = config["ssl_verify"], 
-            timeout = (config["timeout"][0], config["timeout"][1])
-        )
-        jobs = [str(job) for job in jobs_response.json()]
-    except ConnectionError as err:
-        print(err)
-    return jobs
 
 
 def get_job_detail(uge_url: str, session: object, ugeapi_adapter: object, job_id: str) -> object:
