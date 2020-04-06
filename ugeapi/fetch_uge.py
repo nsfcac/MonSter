@@ -80,8 +80,10 @@ def fetch_uge(config: object) -> object:
             # process_node_jobs(host_id:str, node_jobs: dict)
             process_node_jobs_args = zip(exechosts, repeat(node_jobs))
             with multiprocessing.Pool(processes=cpu_count) as pool:
-                processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
-
+                try:
+                    processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
+                except:
+                    print("ERROR")
             # print(processed_node_jobs)
             # print(json.dumps(processed_node_jobs, indent=4))
 
