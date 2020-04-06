@@ -67,8 +67,10 @@ def fetch_uge(config: object) -> object:
             for index, host in enumerate(exechosts):
                 try:
                     if processed_host_info[index]:
-                        all_host_points.extend(processed_host_info[index]["dpoints"])
-                        node_jobs[host] = processed_host_info[index]["joblist"]
+                        if processed_host_info[index]["dpoints"]:
+                            all_host_points.extend(processed_host_info[index]["dpoints"])
+                        if processed_host_info[index]["joblist"]
+                            node_jobs[host] = processed_host_info[index]["joblist"]
                 except Exception as err:
                     print(err)
             
@@ -120,7 +122,6 @@ def fetch_uge(config: object) -> object:
 
         # print(json.dumps(uge_info, indent=4))
     except Exception as err:
-        print("fetch_uge error!")
         print(err)
     return uge_info
 
