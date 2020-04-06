@@ -41,7 +41,7 @@ def fetch_uge(config: object) -> object:
 
         with requests.Session() as session:
 
-            # query_start = time.time()
+            query_start = time.time()
 
             # Get executing hostsZ and jobs running on the cluster
             exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
@@ -72,8 +72,6 @@ def fetch_uge(config: object) -> object:
                 except Exception as err:
                     print(err)
             
-            # print(json.dumps(node_jobs, indent=4))
-
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
@@ -111,7 +109,7 @@ def fetch_uge(config: object) -> object:
                     })
                     all_job_points.append(job_detail[job])
             
-            # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
+            total_elapsed = float("{0:.4f}".format(time.time() - query_start))
 #---------------------------- End Job Points -----------------------------------
         uge_info = {
             "all_job_points": all_job_points,
