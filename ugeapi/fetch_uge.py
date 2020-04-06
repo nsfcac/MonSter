@@ -71,7 +71,9 @@ def fetch_uge(config: object) -> object:
                 except Exception:
                     # print(err)
                     pass
-
+            
+            print(json.dumps(processed_host_info, indent=4))
+            
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
