@@ -44,6 +44,7 @@ def fetch_uge(config: object) -> object:
 
             # Get executing hosts and jobs running on the cluster
             exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
+            hosts = [get_hostip[hostname] for hostname in exechosts if "-" in hostname]
             jobs = get_jobs(uge_url, session, ugeapi_adapter)
 
             epoch_time = int(round(time.time() * 1000000000))
@@ -52,11 +53,7 @@ def fetch_uge(config: object) -> object:
             # for host in exechosts:
             #     host_ip = 
             #     hostlist.append(get_hostip(host))
-            print(exechosts)
-            print("Exe hosts:")
-            print(len(exechosts))
-            print("Host IPs :")
-            # print(len(hostlist))
+            print(hosts)
 
 #--------------------------------- Host Points ---------------------------------
             # # Get hosts detail in parallel 
