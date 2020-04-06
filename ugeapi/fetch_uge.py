@@ -83,7 +83,7 @@ def fetch_uge(config: object) -> object:
                 jobs_info[job] = job_data[index]
 
             # Process job info (job_id:str, jobs_info: object, time: int)
-            process_job_args = (jobs, repeat(jobs_info), repeat(epoch_time))
+            process_job_args = zip(jobs, repeat(jobs_info), repeat(epoch_time))
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 processed_job_info = pool.starmap(process_job, process_job_args)
 
