@@ -48,40 +48,6 @@ def fetch_uge(config: object) -> object:
 
             epoch_time = int(round(time.time() * 1000000000))
 
-#--------------------------------- Host Points ---------------------------------
-            # Get hosts detail in parallel 
-            pool_host_args = zip(repeat(uge_url), repeat(session), 
-                                 repeat(ugeapi_adapter), exechosts)
-            with multiprocessing.Pool(processes=cpu_count) as pool:
-                host_data = pool.starmap(get_host_detail, pool_host_args)
-            
-            for index, host in enumerate(exechosts):
-                host_info[host] = host_data[index]
-
-            # Process host info
-            process_host_args = zip(exechosts, repeat(host_info), repeat(epoch_time))
-            with multiprocessing.Pool(processes=cpu_count) as pool:
-                processed_host_info = pool.starmap(process_host, process_host_args)
-
-            for index, host in enumerate(exechosts):
-                try:
-                    all_host_points.extend(processed_host_info[index]["dpoints"])
-                    node_jobs[host] = processed_host_info[index]["joblist"]
-                except Exception:
-                    pass
-            
-            # print(json.dumps(node_jobs, indent=4))
-
-#----------------------------- End Host Points ---------------------------------
-
-#-------------------------------- Job Points -----------------------------------
-            # process_node_jobs(host_id:str, node_jobs: dict)
-            process_node_jobs_args = zip(exechosts, repeat(node_jobs))
-            with multiprocessing.Pool(processes=cpu_count) as pool:
-                processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
-            # print(processed_node_jobs)
-            # print(json.dumps(processed_node_jobs, indent=4))
-
             hostlist = []
             for host in exechosts:
                 hostlist.append(get_hostip(host))
@@ -90,6 +56,42 @@ def fetch_uge(config: object) -> object:
             print(len(exechosts))
             print("Host IPs :")
             print(len(hostlist))
+
+#--------------------------------- Host Points ---------------------------------
+            # # Get hosts detail in parallel 
+            # pool_host_args = zip(repeat(uge_url), repeat(session), 
+            #                      repeat(ugeapi_adapter), exechosts)
+            # with multiprocessing.Pool(processes=cpu_count) as pool:
+            #     host_data = pool.starmap(get_host_detail, pool_host_args)
+            
+            # for index, host in enumerate(exechosts):
+            #     host_info[host] = host_data[index]
+
+            # # Process host info
+            # process_host_args = zip(exechosts, repeat(host_info), repeat(epoch_time))
+            # with multiprocessing.Pool(processes=cpu_count) as pool:
+            #     processed_host_info = pool.starmap(process_host, process_host_args)
+
+            # for index, host in enumerate(exechosts):
+            #     try:
+            #         all_host_points.extend(processed_host_info[index]["dpoints"])
+            #         node_jobs[host] = processed_host_info[index]["joblist"]
+            #     except Exception:
+            #         pass
+            
+            # # print(json.dumps(node_jobs, indent=4))
+
+#----------------------------- End Host Points ---------------------------------
+
+#-------------------------------- Job Points -----------------------------------
+            # # process_node_jobs(host_id:str, node_jobs: dict)
+            # process_node_jobs_args = zip(exechosts, repeat(node_jobs))
+            # with multiprocessing.Pool(processes=cpu_count) as pool:
+            #     processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
+            # # print(processed_node_jobs)
+            # # print(json.dumps(processed_node_jobs, indent=4))
+
+            
             # # Get jobs detail in parallel
             # pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
             # with multiprocessing.Pool(processes=cpu_count) as pool:
