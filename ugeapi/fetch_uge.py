@@ -97,8 +97,8 @@ def fetch_uge(config: object) -> object:
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 processed_job_info = pool.starmap(process_job, process_job_args)
 
-            # for index, job in enumerate(jobs):
-            #     job_detail[job] = processed_job_info[index]
+            for index, job in enumerate(jobs):
+                job_detail[job] = processed_job_info[index]
 
             #     print(type(job))
             #     if job in aggregated_node_jobs:
@@ -118,7 +118,7 @@ def fetch_uge(config: object) -> object:
             
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
 
-            print(json.dumps(processed_job_info, indent=4))
+            # print(json.dumps(processed_job_info, indent=4))
 #---------------------------- End Job Points -----------------------------------
     except Exception as err:
         print(err)
