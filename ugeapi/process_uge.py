@@ -137,7 +137,7 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
                 if job not in jobset:
                     jobset.append(job)
                     job_data[job] = item[job]
-                    print(item[job]["nodelist"])
+                    print(type(item[job]["nodelist"]))
                 else:
                     pre_totalnodes = job_data[job]["totalnodes"]
                     pre_nodelist = job_data[job]["nodelist"]
