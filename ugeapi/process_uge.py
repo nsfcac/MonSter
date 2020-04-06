@@ -61,8 +61,8 @@ def process_host(host_id:str, host_info: object, time: int) -> list:
             "dpoints": points,
             "joblist": joblist
         }
-    except Exception:
-        pass
+    except Exception as err:
+        print(err)
     
     return all_data
 
@@ -74,12 +74,9 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
     joblist_point = {}
     try:
         job_data = jobs_info[job_id]
-
+        
         starttime = job_data["timeStamp"]["startEpoch"]
         submittime = job_data["timeStamp"]["submitEpoch"]
-        # totalnodes
-        # nodelist
-        # cpucores
         jobname = job_data["name"]
         user = job_data["user"]
 
@@ -96,8 +93,8 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
                 "User": user
             }
         }
-    except Exception:
-        pass
+    except Exception as err:
+        print(err)
         
     return joblist_point
 
@@ -122,8 +119,8 @@ def process_node_jobs(host:str, node_jobs: dict) -> dict:
                     }
                 else:
                     job_data[job]["cpucores"] += 1
-    except Exception:
-        pass
+    except Exception as err:
+        print(err)
     
     return job_data
 
