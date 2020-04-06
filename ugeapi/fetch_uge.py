@@ -69,7 +69,7 @@ def fetch_uge(config: object) -> object:
                     if processed_host_info[index]:
                         if processed_host_info[index]["dpoints"]:
                             all_host_points.extend(processed_host_info[index]["dpoints"])
-                        if processed_host_info[index]["joblist"]
+                        if processed_host_info[index]["joblist"]:
                             node_jobs[host] = processed_host_info[index]["joblist"]
                 except Exception as err:
                     print(err)
