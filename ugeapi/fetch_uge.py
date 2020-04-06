@@ -52,10 +52,12 @@ def fetch_uge(config: object) -> object:
             for host in exechosts:
                 hostlist.append(get_hostip(host))
 
+            exehost_len = len(exechosts)
+            hostlist_len = len(hostlist)
             print("Exe hosts:")
-            print(len(exechosts))
+            print(exehost_len)
             print("Host IPs :")
-            print(len(hostlist))
+            print(hostlist_len)
 
 #--------------------------------- Host Points ---------------------------------
             # # Get hosts detail in parallel 
