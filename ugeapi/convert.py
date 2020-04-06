@@ -5,7 +5,9 @@ def get_hostip(hostname: str) -> str:
     if "-" in hostname:
         h0, h1, h2 = hostname.split('-')
         return '10.101.' + h1 + '.' + h2.split('.')[0]
+    return None
 
+    
 def purify_joblist(jobList: list) -> list:
     """
     Extract job id from jobList
