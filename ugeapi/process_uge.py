@@ -146,6 +146,7 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
                     print(type(pre_nodelist))
                     # print(pre_nodelist)
 
+                    print(item[job]["nodelist"])
                     # all_totalnodes = pre_totalnodes + item[job]["totalnodes"]
                     # all_nodelist = pre_nodelist.extend(item[job]["nodelist"])
                     # all_cpucores = pre_cpucores + item[job]["cpucores"]
