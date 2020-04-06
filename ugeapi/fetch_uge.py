@@ -68,8 +68,9 @@ def fetch_uge(config: object) -> object:
                     host_ip = get_hostip(host)
                     all_host_points.extend(processed_host_info[index]["dpoints"])
                     node_jobs[host_ip] = processed_host_info[index]["joblist"]
-                except:
-                    pass
+                except Exception as err:
+                    print(err)
+                    # pass
 
 #----------------------------- End Host Points ---------------------------------
 
@@ -78,24 +79,25 @@ def fetch_uge(config: object) -> object:
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
 
-            # # Get jobs detail in parallel
-            # pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     job_data = pool.starmap(get_job_detail, pool_job_args)
+            # Get jobs detail in parallel
+            pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                job_data = pool.starmap(get_job_detail, pool_job_args)
             
-            # for index, job in enumerate(jobs):
-            #     jobs_info[job] = job_data[index]
+            for index, job in enumerate(jobs):
+                jobs_info[job] = job_data[index]
 
-            # # Process job info (job_id:str, jobs_info: object, time: int)
-            # process_job_args = zip(jobs, repeat(jobs_info), repeat(epoch_time))
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     processed_job_info = pool.starmap(process_job, process_job_args)
+            # Process job info (job_id:str, jobs_info: object, time: int)
+            process_job_args = zip(jobs, repeat(jobs_info), repeat(epoch_time))
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                processed_job_info = pool.starmap(process_job, process_job_args)
 
-            # for index, job in enumerate(jobs):
-            #     job_point[job] = processed_job_info[index]
+            for index, job in enumerate(jobs):
+                job_point[job] = processed_job_info[index]
 
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
-            print(json.dumps(processed_host_info, indent=4))
+
+            # print(json.dumps(processed_host_info, indent=4))
 #---------------------------- End Job Points -----------------------------------
     except Exception as err:
         print(err)
