@@ -34,7 +34,7 @@ def fetch_uge(config: object) -> object:
         host_info = {}
         jobs_info = {}
         node_jobs = {}
-        job_point = {}
+        job_detail = {}
 
         all_host_points = []
 
@@ -84,27 +84,37 @@ def fetch_uge(config: object) -> object:
             
             aggregated_node_jobs = aggregate_node_jobs(processed_node_jobs)
 
-            print(json.dumps(aggregated_node_jobs, indent=4))
-
-            # # Get jobs detail in parallel
-            # pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     job_data = pool.starmap(get_job_detail, pool_job_args)
+            # Get jobs detail in parallel
+            pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                job_data = pool.starmap(get_job_detail, pool_job_args)
             
-            # for index, job in enumerate(jobs):
-            #     jobs_info[job] = job_data[index]
+            for index, job in enumerate(jobs):
+                jobs_info[job] = job_data[index]
 
-            # # Process job info (job_id:str, jobs_info: object, time: int)
-            # process_job_args = zip(jobs, repeat(jobs_info), repeat(epoch_time))
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     processed_job_info = pool.starmap(process_job, process_job_args)
+            # Process job info (job_id:str, jobs_info: object, time: int)
+            process_job_args = zip(jobs, repeat(jobs_info), repeat(epoch_time))
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                processed_job_info = pool.starmap(process_job, process_job_args)
 
-            # for index, job in enumerate(jobs):
-            #     job_point[job] = processed_job_info[index]
-
+            for index, job in enumerate(jobs):
+                job_detail[job] = processed_job_info[index]
+                if job in aggregated_node_jobs:
+                    job_detail[job].update({
+                        "totalnodes": aggregated_node_jobs[job]["totalnodes"],
+                        "nodelist": aggregated_node_jobs[job]["nodelist"],
+                        "cpucores": aggregated_node_jobs[job]["cpucores"]
+                    })
+                else:
+                    job_detail[job].update({
+                        "totalnodes": None,
+                        "nodelist": None,
+                        "cpucores": None
+                    })
+            
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
 
-            # print(json.dumps(job_point, indent=4))
+            print(json.dumps(job_detail, indent=4))
 #---------------------------- End Job Points -----------------------------------
     except Exception as err:
         print(err)

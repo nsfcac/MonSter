@@ -102,6 +102,9 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
     return joblist_point
 
 def process_node_jobs(host:str, node_jobs: dict) -> dict:
+    """
+    Process node jobs
+    """
     jobset = []
     job_data = {}
 
@@ -126,6 +129,9 @@ def process_node_jobs(host:str, node_jobs: dict) -> dict:
 
 
 def aggregate_node_jobs(processed_node_jobs: list) -> dict:
+    """
+    Aggregate nodes, nolist, cores of jobs
+    """
     jobset = []
     job_data = {}
     try:
