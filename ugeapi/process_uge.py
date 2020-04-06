@@ -123,3 +123,32 @@ def process_node_jobs(host:str, node_jobs: dict) -> dict:
         pass
     
     return job_data
+
+
+def aggregate_node_jobs(processed_node_jobs: list) -> dict:
+    jobset = []
+    job_data = {}
+    try:
+        for item in processed_node_jobs:
+            job = item.keys()[0]
+            if job not in jobset:
+                jobset.append(job)
+                jobset[job] = item[job]
+            else:
+                pre_totalnodes = job_data[job]["totalnodes"]
+                pre_nodelist = job_data[job]["nodelist"]
+                pre_cpucores = job_data[job]["cpucores"]
+
+                all_totalnodes = pre_totalnodes + item[job]["totalnodes"]
+                all_nodelist = pre_nodelist.extend(item[job]["nodelist"])
+                all_cpucores = pre_cpucores + item[job]["cpucores"]
+
+                job_data[job].update({
+                    "totalnodes": all_totalnodes,
+                    "nodelist": all_nodelist,
+                    "cpucores": all_cpucores
+                })
+    except Exception as err:
+        print(err)
+    
+    return job_data
