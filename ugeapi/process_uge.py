@@ -1,3 +1,4 @@
+import json
 from convert import get_hostip
 
 def process_host(host_id:str, host_info: object, time: int) -> list:
@@ -106,8 +107,6 @@ def process_node_jobs(host_id:str, node_jobs: dict) -> dict:
     joblist = node_jobs[host_ip]
     jobset = []
     job_data = {}
-    
-    print(joblist)
 
     try:
         for job in joblist:
@@ -120,6 +119,7 @@ def process_node_jobs(host_id:str, node_jobs: dict) -> dict:
                 }
             else:
                 job_data[job]["cpucores"] += 1
+        print(json.dumps(job_data, indent=4))
     except Exception as err:
         print(err)
 
