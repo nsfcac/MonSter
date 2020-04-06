@@ -66,10 +66,11 @@ def fetch_uge(config: object) -> object:
 
             for index, host in enumerate(exechosts):
                 try:
-                    all_host_points.extend(processed_host_info[index]["dpoints"])
-                    node_jobs[host] = processed_host_info[index]["joblist"]
-                except Exception:
-                    pass
+                    if processed_host_info[index]:
+                        all_host_points.extend(processed_host_info[index]["dpoints"])
+                        node_jobs[host] = processed_host_info[index]["joblist"]
+                except Exception as err:
+                    print(err)
             
             # print(json.dumps(node_jobs, indent=4))
 
@@ -111,8 +112,6 @@ def fetch_uge(config: object) -> object:
                     all_job_points.append(job_detail[job])
             
             # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
-            print(json.dumps(job_detail, indent=4))
-
 #---------------------------- End Job Points -----------------------------------
         uge_info = {
             "all_job_points": all_job_points,
