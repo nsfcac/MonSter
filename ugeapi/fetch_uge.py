@@ -48,16 +48,15 @@ def fetch_uge(config: object) -> object:
 
             epoch_time = int(round(time.time() * 1000000000))
 
-            hostlist = []
-            for host in exechosts:
-                hostlist.append(get_hostip(host))
-
-            exehost_len = len(exechosts)
-            hostlist_len = len(hostlist)
+            # hostlist = []
+            # for host in exechosts:
+            #     host_ip = 
+            #     hostlist.append(get_hostip(host))
+            print(exechosts)
             print("Exe hosts:")
-            print(exehost_len)
+            print(len(exechosts))
             print("Host IPs :")
-            print(hostlist_len)
+            # print(len(hostlist))
 
 #--------------------------------- Host Points ---------------------------------
             # # Get hosts detail in parallel 
