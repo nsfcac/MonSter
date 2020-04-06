@@ -123,4 +123,5 @@ def process_node_jobs(host_id:str, node_jobs: dict) -> dict:
     except Exception as err:
         print(err)
 
+    print(json.dumps(job_data, indent=4))
     return job_data
