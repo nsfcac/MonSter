@@ -72,13 +72,14 @@ def fetch_uge(config: object) -> object:
                     # print(err)
                     pass
             
-            print(json.dumps(node_jobs, indent=4))
+            # print(json.dumps(node_jobs, indent=4))
 
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
-            # # process_node_jobs(host_id:str, node_jobs: dict)
-            # process_node_jobs_args = zip(exechosts, repeat(node_jobs))
+            # process_node_jobs(host_id:str, node_jobs: dict)
+            process_node_jobs_args = zip(exechosts, repeat(node_jobs))
+            print(json.dumps(process_node_jobs_args, indent=4))
             # with multiprocessing.Pool(processes=cpu_count) as pool:
             #     processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
 
