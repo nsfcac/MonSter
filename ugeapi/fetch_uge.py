@@ -110,13 +110,16 @@ def fetch_uge(config: object) -> object:
                     all_job_points.append(job_detail[job])
             
             total_elapsed = float("{0:.4f}".format(time.time() - query_start))
+            
+            print("Running time:")
             print(total_elapsed)
 #---------------------------- End Job Points -----------------------------------
         uge_info = {
             "all_job_points": all_job_points,
             "all_host_points": all_host_points
         }
-        print(json.dumps(uge_info, indent=4))
+
+        # print(json.dumps(uge_info, indent=4))
     except Exception as err:
         print(err)
     return uge_info
