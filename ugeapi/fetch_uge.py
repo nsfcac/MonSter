@@ -120,6 +120,7 @@ def fetch_uge(config: object) -> object:
 
         # print(json.dumps(uge_info, indent=4))
     except Exception as err:
+        print("fetch_uge error!")
         print(err)
     return uge_info
 
