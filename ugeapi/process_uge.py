@@ -137,13 +137,12 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
                 if job not in jobset:
                     jobset.append(job)
                     job_data[job] = item[job]
-                    print("flag")
                 else:
                     pre_totalnodes = job_data[job]["totalnodes"]
                     pre_nodelist = job_data[job]["nodelist"]
                     pre_cpucores = job_data[job]["cpucores"]
                         
-                    print(pre_nodelist)
+                    # print(pre_nodelist)
 
                     # all_totalnodes = pre_totalnodes + item[job]["totalnodes"]
                     # all_nodelist = pre_nodelist.extend(item[job]["nodelist"])
@@ -157,4 +156,5 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
     except Exception as err:
         print(err)
     
+    print(len(jobset))
     return job_data
