@@ -45,14 +45,14 @@ def fetch_uge(config: object) -> object:
         with requests.Session() as session:
 
             # Get executing hosts running on the cluster
-            exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
+            exechosts = get_exechosts(config, uge_url, session, ugeapi_adapter)
             exechosts = [host for host in exechosts if '-' in host]
 
             epoch_time = int(round(time.time() * 1000000000))
 
 #--------------------------------- Host info -----------------------------------
             # Get hosts detail in parallel 
-            pool_host_args = zip(repeat(uge_url), repeat(session), 
+            pool_host_args = zip(repeat(config), repeat(uge_url), repeat(session), 
                                  repeat(ugeapi_adapter), exechosts)
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 host_data = pool.starmap(get_host_detail, pool_host_args)
@@ -84,7 +84,7 @@ def fetch_uge(config: object) -> object:
             jobs = list(aggregated_node_jobs.keys())
 
             # Get jobs detail in parallel
-            pool_job_args = zip(repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
+            pool_job_args = zip(repeat(config), repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 job_data = pool.starmap(get_job_detail, pool_job_args)
             
@@ -123,7 +123,7 @@ def fetch_uge(config: object) -> object:
     return uge_info
 
 
-def get_exechosts(uge_url: str, session: object, ugeapi_adapter: object) -> list:
+def get_exechosts(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
     """
     Get executing hosts
     """
@@ -142,7 +142,7 @@ def get_exechosts(uge_url: str, session: object, ugeapi_adapter: object) -> list
     return exechosts
 
 
-def get_host_detail(uge_url: str, session: object, ugeapi_adapter: object, host_id: str) -> object:
+def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object, host_id: str) -> object:
     """
     Get host details
     """
@@ -160,7 +160,7 @@ def get_host_detail(uge_url: str, session: object, ugeapi_adapter: object, host_
     return host
 
 
-def get_job_detail(uge_url: str, session: object, ugeapi_adapter: object, job_id: str) -> object:
+def get_job_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object, job_id: str) -> object:
     """
     Get job details
     """
