@@ -22,7 +22,7 @@ config = {
 
 def fetch_bmc(config: object) -> object:
     """
-    Fetch bmc metrics from Redfish, average query and process time is:
+    Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
     bmc_info = {}
     try:
@@ -91,7 +91,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
         session.mount(power_url, bmcapi_adapter)
         power_response = session.get(
-            thermal_url, verify = config["ssl_verify"],
+            power_url, verify = config["ssl_verify"],
             auth = (config["user"], config["password"]),
             timeout = (config["timeout"][0], config["timeout"][1])
         )
@@ -102,9 +102,14 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
     return bmc_metrics
 
 
-fetch_bmc(config)
+# fetch_bmc(config)
 
-# def get_thermal()
+host = "10.101.1.1"
+bmcapi_adapter = HTTPAdapter(config["max_retries"])
+with requests.Session() as session:
+    bmc_metrics = get_bmc_metrics(config, host, session, bmcapi_adapter)
+    print(json.dumps(bmc_metrics))
+
 # # BMC health metric
 # url = 'https://' + host + '/redfish/v1/Managers/iDRAC.Embedded.1'
 
