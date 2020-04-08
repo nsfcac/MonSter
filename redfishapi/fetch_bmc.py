@@ -13,7 +13,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 config = {
     "user": "password",
     "password": "monster",
-    "timeout": [5, 10],
+    "timeout": [2, 6],
     "max_retries": 3,
     "ssl_verify": False,
     "hostlist": "./hostlist"
@@ -81,6 +81,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         session.mount(thermal_url, bmcapi_adapter)
         thermal_response = session.get(
             thermal_url, verify = config["ssl_verify"],
+            auth = (config["user"], config["password"]),
             timeout = (config["timeout"][0], config["timeout"][1])
         )
         print(thermal_response)
@@ -91,6 +92,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         session.mount(power_url, bmcapi_adapter)
         power_response = session.get(
             thermal_url, verify = config["ssl_verify"],
+            auth = (config["user"], config["password"]),
             timeout = (config["timeout"][0], config["timeout"][1])
         )
         power_metrics = power_response.json()
