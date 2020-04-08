@@ -22,7 +22,7 @@ config = {
 
 def fetch_uge(config: object) -> object:
     """
-    Fetch metrics from UGE api, average query time is: 0.8850s
+    Fetch metrics from UGE api, average query and process time is: 7.79s
     """
     uge_info = {}
     # Get cpu counts
