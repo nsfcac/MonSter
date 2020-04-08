@@ -28,6 +28,7 @@ def fetch_uge(config: object) -> object:
     # Get cpu counts
     try:
         cpu_count = multiprocessing.cpu_count()
+
         uge_url = "http://" + config["host"] + ":" + config["port"]
         ugeapi_adapter = HTTPAdapter(config["max_retries"])
 
@@ -39,17 +40,17 @@ def fetch_uge(config: object) -> object:
         all_host_points = []
         all_job_points = []
 
+        start = time.time()
+
         with requests.Session() as session:
 
-            # query_start = time.time()
-
-            # Get executing hostsZ and jobs running on the cluster
+            # Get executing hosts running on the cluster
             exechosts = get_exechosts(uge_url, session, ugeapi_adapter)
             exechosts = [host for host in exechosts if '-' in host]
 
             epoch_time = int(round(time.time() * 1000000000))
 
-#--------------------------------- Host Points ---------------------------------
+#--------------------------------- Host info -----------------------------------
             # Get hosts detail in parallel 
             pool_host_args = zip(repeat(uge_url), repeat(session), 
                                  repeat(ugeapi_adapter), exechosts)
@@ -67,17 +68,13 @@ def fetch_uge(config: object) -> object:
             for index, host in enumerate(exechosts):
                 try:
                     if processed_host_info[index]:
-                        if processed_host_info[index]["dpoints"]:
-                            all_host_points.extend(processed_host_info[index]["dpoints"])
-                        if processed_host_info[index]["joblist"]:
-                            node_jobs[host] = processed_host_info[index]["joblist"]
+                        all_host_points.extend(processed_host_info[index]["dpoints"])
+                        node_jobs[host] = processed_host_info[index]["joblist"]
                 except Exception as err:
                     print(err)
-            
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
-            # process_node_jobs(host_id:str, node_jobs: dict)
             process_node_jobs_args = zip(exechosts, repeat(node_jobs))
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
@@ -111,9 +108,9 @@ def fetch_uge(config: object) -> object:
                     })
                     all_job_points.append(job_detail[job])
             
-            # total_elapsed = float("{0:.4f}".format(time.time() - query_start))
-
-            # print(total_elapsed)
+            elapsed = float("{0:.4f}".format(time.time() - start))
+            print("Query and process time: ")
+            print(elapsed)
 #---------------------------- End Job Points -----------------------------------
         uge_info = {
             "all_job_points": all_job_points,
