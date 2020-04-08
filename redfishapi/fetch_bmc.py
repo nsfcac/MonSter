@@ -27,32 +27,45 @@ def fetch_bmc(config: object) -> object:
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
     bmc_info = {}
+    all_points = []
     try:
         cpu_count = multiprocessing.cpu_count()
-        hostlist = get_hostip(config["hostlist"])
+        # hostlist = get_hostip(config["hostlist"])
+        hostlist = ["10.101.1.1", "10.101.1.2"]
         bmcapi_adapter = HTTPAdapter(config["max_retries"])
 
         start = time.time()
 
         with requests.Session() as session:
+            # Query metrics
             get_bmc_metrics_args = zip(repeat(config), hostlist, 
                                        repeat(session), repeat(bmcapi_adapter))
-        
-        with multiprocessing.Pool(processes=cpu_count) as pool:
-            bmc_data = pool.starmap(get_bmc_metrics, get_bmc_metrics_args)
+            epoch_time = int(round(time.time() * 1000000000))
 
-        for index, host in enumerate(hostlist):
-            bmc_info[host] = bmc_data[index]
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                bmc_data = pool.starmap(get_bmc_metrics, get_bmc_metrics_args)
 
-        elapsed = float("{0:.4f}".format(time.time() - start))
-        print("Query and process time: ")
-        print(elapsed)
+            for index, host in enumerate(hostlist):
+                bmc_info[host] = bmc_data[index]
+
+            elapsed = float("{0:.4f}".format(time.time() - start))
+
+            # Process metrics
+            process_bmc_args = zip(hostlist, repeat(bmc_info), repeat(epoch_time))
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                host_points = pool.starmap(process_bmc, process_bmc_args)
+
+            for points in host_points:
+                all_points.extend(points)
+
+            print("Query and process time: ")
+            print(elapsed)
 
     except Exception as err:
         print(err)
     
-    # print(json.dumps(bmc_info, indent=4))
-    return bmc_info
+    print(json.dumps(all_points, indent=4))
+    return all_points
 
 
 def get_hostip(hostlist_config: str) -> list:
@@ -103,19 +116,19 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
     return bmc_metrics
 
 
-# fetch_bmc(config)
+fetch_bmc(config)
 
-# Test using one host
-host = "10.101.1.1"
-bmc_metrics = {}
+# # Test using one host
+# host = "10.101.1.1"
+# bmc_metrics = {}
 
-bmcapi_adapter = HTTPAdapter(config["max_retries"])
-with requests.Session() as session:
-    epoch_time = int(round(time.time() * 1000000000))
-    bmc_metrics = get_bmc_metrics(config, host, session, bmcapi_adapter)
+# bmcapi_adapter = HTTPAdapter(config["max_retries"])
+# with requests.Session() as session:
+#     epoch_time = int(round(time.time() * 1000000000))
+#     bmc_metrics = get_bmc_metrics(config, host, session, bmcapi_adapter)
 
-data_points = process_bmc(host, bmc_metrics, epoch_time)
-print(json.dumps(data_points, indent=4))
+# data_points = process_bmc(host, bmc_metrics, epoch_time)
+# print(json.dumps(data_points, indent=4))
 
 # # BMC health metric
 # url = 'https://' + host + '/redfish/v1/Managers/iDRAC.Embedded.1'

@@ -1,11 +1,12 @@
 import json
 
-def process_bmc(host: str, bmc_metrics: dict, time: int) -> list:
+def process_bmc(host: str, bmc_info: dict, time: int) -> list:
     """
     Process BMC metrics accroding to the schema
     """
     points = []
     try:
+        bmc_metrics = bmc_info["host"]
         thermal_metrics = bmc_metrics["thermal_metrics"]
         power_metrics = bmc_metrics["power_metrics"]
 
