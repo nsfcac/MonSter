@@ -64,7 +64,7 @@ def fetch_bmc(config: object) -> object:
     except Exception as err:
         print(err)
     
-    print(json.dumps(all_points, indent=4))
+    print(json.dumps(bmc_info, indent=4))
     return all_points
 
 
