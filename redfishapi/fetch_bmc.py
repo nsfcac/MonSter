@@ -10,6 +10,8 @@ from requests.adapters import HTTPAdapter
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+from process_uge import process_bmc
+
 config = {
     "user": "password",
     "password": "monster",
@@ -101,13 +103,19 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
     return bmc_metrics
 
 
-fetch_bmc(config)
+# fetch_bmc(config)
 
-# host = "10.101.1.1"
-# bmcapi_adapter = HTTPAdapter(config["max_retries"])
-# with requests.Session() as session:
-#     bmc_metrics = get_bmc_metrics(config, host, session, bmcapi_adapter)
-#     print(json.dumps(bmc_metrics, indent=4))
+# Test using one host
+host = "10.101.1.1"
+bmc_metrics = {}
+
+bmcapi_adapter = HTTPAdapter(config["max_retries"])
+with requests.Session() as session:
+    epoch_time = int(round(time.time() * 1000000000))
+    bmc_metrics = get_bmc_metrics(config, host, session, bmcapi_adapter)
+
+data_points = process_bmc(host, bmc_metrics, epoch_time)
+print(json.dumps(data_points, indent=4))
 
 # # BMC health metric
 # url = 'https://' + host + '/redfish/v1/Managers/iDRAC.Embedded.1'
