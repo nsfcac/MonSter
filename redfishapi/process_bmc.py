@@ -6,7 +6,7 @@ def process_bmc(host: str, bmc_info: dict, time: int) -> list:
     """
     points = []
     try:
-        bmc_metrics = bmc_info["host"]
+        bmc_metrics = bmc_info[host]
         thermal_metrics = bmc_metrics["thermal_metrics"]
         power_metrics = bmc_metrics["power_metrics"]
 
