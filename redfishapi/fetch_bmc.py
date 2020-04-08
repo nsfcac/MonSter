@@ -13,7 +13,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 config = {
     "user": "password",
     "password": "monster",
-    "timeout": [2, 6],
+    "timeout": [5, 10],
     "max_retries": 3,
     "ssl_verify": False,
     "hostlist": "./hostlist"
