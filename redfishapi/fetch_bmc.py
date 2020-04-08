@@ -105,7 +105,6 @@ host = "10.101.1.1"
 bmcapi_adapter = HTTPAdapter(config["max_retries"])
 with requests.Session() as session:
     bmc_metrics = get_bmc_metrics(config, host, session, bmcapi_adapter)
-    elapsed = float("{0:.4f}".format(time.time() - start))
     print(json.dumps(bmc_metrics, indent=4))
 
 # def get_thermal()
