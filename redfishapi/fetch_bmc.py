@@ -83,6 +83,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
             thermal_url, verify = config["ssl_verify"],
             timeout = (config["timeout"][0], config["timeout"][1])
         )
+        print(thermal_response)
         thermal_metrics = thermal_response.json()
         bmc_metrics["thermal_metrics"] = thermal_metrics
         # Power consumption
