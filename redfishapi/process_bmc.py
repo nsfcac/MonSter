@@ -45,7 +45,7 @@ def process_bmc(host: str, bmc_metrics: dict, time: int) -> list:
                 }
                 points.append(fan_point)
         if power_metrics:
-            reading = float("{0:.2f}".format(power_metrics["PowerControl"]["PowerConsumedWatts"]))
+            reading = float("{0:.2f}".format(power_metrics["PowerControl"][0]["PowerConsumedWatts"]))
             power_point = {
                 "measurement": "Power",
                 "time": time,
