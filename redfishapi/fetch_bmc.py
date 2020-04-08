@@ -95,7 +95,15 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         print(err)
     return bmc_metrics
 
-fetch_bmc(config)
+
+host = "10.101.1.1"
+bmcapi_adapter = HTTPAdapter(config["max_retries"])
+with requests.Session() as session:
+    start = time.time()
+    get_bmc_metrics(config, host, session, bmcapi_adapter)
+    elapsed = float("{0:.4f}".format(time.time() - start))
+    print("Query and process time: ")
+    print(elapsed)
 
 # def get_thermal()
 # # BMC health metric
