@@ -31,8 +31,8 @@ def fetch_bmc(config: object) -> object:
 def get_hostip(hostlist_config: str) -> list:
     hostlist = []
     try:
-        with open(hostlist_config) as hostlist_file:
-            hostname = json.loads(hostlist_file)
+        with open(hostlist_config, "r") as hostlist_file:
+            hostname = json.load(hostlist_file)
             hostlist = [host.split(":")[0][1:] for host in hostname]
     except Exception as err:
         print(err)
