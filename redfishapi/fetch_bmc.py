@@ -84,7 +84,6 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
             auth = (config["user"], config["password"]),
             timeout = (config["timeout"][0], config["timeout"][1])
         )
-        print(thermal_response)
         thermal_metrics = thermal_response.json()
         bmc_metrics["thermal_metrics"] = thermal_metrics
         # Power consumption
@@ -105,11 +104,9 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
 host = "10.101.1.1"
 bmcapi_adapter = HTTPAdapter(config["max_retries"])
 with requests.Session() as session:
-    start = time.time()
-    get_bmc_metrics(config, host, session, bmcapi_adapter)
+    bmc_metrics = get_bmc_metrics(config, host, session, bmcapi_adapter)
     elapsed = float("{0:.4f}".format(time.time() - start))
-    print("Query and process time: ")
-    print(elapsed)
+    print(json.dumps(bmc_metrics, indent=4))
 
 # def get_thermal()
 # # BMC health metric
