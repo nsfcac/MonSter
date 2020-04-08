@@ -1,5 +1,3 @@
-Query and process time: 
-13.0785
 [
     {
         "measurement": "Thermal",

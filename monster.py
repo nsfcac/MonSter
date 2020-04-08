@@ -4,7 +4,8 @@ import schedule
 from influxdb import InfluxDBClient
 
 from conf_parser import parse_config, check_config
-from slurmapi.fetch_slurm import fetch_slurm
+from ugeapi.fetch_uge import fetch_uge
+from redfishapi.fetch_bmc import fetch_bmc
 
 
 def main():
@@ -24,8 +25,8 @@ def main():
         dbname = config["influxdb"]["database"]
         client = InfluxDBClient(host, port, user, password, dbname)
 
-        # SLURM monitoring frequency
-        freq = config["slurm_freq"]
+        # Monitoring frequency
+        freq = config["frequency"]
 
         schedule.every(freq).seconds.do(write_db, client, config)
 
@@ -38,15 +39,41 @@ def main():
         print(err)
     return 
 
-def write_db(client, config: object) -> None:
-    # Fetch slurm information
-    slurm_info = fetch_slurm(config["slurm_metrics"])
+def write_db(client: object, config: object) -> None:
+    all_points = []
+    try:
+        # Fetch BMC information
+        bmc_points = fetch_bmc(config["redfish"])
+        all_points.extend(bmc_points)
 
-    # Write points into influxdb
-    client.write_points(slurm_info["job_info"])
-    client.write_points(slurm_info["node_info"])
-    client.write_points(slurm_info["stat_info"])
+        # Fetch UGE information
+        uge_host_points = fetch_uge(config["uge"])["all_host_points"]
+        all_points.extend(uge_host_points)
+
+        uge_job_points = fetch_uge(config["uge"])["all_job_points"]
+        
+        for job_point in uge_host_points:
+            job_id = job_point["tags"]["JobId"]
+            if not check_job(client, job_id):
+                all_points.append(job_point)
+
+        # Write points into influxdb
+        client.write_points(all_points)
+    except Exception as err:
+        print(err)
     return
+
+
+def check_job(client: object, job: str) -> bool:
+    try:
+        query_str = "SELECT " + job + " FROM JobsInfo"
+        data = client.get(query_str)
+        if data:
+            return True
+    except Exception as err:
+        print(err)
+        return False
+
 
 if __name__ == '__main__':
     main()

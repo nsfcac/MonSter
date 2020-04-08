@@ -12,14 +12,14 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from process_bmc import process_bmc
 
-config = {
-    "user": "root",
-    "password": "nivipnut",
-    "timeout": [5, 10],
-    "max_retries": 3,
-    "ssl_verify": False,
-    "hostlist": "./hostlist"
-}
+# config = {
+#     "user": "root",
+#     "password": "nivipnut",
+#     "timeout": [5, 10],
+#     "max_retries": 3,
+#     "ssl_verify": False,
+#     "hostlist": "./hostlist"
+# }
 
 
 def fetch_bmc(config: object) -> object:
@@ -30,11 +30,11 @@ def fetch_bmc(config: object) -> object:
     all_points = []
     try:
         cpu_count = multiprocessing.cpu_count()
-        # hostlist = get_hostip(config["hostlist"])
-        hostlist = ["10.101.1.1", "10.101.1.2"]
+        hostlist = get_hostip(config["hostlist"])
+        # hostlist = ["10.101.1.1", "10.101.1.2"]
         bmcapi_adapter = HTTPAdapter(config["max_retries"])
 
-        start = time.time()
+        # start = time.time()
 
         with requests.Session() as session:
             # Query metrics
@@ -48,7 +48,7 @@ def fetch_bmc(config: object) -> object:
             for index, host in enumerate(hostlist):
                 bmc_info[host] = bmc_data[index]
 
-            elapsed = float("{0:.4f}".format(time.time() - start))
+            # elapsed = float("{0:.4f}".format(time.time() - start))
 
             # Process metrics
             process_bmc_args = zip(hostlist, repeat(bmc_info), repeat(epoch_time))
@@ -58,13 +58,12 @@ def fetch_bmc(config: object) -> object:
             for points in host_points:
                 all_points.extend(points)
 
-            print("Query and process time: ")
-            print(elapsed)
+            # print("Query and process time: ")
+            # print(elapsed)
 
     except Exception as err:
         print(err)
     
-    print(json.dumps(all_points, indent=4))
     return all_points
 
 
@@ -97,7 +96,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         thermal_response = session.get(
             thermal_url, verify = config["ssl_verify"],
             auth = (config["user"], config["password"]),
-            timeout = (config["timeout"][0], config["timeout"][1])
+            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
         )
         thermal_metrics = thermal_response.json()
         bmc_metrics["thermal_metrics"] = thermal_metrics
@@ -107,7 +106,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         power_response = session.get(
             power_url, verify = config["ssl_verify"],
             auth = (config["user"], config["password"]),
-            timeout = (config["timeout"][0], config["timeout"][1])
+            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
         )
         power_metrics = power_response.json()
         bmc_metrics["power_metrics"] = power_metrics
@@ -116,7 +115,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
     return bmc_metrics
 
 
-fetch_bmc(config)
+# fetch_bmc(config)
 
 # # Test using one host
 # host = "10.101.1.1"

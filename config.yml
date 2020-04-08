@@ -5,104 +5,25 @@ influxdb:
   password: '1234'
   database: 'hpcc_metrics'
 
+frequency: 
+  60
+
 redfish:
   user: 'root'
   password: 'nivipnut'
-  timeout: (2, 6)     # connect. read timeout
+  timeout: 
+    connect: 5 # connect timeout
+    read: 10   # read timeout
   max_retries: 3
   ssl_verify: False   # Secure Sockets Layer Verify
 
-ugeapi:
+uge:
   host: '129.118.104.35'
   port: '8182'
   user: 'username'
   password: 'password'
-  timeout: [2, 6]
+  timeout: 
+    connect: 2
+    read: 6
   max_retries: 3
   ssl_verify: False
-  
-scheduler: slurm    # Specify the scheduler used in your system: slurm or uge
-scheduler_freq: 1   # Specify the frequency (in seconds) fetch information from schuduler
-scheduler_metrics:  # Specify the metrics you want to keep in influxdb, comment out if you do not want to keep
-  job:              # job_id as tags in influxdb
-    - submit_time     # Uge: "/jobs/{jobId}" - timeStamp - submitEpoch
-    - start_time      # Uge: "/jobs/{jobId}" - timeStamp - startEpoch
-    - end_time        # NOT available Uge
-    - nodes           # Uge: need reverse node-job to job-node
-    - num_nodes       # length of nodes       
-    - cpus_allocated  # Uge: get this from "/hostsummary/{hostId}" - jobList
-    - num_cpus        # Uge: get this from cpus_allocated
-    - user_id         # Uge: "/jobs/{jobId}" - user
-  node:             # node_addr as tags in influxdb
-    - cpus            # Total cpus
-    - cores           # Total cores. Uge: "/hostsummary/{hostId}" - m_core; Slurm, cores("Cores per socket") * sockets, 
-    - sockets         # Uge: "/hostsummary/{hostId}" - resourceNumericValues - m_socket
-    - threads         # Total threads, Uge: "/hostsummary/{hostId}" - resourceNumericValues - num_proc; Slurm: cores * threads
-    - total_mem       # Uge: "/hostsummary/{hostId}" - resourceNumericValues - m_mem_total; Slurm: real_memory
-    - used_mem        # Uge: "/hostsummary/{hostId}" - resourceNumericValues - m_mem_used; Slurm: real_memory - free_mem
-    - cpu_load        # Uge: "/hostsummary/{hostId}" - resourceNumericValues - load_avg
-    - current_watts   # Not available Uge
-    - consumed_energy # Not available Uge
-    - state           # Uge: "/exechosts", get executing hosts
-
-# slurm_freq: 1
-# slurm_metrics:
-#   job:
-#     - submit_time
-#     - start_time
-#     - suspend_time
-#     - end_time
-#     - run_time
-#     - job_state
-#     - nodes
-#     - num_cpus
-#     - num_nodes
-#     - user_id
-#   node:
-#     - cpus
-#     - cores
-#     - sockets
-#     - free_mem
-#     - real_memory
-#     - cpu_load
-#     - threads
-#     - current_watts
-#     - consumed_energy
-#     - state
-#   statistics:
-#     - jobs_submitted
-#     - jobs_started
-#     - jobs_completed
-#     - jobs_canceled
-#     - jobs_failed
-
-bmc_freq: 5
-bmc_metrics:
-# bmc_health:
-#   status:
-#     - state
-#     - health
-# system_health:
-power: power_consumed_watts
-thermal:
-  - fans:
-    - name # FAN_1, FAN_2, FAN_3, FAN_4 
-    - reading_rpm
-    # - lower_threshold_critical
-    # - upper_threshold_critical
-    # - lower_threshold_non_critical
-    # - upper_threshold_non_critical
-    # - lower_threshold_fatal
-    # - upper_threshold_fatal
-  - temperatures:
-    - name # CPU1 Temp, CPU2 Temp, Inlet Temp
-    - reading_celsius
-    # - lower_threshold_critical
-    # - upper_threshold_critical
-    # - lower_threshold_non_critical
-    # - upper_threshold_non_critical
-    # - lower_threshold_fatal
-    # - upper_threshold_fatal
-
-
-
