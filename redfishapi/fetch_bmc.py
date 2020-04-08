@@ -24,7 +24,8 @@ def fetch_bmc(config: object) -> object:
     bmc_info = {}
     try:
         cpu_count = multiprocessing.cpu_count()
-        hostlist = get_hostip(config["hostlist"])
+        # hostlist = get_hostip(config["hostlist"])
+        hostlist = ["10.101.1.1"]
         bmcapi_adapter = HTTPAdapter(config["max_retries"])
 
         start = time.time()
