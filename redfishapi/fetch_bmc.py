@@ -108,7 +108,7 @@ host = "10.101.1.1"
 bmcapi_adapter = HTTPAdapter(config["max_retries"])
 with requests.Session() as session:
     bmc_metrics = get_bmc_metrics(config, host, session, bmcapi_adapter)
-    print(json.dumps(bmc_metrics))
+    print(json.dumps(bmc_metrics, indent=4))
 
 # # BMC health metric
 # url = 'https://' + host + '/redfish/v1/Managers/iDRAC.Embedded.1'
