@@ -1,80 +1,90 @@
-list indices must be integers, not str
 [
     {
         "fields": {
             "Reading": 62.0
         },
-        "measurement": "Thermal",
         "tags": {
-            "NodeId": "10.101.1.1",
-            "Label": "CPU1Temp"
+            "Label": "CPU1Temp",
+            "NodeId": "10.101.1.1"
         },
-        "time": 1586383618447733760
+        "time": 1586383829396916736,
+        "measurement": "Thermal"
     },
     {
         "fields": {
             "Reading": 49.0
         },
-        "measurement": "Thermal",
         "tags": {
-            "NodeId": "10.101.1.1",
-            "Label": "CPU2Temp"
+            "Label": "CPU2Temp",
+            "NodeId": "10.101.1.1"
         },
-        "time": 1586383618447733760
+        "time": 1586383829396916736,
+        "measurement": "Thermal"
     },
     {
         "fields": {
             "Reading": 17.0
         },
-        "measurement": "Thermal",
         "tags": {
-            "NodeId": "10.101.1.1",
-            "Label": "InletTemp"
+            "Label": "InletTemp",
+            "NodeId": "10.101.1.1"
         },
-        "time": 1586383618447733760
+        "time": 1586383829396916736,
+        "measurement": "Thermal"
     },
     {
         "fields": {
             "Reading": 9870.0
         },
-        "measurement": "Thermal",
         "tags": {
-            "NodeId": "10.101.1.1",
-            "Label": "FAN_1"
+            "Label": "FAN_1",
+            "NodeId": "10.101.1.1"
         },
-        "time": 1586383618447733760
+        "time": 1586383829396916736,
+        "measurement": "Thermal"
     },
     {
         "fields": {
             "Reading": 9870.0
         },
-        "measurement": "Thermal",
         "tags": {
-            "NodeId": "10.101.1.1",
-            "Label": "FAN_2"
+            "Label": "FAN_2",
+            "NodeId": "10.101.1.1"
         },
-        "time": 1586383618447733760
+        "time": 1586383829396916736,
+        "measurement": "Thermal"
     },
     {
         "fields": {
             "Reading": 9870.0
         },
-        "measurement": "Thermal",
         "tags": {
-            "NodeId": "10.101.1.1",
-            "Label": "FAN_3"
+            "Label": "FAN_3",
+            "NodeId": "10.101.1.1"
         },
-        "time": 1586383618447733760
+        "time": 1586383829396916736,
+        "measurement": "Thermal"
     },
     {
         "fields": {
-            "Reading": 10010.0
+            "Reading": 9870.0
         },
-        "measurement": "Thermal",
         "tags": {
-            "NodeId": "10.101.1.1",
-            "Label": "FAN_4"
+            "Label": "FAN_4",
+            "NodeId": "10.101.1.1"
         },
-        "time": 1586383618447733760
+        "time": 1586383829396916736,
+        "measurement": "Thermal"
+    },
+    {
+        "fields": {
+            "Reading": 301.0
+        },
+        "tags": {
+            "Label": "NodePower",
+            "NodeId": "10.101.1.1"
+        },
+        "time": 1586383829396916736,
+        "measurement": "Power"
     }
 ]
