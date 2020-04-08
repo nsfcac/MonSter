@@ -1,4 +1,5 @@
 import json
+import time
 import requests
 import multiprocessing
 
@@ -26,6 +27,8 @@ def fetch_bmc(config: object) -> object:
         hostlist = get_hostip(config["hostlist"])
         bmcapi_adapter = HTTPAdapter(config["max_retries"])
 
+        start = time.time()
+
         with requests.Session() as session:
             get_bmc_metrics_args = zip(repeat(config), hostlist, 
                                        repeat(session), repeat(bmcapi_adapter))
@@ -35,6 +38,10 @@ def fetch_bmc(config: object) -> object:
 
         for index, host in enumerate(hostlist):
             bmc_info[host] = bmc_data[index]
+
+        elapsed = float("{0:.4f}".format(time.time() - start))
+        print("Query and process time: ")
+        print(elapsed)
     except Exception as err:
         print(err)
     
