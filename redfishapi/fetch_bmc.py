@@ -32,9 +32,8 @@ def get_hostip(hostlist_config: str) -> list:
     hostlist = []
     try:
         with open(hostlist_config) as hostlist_file:
-            hostname = json.load(hostlist_file)
-            hostlist = hostname
-            # hostlist = [host.split(":")[0][1:] for host in hostname]
+            hostname = json.loads(hostlist_file)
+            hostlist = [host.split(":")[0][1:] for host in hostname]
     except Exception as err:
         print(err)
 
