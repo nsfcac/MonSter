@@ -7,6 +7,9 @@ from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter 
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 config = {
     "user": "password",
     "password": "monster",
