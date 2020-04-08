@@ -10,15 +10,15 @@ from requests.adapters import HTTPAdapter
 from convert import get_hostip
 from process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
 
-config = {
-    "host": "129.118.104.35",
-    "port": "8182",
-    "user": "username",
-    "password": "password",
-    "timeout": [2, 6],
-    "max_retries": 3,
-    "ssl_verify": False,
-}
+# config = {
+#     "host": "129.118.104.35",
+#     "port": "8182",
+#     "user": "username",
+#     "password": "password",
+#     "timeout": [2, 6],
+#     "max_retries": 3,
+#     "ssl_verify": False,
+# }
 
 def fetch_uge(config: object) -> object:
     """
@@ -133,7 +133,7 @@ def get_exechosts(config: dict, uge_url: str, session: object, ugeapi_adapter: o
     try:
         exechosts_response = session.get(
             exechosts_url, verify = config["ssl_verify"], 
-            timeout = (config["timeout"][0], config["timeout"][1])
+            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
         )
         # exechosts = [get_hostip(h) for h in exechosts_response.json() if '-' in h]
         exechosts = [host for host in exechosts_response.json()]
@@ -152,7 +152,7 @@ def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter:
     try:
         host_response = session.get(
             host_url, verify = config["ssl_verify"], 
-            timeout = (config["timeout"][0], config["timeout"][1])
+            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
         )
         host = host_response.json()
     except ConnectionError as err:
@@ -170,11 +170,11 @@ def get_job_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: 
     try:
         job_response = session.get(
             job_url, verify = config["ssl_verify"], 
-            timeout = (config["timeout"][0], config["timeout"][1])
+            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
         )
         job = job_response.json()
     except ConnectionError as err:
         print(err)
     return job
 
-fetch_uge(config)
+# fetch_uge(config)
