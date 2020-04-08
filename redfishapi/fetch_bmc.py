@@ -45,7 +45,7 @@ def fetch_bmc(config: object) -> object:
     except Exception as err:
         print(err)
     
-    print(json.dumps(bmc_info, indent=4))
+    # print(json.dumps(bmc_info, indent=4))
     return bmc_info
 
 
@@ -93,6 +93,8 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
     except Exception as err:
         print(err)
     return bmc_metrics
+
+fetch_bmc(config)
 
 # def get_thermal()
 # # BMC health metric
