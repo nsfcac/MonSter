@@ -27,8 +27,7 @@ def fetch_bmc(config: object) -> object:
     bmc_info = {}
     try:
         cpu_count = multiprocessing.cpu_count()
-        # hostlist = get_hostip(config["hostlist"])
-        hostlist = ["10.101.1.1"]
+        hostlist = get_hostip(config["hostlist"])
         bmcapi_adapter = HTTPAdapter(config["max_retries"])
 
         start = time.time()
@@ -102,13 +101,13 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
     return bmc_metrics
 
 
-# fetch_bmc(config)
+fetch_bmc(config)
 
-host = "10.101.1.1"
-bmcapi_adapter = HTTPAdapter(config["max_retries"])
-with requests.Session() as session:
-    bmc_metrics = get_bmc_metrics(config, host, session, bmcapi_adapter)
-    print(json.dumps(bmc_metrics, indent=4))
+# host = "10.101.1.1"
+# bmcapi_adapter = HTTPAdapter(config["max_retries"])
+# with requests.Session() as session:
+#     bmc_metrics = get_bmc_metrics(config, host, session, bmcapi_adapter)
+#     print(json.dumps(bmc_metrics, indent=4))
 
 # # BMC health metric
 # url = 'https://' + host + '/redfish/v1/Managers/iDRAC.Embedded.1'
