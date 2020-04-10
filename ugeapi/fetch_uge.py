@@ -40,7 +40,7 @@ def fetch_uge(config: object) -> object:
         all_host_points = []
         all_job_points = []
 
-        start = time.time()
+        # start = time.time()
 
         with requests.Session() as session:
 
@@ -108,9 +108,9 @@ def fetch_uge(config: object) -> object:
                     })
                     all_job_points.append(job_detail[job])
             
-            elapsed = float("{0:.4f}".format(time.time() - start))
-            print("Query and process time: ")
-            print(elapsed)
+            # elapsed = float("{0:.4f}".format(time.time() - start))
+            # print("Query and process time: ")
+            # print(elapsed)
 #---------------------------- End Job Points -----------------------------------
         uge_info = {
             "all_job_points": all_job_points,
@@ -119,7 +119,8 @@ def fetch_uge(config: object) -> object:
 
         # print(json.dumps(uge_info, indent=4))
     except Exception as err:
-        print(err)
+        # print(err)
+        pass
     return uge_info
 
 
@@ -138,7 +139,8 @@ def get_exechosts(config: dict, uge_url: str, session: object, ugeapi_adapter: o
         # exechosts = [get_hostip(h) for h in exechosts_response.json() if '-' in h]
         exechosts = [host for host in exechosts_response.json()]
     except ConnectionError as err:
-        print(err)
+        # print(err)
+        pass
     return exechosts
 
 
@@ -156,7 +158,8 @@ def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter:
         )
         host = host_response.json()
     except ConnectionError as err:
-        print(err)
+        # print(err)
+        pass
     return host
 
 
@@ -174,7 +177,8 @@ def get_job_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: 
         )
         job = job_response.json()
     except ConnectionError as err:
-        print(err)
+        # print(err)
+        pass
     return job
 
 # fetch_uge(config)

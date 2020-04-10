@@ -62,7 +62,8 @@ def fetch_bmc(config: object) -> object:
             # print(elapsed)
 
     except Exception as err:
-        print(err)
+        # print(err)
+        pass
     
     return all_points
 
@@ -77,7 +78,8 @@ def get_hostip(hostlist_config: str) -> list:
             hostname_list = hostlist_file.read()[1:-1].split(", ")
             hostlist = [host.split(":")[0][1:] for host in hostname_list]
     except Exception as err:
-        print(err)
+        # print(err)
+        pass
     return hostlist
 
 
@@ -111,7 +113,8 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         power_metrics = power_response.json()
         bmc_metrics["power_metrics"] = power_metrics
     except Exception as err:
-        print(err)
+        # print(err)
+        pass
     return bmc_metrics
 
 
