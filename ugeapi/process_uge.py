@@ -107,7 +107,8 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
                 }
             }
     except Exception as err:
-        print(err)
+        # print(err)
+        pass
         
     return joblist_point
 
@@ -133,7 +134,8 @@ def process_node_jobs(host:str, node_jobs: dict) -> dict:
                 else:
                     job_data[job]["cpucores"] += 1
     except Exception as err:
-        print(err)
+        # print(err)
+        pass
     
     return job_data
 
@@ -164,6 +166,7 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
                         "cpucores": all_cpucores
                     })
     except Exception as err:
-        print(err)
+        # print(err)
+        pass
     
     return job_data
