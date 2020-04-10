@@ -28,11 +28,13 @@ def main():
         # Monitoring frequency
         freq = config["frequency"]
 
-        schedule.every(freq).seconds.do(write_db, client, config)
+        write_db(client, config)
 
-        while 1:
-            schedule.run_pending()
-            time.sleep(freq)
+        # schedule.every(freq).seconds.do(write_db, client, config)
+
+        # while 1:
+        #     schedule.run_pending()
+        #     time.sleep(freq)
 
         # print("DONE!")
     except Exception as err:
