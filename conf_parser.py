@@ -17,7 +17,7 @@ def parse_config() -> object:
 def check_config(cfg: object) -> bool:
     try:
         redfish = cfg["redfish"]
-        ugeapi = cfg["ugeapi"]
+        ugeapi = cfg["uge"]
         return True
     except Exception as err:
         print(err)
