@@ -68,7 +68,7 @@ def process_host(host_id:str, host_info: object, time: int) -> list:
             "dpoints": None,
             "joblist": None
         }
-        print(err)
+        # print(err)
     
     return all_data
 
