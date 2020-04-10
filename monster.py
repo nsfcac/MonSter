@@ -69,13 +69,14 @@ def write_db(client: object, config: object) -> None:
 
 def check_job(client: object, job: str) -> bool:
     try:
-        query_str = "SELECT " + job + " FROM JobsInfo"
+        query_str = "SELECT * FROM JobsInfo WHERE JobId = '" + job + "'"
         data = client.get(query_str)
         if data:
             return True
     except Exception as err:
         print(err)
-        return False
+        
+    return False
 
 
 if __name__ == '__main__':
