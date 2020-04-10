@@ -10,7 +10,7 @@ from requests.adapters import HTTPAdapter
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-from process_bmc import process_bmc
+from redfishapi.process_bmc import process_bmc
 
 # config = {
 #     "user": "password",
