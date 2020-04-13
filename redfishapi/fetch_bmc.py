@@ -95,6 +95,9 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 async def download_bmc(session: object, url: str, config: dict, bmcapi_adapter: object, bmc_info: dict) -> None:
     host_ip = url.split("/")[2]
     metric_name = url.split("/")[-2]
+    
+    print(host_ip, url)
+
     bmc_info[host_ip] = {}
     session.mount(url, bmcapi_adapter)
     async with session.get( url, verify = config["ssl_verify"], auth = (config["user"], config["password"]),timeout = (config["timeout"]["connect"], config["timeout"]["read"]) ) as response:
