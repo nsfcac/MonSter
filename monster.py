@@ -45,20 +45,20 @@ def main():
 def write_db(client: object, config: object, hostlist: list) -> None:
     all_points = []
     try:
-        # Fetch BMC information
-        bmc_points = fetch_bmc(config["redfish"], hostlist)
-        all_points.extend(bmc_points)
+        # # Fetch BMC information
+        # bmc_points = fetch_bmc(config["redfish"], hostlist)
+        # all_points.extend(bmc_points)
 
         # Fetch UGE information
         uge_host_points = fetch_uge(config["uge"])["all_host_points"]
         all_points.extend(uge_host_points)
 
-        uge_job_points = fetch_uge(config["uge"])["all_job_points"]
+        # uge_job_points = fetch_uge(config["uge"])["all_job_points"]
         
-        for job_point in uge_host_points:
-            job_id = job_point["tags"]["JobId"]
-            if not check_job(client, job_id):
-                all_points.append(job_point)
+        # for job_point in uge_host_points:
+        #     job_id = job_point["tags"]["JobId"]
+        #     if not check_job(client, job_id):
+        #         all_points.append(job_point)
 
         # Write points into influxdb
         # client.write_points(all_points)
