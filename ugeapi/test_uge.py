@@ -22,6 +22,6 @@ ugeapi_adapter = HTTPAdapter(config["max_retries"])
 
 
 with requests.Session() as session:
-    host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter, 501)
+    host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter, 500)
     print(len(host_detail))
-    # print(json.dumps(host_detail, indent=4))
+    print(json.dumps(host_detail, indent=4))
