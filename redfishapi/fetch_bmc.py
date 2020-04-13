@@ -53,20 +53,19 @@ def fetch_bmc(config: object, hostlist: list) -> object:
             for index, host in enumerate(hostlist):
                 bmc_info[host] = bmc_data[index]
 
-            print(bmc_info, indent = 4)
-            # # elapsed = float("{0:.4f}".format(time.time() - start))
+            # elapsed = float("{0:.4f}".format(time.time() - start))
 
-            # # Process metrics
-            # process_bmc_args = zip(hostlist, repeat(bmc_info), repeat(epoch_time))
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     host_points = pool.starmap(process_bmc, process_bmc_args)
+            # Process metrics
+            process_bmc_args = zip(hostlist, repeat(bmc_info), repeat(epoch_time))
+            with multiprocessing.Pool(processes=cpu_count) as pool:
+                host_points = pool.starmap(process_bmc, process_bmc_args)
 
-            # for points in host_points:
-            #     all_points.extend(points)
+            for points in host_points:
+                all_points.extend(points)
 
-            # # print("Query and process time: ")
-            # # print(elapsed)
-            # print(all_points, indent = 4)
+            # print("Query and process time: ")
+            # print(elapsed)
+            print(json.dumps(all_points), indent = 4)
 
     except Exception as err:
         print("fetch_bmc ERROR: ", end = " ")
@@ -128,7 +127,8 @@ def get_hostlist(hostlist_dir: str) -> list:
         # pass
     return hostlist
 
-hostlist = get_hostlist(config["hostlist"])
+# hostlist = get_hostlist(config["hostlist"])
+hostlist = ["10.101.9.18", "10.101.9.17"]
 
 fetch_bmc(config, hostlist)
 
