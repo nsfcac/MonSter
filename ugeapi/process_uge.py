@@ -5,7 +5,7 @@ import json
 from convert import get_hostip
 
 
-def process_host(host_id:str, host_data: object, time: int) -> list:
+def process_host(host_data: object, time: int) -> list:
     """
     Process host data according to the schema
     """
