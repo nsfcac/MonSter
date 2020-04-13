@@ -6,6 +6,9 @@ def process_host(host_id:str, host_info: object, time: int) -> list:
     Process host data according to the schema
     """
     all_data = {}
+    cpuusage_point = {}
+    memusage_point = {}
+    joblist_point = {}
     points = []
     joblist = []
     try:
@@ -14,47 +17,57 @@ def process_host(host_id:str, host_info: object, time: int) -> list:
 
         if host_data:
             # CPUUsage
-            cpuusage = float("{0:.2f}".format(host_data["resourceNumericValues"]["np_load_avg"]))
-            cpuusage_point = {
-                "measurement": "UGE",
-                "tags": {
-                    "Label": "CPUUsage",
-                    "NodeId": host_ip,
-                },
-                "time": time,
-                "fields": {
-                    "Reading": cpuusage
+            try:
+                cpuusage = float("{0:.2f}".format(host_data["resourceNumericValues"]["np_load_avg"]))
+                cpuusage_point = {
+                    "measurement": "UGE",
+                    "tags": {
+                        "Label": "CPUUsage",
+                        "NodeId": host_ip,
+                    },
+                    "time": time,
+                    "fields": {
+                        "Reading": cpuusage
+                    }
                 }
-            }
+            except:
+                pass
 
             # MemUsage
-            mem_free = host_data["resourceNumericValues"]["mem_free"]
-            mem_total = host_data["resourceNumericValues"]["mem_total"]
-            memusage = float("{0:.2f}".format( (mem_total-mem_free)/mem_total ))
-            memusage_point = {
-                "measurement": "UGE",
-                "tags": {
-                    "Label": "MemUsage",
-                    "NodeId": host_ip,
-                },
-                "time": time,
-                "fields": {
-                    "Reading": memusage
+            try:
+                mem_free = host_data["resourceNumericValues"]["mem_free"]
+                mem_total = host_data["resourceNumericValues"]["mem_total"]
+                memusage = float("{0:.2f}".format( (mem_total-mem_free)/mem_total ))
+                memusage_point = {
+                    "measurement": "UGE",
+                    "tags": {
+                        "Label": "MemUsage",
+                        "NodeId": host_ip,
+                    },
+                    "time": time,
+                    "fields": {
+                        "Reading": memusage
+                    }
                 }
-            }
+            except:
+                pass
+
             # NodeJobs
-            joblist = [str(job["id"]) for job in host_data["jobList"]]
-            jobset = list(set(joblist))
-            joblist_point = {
-                "measurement": "NodeJobs",
-                "tags": {
-                    "NodeId": host_ip,
-                },
-                "time": time,
-                "fields": {
-                    "JobList": str(jobset)
+            try:
+                joblist = [str(job["id"]) for job in host_data["jobList"]]
+                jobset = list(set(joblist))
+                joblist_point = {
+                    "measurement": "NodeJobs",
+                    "tags": {
+                        "NodeId": host_ip,
+                    },
+                    "time": time,
+                    "fields": {
+                        "JobList": str(jobset)
+                    }
                 }
-            }
+            except:
+                pass
 
             points = [cpuusage_point, memusage_point, joblist_point]
 
@@ -63,12 +76,13 @@ def process_host(host_id:str, host_info: object, time: int) -> list:
                 "joblist": joblist
             }
     except Exception as err:
-        # print("process_host error!")
         all_data = {
             "dpoints": None,
             "joblist": None
         }
-        # print(err)
+        print("process_host ERROR: ", end = " ")
+        print(host_id, end = " ")
+        print(err)
     
     return all_data
 
@@ -107,8 +121,10 @@ def process_job(job_id:str, jobs_info: object, time: int) -> list:
                 }
             }
     except Exception as err:
-        # print(err)
-        pass
+        print("process_job ERROR: ", end = " ")
+        print(job_id, end = " ")
+        print(err)
+        # pass
         
     return joblist_point
 
@@ -134,8 +150,10 @@ def process_node_jobs(host:str, node_jobs: dict) -> dict:
                 else:
                     job_data[job]["cpucores"] += 1
     except Exception as err:
-        # print(err)
-        pass
+        print("process_node_jobs ERROR: ", end = " ")
+        print(host, end = " ")
+        print(err)
+        # pass
     
     return job_data
 
@@ -166,7 +184,8 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
                         "cpucores": all_cpucores
                     })
     except Exception as err:
-        # print(err)
-        pass
+        print("aggregate_node_jobs ERROR: ", end = " ")
+        print(err)
+        # pass
     
     return job_data

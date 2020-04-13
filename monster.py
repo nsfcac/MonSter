@@ -3,7 +3,7 @@ import time
 import schedule
 from influxdb import InfluxDBClient
 
-from conf_parser import parse_config, check_config
+from helper.py import parse_config, check_config, get_hostlist
 from ugeapi.fetch_uge import fetch_uge
 from redfishapi.fetch_bmc import fetch_bmc
 
@@ -23,12 +23,13 @@ def main():
         user = config["influxdb"]["user"]
         password = config["influxdb"]["password"]
         dbname = config["influxdb"]["database"]
+        hostlist = get_hostlist(config["hostlistdir"])
         client = InfluxDBClient(host, port, user, password, dbname)
 
         # Monitoring frequency
         freq = config["frequency"]
 
-        write_db(client, config)
+        write_db(client, config, hostlist)
 
         # schedule.every(freq).seconds.do(write_db, client, config)
 
@@ -41,11 +42,11 @@ def main():
         print(err)
     return 
 
-def write_db(client: object, config: object) -> None:
+def write_db(client: object, config: object, hostlist: list) -> None:
     all_points = []
     try:
         # Fetch BMC information
-        bmc_points = fetch_bmc(config["redfish"])
+        bmc_points = fetch_bmc(config["redfish"], hostlist)
         all_points.extend(bmc_points)
 
         # Fetch UGE information

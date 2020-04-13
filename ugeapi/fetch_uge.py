@@ -7,18 +7,21 @@ from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-from ugeapi.convert import get_hostip
-from ugeapi.process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
+# from ugeapi.convert import get_hostip
+# from ugeapi.process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
 
-# config = {
-#     "host": "129.118.104.35",
-#     "port": "8182",
-#     "user": "username",
-#     "password": "password",
-#     "timeout": [2, 6],
-#     "max_retries": 3,
-#     "ssl_verify": False,
-# }
+from convert import get_hostip
+from process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
+
+config = {
+    "host": "129.118.104.35",
+    "port": "8182",
+    "user": "username",
+    "password": "password",
+    "timeout": [2, 6],
+    "max_retries": 3,
+    "ssl_verify": False,
+}
 
 def fetch_uge(config: object) -> object:
     """
@@ -117,10 +120,11 @@ def fetch_uge(config: object) -> object:
             "all_host_points": all_host_points
         }
 
-        # print(json.dumps(uge_info, indent=4))
+        print(json.dumps(uge_info, indent=4))
     except Exception as err:
-        # print(err)
-        pass
+        print("fetch_uge ERROR: ", end = " ")
+        print(err)
+        # pass
     return uge_info
 
 
@@ -136,11 +140,11 @@ def get_exechosts(config: dict, uge_url: str, session: object, ugeapi_adapter: o
             exechosts_url, verify = config["ssl_verify"], 
             timeout = (config["timeout"]["connect"], config["timeout"]["read"])
         )
-        # exechosts = [get_hostip(h) for h in exechosts_response.json() if '-' in h]
         exechosts = [host for host in exechosts_response.json()]
     except ConnectionError as err:
-        # print(err)
-        pass
+        print("get_exechosts ERROR: ", end = " ")
+        print(err)
+        # pass
     return exechosts
 
 
@@ -158,8 +162,10 @@ def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter:
         )
         host = host_response.json()
     except ConnectionError as err:
-        # print(err)
-        pass
+        print("get_host_detail ERROR: ", end = " ")
+        print(host_id, end = " ")
+        print(err)
+        # pass
     return host
 
 
@@ -177,8 +183,10 @@ def get_job_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: 
         )
         job = job_response.json()
     except ConnectionError as err:
-        # print(err)
+        print("get_job_detail ERROR: ", end = " ")
+        print(job_id, end = " ")
+        print(err)
         pass
     return job
 
-# fetch_uge(config)
+fetch_uge(config)
