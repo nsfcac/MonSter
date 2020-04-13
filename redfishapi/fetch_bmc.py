@@ -46,7 +46,8 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         urls = generate_urls(hostlist)
         asyncio.get_event_loop().run_until_complete(download_all_bmc(urls, conn, auth, timeout, bmc_info))
 
-        print(json.dumps(bmc_info, indent = 4))
+        # print(json.dumps(bmc_info, indent = 4))
+        
         # with requests.Session() as session:
         #     # Query metrics
         #     # get_bmc_metrics_args = zip(repeat(config), hostlist, 
@@ -100,6 +101,7 @@ async def download_bmc(session: object, url: str, bmc_info: dict) -> None:
     bmc_info[host_ip] = {}
     async with session.get(url) as response:
         bmc_info[host_ip][metric_name] = response.json()
+        print(response.content_length)
 
 
 async def download_all_bmc(urls: list, conn: object, auth: object, timeout: object, bmc_info: dict) -> None:
@@ -110,7 +112,7 @@ async def download_all_bmc(urls: list, conn: object, auth: object, timeout: obje
             task = asyncio.ensure_future(download_bmc(session, url, bmc_info))
             tasks.append(task)
         await asyncio.gather(*tasks, return_exceptions=True)
-        print("Finish download_all_bmc!")
+
 
 def generate_urls(hostlist:list) -> list:
     urls = []
