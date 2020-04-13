@@ -22,11 +22,10 @@ config = {
     "password": "monster",
     "timeout": {
         "connect": 2,
-        "read": 6
+        "total": 10
     },
     "max_retries": 3,
     "ssl_verify": False,
-    "hostlist": "../hostlist"
 }
 
 
@@ -38,12 +37,14 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     all_points = []
     try:
         # cpu_count = multiprocessing.cpu_count()
-        bmcapi_adapter = HTTPAdapter(config["max_retries"])
 
         # # start = time.time()
+        conn = aiohttp.TCPConnector(verify_ssl=config["ssl_verify"])
+        auth = aiohttp.BasicAuth(config["user"], config["password"])
+        timeout = aiohttp.ClientTimeout(total=config["timeout"]["total"], connect=config["timeout"]["connect"])
 
         urls = generate_urls(hostlist)
-        asyncio.get_event_loop().run_until_complete(download_all_bmc(urls, config, bmcapi_adapter, bmc_info))
+        asyncio.get_event_loop().run_until_complete(download_all_bmc(urls, conn, auth, timeout, bmc_info))
 
         print(json.dumps(bmc_info, indent = 4))
         # with requests.Session() as session:
@@ -92,23 +93,24 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return all_points
 
 
-async def download_bmc(session: object, url: str, config: dict, bmcapi_adapter: object, bmc_info: dict) -> None:
+async def download_bmc(session: object, url: str, bmc_info: dict) -> None:
     host_ip = url.split("/")[2]
     metric_name = url.split("/")[-2]
-    
+
     print(host_ip, url)
 
     bmc_info[host_ip] = {}
-    session.mount(url, bmcapi_adapter)
-    async with session.get( url, verify = config["ssl_verify"], auth = (config["user"], config["password"]),timeout = (config["timeout"]["connect"], config["timeout"]["read"]) ) as response:
+    async with session.get(url) as response:
+        print(response)
         bmc_info[host_ip][metric_name] = response.json()
 
 
-async def download_all_bmc(urls: list, config: dict, bmcapi_adapter: object, bmc_info: dict) -> None:
-    async with aiohttp.ClientSession() as session:
+async def download_all_bmc(urls: list, conn: object, auth: object, timeout: object, bmc_info: dict) -> None:
+    # auth = aiohttp.BasicAuth(config["user"], config["password"])
+    async with aiohttp.ClientSession(connector=conn, auth=auth, timeout=timeout) as session:
         tasks = []
         for url in urls:
-            task = asyncio.ensure_future(download_bmc(session, url, config, bmcapi_adapter, bmc_info))
+            task = asyncio.ensure_future(download_bmc(session, url, bmc_info))
             tasks.append(task)
         await asyncio.gather(*tasks, return_exceptions=True)
 
