@@ -129,7 +129,9 @@ def get_hostlist(hostlist_dir: str) -> list:
 
 hostlist = get_hostlist(config["hostlist"])
 
-fetch_bmc(config, hostlist)
+print(hostlist)
+
+# fetch_bmc(config, hostlist)
 
 # # Test using one host
 # host = "10.101.1.1"
