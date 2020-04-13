@@ -60,10 +60,10 @@ def fetch_uge(config: object) -> object:
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 host_data = pool.starmap(get_host_detail, pool_host_args)
             
-            for index, host in enumerate(exechosts):
-                host_info[host] = host_data[index]
+            # for index, host in enumerate(exechosts):
+            #     host_info[host] = host_data[index]
 
-            print(json.dumps(host_info, indent=4))
+            print(json.dumps(host_data, indent=4))
             # # Process host info
             # process_host_args = zip(exechosts, repeat(host_info), repeat(epoch_time))
             # with multiprocessing.Pool(processes=cpu_count) as pool:
