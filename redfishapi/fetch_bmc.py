@@ -107,8 +107,8 @@ async def download_bmc(session: object, url: str, bmc_info: dict) -> None:
 
 async def download_all_bmc(urls: list, conn: object, auth: object, timeout: object, bmc_info: dict) -> None:
     # auth = aiohttp.BasicAuth(config["user"], config["password"])
-    # async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
+    # async with aiohttp.ClientSession() as session:
         tasks = []
         for url in urls:
             task = asyncio.ensure_future(download_bmc(session, url, bmc_info))
