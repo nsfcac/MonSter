@@ -42,30 +42,34 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
         with requests.Session() as session:
             # Query metrics
-            get_bmc_metrics_args = zip(repeat(config), hostlist, 
-                                    repeat(session), repeat(bmcapi_adapter))
+            # get_bmc_metrics_args = zip(repeat(config), hostlist, 
+            #                         repeat(session), repeat(bmcapi_adapter))
             # Use request time as time stamp
             epoch_time = int(round(time.time() * 1000000000))
 
+            # Query bmc metrics in parallel
             with multiprocessing.Pool(processes=cpu_count) as pool:
-                bmc_data = pool.starmap(get_bmc_metrics, get_bmc_metrics_args)
+                # bmc_data = pool.starmap(get_bmc_metrics, get_bmc_metrics_args)
+                for host in hostlist:
+                    result = pool.apply_async(get_bmc_metrics, args = (config, host, session, bmcapi_adapter))
 
-            for index, host in enumerate(hostlist):
-                bmc_info[host] = bmc_data[index]
+            print(result.get(timeout=30))
+            # # for index, host in enumerate(hostlist):
+            # #     bmc_info[host] = bmc_data[index]
 
-            # elapsed = float("{0:.4f}".format(time.time() - start))
+            # # elapsed = float("{0:.4f}".format(time.time() - start))
 
-            # Process metrics
-            process_bmc_args = zip(hostlist, repeat(bmc_info), repeat(epoch_time))
-            with multiprocessing.Pool(processes=cpu_count) as pool:
-                host_points = pool.starmap(process_bmc, process_bmc_args)
+            # # Process metrics
+            # process_bmc_args = zip(hostlist, repeat(bmc_info), repeat(epoch_time))
+            # with multiprocessing.Pool(processes=cpu_count) as pool:
+            #     host_points = pool.starmap(process_bmc, process_bmc_args)
 
-            for points in host_points:
-                all_points.extend(points)
+            # for points in host_points:
+            #     all_points.extend(points)
 
-            # print("Query and process time: ")
-            # print(elapsed)
-            print(json.dumps(all_points, indent = 4))
+            # # print("Query and process time: ")
+            # # print(elapsed)
+            # print(json.dumps(all_points, indent = 4))
 
     except Exception as err:
         print("fetch_bmc ERROR: ", end = " ")
@@ -86,7 +90,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
     try:
         # Thermal information
         thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
-        # session.mount(thermal_url, bmcapi_adapter)
+        session.mount(thermal_url, bmcapi_adapter)
         thermal_response = session.get(
             thermal_url, verify = config["ssl_verify"],
             auth = (config["user"], config["password"]),
@@ -97,7 +101,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         
         # Power consumption
         power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
-        # session.mount(power_url, bmcapi_adapter)
+        session.mount(power_url, bmcapi_adapter)
         power_response = session.get(
             power_url, verify = config["ssl_verify"],
             auth = (config["user"], config["password"]),
@@ -126,6 +130,9 @@ def get_hostlist(hostlist_dir: str) -> list:
         print(err)
         # pass
     return hostlist
+
+# def log_bmc_info(bmc_info: dict, result: dict) -> None:
+
 
 hostlist = get_hostlist(config["hostlist"])
 # hostlist = ["10.101.9.18", "10.101.9.17"]
