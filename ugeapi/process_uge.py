@@ -1,8 +1,8 @@
 import json
-from ugeapi.convert import get_hostip
+# from ugeapi.convert import get_hostip
 
-## For test single function
-# from convert import get_hostip
+# For test single function
+from convert import get_hostip
 
 
 def process_host(host_id:str, host_info: object, time: int) -> list:
