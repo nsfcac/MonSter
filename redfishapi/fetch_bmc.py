@@ -178,8 +178,8 @@ def get_hostlist(hostlist_dir: str) -> list:
 # def log_bmc_info(bmc_info: dict, result: dict) -> None:
 
 
-# hostlist = get_hostlist(config["hostlist"])
-hostlist = ["10.101.1.1", "10.101.9.17"]
+hostlist = get_hostlist(config["hostlist"])
+# hostlist = ["10.101.1.1", "10.101.9.17"]
 # hostlist = ["https://realpython.com/python-concurrency/#how-to-speed-up-an-io-bound-program"]
 
 fetch_bmc(config, hostlist)
