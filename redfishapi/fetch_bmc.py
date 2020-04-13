@@ -19,8 +19,8 @@ config = {
     "user": "password",
     "password": "monster",
     "timeout": {
-        "connect": 2,
-        "read": 6
+        "connect": 5,
+        "read": 15
     },
     "max_retries": 3,
     "ssl_verify": False,
@@ -65,7 +65,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
             # print("Query and process time: ")
             # print(elapsed)
-            print(json.dumps(all_points), indent = 4)
+            print(json.dumps(all_points, indent = 4))
 
     except Exception as err:
         print("fetch_bmc ERROR: ", end = " ")
