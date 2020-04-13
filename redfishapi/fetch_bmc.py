@@ -30,7 +30,7 @@ config = {
 }
 
 
-async def fetch_bmc(config: object, hostlist: list) -> object:
+def fetch_bmc(config: object, hostlist: list) -> object:
     """
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
