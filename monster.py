@@ -56,10 +56,10 @@ def write_db(client: object, config: object, hostlist: list) -> None:
         uge_job_points = fetch_uge(config["uge"])["all_job_points"]
         
         for job_point in uge_host_points:
-            job_id = job_point["tags"]["JobId"]
+            # job_id = job_point["tags"]["JobId"]
             print(json.dumps(job_point, indent=4))
-            if not check_job(client, job_id):
-                all_points.append(job_point)
+            # if not check_job(client, job_id):
+            #     all_points.append(job_point)
             
 
         # Write points into influxdb
