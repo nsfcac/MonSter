@@ -57,7 +57,7 @@ def write_db(client: object, config: object, hostlist: list) -> None:
         
         for job_point in uge_host_points:
             job_id = job_point["tags"]["JobId"]
-            print(job_id)
+            print(json.dumps(job_point, indent=4))
             if not check_job(client, job_id):
                 all_points.append(job_point)
             
