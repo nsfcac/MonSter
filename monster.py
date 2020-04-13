@@ -3,7 +3,7 @@ import time
 import schedule
 from influxdb import InfluxDBClient
 
-from helper.py import parse_config, check_config, get_hostlist
+from helper import parse_config, check_config, get_hostlist
 from ugeapi.fetch_uge import fetch_uge
 from redfishapi.fetch_bmc import fetch_bmc
 
