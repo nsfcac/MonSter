@@ -39,7 +39,6 @@ def fetch_uge(config: object) -> object:
         uge_url = "http://" + config["host"] + ":" + config["port"]
         ugeapi_adapter = HTTPAdapter(config["max_retries"])
 
-        host_info = {}
         jobs_info = {}
         node_jobs = {}
         job_detail = {}
@@ -63,13 +62,12 @@ def fetch_uge(config: object) -> object:
                 processed_host_detail = pool.starmap(process_host, process_host_args)
 
             exechosts = [item["hostname"] for item in host_detail]
-            # for index, host in enumerate(exechosts):
-            #     try:
-            #         if processed_host_info[index]:
-            #             all_host_points.extend(processed_host_info[index]["dpoints"])
-            #             node_jobs[host] = processed_host_info[index]["joblist"]
-            #     except Exception as err:
-            #         print(err)
+            for index, host in enumerate(exechosts):
+                try:
+                    all_host_points.extend(processed_host_detail[index]["dpoints"])
+                    node_jobs[host] = processed_host_detail[index]["joblist"]
+                except Exception as err:
+                    print(err)
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
