@@ -51,34 +51,24 @@ def fetch_uge(config: object) -> object:
 
         with requests.Session() as session:
 
-            # Get executing hosts running on the cluster
-            exechosts = get_exechosts(config, uge_url, session, ugeapi_adapter)
-            exechosts = [host for host in exechosts if '-' in host]
-
             epoch_time = int(round(time.time() * 1000000000))
 
 #--------------------------------- Host info -----------------------------------
-            # Get hosts detail in parallel 
-            pool_host_args = zip(repeat(config), repeat(uge_url), repeat(session), 
-                                 repeat(ugeapi_adapter), exechosts)
-            with multiprocessing.Pool(processes=cpu_count) as pool:
-                host_data = pool.starmap(get_host_detail, pool_host_args)
-            
-            for index, host in enumerate(exechosts):
-                host_info[host] = host_data[index]
+            # Get hosts detail
+            host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter)
 
             # Process host info
-            process_host_args = zip(exechosts, repeat(host_info), repeat(epoch_time))
+            process_host_args = zip(host_detail, repeat(epoch_time))
             with multiprocessing.Pool(processes=cpu_count) as pool:
-                processed_host_info = pool.starmap(process_host, process_host_args)
+                processed_host_detail = pool.starmap(process_host, process_host_args)
 
-            for index, host in enumerate(exechosts):
-                try:
-                    if processed_host_info[index]:
-                        all_host_points.extend(processed_host_info[index]["dpoints"])
-                        node_jobs[host] = processed_host_info[index]["joblist"]
-                except Exception as err:
-                    print(err)
+            # for index, host in enumerate(exechosts):
+            #     try:
+            #         if processed_host_info[index]:
+            #             all_host_points.extend(processed_host_info[index]["dpoints"])
+            #             node_jobs[host] = processed_host_info[index]["joblist"]
+            #     except Exception as err:
+            #         print(err)
 #----------------------------- End Host Points ---------------------------------
 
 #-------------------------------- Job Points -----------------------------------
@@ -131,33 +121,33 @@ def fetch_uge(config: object) -> object:
     return uge_info
 
 
-def get_exechosts(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
-    """
-    Get executing hosts
-    """
-    exechosts = []
-    exechosts_url = uge_url + "/exechosts" 
-    session.mount(exechosts_url, ugeapi_adapter)
-    try:
-        exechosts_response = session.get(
-            exechosts_url, verify = config["ssl_verify"], 
-            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
-        )
-        exechosts = [host for host in exechosts_response.json()]
-    except ConnectionError as err:
-        print("get_exechosts ERROR: ", end = " ")
-        print(err)
-        # pass
-    return exechosts
+# def get_exechosts(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
+#     """
+#     Get executing hosts
+#     """
+#     exechosts = []
+#     exechosts_url = uge_url + "/exechosts" 
+#     session.mount(exechosts_url, ugeapi_adapter)
+#     try:
+#         exechosts_response = session.get(
+#             exechosts_url, verify = config["ssl_verify"], 
+#             timeout = (config["timeout"]["connect"], config["timeout"]["read"])
+#         )
+#         exechosts = [host for host in exechosts_response.json()]
+#     except ConnectionError as err:
+#         print("get_exechosts ERROR: ", end = " ")
+#         print(err)
+#         # pass
+#     return exechosts
 
 
-def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object, range: int) -> object:
+def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
     """
     Get host details
     """
     host = None
     # host_url = uge_url + "/hostsummary" + "/" + host_id
-    host_url = uge_url + "/hostsummary/" + "compute/" + str(range)
+    host_url = uge_url + "/hostsummary/" + "compute/" + str(config["computing_hosts"])
     session.mount(host_url, ugeapi_adapter)
     try:
         host_response = session.get(
@@ -167,7 +157,6 @@ def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter:
         host = host_response.json()
     except ConnectionError as err:
         print("get_host_detail ERROR: ", end = " ")
-        # print(host_id, end = " ")
         print(err)
         # pass
     return host
