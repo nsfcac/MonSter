@@ -22,7 +22,7 @@ from redfishapi.process_bmc import process_bmc
 # }
 
 
-def fetch_bmc(config: object) -> object:
+def fetch_bmc(config: object, hostlist: list) -> object:
     """
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
@@ -30,8 +30,6 @@ def fetch_bmc(config: object) -> object:
     all_points = []
     try:
         cpu_count = multiprocessing.cpu_count()
-        hostlist = get_hostip(config["hostlist"])
-        # hostlist = ["10.101.1.1", "10.101.1.2"]
         bmcapi_adapter = HTTPAdapter(config["max_retries"])
 
         # start = time.time()
@@ -39,7 +37,8 @@ def fetch_bmc(config: object) -> object:
         with requests.Session() as session:
             # Query metrics
             get_bmc_metrics_args = zip(repeat(config), hostlist, 
-                                       repeat(session), repeat(bmcapi_adapter))
+                                    repeat(session), repeat(bmcapi_adapter))
+            # Use request time as time stamp
             epoch_time = int(round(time.time() * 1000000000))
 
             with multiprocessing.Pool(processes=cpu_count) as pool:
@@ -62,25 +61,10 @@ def fetch_bmc(config: object) -> object:
             # print(elapsed)
 
     except Exception as err:
-        # print(err)
-        pass
+        print(err)
+        # pass
     
     return all_points
-
-
-def get_hostip(hostlist_config: str) -> list:
-    """
-    Parse host IP from file
-    """
-    hostlist = []
-    try:
-        with open(hostlist_config, "r") as hostlist_file:
-            hostname_list = hostlist_file.read()[1:-1].split(", ")
-            hostlist = [host.split(":")[0][1:] for host in hostname_list]
-    except Exception as err:
-        # print(err)
-        pass
-    return hostlist
 
 
 def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: object) -> list:
@@ -102,6 +86,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         )
         thermal_metrics = thermal_response.json()
         bmc_metrics["thermal_metrics"] = thermal_metrics
+        
         # Power consumption
         power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
         session.mount(power_url, bmcapi_adapter)
@@ -113,8 +98,8 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         power_metrics = power_response.json()
         bmc_metrics["power_metrics"] = power_metrics
     except Exception as err:
-        # print(err)
-        pass
+        print(err)
+        # pass
     return bmc_metrics
 
 

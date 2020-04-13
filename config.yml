@@ -8,14 +8,17 @@ influxdb:
 frequency: 
   60
 
+hostlistdir: './hostlist'
+
 redfish:
   user: 'root'
   password: 'nivipnut'
   timeout: 
-    connect: 5 # connect timeout
-    read: 10   # read timeout
+    connect: 4 # connect timeout
+    read: 12   # read timeout
   max_retries: 3
   ssl_verify: False   # Secure Sockets Layer Verify
+  hostlist: "./hostlist"
 
 uge:
   host: '129.118.104.35'
