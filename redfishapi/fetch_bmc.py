@@ -97,8 +97,6 @@ async def download_bmc(session: object, url: str, bmc_info: dict) -> None:
     host_ip = url.split("/")[2]
     metric_name = url.split("/")[-2]
 
-    print(host_ip, url)
-
     bmc_info[host_ip] = {}
     async with session.get(url) as response:
         print(response)
