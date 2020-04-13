@@ -61,9 +61,9 @@ def write_db(client: object, config: object, hostlist: list) -> None:
         #         all_points.append(job_point)
 
         # Write points into influxdb
-        # client.write_points(all_points)
-        print(json.dumps(all_points, indent=4))
-        # print("Done!")
+        client.write_points(all_points)
+        # print(json.dumps(all_points, indent=4))
+        print("Done!")
     except Exception as err:
         print(err)
     return
