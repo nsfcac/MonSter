@@ -151,12 +151,13 @@ def get_exechosts(config: dict, uge_url: str, session: object, ugeapi_adapter: o
     return exechosts
 
 
-def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object, host_id: str) -> object:
+def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object, range: int) -> object:
     """
     Get host details
     """
-    host = {}
-    host_url = uge_url + "/hostsummary" + "/" + host_id
+    host = None
+    # host_url = uge_url + "/hostsummary" + "/" + host_id
+    host_url = uge_url + "/hostsummary/" + "compute/" + range
     session.mount(host_url, ugeapi_adapter)
     try:
         host_response = session.get(
@@ -166,7 +167,7 @@ def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter:
         host = host_response.json()
     except ConnectionError as err:
         print("get_host_detail ERROR: ", end = " ")
-        print(host_id, end = " ")
+        # print(host_id, end = " ")
         print(err)
         # pass
     return host
