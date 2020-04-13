@@ -14,7 +14,8 @@ config = {
         "read": 6
     },
     "max_retries": 3,
-    "ssl_verify": False
+    "ssl_verify": False,
+    "total_hosts": 467
 }
 
 uge_url = "http://" + config["host"] + ":" + config["port"]
@@ -22,7 +23,7 @@ ugeapi_adapter = HTTPAdapter(config["max_retries"])
 
 
 with requests.Session() as session:
-    host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter, 500)
+    host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter, config["total_hosts"])
     print(len(host_detail))
     hostname = [item["hostname"] for item in host_detail]
     print(json.dumps(hostname, indent=4))
