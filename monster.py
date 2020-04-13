@@ -5,7 +5,7 @@ from influxdb import InfluxDBClient
 
 from helper import parse_config, check_config, get_hostlist
 from ugeapi.fetch_uge import fetch_uge
-from redfishapi.fetch_bmc import fetch_bmc
+# from redfishapi.fetch_bmc import fetch_bmc
 
 
 def main():
