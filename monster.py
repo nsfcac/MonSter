@@ -24,7 +24,7 @@ def main():
         # password = config["influxdb"]["password"]
         dbname = config["influxdb"]["database"]
         hostlist = get_hostlist(config["hostlistdir"])
-        client = InfluxDBClient(host, port, dbname)
+        client = InfluxDBClient(host=host, port=port, database=dbname)
 
         # Monitoring frequency
         freq = config["frequency"]
