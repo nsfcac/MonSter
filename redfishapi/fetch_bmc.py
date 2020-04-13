@@ -99,8 +99,8 @@ async def download_bmc(session: object, url: str, bmc_info: dict) -> None:
 
     bmc_info[host_ip] = {}
     async with session.get(url) as response:
-        print(response)
         bmc_info[host_ip][metric_name] = response.json()
+    print("download_bmc")
 
 
 async def download_all_bmc(urls: list, conn: object, auth: object, timeout: object, bmc_info: dict) -> None:
@@ -111,7 +111,7 @@ async def download_all_bmc(urls: list, conn: object, auth: object, timeout: obje
             task = asyncio.ensure_future(download_bmc(session, url, bmc_info))
             tasks.append(task)
         await asyncio.gather(*tasks, return_exceptions=True)
-
+        print("Finish download_all_bmc!")
 
 def generate_urls(hostlist:list) -> list:
     urls = []
