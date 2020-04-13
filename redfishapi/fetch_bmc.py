@@ -39,13 +39,13 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         # cpu_count = multiprocessing.cpu_count()
 
         # # start = time.time()
-        conn = aiohttp.connector.TCPConnector(limit=config["max_retries"], verify_ssl=config["ssl_verify"])
+        conn = aiohttp.connector.TCPConnector(limit=config["max_retries"], ssl=config["ssl_verify"])
         auth = aiohttp.BasicAuth(config["user"], config["password"])
         timeout = aiohttp.ClientTimeout(total=config["timeout"]["total"], connect=config["timeout"]["connect"])
 
         urls = generate_urls(hostlist)
-        print(urls)
-        # asyncio.get_event_loop().run_until_complete(download_all_bmc(urls, conn, auth, timeout, bmc_info))
+
+        asyncio.get_event_loop().run_until_complete(download_all_bmc(urls, conn, auth, timeout, bmc_info))
 
         # print(json.dumps(bmc_info, indent = 4))
 
@@ -101,13 +101,14 @@ async def download_bmc(session: object, url: str, bmc_info: dict) -> None:
 
     bmc_info[host_ip] = {}
     async with session.get(url) as response:
-        bmc_info[host_ip][metric_name] = response.json()
-        print(response.json())
+        # bmc_info[host_ip][metric_name] = response.json()
+        print("Read {0} from {1}".format(response.content_length, url))
 
 
 async def download_all_bmc(urls: list, conn: object, auth: object, timeout: object, bmc_info: dict) -> None:
     # auth = aiohttp.BasicAuth(config["user"], config["password"])
-    async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
+    # async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
+    async with aiohttp.ClientSession() as session:
         tasks = []
         for url in urls:
             task = asyncio.ensure_future(download_bmc(session, url, bmc_info))
@@ -180,6 +181,7 @@ def get_hostlist(hostlist_dir: str) -> list:
 
 # hostlist = get_hostlist(config["hostlist"])
 hostlist = ["10.101.9.18", "10.101.9.17"]
+# hostlist = ["https://realpython.com/python-concurrency/#how-to-speed-up-an-io-bound-program"]
 
 fetch_bmc(config, hostlist)
 
