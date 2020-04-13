@@ -20,8 +20,8 @@ def main():
         # Initialize influxdb
         host = config["influxdb"]["host"]
         port = config["influxdb"]["port"]
-        user = config["influxdb"]["user"]
-        password = config["influxdb"]["password"]
+        # user = config["influxdb"]["user"]
+        # password = config["influxdb"]["password"]
         dbname = config["influxdb"]["database"]
         hostlist = get_hostlist(config["hostlistdir"])
         client = InfluxDBClient(host, port, dbname)
