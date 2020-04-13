@@ -110,7 +110,7 @@ def fetch_uge(config: object) -> object:
                 if job_detail[job]:
                     job_detail[job]["fields"].update({
                         "totalnodes": aggregated_node_jobs[job]["totalnodes"],
-                        "nodelist": aggregated_node_jobs[job]["nodelist"],
+                        "nodelist": str(aggregated_node_jobs[job]["nodelist"]),
                         "cpucores": aggregated_node_jobs[job]["cpucores"]
                     })
                     all_job_points.append(job_detail[job])
