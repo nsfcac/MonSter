@@ -7,8 +7,8 @@ from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter 
 
-# import urllib3
-# urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # from redfishapi.process_bmc import process_bmc
 
@@ -86,7 +86,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
     try:
         # Thermal information
         thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
-        session.mount(thermal_url, bmcapi_adapter)
+        # session.mount(thermal_url, bmcapi_adapter)
         thermal_response = session.get(
             thermal_url, verify = config["ssl_verify"],
             auth = (config["user"], config["password"]),
@@ -97,7 +97,7 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         
         # Power consumption
         power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
-        session.mount(power_url, bmcapi_adapter)
+        # session.mount(power_url, bmcapi_adapter)
         power_response = session.get(
             power_url, verify = config["ssl_verify"],
             auth = (config["user"], config["password"]),
