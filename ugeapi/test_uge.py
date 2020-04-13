@@ -1,8 +1,10 @@
 import json
+import time
 import requests
 from requests.adapters import HTTPAdapter
 
 from fetch_uge import get_exechosts, get_host_detail
+from process_uge import process_host
 
 config = {
     "host": "129.118.104.35",
@@ -15,7 +17,7 @@ config = {
     },
     "max_retries": 3,
     "ssl_verify": False,
-    "total_hosts": 467
+    "computing_hosts": 467
 }
 
 uge_url = "http://" + config["host"] + ":" + config["port"]
@@ -23,8 +25,7 @@ ugeapi_adapter = HTTPAdapter(config["max_retries"])
 
 
 with requests.Session() as session:
-    host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter, config["total_hosts"])
-    print(len(host_detail))
-    hostname = [item["hostname"] for item in host_detail if "compute" in item["hostname"]]
-    print(len(hostname))
-    print(json.dumps(hostname, indent=4))
+    epoch_time = int(round(time.time() * 1000000000))
+    host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter)
+    processed_host_detail = process_host(host_detail[0], epoch_time)
+    print(json.dumps(processed_host_detail, indent=4))
