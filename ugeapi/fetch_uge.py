@@ -62,6 +62,7 @@ def fetch_uge(config: object) -> object:
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 processed_host_detail = pool.starmap(process_host, process_host_args)
 
+            exechosts = [item["hostname"] for item in host_detail]
             # for index, host in enumerate(exechosts):
             #     try:
             #         if processed_host_info[index]:
