@@ -3,7 +3,7 @@ import time
 import requests
 from requests.adapters import HTTPAdapter
 
-from fetch_uge import get_exechosts, get_host_detail
+from fetch_uge import get_host_detail
 from process_uge import process_host
 
 config = {
