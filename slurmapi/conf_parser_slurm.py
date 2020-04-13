@@ -1,5 +1,6 @@
 import yaml
 
+
 def parse_config() -> object:
     """
     Read configuration file
@@ -8,9 +9,10 @@ def parse_config() -> object:
     try:
         with open('./config.yml', 'r') as ymlfile:
             cfg = yaml.safe_load(ymlfile)
+        return cfg
     except Exception as err:
         print(err)
-    return cfg
+
 
 def check_config(cfg: object) -> bool:
     try:
