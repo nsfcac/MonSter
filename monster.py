@@ -73,7 +73,7 @@ def write_db(client: object, config: object, hostlist: list) -> None:
 def check_job(client: object, job: str) -> bool:
     try:
         query_str = "SELECT * FROM JobsInfo WHERE JobId = '" + job + "'"
-        data = client.get(query_str)
+        data = client.query(query_str)
         if data:
             return True
     except Exception as err:
