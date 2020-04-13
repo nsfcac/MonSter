@@ -20,8 +20,8 @@ def main():
         # Initialize influxdb
         host = config["influxdb"]["host"]
         port = config["influxdb"]["port"]
-        # user = config["influxdb"]["user"]
-        # password = config["influxdb"]["password"]
+        user = config["influxdb"]["user"]
+        password = config["influxdb"]["password"]
         dbname = config["influxdb"]["database"]
         hostlist = get_hostlist(config["hostlistdir"])
         client = InfluxDBClient(host=host, port=port, database=dbname)
@@ -53,12 +53,12 @@ def write_db(client: object, config: object, hostlist: list) -> None:
         uge_host_points = fetch_uge(config["uge"])["all_host_points"]
         all_points.extend(uge_host_points)
 
-        # uge_job_points = fetch_uge(config["uge"])["all_job_points"]
+        uge_job_points = fetch_uge(config["uge"])["all_job_points"]
         
-        # for job_point in uge_host_points:
-        #     job_id = job_point["tags"]["JobId"]
-        #     if not check_job(client, job_id):
-        #         all_points.append(job_point)
+        for job_point in uge_host_points:
+            job_id = job_point["tags"]["JobId"]
+            if not check_job(client, job_id):
+                all_points.append(job_point)
 
         # Write points into influxdb
         client.write_points(all_points)
