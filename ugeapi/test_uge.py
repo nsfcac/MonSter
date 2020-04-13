@@ -49,4 +49,4 @@ with requests.Session() as session:
         except Exception as err:
             print(err)
     # processed_host_detail = process_host(host_detail[0], epoch_time)
-    print(json.dumps(all_host_points, indent=4))
+    print(json.dumps(node_jobs, indent=4))
