@@ -10,16 +10,22 @@ from requests.adapters import HTTPAdapter
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-from redfishapi.process_bmc import process_bmc
+# from redfishapi.process_bmc import process_bmc
 
-# config = {
-#     "user": "password",
-#     "password": "monster",
-#     "timeout": [5, 10],
-#     "max_retries": 3,
-#     "ssl_verify": False,
-#     "hostlist": "./hostlist"
-# }
+# For test single function
+from process_bmc import process_bmc
+
+config = {
+    "user": "password",
+    "password": "monster",
+    "timeout": {
+        "connect": 4,
+        "read": 12
+    },
+    "max_retries": 3,
+    "ssl_verify": False,
+    "hostlist": "../hostlist"
+}
 
 
 def fetch_bmc(config: object, hostlist: list) -> object:
@@ -59,8 +65,10 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
             # print("Query and process time: ")
             # print(elapsed)
+            print(all_points, indent = 4)
 
     except Exception as err:
+        print("fetch_bmc ERROR: ", end = " ")
         print(err)
         # pass
     
@@ -98,12 +106,30 @@ def get_bmc_metrics(config: dict, host: str, session: object, bmcapi_adapter: ob
         power_metrics = power_response.json()
         bmc_metrics["power_metrics"] = power_metrics
     except Exception as err:
+        print("get_bmc_metrics ERROR: ", end = " " )
+        print(host, end = " ")
         print(err)
         # pass
     return bmc_metrics
 
+# For test
+def get_hostlist(hostlist_dir: str) -> list:
+    """
+    Parse host IP from file
+    """
+    hostlist = []
+    try:
+        with open(hostlist_dir, "r") as hostlist_file:
+            hostname_list = hostlist_file.read()[1:-1].split(", ")
+            hostlist = [host.split(":")[0][1:] for host in hostname_list]
+    except Exception as err:
+        print(err)
+        # pass
+    return hostlist
 
-# fetch_bmc(config)
+hostlist = get_hostlist(config["hostlist"])
+
+fetch_bmc(config, hostlist)
 
 # # Test using one host
 # host = "10.101.1.1"

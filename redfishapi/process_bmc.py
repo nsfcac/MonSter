@@ -60,6 +60,8 @@ def process_bmc(host: str, bmc_info: dict, time: int) -> list:
             }
             points.append(power_point)
     except Exception as err:
+        print("process_bmc ERROR: ", end = " ")
+        print(host, end = " ")
         print(err)
 
     return points
