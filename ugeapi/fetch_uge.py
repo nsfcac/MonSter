@@ -7,12 +7,12 @@ from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-from ugeapi.convert import get_hostip
-from ugeapi.process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
+# from ugeapi.convert import get_hostip
+# from ugeapi.process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
 
-## For test single function
-# from convert import get_hostip
-# from process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
+# For test single function
+from convert import get_hostip
+from process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
 
 # config = {
 #     "host": "129.118.104.35",
