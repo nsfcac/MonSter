@@ -20,7 +20,7 @@ config = {
     "password": "password",
     "timeout": [2, 6],
     "max_retries": 3,
-    "ssl_verify": False,
+    "ssl_verify": False
 }
 
 def fetch_uge(config: object) -> object:
