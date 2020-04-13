@@ -26,6 +26,7 @@ config = {
     },
     "max_retries": 3,
     "ssl_verify": False,
+    "hostlist": "../hostlist"
 }
 
 
