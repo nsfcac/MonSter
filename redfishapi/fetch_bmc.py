@@ -39,7 +39,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         # cpu_count = multiprocessing.cpu_count()
 
         # # start = time.time()
-        conn = aiohttp.TCPConnector(limit=config["max_retries"], verify_ssl=config["ssl_verify"])
+        conn = aiohttp.connector.TCPConnector(limit=config["max_retries"], verify_ssl=config["ssl_verify"])
         auth = aiohttp.BasicAuth(config["user"], config["password"])
         timeout = aiohttp.ClientTimeout(total=config["timeout"]["total"], connect=config["timeout"]["connect"])
 
@@ -104,7 +104,7 @@ async def download_bmc(session: object, url: str, bmc_info: dict) -> None:
 
 async def download_all_bmc(urls: list, conn: object, auth: object, timeout: object, bmc_info: dict) -> None:
     # auth = aiohttp.BasicAuth(config["user"], config["password"])
-    async with aiohttp.ClientSession(auth=auth, timeout=timeout) as session:
+    async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
         tasks = []
         for url in urls:
             task = asyncio.ensure_future(download_bmc(session, url, bmc_info))
