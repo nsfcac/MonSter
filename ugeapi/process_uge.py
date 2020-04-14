@@ -73,8 +73,9 @@ def process_host(host_data: object, time: int) -> list:
                     "JobList": str(jobset)
                 }
             }
-        except:
-            pass
+        except Exception as err:
+            print("Somethis is wrong")
+            print(err)
 
         points = [cpuusage_point, memusage_point, joblist_point]
 
