@@ -6,7 +6,7 @@ influxdb:
   database: 'test_monster'
 
 frequency: 
-  60
+  60 # in seconds
 
 hostlistdir: './hostlist'
 
@@ -30,3 +30,4 @@ uge:
     read: 6
   max_retries: 3
   ssl_verify: False
+  computing_hosts: 467
