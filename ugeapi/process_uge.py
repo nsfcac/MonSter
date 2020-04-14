@@ -88,7 +88,7 @@ def process_host(host_data: object, time: int) -> list:
                     }
                 }
             else:
-                cpucores = jobs_detail[job_id]["cpucores"] + 1
+                cpucores = jobs_detail[job_id]["fields"]["cpucores"] + 1
                 jobs_detail[job_id].update({
                     "cpucores": cpucores
                 })
