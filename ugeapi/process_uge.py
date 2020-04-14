@@ -83,7 +83,7 @@ def process_host(host_data: object, time: int) -> list:
                         "JobName": jobname,
                         "User": user,
                         "totalnodes": 1,
-                        "nodelist": [host_ip],
+                        "nodelist": host_ip,
                         "cpucores": 1
                     }
                 }
