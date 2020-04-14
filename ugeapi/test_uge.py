@@ -55,5 +55,5 @@ with requests.Session() as session:
     #         if "." in id:
     #             print("ARRAY Job")
     # print("End")
-    print(json.dumps(node_jobs, indent=4))
-    # print(json.dumps(host_detail, indent=4))
+    # print(json.dumps(node_jobs, indent=4))
+    print(json.dumps(host_detail, indent=4))
