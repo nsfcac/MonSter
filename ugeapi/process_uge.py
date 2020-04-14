@@ -1,4 +1,7 @@
 import json
+from dateutil.parser import parse #pip install python-dateutil
+
+from datetime import datetime
 # from ugeapi.convert import get_hostip
 
 # For test single function
@@ -10,88 +13,110 @@ def process_host(host_data: object, time: int) -> list:
     Process host data according to the schema
     """
     all_data = {}
+    data_points = []
+    jobs_detail = {}
+
     cpuusage_point = {}
     memusage_point = {}
-    joblist_point = {}
-    points = []
-    joblist = []
+    nodejobs_point = {}
+
     try:
-        host_id = host_data["hostname"]
-        host_ip = get_hostip(host_id)
+        host_ip = get_hostip(host_data["hostname"])
 
         # CPUUsage
-        try:
-            cpuusage = float("{0:.2f}".format(host_data["resourceNumericValues"]["np_load_avg"]))
-            cpuusage_point = {
-                "measurement": "UGE",
-                "tags": {
-                    "Label": "CPUUsage",
-                    "NodeId": host_ip,
-                },
-                "time": time,
-                "fields": {
-                    "Reading": cpuusage
-                }
+        cpuusage = float("{0:.2f}".format(host_data["resourceNumericValues"]["np_load_avg"]))
+        cpuusage_point = {
+            "measurement": "UGE",
+            "tags": {
+                "Label": "CPUUsage",
+                "NodeId": host_ip,
+            },
+            "time": time,
+            "fields": {
+                "Reading": cpuusage
             }
-        except:
-            pass
+        }
 
         # MemUsage
-        try:
-            mem_free = host_data["resourceNumericValues"]["mem_free"]
-            mem_total = host_data["resourceNumericValues"]["mem_total"]
-            memusage = float("{0:.2f}".format( (mem_total-mem_free)/mem_total ))
-            memusage_point = {
-                "measurement": "UGE",
-                "tags": {
-                    "Label": "MemUsage",
-                    "NodeId": host_ip,
-                },
-                "time": time,
-                "fields": {
-                    "Reading": memusage
-                }
+        mem_free = host_data["resourceNumericValues"]["mem_free"]
+        mem_total = host_data["resourceNumericValues"]["mem_total"]
+        memusage = float("{0:.2f}".format( (mem_total-mem_free)/mem_total ))
+        memusage_point = {
+            "measurement": "UGE",
+            "tags": {
+                "Label": "MemUsage",
+                "NodeId": host_ip,
+            },
+            "time": time,
+            "fields": {
+                "Reading": memusage
             }
-        except:
-            pass
+        }
+
+        joblist = []
+        for job in  host_data["jobList"]:
+            if "taskId" in job:
+                job_id = str(job["id"]) + "." + job["taskId"]
+            else:
+                job_id = str(job["id"])
+            
+            joblist.append(job_id)
+
+            # Add job information
+            if job_id not in jobs_detail:
+                
+                starttime = convert_time(job["startTime"])
+                submittime = convert_time(job["submitTime"])
+                jobname = job["name"]
+                user = job["user"]
+
+                jobs_detail[job_id] = {
+                    "measurement": "JobsInfo",
+                    "tags": {
+                        "JobId": job_id,
+                    },
+                    "time": time,
+                    "fields": {
+                        "StartTime": starttime,
+                        "SubmitTime": submittime,
+                        "FinishTime": None,
+                        "JobName": jobname,
+                        "User": user,
+                        "totalnodes": 1,
+                        "nodelist": [host_ip],
+                        "cpucores": 1
+                    }
+                }
+            else:
+                cpucores = jobs_detail[job_id]["cpucores"] + 1
+                jobs_detail[job_id].update({
+                    "cpucores": cpucores
+                })
 
         # NodeJobs
-        try:
-            joblist = []
-            for job in  host_data["jobList"]:
-                if "taskId" in job:
-                    joblist.append(str(job["id"]) + "." + job["taskId"])
-                else:
-                    joblist.append(str(job["id"]))
-
-            jobset = list(set(joblist))
-            joblist_point = {
-                "measurement": "NodeJobs",
-                "tags": {
-                    "NodeId": host_ip,
-                },
-                "time": time,
-                "fields": {
-                    "JobList": str(jobset)
-                }
+        nodejobs_point = {
+            "measurement": "NodeJobs",
+            "tags": {
+                "NodeId": host_ip,
+            },
+            "time": time,
+            "fields": {
+                "JobList": list(set(joblist))
             }
-        except Exception as err:
-            print(host_id, end = " ")
-            print(err)
+        }
 
-        points = [cpuusage_point, memusage_point, joblist_point]
+        data_points = [cpuusage_point, memusage_point, nodejobs_point]
 
         all_data = {
-            "dpoints": points,
-            "joblist": joblist
+            "data_points": data_points,
+            "jobs_detail": jobs_detail
         }
     except Exception as err:
         all_data = {
-            "dpoints": None,
-            "joblist": None
+            "data_points": None,
+            "jobs_detail": None
         }
         print("process_host ERROR: ", end = " ")
-        print(host_id, end = " ")
         print(err)
     
     return all_data
@@ -199,3 +224,8 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
         # pass
     
     return job_data
+
+
+def convert_time(timestr: str) -> int:
+    date = parse(timestr)
+    return int(date.timestamp())
