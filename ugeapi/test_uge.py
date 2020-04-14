@@ -7,7 +7,7 @@ from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-from fetch_uge import get_host_detail, get_job_detail
+from fetch_uge import get_host_detail, get_current_jobs
 from process_uge import process_host
 
 config = {
@@ -36,7 +36,7 @@ with requests.Session() as session:
     epoch_time = int(round(time.time() * 1000000000))
     host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter)
     
-    jobs_detail = get_job_detail(config, uge_url, session, ugeapi_adapter)
+    current_jobs = get_current_jobs(config, uge_url, session, ugeapi_adapter)
     # # Process host info
     # process_host_args = zip(host_detail, repeat(epoch_time))
     # with multiprocessing.Pool(processes=cpu_count) as pool:
@@ -55,4 +55,5 @@ with requests.Session() as session:
     #         if "." in id:
     #             print("ARRAY Job")
     # print("End")
-    print(json.dumps(jobs_detail, indent=4))
+    print(json.dumps(current_jobs, indent=4))
+    print(json.dumps(host_detail, indent=4))
