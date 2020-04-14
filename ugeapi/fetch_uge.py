@@ -141,6 +141,27 @@ def fetch_uge(config: object) -> object:
 #     return exechosts
 
 
+def get_job_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
+    """
+    Get executing jobs
+    """
+    exechosts = []
+    exechosts_url = uge_url + "/jobs" 
+    session.mount(exechosts_url, ugeapi_adapter)
+    try:
+        exechosts_response = session.get(
+            exechosts_url, verify = config["ssl_verify"], 
+            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
+        )
+        exechosts = [host for host in exechosts_response.json()]
+    except ConnectionError as err:
+        print("get_job_detail ERROR: ", end = " ")
+        print(err)
+        # pass
+    return exechosts
+
+
+
 def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
     """
     Get host details
