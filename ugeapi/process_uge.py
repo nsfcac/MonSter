@@ -57,11 +57,13 @@ def process_host(host_data: object, time: int) -> list:
 
         # NodeJobs
         try:
+            joblist = []
             for job in  host_data["jobList"]:
                 if "taskId" in job:
-                    joblist = [str(job["id"]) + "." + job["taskId"] for job in host_data["jobList"]]
+                    joblist.append(str(job["id"]) + "." + job["taskId"])
                 else:
-                    joblist = [str(job["id"]) for job in host_data["jobList"]]
+                    joblist.append(str(job["id"]))
+
             jobset = list(set(joblist))
             joblist_point = {
                 "measurement": "NodeJobs",
@@ -74,7 +76,6 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except Exception as err:
-            print("Somethis is wrong : ", end = " ")
             print(host_id, end = " ")
             print(err)
 
