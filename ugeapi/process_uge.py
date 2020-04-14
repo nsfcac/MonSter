@@ -57,7 +57,7 @@ def process_host(host_data: object, time: int) -> list:
 
         # NodeJobs
         try:
-            joblist = [str(job["id"]) for job in host_data["jobList"]]
+            joblist = [str(job["id"]) + "." + str(job["taskId"]) for job in host_data["jobList"]]
             jobset = list(set(joblist))
             joblist_point = {
                 "measurement": "NodeJobs",
