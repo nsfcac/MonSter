@@ -58,7 +58,7 @@ def process_host(host_data: object, time: int) -> list:
         # NodeJobs
         try:
             for job in  host_data["jobList"]:
-                if "taskId" in list(job.keys()):
+                if "taskId" in job:
                     joblist = [str(job["id"]) + "." + job["taskId"] for job in host_data["jobList"]]
                 else:
                     joblist = [str(job["id"]) for job in host_data["jobList"]]
