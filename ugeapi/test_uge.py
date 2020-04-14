@@ -49,4 +49,9 @@ with requests.Session() as session:
         except Exception as err:
             print(err)
     # processed_host_detail = process_host(host_detail[0], epoch_time)
-    print(json.dumps(node_jobs, indent=4))
+    for k, v in node_jobs.items():
+        for id in v:
+            if "." in id:
+                print("ARRAY Job")
+    print("End")
+    # print(json.dumps(node_jobs, indent=4))

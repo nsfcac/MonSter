@@ -64,6 +64,7 @@ def fetch_uge(config: object) -> object:
             exechosts = [item["hostname"] for item in host_detail]
             for index, host in enumerate(exechosts):
                 try:
+                    # Add processed data points to the list
                     all_host_points.extend(processed_host_detail[index]["dpoints"])
                     node_jobs[host] = processed_host_detail[index]["joblist"]
                 except Exception as err:
