@@ -141,7 +141,7 @@ def fetch_uge(config: object) -> object:
 #     return exechosts
 
 
-def get_job_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
+def get_current_jobs(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
     """
     Get executing jobs
     """
@@ -155,7 +155,7 @@ def get_job_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: 
         )
         exechosts = [host for host in exechosts_response.json()]
     except ConnectionError as err:
-        print("get_job_detail ERROR: ", end = " ")
+        print("get_current_jobs ERROR: ", end = " ")
         print(err)
         # pass
     return exechosts
@@ -183,24 +183,24 @@ def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter:
     return host
 
 
-# def get_job_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object, job_id: str) -> object:
-#     """
-#     Get job details
-#     """
-#     job = {}
-#     job_url = uge_url + "/jobs" + "/" + job_id
-#     session.mount(job_url, ugeapi_adapter)
-#     try:
-#         job_response = session.get(
-#             job_url, verify = config["ssl_verify"], 
-#             timeout = (config["timeout"]["connect"], config["timeout"]["read"])
-#         )
-#         job = job_response.json()
-#     except ConnectionError as err:
-#         print("get_job_detail ERROR: ", end = " ")
-#         print(job_id, end = " ")
-#         print(err)
-#         pass
-#     return job
+def get_job_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object, job_id: str) -> object:
+    """
+    Get job details
+    """
+    job = {}
+    job_url = uge_url + "/jobs" + "/" + job_id
+    session.mount(job_url, ugeapi_adapter)
+    try:
+        job_response = session.get(
+            job_url, verify = config["ssl_verify"], 
+            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
+        )
+        job = job_response.json()
+    except ConnectionError as err:
+        print("get_job_detail ERROR: ", end = " ")
+        print(job_id, end = " ")
+        print(err)
+        pass
+    return job
 
 # fetch_uge(config)
