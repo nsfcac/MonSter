@@ -3,3 +3,4 @@ influxdb
 PyYAML
 schedule
 requests
+python-dateutil
