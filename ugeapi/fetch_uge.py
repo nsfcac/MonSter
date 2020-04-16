@@ -167,7 +167,6 @@ def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter:
     Get host details
     """
     host = None
-    # host_url = uge_url + "/hostsummary" + "/" + host_id
     host_url = uge_url + "/hostsummary/" + "compute/" + str(config["computing_hosts"])
     session.mount(host_url, ugeapi_adapter)
     try:
