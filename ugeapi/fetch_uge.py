@@ -12,7 +12,7 @@ from requests.adapters import HTTPAdapter
 
 # For test single function
 from convert import get_hostip
-from process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
+from process_uge import process_host, aggregate_node_jobs
 
 # config = {
 #     "host": "129.118.104.35",
