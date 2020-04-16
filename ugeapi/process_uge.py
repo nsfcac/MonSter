@@ -145,8 +145,8 @@ def aggregate_node_jobs(node_jobs: dict) -> dict:
     jobset = []
     jobs_data = {}
     try:
-        for node, jobs in node_jobs:
-            for job, job_detail in jobs:
+        for node, jobs in node_jobs.items():
+            for job, job_detail in jobs.items():
                 if job not in jobset:
                     jobset.append(job)
                     nodelist = [job_detail["fields"]["nodelist"] + "-" + str(job_detail["fields"]["cpucores"])]
