@@ -149,12 +149,13 @@ def process_host(host_data: object, time: int) -> list:
     return all_data
 
 
-def aggregate_node_jobs(node_jobs: dict) -> dict:
+def aggregate_node_jobs(node_jobs: dict) -> list:
     """
     Aggregate nodes, nolist, cores of jobs
     """
     jobset = []
     jobs_data = {}
+    all_job_points = []
     try:
         for node, jobs in node_jobs.items():
             for job, job_detail in jobs.items():
@@ -170,12 +171,15 @@ def aggregate_node_jobs(node_jobs: dict) -> dict:
                         "totalnodes": totalnodes,
                         "nodelist": nodelist
                     })
-
+        
+        # for job, job_detail in jobs_data:
+        #     all_job_points.append(job_detail)
+        all_job_points = jobs_data.values()
     except Exception as err:
         print("aggregate_node_jobs ERROR: ", end = " ")
         print(err)
     
-    return jobs_data
+    return all_job_points
 
 
 def convert_time(timestr: str) -> int:
