@@ -109,8 +109,8 @@ def process_host(host_data: object, time: int) -> list:
                 # if not nodelist:
                 #     print(host_ip, end = " ")
                 #     print("nodelist ERROR")
-                print(host_ip, end = " ")
-                print(nodelist)
+                # print(host_ip, end = " ")
+                # print(nodelist)
 
                 jobs_detail[job_id]["fields"].update({
                     "nodelist": nodelist
