@@ -157,7 +157,7 @@ def aggregate_node_jobs(node_jobs: dict) -> dict:
                 else:
                     cpucores = jobs_data[job]["fields"]["cpucores"] + job_detail["fields"]["cpucores"]
                     totalnodes = jobs_data[job]["fields"]["totalnodes"] + 1
-                    nodelist = jobs_data[job]["fields"]["nodelist"].append(job_detail["fields"]["nodelist"])
+                    nodelist = jobs_data[job]["fields"]["nodelist"].extend([job_detail["fields"]["nodelist"] + "-" + str(job_detail["fields"]["cpucores"])])
                     jobs_data[job]["fields"].update({
                         "cpucores": cpucores,
                         "totalnodes": totalnodes,
