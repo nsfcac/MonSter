@@ -43,6 +43,9 @@ with requests.Session() as session:
         processed_host_detail = pool.starmap(process_host, process_host_args)
 
     exechosts = [item["hostname"] for item in host_detail]
+
+    # print(json.dumps(exechosts, indent=4))
+
     for index, host in enumerate(exechosts):
         try:
             all_host_points.extend(processed_host_detail[index]["data_points"])

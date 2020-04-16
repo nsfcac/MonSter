@@ -24,35 +24,44 @@ def process_host(host_data: object, time: int) -> list:
         host_ip = get_hostip(host_data["hostname"])
 
         # CPUUsage
-        cpuusage = float("{0:.2f}".format(host_data["resourceNumericValues"]["np_load_avg"]))
-        cpuusage_point = {
-            "measurement": "UGE",
-            "tags": {
-                "Label": "CPUUsage",
-                "NodeId": host_ip,
-            },
-            "time": time,
-            "fields": {
-                "Reading": cpuusage
+        try:
+            cpuusage = float("{0:.2f}".format(host_data["resourceNumericValues"]["np_load_avg"]))
+            cpuusage_point = {
+                "measurement": "UGE",
+                "tags": {
+                    "Label": "CPUUsage",
+                    "NodeId": host_ip,
+                },
+                "time": time,
+                "fields": {
+                    "Reading": cpuusage
+                }
             }
-        }
+        except Exception as err:
+            print("Get CPUUsage ERROR: ", end = " ")
+            print(err)
 
         # MemUsage
-        mem_free = host_data["resourceNumericValues"]["mem_free"]
-        mem_total = host_data["resourceNumericValues"]["mem_total"]
-        memusage = float("{0:.2f}".format( (mem_total-mem_free)/mem_total ))
-        memusage_point = {
-            "measurement": "UGE",
-            "tags": {
-                "Label": "MemUsage",
-                "NodeId": host_ip,
-            },
-            "time": time,
-            "fields": {
-                "Reading": memusage
+        try:
+            mem_free = host_data["resourceNumericValues"]["mem_free"]
+            mem_total = host_data["resourceNumericValues"]["mem_total"]
+            memusage = float("{0:.2f}".format( (mem_total-mem_free)/mem_total ))
+            memusage_point = {
+                "measurement": "UGE",
+                "tags": {
+                    "Label": "MemUsage",
+                    "NodeId": host_ip,
+                },
+                "time": time,
+                "fields": {
+                    "Reading": memusage
+                }
             }
-        }
+        except Exception as err:
+            print("Get CPUUsage ERROR: ", end = " ")
+            print(err)
 
+        # Job List
         joblist = []
         for job in  host_data["jobList"]:
             if "taskId" in job:
