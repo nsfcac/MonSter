@@ -33,6 +33,7 @@ node_jobs = {}
 
 cpu_count = multiprocessing.cpu_count()
 
+start = time.time()
 with requests.Session() as session:
     epoch_time = int(round(time.time() * 1000000000))
     host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter)
@@ -62,4 +63,7 @@ with requests.Session() as session:
     # print("End")
     # print(json.dumps(processed_host_detail, indent=4))
     # print(json.dumps(node_jobs, indent=4))
-    print(json.dumps(all_job_points, indent=4))
+    # print(json.dumps(all_job_points, indent=4))
+    elapsed = float("{0:.4f}".format(time.time() - start))
+    print("Query and process time: ", end = " ")
+    print(elapsed)
