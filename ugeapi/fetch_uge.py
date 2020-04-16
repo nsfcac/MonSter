@@ -56,7 +56,7 @@ def fetch_uge(config: object) -> object:
             # Get hosts detail
             host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter)
 
-            # Process host info
+            # Process hosts info
             process_host_args = zip(host_detail, repeat(epoch_time))
             with multiprocessing.Pool(processes=cpu_count) as pool:
                 processed_host_detail = pool.starmap(process_host, process_host_args)
@@ -69,43 +69,8 @@ def fetch_uge(config: object) -> object:
                 if processed_host_detail[index]["jobs_detail"]:
                     node_jobs[host_ip] = processed_host_detail[index]["jobs_detail"]
 
-#----------------------------- End Host Points ---------------------------------
-
-#-------------------------------- Job Points -----------------------------------
-            processed_node_jobs = aggregate_node_jobs(node_jobs)
-
-            # process_node_jobs_args = zip(exechosts, repeat(node_jobs))
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     processed_node_jobs = pool.starmap(process_node_jobs, process_node_jobs_args)
-            
-            # aggregated_node_jobs = aggregate_node_jobs(processed_node_jobs)
-
-            # jobs = list(aggregated_node_jobs.keys())
-
-            # # Get jobs detail in parallel
-            # pool_job_args = zip(repeat(config), repeat(uge_url), repeat(session), repeat(ugeapi_adapter), jobs)
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     job_data = pool.starmap(get_job_detail, pool_job_args)
-            
-            # for index, job in enumerate(jobs):
-            #     jobs_info[job] = job_data[index]
-
-            # # Process job info (job_id:str, jobs_info: object, time: int)
-            # process_job_args = zip(jobs, repeat(jobs_info), repeat(epoch_time))
-            # with multiprocessing.Pool(processes=cpu_count) as pool:
-            #     processed_job_info = pool.starmap(process_job, process_job_args)
-
-            # for index, job in enumerate(jobs):
-            #     job_detail[job] = processed_job_info[index]
-
-            # for job in jobs:
-            #     if job_detail[job]:
-            #         job_detail[job]["fields"].update({
-            #             "totalnodes": aggregated_node_jobs[job]["totalnodes"],
-            #             "nodelist": str(aggregated_node_jobs[job]["nodelist"]),
-            #             "cpucores": aggregated_node_jobs[job]["cpucores"]
-            #         })
-            #         all_job_points.append(job_detail[job])
+            # Process jobs info
+            all_job_points = aggregate_node_jobs(node_jobs)
             
             # elapsed = float("{0:.4f}".format(time.time() - start))
             # print("Query and process time: ")
