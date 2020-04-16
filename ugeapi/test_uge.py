@@ -7,8 +7,9 @@ from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
+from convert import get_hostip
 from fetch_uge import get_host_detail, get_current_jobs
-from process_uge import process_host
+from process_uge import process_host, process_node_jobs
 
 config = {
     "host": "129.118.104.35",
@@ -47,10 +48,11 @@ with requests.Session() as session:
     # print(json.dumps(exechosts, indent=4))
 
     for index, host in enumerate(exechosts):
+        host_ip = get_hostip(host)
         if processed_host_detail[index]["data_points"]:
             all_host_points.extend(processed_host_detail[index]["data_points"])
         if processed_host_detail[index]["jobs_detail"]:
-            node_jobs[host] = processed_host_detail[index]["jobs_detail"]
+            node_jobs[host_ip] = processed_host_detail[index]["jobs_detail"]
 
     # processed_host_detail = process_host(host_detail[0], epoch_time)
     # for k, v in node_jobs.items():
