@@ -58,61 +58,65 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except Exception as err:
-            print("Get CPUUsage ERROR: ", end = " ")
+            print("Get MemUsage ERROR: ", end = " ")
             print(err)
 
         # Job List
         joblist = []
-        for job in  host_data["jobList"]:
-            if "taskId" in job:
-                job_id = str(job["id"]) + "." + job["taskId"]
-            else:
-                job_id = str(job["id"])
-            
-            joblist.append(job_id)
-
-            # Add job information
-            if job_id not in jobs_detail:
+        try:
+            for job in  host_data["jobList"]:
+                if "taskId" in job:
+                    job_id = str(job["id"]) + "." + job["taskId"]
+                else:
+                    job_id = str(job["id"])
                 
-                starttime = convert_time(job["startTime"])
-                submittime = convert_time(job["submitTime"])
-                jobname = job["name"]
-                user = job["user"]
+                joblist.append(job_id)
 
-                jobs_detail[job_id] = {
-                    "measurement": "JobsInfo",
-                    "tags": {
-                        "JobId": job_id,
-                    },
-                    "time": time,
-                    "fields": {
-                        "StartTime": starttime,
-                        "SubmitTime": submittime,
-                        "FinishTime": None,
-                        "JobName": jobname,
-                        "User": user,
-                        "totalnodes": 1,
-                        "nodelist": host_ip,
-                        "cpucores": 1
+                # Add job information
+                if job_id not in jobs_detail:
+                    
+                    starttime = convert_time(job["startTime"])
+                    submittime = convert_time(job["submitTime"])
+                    jobname = job["name"]
+                    user = job["user"]
+
+                    jobs_detail[job_id] = {
+                        "measurement": "JobsInfo",
+                        "tags": {
+                            "JobId": job_id,
+                        },
+                        "time": time,
+                        "fields": {
+                            "StartTime": starttime,
+                            "SubmitTime": submittime,
+                            "FinishTime": None,
+                            "JobName": jobname,
+                            "User": user,
+                            "totalnodes": 1,
+                            "nodelist": host_ip,
+                            "cpucores": 1
+                        }
                     }
-                }
-            else:
-                cpucores = jobs_detail[job_id]["fields"]["cpucores"] + 1
-                jobs_detail[job_id]["fields"].update({
-                    "cpucores": cpucores
-                })
+                else:
+                    cpucores = jobs_detail[job_id]["fields"]["cpucores"] + 1
+                    jobs_detail[job_id]["fields"].update({
+                        "cpucores": cpucores
+                    })
 
-        # NodeJobs
-        nodejobs_point = {
-            "measurement": "NodeJobs",
-            "tags": {
-                "NodeId": host_ip,
-            },
-            "time": time,
-            "fields": {
-                "JobList": list(set(joblist))
+            # NodeJobs
+            nodejobs_point = {
+                "measurement": "NodeJobs",
+                "tags": {
+                    "NodeId": host_ip,
+                },
+                "time": time,
+                "fields": {
+                    "JobList": list(set(joblist))
+                }
             }
-        }
+        except Exception as err:
+            print("Get JobList ERROR: ", end = " ")
+            print(err)
 
         data_points = [cpuusage_point, memusage_point, nodejobs_point]
 
