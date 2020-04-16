@@ -57,6 +57,6 @@ with requests.Session() as session:
     #     if not v:
     #         print("Empty Job List")
     # print("End")
-    print(json.dumps(all_host_points, indent=4))
-    # print(json.dumps(node_jobs, indent=4))
+    # print(json.dumps(all_host_points, indent=4))
+    print(json.dumps(node_jobs, indent=4))
     # print(json.dumps(processed_host_detail, indent=4))
