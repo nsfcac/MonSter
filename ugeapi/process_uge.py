@@ -38,6 +38,7 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except Exception as err:
+            print(host_ip, end = " ")
             print("Get CPUUsage ERROR: ", end = " ")
             print(err)
 
@@ -58,6 +59,7 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except Exception as err:
+            print(host_ip, end = " ")
             print("Get MemUsage ERROR: ", end = " ")
             print(err)
 
@@ -115,6 +117,7 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except Exception as err:
+            print(host_ip, end = " ")
             print("Get JobList ERROR: ", end = " ")
             print(err)
 
