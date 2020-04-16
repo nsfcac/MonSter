@@ -174,7 +174,7 @@ def aggregate_node_jobs(node_jobs: dict) -> list:
         
         # for job, job_detail in jobs_data:
         #     all_job_points.append(job_detail)
-        all_job_points = jobs_data.values()
+        all_job_points = list(jobs_data.values())
     except Exception as err:
         print("aggregate_node_jobs ERROR: ", end = " ")
         print(err)
