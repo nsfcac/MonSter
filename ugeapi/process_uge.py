@@ -81,7 +81,7 @@ def process_host(host_data: object, time: int) -> list:
                     submittime = convert_time(job["submitTime"])
                     jobname = job["name"]
                     user = job["user"]
-
+                    cpucores = 1
                     jobs_detail[job_id] = {
                         "measurement": "JobsInfo",
                         "tags": {
@@ -95,7 +95,6 @@ def process_host(host_data: object, time: int) -> list:
                             "JobName": jobname,
                             "User": user,
                             "totalnodes": 1,
-                            "nodelist": host_ip,
                             "cpucores": 1
                         }
                     }
@@ -104,6 +103,11 @@ def process_host(host_data: object, time: int) -> list:
                     jobs_detail[job_id]["fields"].update({
                         "cpucores": cpucores
                     })
+
+                nodelist = [host_ip + "-" + str(cpucores)]
+                jobs_detail[job_id]["fields"].update({
+                    "nodelist": nodelist
+                })
 
             # NodeJobs
             nodejobs_point = {
