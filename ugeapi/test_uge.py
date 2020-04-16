@@ -8,8 +8,8 @@ from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
 from convert import get_hostip
-from fetch_uge import get_host_detail, get_current_jobs
-from process_uge import process_host, process_node_jobs
+from fetch_uge import get_host_detail
+from process_uge import process_host, aggregate_node_jobs
 
 config = {
     "host": "129.118.104.35",
