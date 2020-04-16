@@ -138,85 +138,14 @@ def process_host(host_data: object, time: int) -> list:
     return all_data
 
 
-def process_job(job_id:str, jobs_info: object, time: int) -> list:
-    """
-    Process host data according to the schema
-    """
-    joblist_point = {}
-    try:
-        job_data = jobs_info[job_id]
-
-        if job_data:
-            try:
-                starttime = job_data["timeStamp"]["startEpoch"]
-                submittime = job_data["timeStamp"]["submitEpoch"]
-                jobname = job_data["name"]
-                user = job_data["user"]
-            except:
-                starttime = None
-                submittime = None
-                jobname = None
-                user = None
-
-            joblist_point = {
-                "measurement": "JobsInfo",
-                "tags": {
-                    "JobId": job_id,
-                },
-                "time": time,
-                "fields": {
-                    "StartTime": starttime,
-                    "SubmitTime": submittime,
-                    "JobName": jobname,
-                    "User": user
-                }
-            }
-    except Exception as err:
-        print("process_job ERROR: ", end = " ")
-        print(job_id, end = " ")
-        print(err)
-        # pass
-        
-    return joblist_point
-
-def process_node_jobs(host:str, node_jobs: dict) -> dict:
-    """
-    Process node jobs
-    """
-    jobset = []
-    job_data = {}
-
-    try:
-        host_ip = get_hostip(host)
-        joblist = node_jobs[host]
-        if joblist:
-            for job in joblist:
-                if job not in jobset:
-                    jobset.append(job)
-                    job_data[job] = {
-                        "totalnodes": 1,
-                        "nodelist": [host_ip],
-                        "cpucores": 1
-                    }
-                else:
-                    job_data[job]["cpucores"] += 1
-    except Exception as err:
-        print("process_node_jobs ERROR: ", end = " ")
-        print(host, end = " ")
-        print(err)
-        # pass
-    
-    return job_data
-
-
-def aggregate_node_jobs(processed_node_jobs: list) -> dict:
+def aggregate_node_jobs(node_jobs: dict) -> dict:
     """
     Aggregate nodes, nolist, cores of jobs
     """
     jobset = []
     job_data = {}
     try:
-        for item in processed_node_jobs:
+        for item in node_jobs:
             if item:
                 job = list(item.keys())
                 job = job[0]
@@ -245,3 +174,74 @@ def aggregate_node_jobs(processed_node_jobs: list) -> dict:
 def convert_time(timestr: str) -> int:
     date = parse(timestr)
     return int(date.timestamp())
+
+
+# def process_job(job_id:str, jobs_info: object, time: int) -> list:
+#     """
+#     Process host data according to the schema
+#     """
+#     joblist_point = {}
+#     try:
+#         job_data = jobs_info[job_id]
+
+#         if job_data:
+#             try:
+#                 starttime = job_data["timeStamp"]["startEpoch"]
+#                 submittime = job_data["timeStamp"]["submitEpoch"]
+#                 jobname = job_data["name"]
+#                 user = job_data["user"]
+#             except:
+#                 starttime = None
+#                 submittime = None
+#                 jobname = None
+#                 user = None
+
+#             joblist_point = {
+#                 "measurement": "JobsInfo",
+#                 "tags": {
+#                     "JobId": job_id,
+#                 },
+#                 "time": time,
+#                 "fields": {
+#                     "StartTime": starttime,
+#                     "SubmitTime": submittime,
+#                     "JobName": jobname,
+#                     "User": user
+#                 }
+#             }
+#     except Exception as err:
+#         print("process_job ERROR: ", end = " ")
+#         print(job_id, end = " ")
+#         print(err)
+#         # pass
+        
+#     return joblist_point
+
+
+# def process_node_jobs(host:str, node_jobs: dict) -> dict:
+#     """
+#     Process node jobs
+#     """
+#     jobset = []
+#     job_data = {}
+
+#     try:
+#         host_ip = get_hostip(host)
+#         jobs_detail = node_jobs[host]
+#         for job in jobs_detail:
+#             if job not in jobset:
+#                 jobset.append(job)
+#                 job_data[job] = {
+#                     "totalnodes": 1,
+#                     "nodelist": [host_ip],
+#                     "cpucores": 1
+#                 }
+#             else:
+#                 job_data[job]["cpucores"] += 1
+#     except Exception as err:
+#         print("process_node_jobs ERROR: ", end = " ")
+#         print(host, end = " ")
+#         print(err)
+#         # pass
+    
+#     return job_data
