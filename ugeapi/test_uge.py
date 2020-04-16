@@ -61,5 +61,5 @@ with requests.Session() as session:
     #         print("Empty Job List")
     # print("End")
     # print(json.dumps(all_host_points, indent=4))
-    # print(json.dumps(node_jobs, indent=4))
+    print(json.dumps(node_jobs, indent=4))
     print(json.dumps(all_job_points, indent=4))
