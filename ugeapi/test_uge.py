@@ -63,3 +63,41 @@ with requests.Session() as session:
     # print(json.dumps(processed_host_detail, indent=4))
     # print(json.dumps(node_jobs, indent=4))
     # print(json.dumps(all_job_points, indent=4))
+
+    "1323308": {
+            "measurement": "JobsInfo",
+            "time": 1587122060377742080,
+            "fields": {
+                "FinishTime": null,
+                "JobName": "namd",
+                "User": "rosutton",
+                "StartTime": 1587020060,
+                "nodelist": null,
+                "totalnodes": 2,
+                "cpucores": 72,
+                "SubmitTime": 1586996931
+            },
+            "tags": {
+                "JobId": "1323308"
+            }
+        }
+
+    "1323308": {
+            "tags": {
+                "JobId": "1323308"
+            },
+            "measurement": "JobsInfo",
+            "time": 1587122121174705408,
+            "fields": {
+                "cpucores": 36,
+                "nodelist": [
+                    "10.101.10.29-36"
+                ],
+                "FinishTime": null,
+                "User": "rosutton",
+                "StartTime": 1587020060,
+                "SubmitTime": 1586996931,
+                "totalnodes": 1,
+                "JobName": "namd"
+            }
+        }
