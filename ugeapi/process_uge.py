@@ -106,11 +106,12 @@ def process_host(host_data: object, time: int) -> list:
                         "cpucores": cpucores
                     })
 
+                nodelist = [host_ip + "-" + str(cpucores)]
+
                 if not nodelist:
                     print(host_ip, end = " ")
                     print("nodelist ERROR")
-
-                nodelist = [host_ip + "-" + str(cpucores)]
+                    
                 jobs_detail[job_id]["fields"].update({
                     "nodelist": nodelist
                 })
