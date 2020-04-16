@@ -143,32 +143,32 @@ def aggregate_node_jobs(node_jobs: dict) -> dict:
     Aggregate nodes, nolist, cores of jobs
     """
     jobset = []
-    job_data = {}
+    jobs_data = {}
     try:
-        for item in node_jobs:
-            if item:
-                job = list(item.keys())
-                job = job[0]
-                # print(job)
+        for node, jobs in node_jobs:
+            for job, job_detail in jobs:
                 if job not in jobset:
                     jobset.append(job)
-                    job_data[job] = item[job]
-                else:
-                    all_totalnodes = job_data[job]["totalnodes"] + item[job]["totalnodes"]
-                    all_nodelist = job_data[job]["nodelist"] + item[job]["nodelist"]
-                    all_cpucores = job_data[job]["cpucores"] + item[job]["cpucores"]
-
-                    job_data[job].update({
-                        "totalnodes": all_totalnodes,
-                        "nodelist": all_nodelist,
-                        "cpucores": all_cpucores
+                    nodelist = [job_detail["fields"]["nodelist"] + "-" + str(job_detail["fields"]["cpucores"])]
+                    jobs_data[job] = job_detail
+                    jobs_data[job]["fields"].update({
+                        "nodelist": nodelist
                     })
+                else:
+                    cpucores = jobs_data[job]["fields"]["cpucores"] + job_detail["fields"]["cpucores"]
+                    totalnodes = jobs_data[job]["fields"]["totalnodes"] + 1
+                    nodelist = jobs_data[job]["fields"]["nodelist"].append(job_detail["fields"]["nodelist"])
+                    jobs_data[job]["fields"].update({
+                        "cpucores": cpucores,
+                        "totalnodes": totalnodes,
+                        "nodelist": nodelist
+                    })
+
     except Exception as err:
         print("aggregate_node_jobs ERROR: ", end = " ")
         print(err)
-        # pass
     
-    return job_data
+    return jobs_data
 
 
 def convert_time(timestr: str) -> int:
