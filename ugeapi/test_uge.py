@@ -43,16 +43,16 @@ with requests.Session() as session:
     with multiprocessing.Pool(processes=cpu_count) as pool:
         processed_host_detail = pool.starmap(process_host, process_host_args)
 
-    exechosts = [item["hostname"] for item in host_detail]
+    # exechosts = [item["hostname"] for item in host_detail]
 
-    # print(json.dumps(exechosts, indent=4))
+    # # print(json.dumps(exechosts, indent=4))
 
-    for index, host in enumerate(exechosts):
-        host_ip = get_hostip(host)
-        if processed_host_detail[index]["data_points"]:
-            all_host_points.extend(processed_host_detail[index]["data_points"])
-        if processed_host_detail[index]["jobs_detail"]:
-            node_jobs[host_ip] = processed_host_detail[index]["jobs_detail"]
+    # for index, host in enumerate(exechosts):
+    #     host_ip = get_hostip(host)
+    #     if processed_host_detail[index]["data_points"]:
+    #         all_host_points.extend(processed_host_detail[index]["data_points"])
+    #     if processed_host_detail[index]["jobs_detail"]:
+    #         node_jobs[host_ip] = processed_host_detail[index]["jobs_detail"]
 
     # all_job_points = aggregate_node_jobs(node_jobs)
     # processed_host_detail = process_host(host_detail[0], epoch_time)
@@ -61,5 +61,5 @@ with requests.Session() as session:
     #         print("Empty Job List")
     # print("End")
     print(json.dumps(processed_host_detail, indent=4))
-    print(json.dumps(node_jobs, indent=4))
+    # print(json.dumps(node_jobs, indent=4))
     # print(json.dumps(all_job_points, indent=4))
