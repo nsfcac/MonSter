@@ -106,9 +106,9 @@ def process_host(host_data: object, time: int) -> list:
 
                 nodelist = [host_ip + "-" + str(cpucores)]
 
-                # if not nodelist:
-                #     print(host_ip, end = " ")
-                #     print("nodelist ERROR")
+                if not nodelist:
+                    print(host_ip, end = " ")
+                    print("nodelist ERROR")
                 # print(host_ip, end = " ")
                 # print(nodelist)
 
