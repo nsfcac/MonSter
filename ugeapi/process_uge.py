@@ -22,7 +22,7 @@ def process_host(host_data: object, time: int) -> list:
 
         # CPUUsage
         try:
-            cpuusage = float("{0:.2f}".format(host_data["resourceNumericValues"]["np_load_avg"]))
+            cpuusage = float("{0:.2f}".format(host_data["resourceNumericValues"]["cpu"]))
             cpuusage_point = {
                 "measurement": "UGE",
                 "tags": {
