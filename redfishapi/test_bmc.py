@@ -22,7 +22,7 @@ config = {
     "password": "monster",
     "timeout": {
         "connect": 2,
-        "total": 10
+        "total": 8
     },
     "max_retries": 3,
     "ssl_verify": False,
@@ -45,8 +45,6 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(download_all_bmc(urls, conn, auth, timeout))
 
-        # print(json.dumps(bmc_metrics, indent=4))
-
     except Exception as err:
         print("fetch_bmc ERROR: ", end = " ")
         print(err)
@@ -61,9 +59,9 @@ async def download_bmc(session: object, url: str) -> None:
 
 async def download_all_bmc(urls: list, conn: object, auth: object, timeout: object) -> None:
     async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
-        # bmc_metrics = []
         for url in urls:
             metric = await download_bmc(session, url)
+            print(url)
             print(json.dumps(metric, indent=4))
 
 
@@ -73,9 +71,18 @@ def generate_urls(hostlist:list) -> list:
     for host in hostlist:
         thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
         urls.append(thermal_url)
+    # Power
     for host in hostlist:
         power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
         urls.append(power_url)
+    # BMC health
+    for host in hostlist:
+        bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
+        urls.append(bmc_health_url)
+    # System health
+    for host in hostlist:
+        system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
+        urls.append(system_health_url)
     return urls
 
 
@@ -94,6 +101,6 @@ def get_hostlist(hostlist_dir: str) -> list:
 
 
 # hostlist = get_hostlist(config["hostlist"])
-hostlist = ["10.101.1.1", "10.101.9.17"]
+hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
