@@ -36,7 +36,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     """
 
     conn = aiohttp.TCPConnector(limit_per_host=config["max_retries"], ssl=config["ssl_verify"])
-    auth = aiohttp.BasicAuth(config["user"], config["password"])
+    auth = aiohttp.BasicAuth(config["user"], password=config["password"])
     timeout = aiohttp.ClientTimeout(total=config["timeout"]["total"], connect=config["timeout"]["connect"])
 
     urls = generate_urls(hostlist)
