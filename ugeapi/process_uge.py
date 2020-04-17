@@ -2,10 +2,10 @@ import json
 from dateutil.parser import parse #pip install python-dateutil
 
 from datetime import datetime
-# from ugeapi.convert import get_hostip
+from ugeapi.convert import get_hostip
 
-# For testing
-from convert import get_hostip
+# # For testing
+# from convert import get_hostip
 
 
 def process_host(host_data: object, time: int) -> list:
