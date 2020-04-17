@@ -34,21 +34,16 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     """
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
-    bmc_metrics = []
-    try:
-        conn = aiohttp.TCPConnector(limit=config["max_retries"], ssl=config["ssl_verify"])
-        auth = aiohttp.BasicAuth(config["user"], config["password"])
-        timeout = aiohttp.ClientTimeout(total=config["timeout"]["total"], connect=config["timeout"]["connect"])
 
-        urls = generate_urls(hostlist)
+    conn = aiohttp.TCPConnector(limit=config["max_retries"], ssl=config["ssl_verify"])
+    auth = aiohttp.BasicAuth(config["user"], config["password"])
+    timeout = aiohttp.ClientTimeout(total=config["timeout"]["total"], connect=config["timeout"]["connect"])
 
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(download_all_bmc(urls, conn, auth, timeout))
+    urls = generate_urls(hostlist)
 
-    except Exception as err:
-        print("fetch_bmc ERROR: ", end = " ")
-        print(err)
-    
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(download_all_bmc(urls, conn, auth, timeout))
+
     return 
 
 
