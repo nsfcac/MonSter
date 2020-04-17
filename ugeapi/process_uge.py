@@ -25,7 +25,7 @@ def process_host(host_data: object, time: int) -> list:
 
         # CPUUsage
         try:
-            cpuusage = float("{0:.2f}".format(host_data["resourceNumericValues"]["cpu"]/100))
+            cpuusage = float("{0:.2f}".format(host_data["resourceNumericValues"]["cpu"]))
             cpuusage_point = {
                 "measurement": "UGE",
                 "tags": {
@@ -46,7 +46,7 @@ def process_host(host_data: object, time: int) -> list:
         try:
             mem_free = host_data["resourceNumericValues"]["mem_free"]
             mem_total = host_data["resourceNumericValues"]["mem_total"]
-            memusage = float("{0:.2f}".format( (mem_total-mem_free)/mem_total ))
+            memusage = float("{0:.2f}".format( (mem_total-mem_free)/mem_total * 100 ))
             memusage_point = {
                 "measurement": "UGE",
                 "tags": {
