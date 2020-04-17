@@ -40,8 +40,6 @@ def fetch_uge(config: object) -> object:
         all_host_points = []
         all_job_points = []
 
-        # start = time.time()
-
         with requests.Session() as session:
 
             epoch_time = int(round(time.time() * 1000000000))
