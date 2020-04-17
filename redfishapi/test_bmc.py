@@ -43,9 +43,9 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         urls = generate_urls(hostlist)
 
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(download_all_bmc(urls, conn, auth, timeout, bmc_metrics))
+        loop.run_until_complete(download_all_bmc(urls, conn, auth, timeout))
 
-        print(json.dumps(bmc_metrics, indent=4))
+        # print(json.dumps(bmc_metrics, indent=4))
 
     except Exception as err:
         print("fetch_bmc ERROR: ", end = " ")
@@ -59,12 +59,12 @@ async def download_bmc(session: object, url: str) -> None:
         return await response.json()
 
 
-async def download_all_bmc(urls: list, conn: object, auth: object, timeout: object, bmc_metrics: list) -> None:
+async def download_all_bmc(urls: list, conn: object, auth: object, timeout: object) -> None:
     async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
-        bmc_metrics = []
+        # bmc_metrics = []
         for url in urls:
             metric = await download_bmc(session, url)
-            bmc_metrics.append(metric)
+            print(json.dumps(metric, indent=4))
 
 
 def generate_urls(hostlist:list) -> list:
