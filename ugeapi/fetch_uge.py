@@ -7,12 +7,8 @@ from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-# from ugeapi.convert import get_hostip
-# from ugeapi.process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
-
-# For test single function
-from convert import get_hostip
-from process_uge import process_host, aggregate_node_jobs
+from ugeapi.convert import get_hostip
+from ugeapi.process_uge import process_host, process_job, process_node_jobs, aggregate_node_jobs
 
 # config = {
 #     "host": "129.118.104.35",
@@ -25,11 +21,12 @@ from process_uge import process_host, aggregate_node_jobs
 #     },
 #     "max_retries": 3,
 #     "ssl_verify": False
+#     "computing_hosts": 467
 # }
 
 def fetch_uge(config: object) -> object:
     """
-    Fetch metrics from UGE api, average query and process time is: 7.79s
+    Fetch metrics from UGE api, average query and process time is: 1.4088s
     """
     uge_info = {}
     # Get cpu counts
@@ -39,10 +36,7 @@ def fetch_uge(config: object) -> object:
         uge_url = "http://" + config["host"] + ":" + config["port"]
         ugeapi_adapter = HTTPAdapter(config["max_retries"])
 
-        jobs_info = {}
         node_jobs = {}
-        job_detail = {}
-
         all_host_points = []
         all_job_points = []
 
@@ -52,7 +46,6 @@ def fetch_uge(config: object) -> object:
 
             epoch_time = int(round(time.time() * 1000000000))
 
-#--------------------------------- Host info -----------------------------------
             # Get hosts detail
             host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter)
 
@@ -71,11 +64,7 @@ def fetch_uge(config: object) -> object:
 
             # Process jobs info
             all_job_points = aggregate_node_jobs(node_jobs)
-            
-            # elapsed = float("{0:.4f}".format(time.time() - start))
-            # print("Query and process time: ")
-            # print(elapsed)
-#---------------------------- End Job Points -----------------------------------
+
         uge_info = {
             "all_job_points": all_job_points,
             "all_host_points": all_host_points
@@ -84,7 +73,7 @@ def fetch_uge(config: object) -> object:
     except Exception as err:
         print("fetch_uge ERROR: ", end = " ")
         print(err)
-        # pass
+
     return uge_info
 
 
@@ -104,68 +93,5 @@ def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter:
     except ConnectionError as err:
         print("get_host_detail ERROR: ", end = " ")
         print(err)
-        # pass
+
     return host
-
-
-# def get_job_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object, job_id: str) -> object:
-#     """
-#     Get job details
-#     """
-#     job = {}
-#     job_url = uge_url + "/jobs" + "/" + job_id
-#     session.mount(job_url, ugeapi_adapter)
-#     try:
-#         job_response = session.get(
-#             job_url, verify = config["ssl_verify"], 
-#             timeout = (config["timeout"]["connect"], config["timeout"]["read"])
-#         )
-#         job = job_response.json()
-#     except ConnectionError as err:
-#         print("get_job_detail ERROR: ", end = " ")
-#         print(job_id, end = " ")
-#         print(err)
-#         pass
-#     return job
-
-
-# def get_exechosts(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
-#     """
-#     Get executing hosts
-#     """
-#     exechosts = []
-#     exechosts_url = uge_url + "/exechosts" 
-#     session.mount(exechosts_url, ugeapi_adapter)
-#     try:
-#         exechosts_response = session.get(
-#             exechosts_url, verify = config["ssl_verify"], 
-#             timeout = (config["timeout"]["connect"], config["timeout"]["read"])
-#         )
-#         exechosts = [host for host in exechosts_response.json()]
-#     except ConnectionError as err:
-#         print("get_exechosts ERROR: ", end = " ")
-#         print(err)
-#         # pass
-#     return exechosts
-
-
-# def get_current_jobs(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
-#     """
-#     Get executing jobs
-#     """
-#     exechosts = []
-#     exechosts_url = uge_url + "/jobs" 
-#     session.mount(exechosts_url, ugeapi_adapter)
-#     try:
-#         exechosts_response = session.get(
-#             exechosts_url, verify = config["ssl_verify"], 
-#             timeout = (config["timeout"]["connect"], config["timeout"]["read"])
-#         )
-#         exechosts = [host for host in exechosts_response.json()]
-#     except ConnectionError as err:
-#         print("get_current_jobs ERROR: ", end = " ")
-#         print(err)
-#         # pass
-#     return exechosts
-
-# fetch_uge(config)
