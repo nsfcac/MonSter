@@ -2,10 +2,7 @@ import json
 from dateutil.parser import parse #pip install python-dateutil
 
 from datetime import datetime
-# from ugeapi.convert import get_hostip
-
-# For test single function
-from convert import get_hostip
+from ugeapi.convert import get_hostip
 
 
 def process_host(host_data: object, time: int) -> list:
@@ -106,12 +103,6 @@ def process_host(host_data: object, time: int) -> list:
 
                 nodelist = [host_ip + "-" + str(cpucores)]
 
-                if not nodelist:
-                    print(host_ip, end = " ")
-                    print("nodelist ERROR")
-                # print(host_ip, end = " ")
-                # print(nodelist)
-
                 jobs_detail[job_id]["fields"].update({
                     "nodelist": nodelist
                 })
@@ -151,7 +142,7 @@ def process_host(host_data: object, time: int) -> list:
 
 def aggregate_node_jobs(node_jobs: dict) -> list:
     """
-    Aggregate nodes, nolist, cores of jobs
+    Aggregate total nodes, nodelist, cores of jobs
     """
     jobset = []
     jobs_data = {}
@@ -172,8 +163,6 @@ def aggregate_node_jobs(node_jobs: dict) -> list:
                         "nodelist": nodelist
                     })
         
-        # for job, job_detail in jobs_data:
-        #     all_job_points.append(job_detail)
         all_job_points = list(jobs_data.values())
     except Exception as err:
         print("aggregate_node_jobs ERROR: ", end = " ")
@@ -183,76 +172,8 @@ def aggregate_node_jobs(node_jobs: dict) -> list:
 
 
 def convert_time(timestr: str) -> int:
+    """
+    Convert time string to epoch time
+    """
     date = parse(timestr)
     return int(date.timestamp())
-
-
-# def process_job(job_id:str, jobs_info: object, time: int) -> list:
-#     """
-#     Process host data according to the schema
-#     """
-#     joblist_point = {}
-#     try:
-#         job_data = jobs_info[job_id]
-
-#         if job_data:
-#             try:
-#                 starttime = job_data["timeStamp"]["startEpoch"]
-#                 submittime = job_data["timeStamp"]["submitEpoch"]
-#                 jobname = job_data["name"]
-#                 user = job_data["user"]
-#             except:
-#                 starttime = None
-#                 submittime = None
-#                 jobname = None
-#                 user = None
-
-#             joblist_point = {
-#                 "measurement": "JobsInfo",
-#                 "tags": {
-#                     "JobId": job_id,
-#                 },
-#                 "time": time,
-#                 "fields": {
-#                     "StartTime": starttime,
-#                     "SubmitTime": submittime,
-#                     "JobName": jobname,
-#                     "User": user
-#                 }
-#             }
-#     except Exception as err:
-#         print("process_job ERROR: ", end = " ")
-#         print(job_id, end = " ")
-#         print(err)
-#         # pass
-        
-#     return joblist_point
-
-
-# def process_node_jobs(host:str, node_jobs: dict) -> dict:
-#     """
-#     Process node jobs
-#     """
-#     jobset = []
-#     job_data = {}
-
-#     try:
-#         host_ip = get_hostip(host)
-#         jobs_detail = node_jobs[host]
-#         for job in jobs_detail:
-#             if job not in jobset:
-#                 jobset.append(job)
-#                 job_data[job] = {
-#                     "totalnodes": 1,
-#                     "nodelist": [host_ip],
-#                     "cpucores": 1
-#                 }
-#             else:
-#                 job_data[job]["cpucores"] += 1
-#     except Exception as err:
-#         print("process_node_jobs ERROR: ", end = " ")
-#         print(host, end = " ")
-#         print(err)
-#         # pass
-    
-#     return job_data
