@@ -46,7 +46,8 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
         urls = generate_urls(hostlist)
 
-        asyncio.get_event_loop().run_until_complete(download_all_bmc(urls, conn, auth, timeout, bmc_info))
+        print(json.dumps(urls, indent=4))
+        # asyncio.get_event_loop().run_until_complete(download_all_bmc(urls, conn, auth, timeout, bmc_info))
 
         # print(json.dumps(bmc_info, indent = 4))
 
