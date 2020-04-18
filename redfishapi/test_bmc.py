@@ -51,7 +51,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
 
 async def fetch(url: str, session:object, config: dict) -> dict:
-    with async_timeout.timeout(config["timeout"]["total"]):
+    with async_timeout.timeout(10):
         async with session.get(url) as response:
             return await response.json()
 
