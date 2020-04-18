@@ -24,7 +24,7 @@ config = {
         "connect": 2,
         "total": 8
     },
-    "max_retries": 3,
+    "max_retries": 1,
     "ssl_verify": False,
     "hostlist": "../hostlist"
 }
@@ -35,29 +35,35 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
 
-    conn = aiohttp.TCPConnector(limit_per_host=config["max_retries"], ssl=config["ssl_verify"])
+    conn = aiohttp.TCPConnector(limit=0, limit_per_host=config["max_retries"], ssl=config["ssl_verify"])
     auth = aiohttp.BasicAuth(config["user"], password=config["password"])
     timeout = aiohttp.ClientTimeout(total=config["timeout"]["total"], connect=config["timeout"]["connect"])
 
     urls = generate_urls(hostlist)
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(download_all_bmc(urls, conn, auth, timeout))
+
+    future = asyncio.ensure_future(download_bmc(urls, conn, auth, timeout))
+    loop.run_until_complete(asyncio.wait(future))
 
     return 
 
 
-async def download_bmc(session: object, url: str) -> None:
+async def fetch(url: str, session:object) -> dict:
     async with session.get(url) as response:
         return await response.json()
 
 
-async def download_all_bmc(urls: list, conn: object, auth: object, timeout: object) -> None:
+async def download_bmc(urls: list, conn: object, auth: object, timeout: object) -> None:
+    tasks = []
     async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
         for url in urls:
-            metric = await download_bmc(session, url)
-            print(url)
-            print(json.dumps(metric, indent=4))
+            task = asyncio.ensure_future(fetch(url, session))
+            tasks.append(task)
+        
+        responses =  await asyncio.gather(*tasks)
+
+        print(json.dumps(responses, indent=4))
 
 
 def generate_urls(hostlist:list) -> list:
@@ -95,7 +101,7 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-hostlist = get_hostlist(config["hostlist"])[:100]
+hostlist = get_hostlist(config["hostlist"])[:10]
 # hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
