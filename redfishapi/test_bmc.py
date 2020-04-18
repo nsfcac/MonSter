@@ -50,8 +50,11 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
 
 async def fetch(url: str, session:object) -> dict:
-    async with session.get(url) as response:
-        return await response.json()
+    try:
+        async with session.get(url) as response:
+            return await response.json()
+    except:
+        return None
 
 
 async def download_bmc(urls: list, conn: object, auth: object, timeout: object) -> None:
@@ -101,7 +104,7 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-hostlist = get_hostlist(config["hostlist"])[10:20]
+hostlist = get_hostlist(config["hostlist"])[:10]
 # hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
