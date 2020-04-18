@@ -1,67 +1,138 @@
 import json
 
-def process_bmc(host: str, bmc_info: dict, time: int) -> list:
-    """
-    Process BMC metrics accroding to the schema
-    """
+
+def process_bmc_metrics(urls: list, bmc_metrics: list, time: int) -> list:
+    data_points = []
+    for index, url in enumerate(urls):
+        metric = bmc_metrics[index]
+        node_id = url.split("/")[2]
+        if "Thermal" in metric["@odata.type"]:
+            process_thermal(node_id, metric, time)
+        elif "Power" in metric["@odata.type"]:
+            process_power(node_id, metric, time)
+        elif "Manager" in metric["@odata.type"]:
+            process_bmc_health(node_id, metric, time)
+        else:
+            # ComputerSystem.v1_4_0.ComputerSystem
+            process_sys_health(node_id, metric, time)
+        return 
+    return data_points
+
+
+def process_thermal(node_id: str, metric: dict, time: int) -> list:
     points = []
     try:
-        bmc_metrics = bmc_info[host]
-        thermal_metrics = bmc_metrics["thermal_metrics"]
-        power_metrics = bmc_metrics["power_metrics"]
-
-        if thermal_metrics:
-            # Temperature
-            temperatures = thermal_metrics["Temperatures"]
-            for temp in temperatures:
-                name = temp["Name"].replace(" ", "")
-                reading = float("{0:.2f}".format(temp["ReadingCelsius"]))
-                temp_point = {
-                    "measurement": "Thermal",
-                    "time": time,
-                    "tags": {
-                        "Label": name,
-                        "NodeId": host
-                    }, 
-                    "fields": {
-                        "Reading": reading
-                    }
-                }
-                points.append(temp_point)
-            # Fans
-            fans = thermal_metrics["Fans"]
-            for fan in fans:
-                name = fan["Name"]
-                reading = float("{0:.2f}".format(fan["Reading"]))
-                fan_point = {
-                    "measurement": "Thermal",
-                    "time": time,
-                    "tags": {
-                        "Label": name,
-                        "NodeId": host
-                    }, 
-                    "fields": {
-                        "Reading": reading
-                    }
-                }
-                points.append(fan_point)
-        if power_metrics:
-            reading = float("{0:.2f}".format(power_metrics["PowerControl"][0]["PowerConsumedWatts"]))
-            power_point = {
-                "measurement": "Power",
+        # Temperature
+        temperatures = metric["Temperatures"]
+        for temp in temperatures:
+            name = temp["Name"].replace(" ", "")
+            reading = float("{0:.2f}".format(temp["ReadingCelsius"]))
+            temp_point = {
+                "measurement": "Thermal",
                 "time": time,
                 "tags": {
-                    "Label": "NodePower",
-                    "NodeId": host
+                    "Label": name,
+                    "NodeId": node_id
                 }, 
                 "fields": {
                     "Reading": reading
                 }
             }
-            points.append(power_point)
+            points.append(temp_point)
+        # Fans
+        fans = metric["Fans"]
+        for fan in fans:
+            name = fan["Name"]
+            reading = float("{0:.2f}".format(fan["Reading"]))
+            fan_point = {
+                "measurement": "Thermal",
+                "time": time,
+                "tags": {
+                    "Label": name,
+                    "NodeId": node_id
+                }, 
+                "fields": {
+                    "Reading": reading
+                }
+            }
+            points.append(fan_point)
     except Exception as err:
-        print("process_bmc ERROR: ", end = " ")
-        print(host, end = " ")
+        print("process_thermal ERROR: ", end = " ")
+        print(node_id, end = " ")
         print(err)
+    return points
 
+
+def process_power(node_id: str, metric: dict, time: int) -> list:
+    points = []
+    try:
+        reading = float("{0:.2f}".format(metric["PowerControl"][0]["PowerConsumedWatts"]))
+        power_point = {
+            "measurement": "Power",
+            "time": time,
+            "tags": {
+                "Label": "NodePower",
+                "NodeId": node_id
+            }, 
+            "fields": {
+                "Reading": reading
+            }
+        }
+        points.append(power_point)
+    except Exception as err:
+        print("process_power ERROR: ", end = " ")
+        print(node_id, end = " ")
+        print(err)
+    return points
+
+
+def process_bmc_health(node_id: str, metric: dict, time: int) -> list:
+    points = []
+    try:
+        if metric["Status"]["Health"] == "OK":
+            reading = 0
+        else:
+            reading = 1
+        power_point = {
+            "measurement": "Health",
+            "time": time,
+            "tags": {
+                "Label": "BMC",
+                "NodeId": node_id
+            }, 
+            "fields": {
+                "Reading": reading
+            }
+        }
+        points.append(power_point)
+    except Exception as err:
+        print("process_bmc_health ERROR: ", end = " ")
+        print(node_id, end = " ")
+        print(err)
+    return points
+
+
+def process_sys_health(node_id: str, metric: dict, time: int) -> list:
+    points = []
+    try:
+        if metric["Status"]["Health"] == "OK":
+            reading = 0
+        else:
+            reading = 1
+        power_point = {
+            "measurement": "Health",
+            "time": time,
+            "tags": {
+                "Label": "System",
+                "NodeId": node_id
+            }, 
+            "fields": {
+                "Reading": reading
+            }
+        }
+        points.append(power_point)
+    except Exception as err:
+        print("process_sys_health ERROR: ", end = " ")
+        print(node_id, end = " ")
+        print(err)
     return points
