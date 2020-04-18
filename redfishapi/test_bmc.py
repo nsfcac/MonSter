@@ -44,7 +44,9 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     loop = asyncio.get_event_loop()
 
     future = asyncio.ensure_future(download_bmc(urls, conn, auth, config))
-    loop.run_until_complete(future)
+    bmc_metrics = loop.run_until_complete(future)
+
+    print(json.dumps(bmc_metrics, indent=4))
 
     return 
 
@@ -61,14 +63,16 @@ async def fetch(url: str, session:object, config: dict) -> dict:
 
 async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
     tasks = []
-    async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
-        for url in urls:
-            task = asyncio.ensure_future(fetch(url, session, config))
-            tasks.append(task)
-        
-        responses =  await asyncio.gather(*tasks)
-
-        print(json.dumps(responses, indent=4))
+    try:
+        async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
+            for url in urls:
+                task = asyncio.ensure_future(fetch(url, session, config))
+                tasks.append(task)
+            
+            responses =  await asyncio.gather(*tasks)
+            return responses
+    except:
+        return None
 
 
 def generate_urls(hostlist:list) -> list:
