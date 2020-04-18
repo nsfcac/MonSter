@@ -35,7 +35,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
 
-    conn = aiohttp.TCPConnector(limit=0, limit_per_host=config["max_retries"], ssl=config["ssl_verify"])
+    conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
     auth = aiohttp.BasicAuth(config["user"], password=config["password"])
     timeout = aiohttp.ClientTimeout(total=config["timeout"]["total"], connect=config["timeout"]["connect"])
 
