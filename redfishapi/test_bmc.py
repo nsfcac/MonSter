@@ -57,7 +57,7 @@ def return_none(retry_state):
     return None
 
 
-@retry( stop=(stop_after_delay(10) | stop_after_attempt(5)), 
+@retry( stop=(stop_after_delay(10) | stop_after_attempt(3)), 
         retry_error_callback=return_none)
 async def fetch(url: str, session:object, config: dict) -> dict:
     async with session.get(url) as response:
@@ -89,18 +89,18 @@ def generate_urls(hostlist:list) -> list:
     for host in hostlist:
         thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
         urls.append(thermal_url)
-    # # Power
-    # for host in hostlist:
-    #     power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
-    #     urls.append(power_url)
-    # # BMC health
-    # for host in hostlist:
-    #     bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
-    #     urls.append(bmc_health_url)
-    # # System health
-    # for host in hostlist:
-    #     system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
-    #     urls.append(system_health_url)
+    # Power
+    for host in hostlist:
+        power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
+        urls.append(power_url)
+    # BMC health
+    for host in hostlist:
+        bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
+        urls.append(bmc_health_url)
+    # System health
+    for host in hostlist:
+        system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
+        urls.append(system_health_url)
     return urls
 
 
