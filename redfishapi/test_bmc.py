@@ -8,6 +8,8 @@ import async_timeout
 import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
+from tenacity import retry
+
 from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter 
@@ -35,7 +37,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
 
-    conn = aiohttp.TCPConnector(limit=0, limit_per_host=config["max_retries"], ssl=config["ssl_verify"])
+    conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
     auth = aiohttp.BasicAuth(config["user"], password=config["password"])
     # timeout = aiohttp.ClientTimeout(total=config["timeout"]["total"], connect=config["timeout"]["connect"])
 
@@ -51,14 +53,21 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return 
 
 
+def return_none(retry_state):
+    return None
+
+
+@retry( stop=stop_after_attempt(3), 
+        wait=wait_random_exponential(multiplier=1, max=16),
+        retry_error_callback=return_none)
 async def fetch(url: str, session:object, config: dict) -> dict:
-    timeout = config["timeout"]
-    try:
-        with async_timeout.timeout(timeout):
-            async with session.get(url) as response:
-                return await response.json()
-    except:
-        return None
+    async with session.get(url) as response:
+        return await response.json()
+    # timeout = config["timeout"]
+    # with async_timeout.timeout(timeout):
+    #     async with session.get(url) as response:
+    #         return await response.json()
+
 
 
 async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
