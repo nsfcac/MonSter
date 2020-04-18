@@ -21,8 +21,8 @@ config = {
     "user": "password",
     "password": "monster",
     "timeout": {
-        "connect": 2,
-        "total": 8
+        "connect": 5,
+        "total": 15
     },
     "max_retries": 1,
     "ssl_verify": False,
@@ -50,11 +50,8 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
 
 async def fetch(url: str, session:object) -> dict:
-    try:
-        async with session.get(url) as response:
-            return await response.json()
-    except:
-        return None
+    async with session.get(url) as response:
+        return await response.json()
 
 
 async def download_bmc(urls: list, conn: object, auth: object, timeout: object) -> None:
