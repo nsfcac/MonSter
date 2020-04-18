@@ -23,7 +23,7 @@ from process_bmc import process_bmc
 config = {
     "user": "password",
     "password": "monster",
-    "timeout": 10,
+    "timeout": 15,
     "max_retries": 1,
     "ssl_verify": False,
     "hostlist": "../hostlist"
