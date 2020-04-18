@@ -44,23 +44,22 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     loop = asyncio.get_event_loop()
 
-    future = asyncio.ensure_future(download_bmc(urls, conn, auth, timeout))
+    future = asyncio.ensure_future(download_bmc(urls, conn, auth))
     loop.run_until_complete(future)
 
     return 
 
 
-async def fetch(url: str, session:object, config: dict) -> dict:
-    with async_timeout.timeout(10):
-        async with session.get(url) as response:
-            return await response.json()
+async def fetch(url: str, session:object) -> dict:
+    async with session.get(url) as response:
+        return await response.json()
 
 
-async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
+async def download_bmc(urls: list, conn: object, auth: object) -> None:
     tasks = []
     async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
         for url in urls:
-            task = asyncio.ensure_future(fetch(url, session, config))
+            task = asyncio.ensure_future(fetch(url, session))
             tasks.append(task)
         
         responses =  await asyncio.gather(*tasks)
@@ -103,7 +102,7 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-hostlist = get_hostlist(config["hostlist"])[:10]
-# hostlist = ["10.101.1.1"]
+# hostlist = get_hostlist(config["hostlist"])[:10]
+hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
