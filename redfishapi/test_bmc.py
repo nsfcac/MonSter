@@ -101,7 +101,7 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-hostlist = get_hostlist(config["hostlist"])[:10]
+hostlist = get_hostlist(config["hostlist"])[10:20]
 # hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
