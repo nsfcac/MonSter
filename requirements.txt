@@ -4,3 +4,5 @@ PyYAML
 schedule
 requests
 python-dateutil
+aiohttp
+uvloop
