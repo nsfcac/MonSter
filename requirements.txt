@@ -6,3 +6,4 @@ requests
 python-dateutil
 aiohttp
 uvloop
+tenacity
