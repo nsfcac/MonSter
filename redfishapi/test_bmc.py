@@ -56,7 +56,7 @@ async def fetch(url: str, session:object) -> dict:
 
 async def download_bmc(urls: list, conn: object, auth: object, timeout: object) -> None:
     tasks = []
-    async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
+    async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
         for url in urls:
             task = asyncio.ensure_future(fetch(url, session))
             tasks.append(task)
