@@ -44,7 +44,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     loop = asyncio.get_event_loop()
 
     future = asyncio.ensure_future(download_bmc(urls, conn, auth, timeout))
-    loop.run_until_complete(asyncio.wait(future))
+    loop.run_until_complete(future)
 
     return 
 
