@@ -4,6 +4,7 @@ import requests
 # import multiprocessing
 import asyncio
 import aiohttp
+import async_timeout
 
 from itertools import repeat
 from requests.exceptions import Timeout
@@ -22,7 +23,7 @@ config = {
     "password": "monster",
     "timeout": {
         "connect": 5,
-        "total": 15
+        "total": 10
     },
     "max_retries": 1,
     "ssl_verify": False,
@@ -49,16 +50,17 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return 
 
 
-async def fetch(url: str, session:object) -> dict:
-    async with session.get(url) as response:
-        return await response.json()
+async def fetch(url: str, session:object, config: dict) -> dict:
+    with async_timeout.timeout(config["timeout"]["total"]):
+        async with session.get(url) as response:
+            return await response.json()
 
 
-async def download_bmc(urls: list, conn: object, auth: object, timeout: object) -> None:
+async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
     tasks = []
     async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
         for url in urls:
-            task = asyncio.ensure_future(fetch(url, session))
+            task = asyncio.ensure_future(fetch(url, session, config))
             tasks.append(task)
         
         responses =  await asyncio.gather(*tasks)
@@ -101,7 +103,7 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-hostlist = get_hostlist(config["hostlist"])
+hostlist = get_hostlist(config["hostlist"])[:10]
 # hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
