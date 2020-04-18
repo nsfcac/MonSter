@@ -8,7 +8,7 @@ import async_timeout
 import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-from tenacity import retry
+from tenacity import *
 
 from itertools import repeat
 from requests.exceptions import Timeout
