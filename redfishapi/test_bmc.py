@@ -1,7 +1,8 @@
 import json
 import time
 import requests
-# import multiprocessing
+import logging
+
 import asyncio
 import aiohttp
 import async_timeout
@@ -118,7 +119,7 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-hostlist = get_hostlist(config["hostlist"])
-# hostlist = ["10.101.1.1"]
+# hostlist = get_hostlist(config["hostlist"])
+hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
