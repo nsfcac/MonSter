@@ -57,7 +57,7 @@ def return_none(retry_state):
     return None
 
 
-@retry( stop=(stop_after_delay(10) | stop_after_attempt(3)), 
+@retry( stop=(stop_after_delay(15) | stop_after_attempt(3)), 
         retry_error_callback=return_none)
 async def fetch(url: str, session:object, config: dict) -> dict:
     async with session.get(url) as response:
