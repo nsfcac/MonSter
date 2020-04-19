@@ -89,17 +89,18 @@ async def fetch(url: str, session:object, config: dict) -> dict:
     try:
         async for attempt in AsyncRetrying(stop_after_attempt(3)):
             with attempt:
-                try:
-                    timeout = config["timeout"]
-                    with async_timeout.timeout(timeout):
-                        async with session.get(url) as response:
-                            return await response.json()
-                except asyncio.TimeoutError:
-                    logging.error("Connection timeout: %s", url)
+                async with session.get(url) as response:
+                    return await response.json()
+                # try:
+                #     timeout = config["timeout"]
+                #     with async_timeout.timeout(timeout):
+                #         async with session.get(url) as response:
+                #             return await response.json()
+                # except asyncio.TimeoutError:
+                #     logging.error("Connection timeout: %s", url)
     except RetryError:
         logging.error("Cannot connect to remote BMC after 3 retries: %s", url)
         return None
-
 
 
 async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
@@ -107,12 +108,8 @@ async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> 
     try:
         async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
             for url in urls:
-                # try:
                 task = asyncio.ensure_future(fetch(url, session, config))
                 tasks.append(task)
-                # except:
-                #     tasks.append(None)
-                #     logging.error("Cannot connect to remote BMC after 3 retries: %s", url)
             
             responses =  await asyncio.gather(*tasks)
             return responses
