@@ -70,6 +70,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
 
 def return_last_value(retry_state):
+    return None
     logging.error(retry_state.outcome.result())
 
 
