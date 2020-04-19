@@ -7,15 +7,16 @@ def process_bmc_metrics(urls: list, bmc_metrics: list, time: int) -> list:
     for index, url in enumerate(urls):
         metric = bmc_metrics[index]
         host_ip = url.split("/")[2]
-        if "Thermal" in metric["@odata.type"]:
-            thermal_points = process_thermal(host_ip, metric, time)
-            if thermal_points:
-                data_points = data_points + thermal_points
-        # "Power" in metric["@odata.type"]
-        else:
-            power_points = process_power(host_ip, metric, time)
-            if power_points:
-                data_points = data_points + power_points
+        if metric:
+            if "Thermal" in metric["@odata.type"]:
+                thermal_points = process_thermal(host_ip, metric, time)
+                if thermal_points:
+                    data_points = data_points + thermal_points
+            # "Power" in metric["@odata.type"]
+            else:
+                power_points = process_power(host_ip, metric, time)
+                if power_points:
+                    data_points = data_points + power_points
         # elif "Manager" in metric["@odata.type"]:
         #     process_bmc_health(host_ip, metric, time)
         # else:
