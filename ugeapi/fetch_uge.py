@@ -81,7 +81,7 @@ def fetch_uge(config: object) -> object:
         }
 
     except:
-        logging.error('Cannot get UGE data points')
+        logging.error("Cannot get UGE data points")
 
     return uge_info
 
@@ -100,6 +100,6 @@ def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter:
         )
         host = host_response.json()
     except:
-        logging.error('Cannot get host details from UGE')
+        logging.error("Cannot get host details from UGE")
 
     return host
