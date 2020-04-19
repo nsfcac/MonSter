@@ -40,7 +40,7 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except:
-            logging.error('Cannot find cpu in from host: %s', host_ip)
+            logging.error("Cannot find 'cpu' from host: %s", host_ip)
 
         # MemUsage
         try:
@@ -59,7 +59,7 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except:
-            logging.error('Cannot find mem_free or mem_total from host: %s', host_ip)
+            logging.error("Cannot find 'mem_free' or 'mem_total' from host: %s", host_ip)
 
         # Job List
         joblist = []
@@ -120,7 +120,7 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except:
-            logging.error('Cannot find job list from host: %s', host_ip)
+            logging.error("Cannot find 'jobList' from host: %s", host_ip)
 
         data_points = [cpuusage_point, memusage_point, nodejobs_point]
 
@@ -133,7 +133,7 @@ def process_host(host_data: object, time: int) -> list:
             "data_points": None,
             "jobs_detail": None
         }
-        logging.error('Cannot get UGE metrics')
+        logging.error("Cannot get UGE metrics")
     
     return all_data
 
@@ -162,9 +162,8 @@ def aggregate_node_jobs(node_jobs: dict) -> list:
                     })
         
         all_job_points = list(jobs_data.values())
-    except Exception as err:
-        print("aggregate_node_jobs ERROR: ", end = " ")
-        print(err)
+    except:
+        logging.error("Cannot aggregate jobs information")
     
     return all_job_points
 
