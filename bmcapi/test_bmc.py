@@ -38,7 +38,7 @@ logging.basicConfig(
 config = {
     "user": "root",
     "password": "nivipnut",
-    "timeout": 10,
+    "timeout": 12,
     "max_retries": 1,
     "ssl_verify": False,
     "hostlist": "../hostlist"
