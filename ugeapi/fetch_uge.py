@@ -9,8 +9,8 @@ from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-# from ugeapi.convert import get_hostip
-# from ugeapi.process_uge import process_host, aggregate_node_jobs
+from ugeapi.convert import get_hostip
+from ugeapi.process_uge import process_host, aggregate_node_jobs
 
 logging.basicConfig(
     filename='ugeapi.log',
@@ -18,9 +18,9 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
 
-# For testing
-from convert import get_hostip
-from process_uge import process_host, aggregate_node_jobs
+# # For testing
+# from convert import get_hostip
+# from process_uge import process_host, aggregate_node_jobs
 
 # config = {
 #     "host": "129.118.104.35",
