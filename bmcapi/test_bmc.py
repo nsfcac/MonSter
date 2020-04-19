@@ -10,7 +10,7 @@ import async_timeout
 import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-from tenacity
+import tenacity
 
 from itertools import repeat
 from requests.exceptions import Timeout
@@ -79,7 +79,7 @@ async def fetch(url: str, session:object, config: dict) -> dict:
                 return await response.json()
     except asyncio.TimeoutError:
         logging.error("Connection timeout: %s", url)
-        
+
 
 async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
     tasks = []
