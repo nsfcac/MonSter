@@ -12,9 +12,10 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 import tenacity
 
-from itertools import repeat
-from requests.exceptions import Timeout
-from requests.adapters import HTTPAdapter 
+# from itertools import repeat
+from functools import wraps
+# from requests.exceptions import Timeout
+# from requests.adapters import HTTPAdapter 
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -71,12 +72,13 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
 
 def return_last_value(retry_state):
-    logging.error("Cannot connect to host after 3 retries")
+    logging.erro(retry_state.args)
+    # logging.error("Cannot connect to host after 3 retries")
     return None
 
 
 @tenacity.retry(stop=tenacity.stop_after_attempt(3),
-                wait=tenacity.wait_random(min=1, max=5),
+                wait=tenacity.wait_random(min=1, max=3),
                 retry_error_callback=return_last_value,)      
 async def fetch(url: str, session:object, config: dict) -> dict:
     # try:
