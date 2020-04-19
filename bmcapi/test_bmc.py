@@ -24,6 +24,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(
     level=logging.DEBUG,
     filename='bmcapi.log',
+    filemode='w',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
@@ -79,7 +80,7 @@ async def fetch(url: str, session:object, config: dict) -> dict:
                 return await response.json()
     except asyncio.TimeoutError:
         logging.error("Connection timeout: %s", url)
-    except:
+    except tenacity.RetryError:
         logging.error("Cannot connect to remote BMC after 3 retries: %s", url)
         return None
 
