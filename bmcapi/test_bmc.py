@@ -52,7 +52,6 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
     auth = aiohttp.BasicAuth(config["user"], password=config["password"])
-    # timeout = aiohttp.ClientTimeout(total=config["timeout"]["total"], connect=config["timeout"]["connect"])
 
     urls = generate_urls(hostlist)
 
@@ -67,10 +66,18 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return
 
 
-def return_last_value(retry_state):
-    url = retry_state.args[0]
-    logging.error("Cannot connect to %s", url)
-    return None
+async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
+    tasks = []
+    try:
+        async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
+            for url in urls:
+                task = asyncio.ensure_future(fetch(url, session, config))
+                tasks.append(task)
+            
+            responses =  await asyncio.gather(*tasks)
+            return responses
+    except:
+        return None
 
 
 @tenacity.retry(stop=tenacity.stop_after_attempt(3),
@@ -83,19 +90,10 @@ async def fetch(url: str, session:object, config: dict) -> dict:
             return await response.json()
 
 
-async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
-    tasks = []
-    try:
-        async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
-            for url in urls:
-                task = asyncio.ensure_future(fetch(url, session, config))
-                tasks.append(task)
-            
-            responses =  await asyncio.gather(*tasks)
-            return responses
-    except:
-        
-        return None
+def return_last_value(retry_state):
+    url = retry_state.args[0]
+    logging.error("Cannot connect to %s", url)
+    return None
 
 
 def generate_urls(hostlist:list) -> list:
@@ -104,18 +102,18 @@ def generate_urls(hostlist:list) -> list:
     for host in hostlist:
         thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
         urls.append(thermal_url)
-    # # Power
-    # for host in hostlist:
-    #     power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
-    #     urls.append(power_url)
-    # # BMC health
-    # for host in hostlist:
-    #     bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
-    #     urls.append(bmc_health_url)
-    # # System health
-    # for host in hostlist:
-    #     system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
-    #     urls.append(system_health_url)
+    # Power
+    for host in hostlist:
+        power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
+        urls.append(power_url)
+    # BMC health
+    for host in hostlist:
+        bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
+        urls.append(bmc_health_url)
+    # System health
+    for host in hostlist:
+        system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
+        urls.append(system_health_url)
     return urls
 
 
