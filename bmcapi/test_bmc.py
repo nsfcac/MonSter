@@ -64,13 +64,13 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     logging.info("Finish fetching BMC metrics")
 
+    print(len(bmc_metrics))
     print(json.dumps(bmc_metrics, indent=4))
 
     return
 
 
 def return_last_value(retry_state):
-    logging.error(retry_state.outcome)
     logging.error("Cannot connect to host after 3 retries")
     return None
 
