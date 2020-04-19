@@ -40,7 +40,7 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except:
-            logging.error('Cannot find cpu in resourceNumericValues')
+            logging.error('Cannot find cpu in from host: %s', host_ip)
 
         # MemUsage
         try:
@@ -59,7 +59,7 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except:
-            logging.error('Cannot find mem_free or mem_total resourceNumericValues')
+            logging.error('Cannot find mem_free or mem_total from host: %s', host_ip)
 
         # Job List
         joblist = []
@@ -120,7 +120,7 @@ def process_host(host_data: object, time: int) -> list:
                 }
             }
         except:
-            logging.error('Cannot find job list')
+            logging.error('Cannot find job list from host: %s', host_ip)
 
         data_points = [cpuusage_point, memusage_point, nodejobs_point]
 
