@@ -23,11 +23,6 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
 
-# from redfishapi.process_bmc import *
-
-# For test single function
-# from process_bmc import *
-
 config = {
     "user": "password",
     "password": "monster",
@@ -59,7 +54,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
     # print(len(bmc_metrics))
-    print(json.dumps(bmc_metrics, indent=4))
+    print(json.dumps(all_bmc_points, indent=4))
 
     return
 
