@@ -12,15 +12,8 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 import tenacity
 
-# from itertools import repeat
-from functools import wraps
-# from requests.exceptions import Timeout
-# from requests.adapters import HTTPAdapter 
+from process_bmc import process_bmc_metrics
 
-import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-# AbstractEventLoop.set_debug()
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -50,6 +43,8 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
 
+    all_bmc_points = []
+
     conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
     auth = aiohttp.BasicAuth(config["user"], password=config["password"])
 
@@ -57,11 +52,14 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     loop = asyncio.get_event_loop()
 
+    epoch_time = int(round(time.time() * 1000000000))
+
     future = asyncio.ensure_future(download_bmc(urls, conn, auth, config))
     bmc_metrics = loop.run_until_complete(future)
 
-    print(len(bmc_metrics))
-    print(json.dumps(bmc_metrics, indent=4))
+    all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
+    # print(len(bmc_metrics))
+    print(json.dumps(all_bmc_points, indent=4))
 
     return
 
@@ -106,14 +104,14 @@ def generate_urls(hostlist:list) -> list:
     for host in hostlist:
         power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
         urls.append(power_url)
-    # BMC health
-    for host in hostlist:
-        bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
-        urls.append(bmc_health_url)
-    # System health
-    for host in hostlist:
-        system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
-        urls.append(system_health_url)
+    # # BMC health
+    # for host in hostlist:
+    #     bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
+    #     urls.append(bmc_health_url)
+    # # System health
+    # for host in hostlist:
+    #     system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
+    #     urls.append(system_health_url)
     return urls
 
 
