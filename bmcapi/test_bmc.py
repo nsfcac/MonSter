@@ -70,8 +70,8 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
 
 def return_last_value(retry_state):
+    logging.error("Cannot connect to host after 3 retries")
     return None
-    logging.error(retry_state.outcome.result())
 
 
 @tenacity.retry(stop=tenacity.stop_after_attempt(3),
