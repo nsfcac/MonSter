@@ -1,25 +1,30 @@
 import json
+import logging
 
 
 def process_bmc_metrics(urls: list, bmc_metrics: list, time: int) -> list:
     data_points = []
     for index, url in enumerate(urls):
         metric = bmc_metrics[index]
-        node_id = url.split("/")[2]
+        host_ip = url.split("/")[2]
         if "Thermal" in metric["@odata.type"]:
-            process_thermal(node_id, metric, time)
-        elif "Power" in metric["@odata.type"]:
-            process_power(node_id, metric, time)
-        elif "Manager" in metric["@odata.type"]:
-            process_bmc_health(node_id, metric, time)
+            thermal_points = process_thermal(host_ip, metric, time)
+            if thermal_points:
+                data_points = data_points + thermal_points
+        # "Power" in metric["@odata.type"]
         else:
-            # ComputerSystem.v1_4_0.ComputerSystem
-            process_sys_health(node_id, metric, time)
-        return 
+            power_points = process_power(host_ip, metric, time)
+            if power_points:
+                data_points = data_points + power_points
+        # elif "Manager" in metric["@odata.type"]:
+        #     process_bmc_health(host_ip, metric, time)
+        # else:
+        #     # ComputerSystem.v1_4_0.ComputerSystem
+        #     process_sys_health(host_ip, metric, time)
     return data_points
 
 
-def process_thermal(node_id: str, metric: dict, time: int) -> list:
+def process_thermal(host_ip: str, metric: dict, time: int) -> list:
     points = []
     try:
         # Temperature
@@ -32,7 +37,7 @@ def process_thermal(node_id: str, metric: dict, time: int) -> list:
                 "time": time,
                 "tags": {
                     "Label": name,
-                    "NodeId": node_id
+                    "NodeId": host_ip
                 }, 
                 "fields": {
                     "Reading": reading
@@ -49,21 +54,19 @@ def process_thermal(node_id: str, metric: dict, time: int) -> list:
                 "time": time,
                 "tags": {
                     "Label": name,
-                    "NodeId": node_id
+                    "NodeId": host_ip
                 }, 
                 "fields": {
                     "Reading": reading
                 }
             }
             points.append(fan_point)
-    except Exception as err:
-        print("process_thermal ERROR: ", end = " ")
-        print(node_id, end = " ")
-        print(err)
+    except:
+        logging.error("Cannot find 'Temperatures' or 'Fans' from BMC on host: %s", host_ip)
     return points
 
 
-def process_power(node_id: str, metric: dict, time: int) -> list:
+def process_power(host_ip: str, metric: dict, time: int) -> list:
     points = []
     try:
         reading = float("{0:.2f}".format(metric["PowerControl"][0]["PowerConsumedWatts"]))
@@ -72,21 +75,19 @@ def process_power(node_id: str, metric: dict, time: int) -> list:
             "time": time,
             "tags": {
                 "Label": "NodePower",
-                "NodeId": node_id
+                "NodeId": host_ip
             }, 
             "fields": {
                 "Reading": reading
             }
         }
         points.append(power_point)
-    except Exception as err:
-        print("process_power ERROR: ", end = " ")
-        print(node_id, end = " ")
-        print(err)
+    except:
+        logging.error("Cannot find 'PowerConsumedWatts from BMC on host: %s", host_ip)
     return points
 
 
-def process_bmc_health(node_id: str, metric: dict, time: int) -> list:
+def process_bmc_health(host_ip: str, metric: dict, time: int) -> list:
     points = []
     try:
         if metric["Status"]["Health"] == "OK":
@@ -98,21 +99,19 @@ def process_bmc_health(node_id: str, metric: dict, time: int) -> list:
             "time": time,
             "tags": {
                 "Label": "BMC",
-                "NodeId": node_id
+                "NodeId": host_ip
             }, 
             "fields": {
                 "Reading": reading
             }
         }
         points.append(power_point)
-    except Exception as err:
-        print("process_bmc_health ERROR: ", end = " ")
-        print(node_id, end = " ")
-        print(err)
+    except:
+        logging.error("Cannot find 'BMC Health from BMC on host: %s", host_ip)
     return points
 
 
-def process_sys_health(node_id: str, metric: dict, time: int) -> list:
+def process_sys_health(host_ip: str, metric: dict, time: int) -> list:
     points = []
     try:
         if metric["Status"]["Health"] == "OK":
@@ -124,15 +123,13 @@ def process_sys_health(node_id: str, metric: dict, time: int) -> list:
             "time": time,
             "tags": {
                 "Label": "System",
-                "NodeId": node_id
+                "NodeId": host_ip
             }, 
             "fields": {
                 "Reading": reading
             }
         }
         points.append(power_point)
-    except Exception as err:
-        print("process_sys_health ERROR: ", end = " ")
-        print(node_id, end = " ")
-        print(err)
+    except:
+        logging.error("Cannot find 'System Health from BMC on host: %s", host_ip)
     return points
