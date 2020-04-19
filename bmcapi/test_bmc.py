@@ -80,7 +80,7 @@ async def fetch(url: str, session:object, config: dict) -> dict:
                 return await response.json()
     except asyncio.TimeoutError:
         logging.error("Connection timeout: %s", url)
-    raise RetryException("Cannot connect to remote BMC after 3 retries")
+    # raise RetryException("Cannot connect to remote BMC after 3 retries")
     # except tenacity.RetryError:
     #     logging.error("Cannot connect to remote BMC after 3 retries: %s", url)
     #     return None
@@ -94,7 +94,7 @@ async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> 
                 try:
                     task = asyncio.ensure_future(fetch(url, session, config))
                     tasks.append(task)
-                except RetryException:
+                except:
                     tasks.append(None)
                     logging.error("Cannot connect to remote BMC after 3 retries: %s", url)
             
