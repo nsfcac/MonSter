@@ -1,11 +1,13 @@
 import json
-from dateutil.parser import parse #pip install python-dateutil
+import logging
+
+from dateutil.parser import parse
 
 from datetime import datetime
-from ugeapi.convert import get_hostip
+# from ugeapi.convert import get_hostip
 
-# # For testing
-# from convert import get_hostip
+# For testing
+from convert import get_hostip
 
 
 def process_host(host_data: object, time: int) -> list:
@@ -37,10 +39,8 @@ def process_host(host_data: object, time: int) -> list:
                     "Reading": cpuusage
                 }
             }
-        except Exception as err:
-            print(host_ip, end = " ")
-            print("Get CPUUsage ERROR: ", end = " ")
-            print(err)
+        except:
+            logging.error('Cannot find cpu in resourceNumericValues')
 
         # MemUsage
         try:
@@ -58,10 +58,8 @@ def process_host(host_data: object, time: int) -> list:
                     "Reading": memusage
                 }
             }
-        except Exception as err:
-            print(host_ip, end = " ")
-            print("Get MemUsage ERROR: ", end = " ")
-            print(err)
+        except:
+            logging.error('Cannot find mem_free or mem_total resourceNumericValues')
 
         # Job List
         joblist = []
@@ -121,10 +119,8 @@ def process_host(host_data: object, time: int) -> list:
                     "JobList": list(set(joblist))
                 }
             }
-        except Exception as err:
-            print(host_ip, end = " ")
-            print("Get JobList ERROR: ", end = " ")
-            print(err)
+        except:
+            logging.error('Cannot find job list')
 
         data_points = [cpuusage_point, memusage_point, nodejobs_point]
 
@@ -132,13 +128,12 @@ def process_host(host_data: object, time: int) -> list:
             "data_points": data_points,
             "jobs_detail": jobs_detail
         }
-    except Exception as err:
+    except:
         all_data = {
             "data_points": None,
             "jobs_detail": None
         }
-        print("process_host ERROR: ", end = " ")
-        print(err)
+        logging.error('Cannot get UGE metrics')
     
     return all_data
 
