@@ -72,7 +72,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
 
 def return_last_value(retry_state):
-    url = logging.error(retry_state.args[0])
+    url = retry_state.args[0]
     logging.error("Cannot connect to host: %s", url)
     return None
 
