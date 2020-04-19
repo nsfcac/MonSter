@@ -28,10 +28,10 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
 
-# from redfishapi.process_bmc import process_bmc
+# from redfishapi.process_bmc import *
 
 # For test single function
-from process_bmc import process_bmc
+# from process_bmc import *
 
 config = {
     "user": "password",
