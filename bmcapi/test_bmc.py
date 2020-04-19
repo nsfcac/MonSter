@@ -70,6 +70,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
 
 def return_last_value(retry_state):
+    logging.error(retry_state.outcome)
     logging.error("Cannot connect to host after 3 retries")
     return None
 
@@ -78,13 +79,13 @@ def return_last_value(retry_state):
                 wait=tenacity.wait_random(min=1, max=5),
                 retry_error_callback=return_last_value,)      
 async def fetch(url: str, session:object, config: dict) -> dict:
-    try:
-        timeout = config["timeout"]
-        with async_timeout.timeout(timeout):
-            async with session.get(url) as response:
-                return await response.json()
-    except asyncio.TimeoutError:
-        logging.error("Connection timeout: %s", url)
+    # try:
+    timeout = config["timeout"]
+    with async_timeout.timeout(timeout):
+        async with session.get(url) as response:
+            return await response.json()
+    # except asyncio.TimeoutError:
+    #     logging.error("Connection timeout: %s", url)
 
 
 async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
