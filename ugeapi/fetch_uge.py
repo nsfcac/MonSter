@@ -3,16 +3,24 @@ import time
 
 import requests
 import multiprocessing
+import logging 
+
 from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-from ugeapi.convert import get_hostip
-from ugeapi.process_uge import process_host, aggregate_node_jobs
+# from ugeapi.convert import get_hostip
+# from ugeapi.process_uge import process_host, aggregate_node_jobs
 
-# # For testing
-# from convert import get_hostip
-# from process_uge import process_host, aggregate_node_jobs
+logging.basicConfig(
+    filename='ugeapi.log',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S %Z'
+)
+
+# For testing
+from convert import get_hostip
+from process_uge import process_host, aggregate_node_jobs
 
 # config = {
 #     "host": "129.118.104.35",
@@ -72,9 +80,8 @@ def fetch_uge(config: object) -> object:
             "all_host_points": all_host_points
         }
 
-    except Exception as err:
-        print("fetch_uge ERROR: ", end = " ")
-        print(err)
+    except:
+        logging.error('Cannot get UGE data points')
 
     return uge_info
 
@@ -92,8 +99,7 @@ def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter:
             timeout = (config["timeout"]["connect"], config["timeout"]["read"])
         )
         host = host_response.json()
-    except ConnectionError as err:
-        print("get_host_detail ERROR: ", end = " ")
-        print(err)
+    except:
+        logging.error('Cannot get host details from UGE')
 
     return host
