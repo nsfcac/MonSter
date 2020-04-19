@@ -80,6 +80,12 @@ async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> 
         return None
 
 
+def return_last_value(retry_state):
+    url = retry_state.args[0]
+    logging.error("Cannot connect to %s", url)
+    return None
+
+
 @tenacity.retry(stop=tenacity.stop_after_attempt(3),
                 wait=tenacity.wait_random(min=1, max=3),
                 retry_error_callback=return_last_value,)      
@@ -88,12 +94,6 @@ async def fetch(url: str, session:object, config: dict) -> dict:
     with async_timeout.timeout(timeout):
         async with session.get(url) as response:
             return await response.json()
-
-
-def return_last_value(retry_state):
-    url = retry_state.args[0]
-    logging.error("Cannot connect to %s", url)
-    return None
 
 
 def generate_urls(hostlist:list) -> list:
