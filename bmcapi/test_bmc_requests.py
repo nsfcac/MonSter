@@ -50,7 +50,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     with requests.Session() as session:
         bmc_metrics = [gevent.spawn(get_bmc_detail, config, url, session, bmcapi_adapter) for url in urls]
-        gevent.wait(bmc_metrics)
+        gevent.joinall(bmc_metrics)
         # for url in urls:
         #     host_ip = url.split("/")[2]
         #     bmc_metrics[host_ip] = get_bmc_detail(config, url, session, bmcapi_adapter)
