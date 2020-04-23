@@ -17,7 +17,7 @@ from process_bmc import process_bmc_metrics
 
 logging.basicConfig(
     level=logging.DEBUG,
-    filename='bmcapi.log',
+    filename='test_bmcapi.log',
     filemode='w',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S %Z'
@@ -27,7 +27,7 @@ config = {
     "user": "password",
     "password": "monster",
     "timeout": 12,
-    "max_retries": 1,
+    # "max_retries": 1,
     "ssl_verify": False,
     "hostlist": "../hostlist"
 }

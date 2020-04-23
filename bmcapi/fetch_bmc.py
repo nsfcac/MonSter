@@ -1,12 +1,9 @@
 import json
 import time
-import requests
 import logging
-
 import asyncio
 import aiohttp
 import async_timeout
-
 import tenacity
 import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -16,7 +13,6 @@ from bmcapi.process_bmc import process_bmc_metrics
 logging.basicConfig(
     level=logging.DEBUG,
     filename='bmcapi.log',
-    filemode='w',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
@@ -24,27 +20,29 @@ logging.basicConfig(
 
 def fetch_bmc(config: object, hostlist: list) -> object:
     """
-    Fetch bmc metrics from Redfish, average query and process time is: 11.57s
+    Fetch bmc metrics from Redfish, average query and process time is: ---s
     """
 
     all_bmc_points = []
+    try:
+        conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
+        auth = aiohttp.BasicAuth(config["user"], password=config["password"])
 
-    conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
-    auth = aiohttp.BasicAuth(config["user"], password=config["password"])
+        # Generate urls for accessing BMC metrics
+        urls = generate_urls(hostlist)
 
-    # Generate urls for accessing BMC metrics
-    urls = generate_urls(hostlist)
+        # Fetch BMC metrics in asynchronous
+        loop = asyncio.get_event_loop()
 
-    # Fetch BMC metrics in asynchronous
-    loop = asyncio.get_event_loop()
+        epoch_time = int(round(time.time() * 1000000000))
 
-    epoch_time = int(round(time.time() * 1000000000))
+        future = asyncio.ensure_future(download_bmc(urls, conn, auth, config))
+        bmc_metrics = loop.run_until_complete(future)
 
-    future = asyncio.ensure_future(download_bmc(urls, conn, auth, config))
-    bmc_metrics = loop.run_until_complete(future)
-
-    # Process BMC metrics and convert them to data points
-    all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
+        # Process BMC metrics and convert them to data points
+        all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
+    except:
+        logging.error("Cannot get BMC data points")
 
     return all_bmc_points
 
