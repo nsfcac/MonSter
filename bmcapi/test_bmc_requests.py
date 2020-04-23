@@ -7,8 +7,8 @@ from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
 import gevent
-from gevent import monkey
-monkey.patch_all()
+# from gevent import monkey
+# monkey.patch_all()
 
 from process_bmc import process_bmc_metrics
 
