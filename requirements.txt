@@ -7,3 +7,6 @@ python-dateutil
 aiohttp
 uvloop
 tenacity
+
+gevent
+requests-futures
