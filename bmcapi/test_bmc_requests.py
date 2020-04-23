@@ -58,7 +58,11 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     # print(bmc_metrics)
 
     print(json.dumps(bmc_metrics, indent=4))
-
+    valid = 0
+    for key, values in bmc_metrics.items():
+        if values:
+            valid += 1
+    print("Valid metrics: ", valid)
     return
 
 
