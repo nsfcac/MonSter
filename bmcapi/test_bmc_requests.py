@@ -28,7 +28,7 @@ config = {
     "password": "nivipnut",
     "timeout": {
         "connect": 2,
-        "read": 12
+        "read": 15
     },
     "max_retries": 3,
     "ssl_verify": False,
