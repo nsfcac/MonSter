@@ -6,6 +6,10 @@ import requests
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
+import gevent
+from gevent import monkey
+monkey.patch_all()
+
 from process_bmc import process_bmc_metrics
 
 import urllib3
@@ -37,16 +41,19 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
 
-    bmc_metrics = {}
+    # bmc_metrics = {}
+    bmc_metrics = []
     all_bmc_points = []
 
     bmcapi_adapter = HTTPAdapter(config["max_retries"])
     urls = generate_urls(hostlist)
 
     with requests.Session() as session:
-        for url in urls:
-            host_ip = url.split("/")[2]
-            bmc_metrics[host_ip] = get_bmc_detail(config, url, session, bmcapi_adapter)
+        bmc_metrics = [gevent.spawn(get_bmc_detail, config, url, session, bmcapi_adapter) for url in urls]
+        gevent.wait(bmc_metrics)
+        # for url in urls:
+        #     host_ip = url.split("/")[2]
+        #     bmc_metrics[host_ip] = get_bmc_detail(config, url, session, bmcapi_adapter)
 
     print(json.dumps(bmc_metrics, indent=4))
 
