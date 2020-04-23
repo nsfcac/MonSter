@@ -39,7 +39,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
     auth = aiohttp.BasicAuth(config["user"], password=config["password"])
-    timeout = aiohttp.ClientTimeout(total=60)
+    timeout = aiohttp.ClientTimeout(total=60*5)
 
     urls = generate_urls(hostlist)
 
@@ -51,9 +51,9 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     bmc_metrics = loop.run_until_complete(future)
 
     all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
-    print(len(bmc_metrics))
+    # print(len(bmc_metrics))
     # print(json.dumps(all_bmc_points, indent=4))
-    # print(json.dumps(bmc_metrics, indent=4))
+    print(json.dumps(bmc_metrics, indent=4))
 
     return
 
@@ -78,9 +78,10 @@ def return_last_value(retry_state):
     return None
 
 
-@tenacity.retry(stop=tenacity.stop_after_attempt(3),
-                wait=tenacity.wait_random(min=1, max=3),
-                retry_error_callback=return_last_value,)      
+# @tenacity.retry(stop=tenacity.stop_after_attempt(3),
+#                 wait=tenacity.wait_random(min=1, max=3),
+#                 retry_error_callback=return_last_value,)     
+@tenacity.retry
 async def fetch(url: str, session:object, config: dict) -> dict:
     timeout = config["timeout"]
     with async_timeout.timeout(timeout):
@@ -89,6 +90,8 @@ async def fetch(url: str, session:object, config: dict) -> dict:
 
 
 def generate_urls(hostlist:list) -> list:
+    # For testing
+    # curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k
     urls = []
     # Thermal URLS
     for host in hostlist:
