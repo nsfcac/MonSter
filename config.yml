@@ -5,18 +5,15 @@ influxdb:
   password: 'li29729'
   database: 'test_monster'
 
-frequency: 
-  60 # in seconds
+frequency: 60 # in seconds
 
 hostlistdir: './hostlist'
 
 redfish:
   user: 'root'
   password: 'nivipnut'
-  timeout: 
-    connect: 4 # connect timeout
-    read: 12   # read timeout
-  max_retries: 3
+  timeout: 12
+  # max_retries: 3
   ssl_verify: False   # Secure Sockets Layer Verify
   hostlist: "./hostlist"
 

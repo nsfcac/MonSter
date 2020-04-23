@@ -2,15 +2,12 @@ import json
 import time
 import requests
 import logging
-
 import asyncio
 import aiohttp
 import async_timeout
-
+import tenacity
 import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-
-import tenacity
 
 from process_bmc import process_bmc_metrics
 
@@ -42,6 +39,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
     auth = aiohttp.BasicAuth(config["user"], password=config["password"])
+    timeout = aiohttp.ClientTimeout(total=60)
 
     urls = generate_urls(hostlist)
 
@@ -49,7 +47,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     epoch_time = int(round(time.time() * 1000000000))
 
-    future = asyncio.ensure_future(download_bmc(urls, conn, auth, config))
+    future = asyncio.ensure_future(download_bmc(urls, conn, auth, timeout, config))
     bmc_metrics = loop.run_until_complete(future)
 
     all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
@@ -59,10 +57,10 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return
 
 
-async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
+async def download_bmc(urls: list, conn: object, auth: object, timeout: object, config: dict) -> None:
     tasks = []
     try:
-        async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
+        async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
             for url in urls:
                 task = asyncio.ensure_future(fetch(url, session, config))
                 tasks.append(task)
