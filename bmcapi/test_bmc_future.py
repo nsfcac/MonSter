@@ -6,9 +6,10 @@ import requests
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
+import multiprocessing
 from concurrent.futures import as_completed
-from concurrent.futures import ThreadPoolExecutor
-# from concurrent.futures import ProcessPoolExecutor
+# from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from requests_futures.sessions import FuturesSession
 
 from process_bmc import process_bmc_metrics
@@ -28,7 +29,7 @@ config = {
     "user": "password",
     "password": "monster",
     "timeout": {
-        "connect": 2,
+        "connect": 5,
         "read": 15
     },
     "max_retries": 3,
@@ -46,11 +47,12 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     bmc_metrics = {}
     all_bmc_points = []
 
+    cpu_count = multiprocessing.cpu_count()
     bmcapi_adapter = HTTPAdapter(config["max_retries"])
     urls = generate_urls(hostlist)
 
     with requests.Session() as session:
-        future_session = FuturesSession(session=session, executor=ThreadPoolExecutor(max_workers=10))
+        future_session = FuturesSession(session=session, executor=ProcessPoolExecutor(max_workers=cpu_count))
         futures = [get_bmc_detail(config, url, future_session, bmcapi_adapter) for url in urls]
         for index, future in enumerate(as_completed(futures)):
             host_ip = urls[index].split("/")[2]
