@@ -23,7 +23,7 @@ config = {
     "user": "root",
     "password": "nivipnut",
     "timeout": {
-        "connect": 2,
+        "connect": 5,
         "read": 15
     },
     "max_retries": 3,
