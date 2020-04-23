@@ -8,6 +8,8 @@ from requests.adapters import HTTPAdapter
 
 from process_bmc import process_bmc_metrics
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -22,7 +24,7 @@ config = {
     "password": "monster",
     "timeout": {
         "connect": 2,
-        "read": 6
+        "read": 15
     },
     "max_retries": 3,
     "ssl_verify": False,
