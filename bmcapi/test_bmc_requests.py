@@ -57,7 +57,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     # print(bmc_metrics)
 
-    # print(json.dumps(all_bmc_points, indent=4))
+    print(json.dumps(bmc_metrics, indent=4))
 
     return
 
