@@ -78,10 +78,9 @@ def return_last_value(retry_state):
     return None
 
 
-# @tenacity.retry(stop=tenacity.stop_after_attempt(3),
-#                 wait=tenacity.wait_random(min=1, max=3),
-#                 retry_error_callback=return_last_value,)     
-@tenacity.retry
+@tenacity.retry(stop=tenacity.stop_after_attempt(3),
+                wait=tenacity.wait_random(min=1, max=3),
+                retry_error_callback=return_last_value,)     
 async def fetch(url: str, session:object, config: dict) -> dict:
     timeout = config["timeout"]
     with async_timeout.timeout(timeout):
