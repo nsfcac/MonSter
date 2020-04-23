@@ -47,7 +47,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     bmcapi_adapter = HTTPAdapter(config["max_retries"])
     urls = generate_urls(hostlist)
 
-    with FutureSession() as session:
+    with FuturesSession() as session:
         futures = [session.get(url, verify = config["ssl_verify"], auth=(config["user"], config["password"]), timeout = (config["timeout"]["connect"], config["timeout"]["read"])) for url in urls]
         for index, future in enumerate(as_completed(futures)):
             host_ip = urls[index].split("/")[2]
