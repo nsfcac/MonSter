@@ -2,7 +2,9 @@ import json
 import time
 import logging
 
-import grequests
+import requests
+from requests.exceptions import Timeout
+from requests.adapters import HTTPAdapter
 
 from process_bmc import process_bmc_metrics
 
@@ -18,7 +20,10 @@ logging.basicConfig(
 config = {
     "user": "password",
     "password": "monster",
-    "timeout": 12,
+    "timeout": {
+        "connect": 2,
+        "read": 6
+    },
     "max_retries": 3,
     "ssl_verify": False,
     "hostlist": "../hostlist"
@@ -33,12 +38,15 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     bmc_metrics = {}
     all_bmc_points = []
 
+    bmcapi_adapter = HTTPAdapter(config["max_retries"])
     urls = generate_urls(hostlist)
 
-    responses = (grequests.get(url) for url in urls)
-    results = grequests.map(responses)
+    with requests.Session() as session:
+        for url in urls:
+            host_ip = url.split("/")[2]
+            bmc_metrics[host_ip] = get_bmc_detail(config, url, session, bmcapi_adapter)
 
-    print(json.dumps(results, indent=4))
+    print(json.dumps(bmc_metrics, indent=4))
 
     # print(json.dumps(all_bmc_points, indent=4))
 
@@ -82,7 +90,25 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-hostlist = get_hostlist(config["hostlist"])
-# hostlist = ["10.101.1.1"]
+def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: object) -> dict:
+    """
+    Get BMC detail
+    """
+    bmc_metric = {}
+    session.mount(bmc_url, bmcapi_adapter)
+    try:
+        bmc_response = session.get(
+            bmc_url, verify = config["ssl_verify"],
+            auth=(config["user"], config["password"]),
+            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
+        )
+        bmc_metric = bmc_response.json()
+    except:
+        logging.error("Cannot get BMC metrics from: %s", bmc_url)
+    return bmc_metric
+
+
+# hostlist = get_hostlist(config["hostlist"])
+hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
