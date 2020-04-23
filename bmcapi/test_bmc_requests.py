@@ -119,7 +119,7 @@ def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: 
     return
 
 
-# hostlist = get_hostlist(config["hostlist"])
-hostlist = ["10.101.1.1"]
+hostlist = get_hostlist(config["hostlist"])
+# hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
