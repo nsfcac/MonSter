@@ -53,7 +53,14 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
     # print(len(bmc_metrics))
     # print(json.dumps(all_bmc_points, indent=4))
+
     print(json.dumps(bmc_metrics, indent=4))
+
+    valid = 0
+    for index, url in enumerate(urls):
+        if bmc_metrics[index]:
+            valid += 1
+    print("Valid metrics: ", valid)
 
     return
 
