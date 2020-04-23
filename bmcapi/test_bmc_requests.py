@@ -55,7 +55,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         #     host_ip = url.split("/")[2]
         #     bmc_metrics[host_ip] = get_bmc_detail(config, url, session, bmcapi_adapter)
 
-    print(json.dumps(bmc_metrics, indent=4))
+    print(bmc_metrics)
 
     # print(json.dumps(all_bmc_points, indent=4))
 
