@@ -7,7 +7,7 @@ from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
 from concurrent.futures import as_completed
-from requests_futures.session import FutureSession
+from requests_futures.sessions import FuturesSession
 
 from process_bmc import process_bmc_metrics
 
