@@ -1,21 +1,16 @@
 import json
 import time
-import logging
-
 import requests
-from requests.exceptions import Timeout
-from requests.adapters import HTTPAdapter
-
-import multiprocessing
-from concurrent.futures import as_completed
-# from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import ProcessPoolExecutor
-from requests_futures.sessions import FuturesSession
+import logging
+import asyncio
+import aiohttp
+import async_timeout
+import tenacity
+import uvloop
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 from process_bmc import process_bmc_metrics
 
-import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -28,13 +23,10 @@ logging.basicConfig(
 config = {
     "user": "password",
     "password": "monster",
-    "timeout": {
-        "connect": 5,
-        "read": 15
-    },
-    "max_retries": 3,
+    "timeout": 12,
+    # "max_retries": 1,
     "ssl_verify": False,
-    "hostlist": "../hostlist"
+    "hostlist": "../../hostlist"
 }
 
 
@@ -43,34 +35,64 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
 
-    # bmc_metrics = {}
-    bmc_metrics = {}
     all_bmc_points = []
 
-    cpu_count = multiprocessing.cpu_count()
-    bmcapi_adapter = HTTPAdapter(config["max_retries"])
+    conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
+    auth = aiohttp.BasicAuth(config["user"], password=config["password"])
+    timeout = aiohttp.ClientTimeout(total=60*5)
+
     urls = generate_urls(hostlist)
 
-    with requests.Session() as session:
-        future_session = FuturesSession(session=session, executor=ProcessPoolExecutor(max_workers=cpu_count))
-        futures = [get_bmc_detail(config, url, future_session, bmcapi_adapter) for url in urls]
-        for index, future in enumerate(as_completed(futures)):
-            host_ip = urls[index].split("/")[2]
-            resp = future.result()
-            if resp:
-                bmc_metrics[host_ip] = resp.json()
-            else:
-                bmc_metrics[host_ip] = None
+    loop = asyncio.get_event_loop()
 
-    # print(bmc_metrics)
+    epoch_time = int(round(time.time() * 1000000000))
+
+    future = asyncio.ensure_future(download_bmc(urls, conn, auth, timeout, config))
+    bmc_metrics = loop.run_until_complete(future)
+
+    all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
+    # print(len(bmc_metrics))
+    # print(json.dumps(all_bmc_points, indent=4))
 
     print(json.dumps(bmc_metrics, indent=4))
+
     valid = 0
-    for key, values in bmc_metrics.items():
-        if values:
+    for index, url in enumerate(urls):
+        if bmc_metrics[index]:
             valid += 1
     print("Valid metrics: ", valid)
+
     return
+
+
+async def download_bmc(urls: list, conn: object, auth: object, timeout: object, config: dict) -> None:
+    tasks = []
+    try:
+        async with aiohttp.ClientSession(connector= conn, auth=auth, timeout=timeout) as session:
+            for url in urls:
+                task = asyncio.ensure_future(fetch(url, session, config))
+                tasks.append(task)
+            
+            responses =  await asyncio.gather(*tasks)
+            return responses
+    except:
+        return None
+
+
+def return_last_value(retry_state):
+    url = retry_state.args[0]
+    logging.error("Cannot connect to %s", url)
+    return None
+
+
+@tenacity.retry(stop=tenacity.stop_after_attempt(3),
+                wait=tenacity.wait_random(min=1, max=3),
+                retry_error_callback=return_last_value,)     
+async def fetch(url: str, session:object, config: dict) -> dict:
+    timeout = config["timeout"]
+    with async_timeout.timeout(timeout):
+        async with session.get(url) as response:
+            return await response.json()
 
 
 def generate_urls(hostlist:list) -> list:
@@ -108,23 +130,6 @@ def get_hostlist(hostlist_dir: str) -> list:
     except Exception as err:
         print(err)
     return hostlist
-
-
-def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: object) -> None:
-    """
-    Get BMC detail
-    """
-    bmc_response = None
-    session.mount(bmc_url, bmcapi_adapter)
-    try:
-        bmc_response = session.get(
-            bmc_url, verify = config["ssl_verify"],
-            auth=(config["user"], config["password"]),
-            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
-        )
-    except:
-        logging.error("Cannot get BMC metrics from: %s", bmc_url)
-    return bmc_response
 
 
 hostlist = get_hostlist(config["hostlist"])
