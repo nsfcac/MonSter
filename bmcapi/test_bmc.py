@@ -51,9 +51,9 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     bmc_metrics = loop.run_until_complete(future)
 
     all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
-    # print(len(bmc_metrics))
+    print(len(bmc_metrics))
     # print(json.dumps(all_bmc_points, indent=4))
-    print(json.dumps(bmc_metrics, indent=4))
+    # print(json.dumps(bmc_metrics, indent=4))
 
     return
 
