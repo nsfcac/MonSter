@@ -42,20 +42,20 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     """
 
     # bmc_metrics = {}
-    bmc_metrics = []
+    bmc_metrics = {}
     all_bmc_points = []
 
     bmcapi_adapter = HTTPAdapter(config["max_retries"])
     urls = generate_urls(hostlist)
 
     with requests.Session() as session:
-        bmc_metrics = [gevent.spawn(get_bmc_detail, config, url, session, bmcapi_adapter) for url in urls]
-        gevent.joinall(bmc_metrics)
+        clients = [gevent.spawn(get_bmc_detail, config, url, session, bmcapi_adapter, bmc_metrics) for url in urls]
+        gevent.wait(clients)
         # for url in urls:
         #     host_ip = url.split("/")[2]
         #     bmc_metrics[host_ip] = get_bmc_detail(config, url, session, bmcapi_adapter)
 
-    print(bmc_metrics)
+    # print(bmc_metrics)
 
     # print(json.dumps(all_bmc_points, indent=4))
 
@@ -99,11 +99,12 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: object) -> dict:
+def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: object, bmc_metrics: dict) -> None:
     """
     Get BMC detail
     """
     bmc_metric = {}
+    host_ip = bmc_url.split("/")[2]
     session.mount(bmc_url, bmcapi_adapter)
     try:
         bmc_response = session.get(
@@ -114,7 +115,8 @@ def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: 
         bmc_metric = bmc_response.json()
     except:
         logging.error("Cannot get BMC metrics from: %s", bmc_url)
-    return bmc_metric
+    bmc_metrics[host_ip] = bmc_metric
+    return
 
 
 # hostlist = get_hostlist(config["hostlist"])
