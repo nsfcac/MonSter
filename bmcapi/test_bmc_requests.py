@@ -28,7 +28,7 @@ config = {
     "password": "monster",
     "timeout": {
         "connect": 2,
-        "read": 15
+        "read": 12
     },
     "max_retries": 3,
     "ssl_verify": False,
