@@ -6,11 +6,9 @@ import requests
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-import multiprocessing
-from concurrent.futures import as_completed
-# from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import ProcessPoolExecutor
-from requests_futures.sessions import FuturesSession
+import gevent
+# from gevent import monkey
+# monkey.patch_all()
 
 from process_bmc import process_bmc_metrics
 
@@ -29,12 +27,12 @@ config = {
     "user": "root",
     "password": "nivipnut",
     "timeout": {
-        "connect": 5,
-        "read": 15
+        "connect": 2,
+        "read": 12
     },
     "max_retries": 3,
     "ssl_verify": False,
-    "hostlist": "../hostlist"
+    "hostlist": "../../hostlist"
 }
 
 
@@ -47,20 +45,15 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     bmc_metrics = {}
     all_bmc_points = []
 
-    cpu_count = multiprocessing.cpu_count()
     bmcapi_adapter = HTTPAdapter(config["max_retries"])
     urls = generate_urls(hostlist)
 
     with requests.Session() as session:
-        future_session = FuturesSession(session=session, executor=ProcessPoolExecutor(max_workers=cpu_count))
-        futures = [get_bmc_detail(config, url, future_session, bmcapi_adapter) for url in urls]
-        for index, future in enumerate(as_completed(futures)):
-            host_ip = urls[index].split("/")[2]
-            resp = future.result()
-            if resp:
-                bmc_metrics[host_ip] = resp.json()
-            else:
-                bmc_metrics[host_ip] = None
+        clients = [gevent.spawn(get_bmc_detail, config, url, session, bmcapi_adapter, bmc_metrics) for url in urls]
+        gevent.wait(clients)
+        # for url in urls:
+        #     host_ip = url.split("/")[2]
+        #     bmc_metrics[host_ip] = get_bmc_detail(config, url, session, bmcapi_adapter)
 
     # print(bmc_metrics)
 
@@ -110,11 +103,12 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: object) -> None:
+def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: object, bmc_metrics: dict) -> None:
     """
     Get BMC detail
     """
-    bmc_response = None
+    bmc_metric = {}
+    host_ip = bmc_url.split("/")[2]
     session.mount(bmc_url, bmcapi_adapter)
     try:
         bmc_response = session.get(
@@ -122,9 +116,11 @@ def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: 
             auth=(config["user"], config["password"]),
             timeout = (config["timeout"]["connect"], config["timeout"]["read"])
         )
+        bmc_metric = bmc_response.json()
     except:
         logging.error("Cannot get BMC metrics from: %s", bmc_url)
-    return bmc_response
+    bmc_metrics[host_ip] = bmc_metric
+    return
 
 
 hostlist = get_hostlist(config["hostlist"])
