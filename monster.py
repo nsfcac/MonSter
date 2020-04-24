@@ -39,7 +39,6 @@ def main():
             schedule.run_pending()
             time.sleep(freq)
 
-        print("DONE!")
     except Exception as err:
         print(err)
     return 
