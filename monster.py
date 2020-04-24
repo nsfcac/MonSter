@@ -34,17 +34,17 @@ def main():
         # Monitoring frequency
         freq = config["frequency"]
 
-        write_db(client, config, hostlist)
+        # write_db(client, config, hostlist)
 
-        # schedule.every(freq).seconds.do(write_db, client, config, hostlist)
+        schedule.every(freq).seconds.do(write_db, client, config, hostlist)
 
         # # while 1:
         # #     schedule.run_pending()
         # #     time.sleep(freq)
 
-        # for i in range(10):
-        #     schedule.run_pending()
-        #     time.sleep(freq)
+        for i in range(10):
+            schedule.run_pending()
+            time.sleep(freq)
 
     except Exception as err:
         print(err)
@@ -69,8 +69,8 @@ def write_db(client: object, config: object, hostlist: list) -> None:
         all_points.extend(bmc_points)
 
         # Write points into influxdb
-        # client.write_points(all_points)
-        print(json.dumps(all_points, indent=4))
+        client.write_points(all_points)
+        # print(json.dumps(all_points, indent=4))
 
     except:
         logging.error("Cannot write data points to influxDB")
