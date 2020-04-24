@@ -12,11 +12,11 @@ from requests.adapters import HTTPAdapter
 from ugeapi.convert import get_hostip
 from ugeapi.process_uge import process_host, aggregate_node_jobs
 
-logging.basicConfig(
-    filename='ugeapi.log',
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S %Z'
-)
+# logging.basicConfig(
+#     filename='ugeapi.log',
+#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+#     datefmt='%Y-%m-%d %H:%M:%S %Z'
+# )
 
 # # For testing
 # from convert import get_hostip
