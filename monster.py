@@ -36,15 +36,15 @@ def main():
 
         write_db(client, config, hostlist)
 
-        schedule.every(freq).seconds.do(write_db, client, config)
+        # schedule.every(freq).seconds.do(write_db, client, config, hostlist)
 
-        # while 1:
+        # # while 1:
+        # #     schedule.run_pending()
+        # #     time.sleep(freq)
+
+        # for i in range(10):
         #     schedule.run_pending()
         #     time.sleep(freq)
-
-        for i in range(10):
-            schedule.run_pending()
-            time.sleep(freq)
 
     except Exception as err:
         print(err)
@@ -53,10 +53,6 @@ def main():
 def write_db(client: object, config: object, hostlist: list) -> None:
     all_points = []
     try:
-        # Fetch BMC information
-        bmc_points = fetch_bmc(config["redfish"], hostlist)
-        all_points.extend(bmc_points)
-
         # Fetch UGE information
         uge_host_points = fetch_uge(config["uge"])["all_host_points"]
         all_points.extend(uge_host_points)
@@ -67,11 +63,15 @@ def write_db(client: object, config: object, hostlist: list) -> None:
             job_id = job_point["tags"]["JobId"]
             if not check_job(client, job_id):
                 all_points.append(job_point)
-            
+        
+        # Fetch BMC information
+        bmc_points = fetch_bmc(config["redfish"], hostlist)
+        all_points.extend(bmc_points)
+
         # Write points into influxdb
-        client.write_points(all_points)
-        # print(json.dumps(uge_job_points, indent=4))
-        print("Done!")
+        # client.write_points(all_points)
+        print(json.dumps(all_points, indent=4))
+
     except:
         logging.error("Cannot write data points to influxDB")
     return
