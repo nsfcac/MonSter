@@ -2,11 +2,18 @@ import json
 import time
 import schedule
 from influxdb import InfluxDBClient
+import logging
 
 from helper import parse_config, check_config, get_hostlist
 from ugeapi.fetch_uge import fetch_uge
 from bmcapi.fetch_bmc import fetch_bmc
 
+logging.basicConfig(
+    level=logging.ERROR,
+    filename='monster.log',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S %Z'
+)
 
 def main():
     config = parse_config()
@@ -65,8 +72,8 @@ def write_db(client: object, config: object, hostlist: list) -> None:
         client.write_points(all_points)
         # print(json.dumps(uge_job_points, indent=4))
         print("Done!")
-    except Exception as err:
-        print(err)
+    except:
+        logging.error("Cannot write data points to influxDB")
     return
 
 
