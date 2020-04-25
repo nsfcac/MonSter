@@ -40,7 +40,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
     auth = aiohttp.BasicAuth(config["user"], password=config["password"])
-    timeout = aiohttp.ClientTimeout(total=60*5)
+    # timeout = aiohttp.ClientTimeout(total=60*5)
 
     # urls = generate_urls(hostlist)
     urls = ["https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/" for host in hostlist]
@@ -58,7 +58,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     print(json.dumps(bmc_metrics, indent=4))
 
-    # print(len(bmc_metrics))
+    print(len(bmc_metrics))
     # valid = 0
     # for index, url in enumerate(urls):
     #     if bmc_metrics[index]:
