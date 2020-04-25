@@ -4,6 +4,7 @@ import requests
 import logging
 import asyncio
 import aiohttp
+from aiohttp_retry import RetryClient
 import async_timeout
 import tenacity
 import uvloop
@@ -68,10 +69,11 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
 async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
     tasks = []
-    try:
-        async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
+    try:    
+        async with RetryClient(connector= conn, auth=auth) as client:
+        # async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
             for url in urls:
-                task = asyncio.ensure_future(fetch(url, session, config))
+                task = asyncio.ensure_future(fetch(url, client, config))
                 tasks.append(task)
             
             responses =  await asyncio.gather(*tasks)
@@ -80,18 +82,18 @@ async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> 
         return None
 
 
-def return_last_value(retry_state):
-    url = retry_state.args[0]
-    logging.error("Cannot connect to %s", url)
-    return None
+# def return_last_value(retry_state):
+#     url = retry_state.args[0]
+#     logging.error("Cannot connect to %s", url)
+#     return None
 
 
 # @tenacity.retry(stop=tenacity.stop_after_attempt(3),
 #                 # wait=tenacity.wait_random(min=1, max=3),
 #                 retry_error_callback=return_last_value,)     
-async def fetch(url: str, session:object, config: dict) -> dict:
+async def fetch(url: str, client:object, config: dict) -> dict:
     try:
-        async with session.get(url) as response:
+        async with client.get(url, retry_attempts=3) as response:
             return await response.json()
     except:
         return None
