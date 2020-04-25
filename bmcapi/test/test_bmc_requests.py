@@ -72,7 +72,7 @@ def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: 
         )
         bmc_metric = bmc_response.json()
     except:
-        logging.error("Cannot get BMC details from: ", bmc_url)
+        logging.error("Cannot get BMC details from: %s", bmc_url)
     return bmc_metric
 
 def generate_urls(hostlist:list) -> list:
