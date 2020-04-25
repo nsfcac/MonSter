@@ -71,7 +71,8 @@ def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: 
             auth=HTTPBasicAuth(config["user"], config["monster"])
         )
         bmc_metric = bmc_response.json()
-    except:
+    except Exception as err:
+        print(err)
         logging.error("Cannot get BMC details from: %s", bmc_url)
     return bmc_metric
 
