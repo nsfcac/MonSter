@@ -58,7 +58,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     print(json.dumps(bmc_metrics, indent=4))
 
-    print(len(bmc_metrics))
+    # print(len(bmc_metrics))
     # valid = 0
     # for index, url in enumerate(urls):
     #     if bmc_metrics[index]:
