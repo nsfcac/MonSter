@@ -94,7 +94,7 @@ async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> 
 #                 retry_error_callback=return_last_value,)     
 
 async def fetch(url: str, client:object, config: dict) -> dict:
-    async with client.get(url, retry_attempts=3, retry_max_timeout=8) as response:
+    async with client.get(url, retry_attempts=3, retry_max_timeout=40) as response:
         return await response.json()
 
 
