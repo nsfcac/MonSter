@@ -68,7 +68,7 @@ def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: 
         bmc_response = session.get(
             bmc_url, verify = config["ssl_verify"], 
             timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
-            auth=HTTPBasicAuth(config["user"], config["monster"])
+            auth=HTTPBasicAuth(config["user"], config["password"])
         )
         bmc_metric = bmc_response.json()
     except Exception as err:
