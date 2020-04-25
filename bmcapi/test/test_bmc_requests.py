@@ -10,6 +10,8 @@ from requests.auth import HTTPBasicAuth
 
 from process_bmc import process_bmc_metrics
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -113,7 +115,7 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-# hostlist = get_hostlist(config["hostlist"])
-hostlist = ["10.101.1.1"]
+hostlist = get_hostlist(config["hostlist"])
+# hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
