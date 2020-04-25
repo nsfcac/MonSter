@@ -106,10 +106,10 @@ def generate_urls(hostlist:list) -> list:
     for host in hostlist:
         thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
         urls.append(thermal_url)
-    # Power
-    for host in hostlist:
-        power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
-        urls.append(power_url)
+    # # Power
+    # for host in hostlist:
+    #     power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
+    #     urls.append(power_url)
     # # BMC health
     # for host in hostlist:
     #     bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
