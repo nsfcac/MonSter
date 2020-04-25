@@ -2,12 +2,6 @@ import json
 import time
 import requests
 import logging
-import asyncio
-import aiohttp
-import async_timeout
-import tenacity
-import uvloop
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 from process_bmc import process_bmc_metrics
 
@@ -24,7 +18,7 @@ config = {
     "user": "password",
     "password": "monster",
     "timeout": 12,
-    # "max_retries": 1,
+    "max_retries": 1,
     "ssl_verify": False,
     "hostlist": "../../hostlist"
 }
@@ -35,21 +29,14 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
 
+    bmc_metrics = []
     all_bmc_points = []
 
-    conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
-    auth = aiohttp.BasicAuth(config["user"], password=config["password"])
-    timeout = aiohttp.ClientTimeout(total=60*5)
+    urls = generate_urls(hostlist)
 
-    # urls = generate_urls(hostlist)
-    urls = ["https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/" for host in hostlist]
-
-    loop = asyncio.get_event_loop()
 
     epoch_time = int(round(time.time() * 1000000000))
 
-    future = asyncio.ensure_future(download_bmc(urls, conn, auth, config))
-    bmc_metrics = loop.run_until_complete(future)
 
     # all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
     # print(len(bmc_metrics))
@@ -57,44 +44,13 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     print(json.dumps(bmc_metrics, indent=4))
 
-    valid = 0
-    for index, url in enumerate(urls):
-        if bmc_metrics[index]:
-            valid += 1
-    print("Valid metrics: ", valid)
+    # valid = 0
+    # for index, url in enumerate(urls):
+    #     if bmc_metrics[index]:
+    #         valid += 1
+    # print("Valid metrics: ", valid)
 
     return
-
-
-async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
-    tasks = []
-    try:
-        async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
-            for url in urls:
-                task = asyncio.ensure_future(fetch(url, session, config))
-                tasks.append(task)
-            
-            responses =  await asyncio.gather(*tasks)
-            return responses
-    except:
-        return None
-
-
-def return_last_value(retry_state):
-    url = retry_state.args[0]
-    logging.error("Cannot connect to %s", url)
-    return None
-
-
-# @tenacity.retry(stop=tenacity.stop_after_attempt(3),
-#                 # wait=tenacity.wait_random(min=1, max=3),
-#                 retry_error_callback=return_last_value,)     
-async def fetch(url: str, session:object, config: dict) -> dict:
-    try:
-        async with session.get(url) as response:
-            return await response.json()
-    except:
-        return None
 
 
 def generate_urls(hostlist:list) -> list:
