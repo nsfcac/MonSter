@@ -50,7 +50,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     future = asyncio.ensure_future(download_bmc(urls, conn, auth, timeout, config))
     bmc_metrics = loop.run_until_complete(future)
 
-    all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
+    # all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
     # print(len(bmc_metrics))
     # print(json.dumps(all_bmc_points, indent=4))
 
