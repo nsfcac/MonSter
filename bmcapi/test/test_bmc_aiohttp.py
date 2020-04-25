@@ -90,9 +90,12 @@ def return_last_value(retry_state):
 #                 retry_error_callback=return_last_value,)     
 async def fetch(url: str, session:object, config: dict) -> dict:
     timeout = config["timeout"]
-    with async_timeout.timeout(timeout):
-        async with session.get(url) as response:
-            return await response.json()
+    try:
+        with async_timeout.timeout(timeout):
+            async with session.get(url) as response:
+                return await response.json()
+    except:
+        return None
 
 
 def generate_urls(hostlist:list) -> list:
