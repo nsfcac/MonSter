@@ -91,12 +91,10 @@ async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> 
 # @tenacity.retry(stop=tenacity.stop_after_attempt(3),
 #                 # wait=tenacity.wait_random(min=1, max=3),
 #                 retry_error_callback=return_last_value,)     
+
 async def fetch(url: str, client:object, config: dict) -> dict:
-    try:
-        async with client.get(url, retry_attempts=3) as response:
-            return await response.json()
-    except:
-        return None
+    async with client.get(url, retry_attempts=3, retry_max_timeout=8) as response:
+        return await response.json()
 
 
 def generate_urls(hostlist:list) -> list:
