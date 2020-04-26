@@ -50,16 +50,16 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     # cpu_count = multiprocessing.cpu_count()
     urls = generate_urls(hostlist)
-    connections = len(urls)
+    # connections = len(urls)
+    bmcapi_adapter = HTTPAdapter(pool_maxsize = 5, max_retries=config["max_retries"])
 
     bmc_metrics = []
     with requests.Session() as session:
-        session.mount("https://", HTTPAdapter(pool_connections = connections, pool_maxsize = connections, max_retries=config["max_retries"]))
         # # epoch_time = int(round(time.time() * 1000000000))
         # get_bmc_detail_args = zip(repeat(config), urls, repeat(session), repeat(bmcapi_adapter))
         # with multiprocessing.Pool(processes=cpu_count) as pool:
         #     bmc_details = pool.starmap(get_bmc_detail, get_bmc_detail_args)
-        bmc_metrics = get_bmc_thread(config, urls, session)
+        bmc_metrics = get_bmc_thread(config, urls, session, bmcapi_adapter)
     
     print(json.dumps(bmc_metrics, indent=4))
     print(len(bmc_metrics))
@@ -73,15 +73,16 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return True
 
 
-def get_bmc_thread(config: dict, bmc_urls: list, session: object) -> list:
+def get_bmc_thread(config: dict, bmc_urls: list, session: object, bmcapi_adapter: object) -> list:
     q = Queue(maxsize=0)
     bmc_metrics = [{} for url in bmc_urls]
     try:
         for i in range(len(bmc_urls)):
+            session.mount(bmc_urls[i], bmcapi_adapter)
             q.put((i, bmc_urls[i]))
         
         for i in range(len(bmc_urls)):
-            worker = threading.Thread(target=get_bmc_detail, args=(q, config, session, bmc_metrics))
+            worker = threading.Thread(target=get_bmc_detail, args=(q, config, session, bmcapi_adapter, bmc_metrics))
             # x = threading.Thread(target=get_bmc_detail, args=(config, url, session, bmcapi_adapter, bmc_metrics))
             worker.setDaemon(True)
             worker.start()
@@ -94,7 +95,7 @@ def get_bmc_thread(config: dict, bmc_urls: list, session: object) -> list:
     
     return bmc_metrics
 
-def get_bmc_detail(q: object, config: dict, session: object, bmc_metrics: list) -> None:
+def get_bmc_detail(q: object, config: dict, session: object, bmcapi_adapter: object, bmc_metrics: list) -> None:
     while not q.empty():
         work = q.get()
         index = work[0]
