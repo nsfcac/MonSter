@@ -76,8 +76,8 @@ def get_bmc_thread(config: dict, bmc_urls: list, session: object, bmcapi_adapter
     q = Queue(maxsize=0)
     bmc_metrics = []
     try:
-        for url in bmc_urls:
-            q.put(url)
+        for i in range(bmc_urls):
+            q.put((i, bmc_urls[i]))
         
         for url in bmc_urls:
             worker = threading.Thread(target=get_bmc_detail, args=(q, config, session, bmcapi_adapter, bmc_metrics))
@@ -94,7 +94,9 @@ def get_bmc_thread(config: dict, bmc_urls: list, session: object, bmcapi_adapter
 
 def get_bmc_detail(q: object, config: dict, session: object, bmcapi_adapter: object, bmc_metrics: list) -> None:
     while not q.empty():
-        bmc_url = q.get()
+        work = q.get()
+        index = work[0]
+        bmc_url = work[1]
         
         session.mount(bmc_url, bmcapi_adapter)
         metric = {}
@@ -118,7 +120,7 @@ def get_bmc_detail(q: object, config: dict, session: object, bmcapi_adapter: obj
             "feature": feature,
             "details": details
         })
-        bmc_metrics.append(metric)
+        bmc_metrics[index] = metric
         q.task_done()
     return True
 
