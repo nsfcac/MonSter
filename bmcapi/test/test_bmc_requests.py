@@ -30,8 +30,8 @@ config = {
     "user": "root",
     "password": "nivipnut",
     "timeout": {
-        "connect": 15,
-        "read": 40
+        "connect": 2,
+        "read": 10
     },
     "max_retries": 3,
     "ssl_verify": False,
