@@ -4,8 +4,6 @@ import logging
 import multiprocessing
 # import concurrent.futures
 import threading
-local = threading.local()
-vars(local)
 
 from queue import Queue
 from itertools import repeat
@@ -179,6 +177,5 @@ def get_hostlist(hostlist_dir: str) -> list:
 
 
 hostlist = get_hostlist(config["hostlist"])
-# hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
