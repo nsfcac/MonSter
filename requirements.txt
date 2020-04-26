@@ -10,3 +10,6 @@ tenacity
 
 gevent
 requests-futures
+
+aiohttp-retry
+aiomultiprocess
