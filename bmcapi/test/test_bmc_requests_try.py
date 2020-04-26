@@ -33,7 +33,7 @@ config = {
         "connect": 15,
         "read": 30
     },
-    "max_retries": 2,
+    "max_retries": 3,
     "ssl_verify": False,
     "hostlist": "../../hostlist"
 }
