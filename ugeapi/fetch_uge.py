@@ -46,7 +46,7 @@ def fetch_uge(config: object) -> object:
         cpu_count = multiprocessing.cpu_count()
 
         uge_url = "http://" + config["host"] + ":" + config["port"]
-        ugeapi_adapter = HTTPAdapter(config["max_retries"])
+        ugeapi_adapter = HTTPAdapter(max_retries=config["max_retries"])
 
         node_jobs = {}
         all_host_points = []
