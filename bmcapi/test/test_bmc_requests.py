@@ -86,7 +86,9 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 def get_bmc_thread(config: dict, bmc_urls: list) -> list:
     q = Queue(maxsize=0)
     bmc_metrics = [{} for url in bmc_urls]
-    bmcapi_adapter = HTTPAdapter(pool_maxsize = 5, max_retries=config["max_retries"])
+    # bmcapi_adapter = HTTPAdapter(pool_maxsize = 5, max_retries=config["max_retries"])
+    bmcapi_adapter = HTTPAdapter(max_retries=config["max_retries"])
+
     try:
         with requests.Session() as session:
             for i in range(len(bmc_urls)):
