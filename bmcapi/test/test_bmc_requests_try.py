@@ -31,9 +31,9 @@ config = {
     "password": "monster",
     "timeout": {
         "connect": 15,
-        "read": 30
+        "read": 45
     },
-    "max_retries": 3,
+    "max_retries": 2,
     "ssl_verify": False,
     "hostlist": "../../hostlist"
 }
