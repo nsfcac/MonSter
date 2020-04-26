@@ -5,7 +5,7 @@ import multiprocessing
 # import concurrent.futures
 import threading
 
-from Queue import Queue
+from queue import Queue
 from itertools import repeat
 import requests
 from requests.adapters import HTTPAdapter
