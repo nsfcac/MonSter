@@ -2,34 +2,36 @@ import json
 import logging
 
 
-def process_bmc_metrics(urls: list, bmc_metrics: list, time: int) -> list:
-    data_points = []
-    for index, url in enumerate(urls):
-        metric = bmc_metrics[index]
-        host_ip = url.split("/")[2]
-        if metric:
-            if "Thermal" in metric["@odata.type"]:
-                thermal_points = process_thermal(host_ip, metric, time)
-                if thermal_points:
-                    data_points = data_points + thermal_points
-            # "Power" in metric["@odata.type"]
-            else:
-                power_points = process_power(host_ip, metric, time)
-                if power_points:
-                    data_points = data_points + power_points
-        # elif "Manager" in metric["@odata.type"]:
-        #     process_bmc_health(host_ip, metric, time)
-        # else:
-        #     # ComputerSystem.v1_4_0.ComputerSystem
-        #     process_sys_health(host_ip, metric, time)
-    return data_points
+def process_bmc_metrics(bmc_metric: dict, time: int) -> list:
+    all_points = []
+    host_ip = bmc_metric["host"]
+    feature = bmc_metric["feature"]
+    details = bmc_metric["details"]
+    if bmc_metric["details"]:
+        if feature == "Thermal":
+            data_points = process_thermal(host_ip, details, time)
+            if data_points:
+                all_points.extend(data_points)
+        elif feature == "Power":
+            data_points = process_power(host_ip, details, time)
+            if data_points:
+                all_points.extend(data_points)
+        elif feature == "Managers":
+            data_points = process_bmc_health(host_ip, details, time)
+            if data_points:
+                all_points.extend(data_points)
+        else:
+            data_points = process_sys_health(host_ip, details, time)
+            if data_points:
+                all_points.extend(data_points)
+    return all_points
 
 
-def process_thermal(host_ip: str, metric: dict, time: int) -> list:
+def process_thermal(host_ip: str, details: dict, time: int) -> list:
     points = []
     try:
         # Temperature
-        temperatures = metric["Temperatures"]
+        temperatures = details["Temperatures"]
         for temp in temperatures:
             name = temp["Name"].replace(" ", "")
             reading = float("{0:.2f}".format(temp["ReadingCelsius"]))
@@ -67,10 +69,10 @@ def process_thermal(host_ip: str, metric: dict, time: int) -> list:
     return points
 
 
-def process_power(host_ip: str, metric: dict, time: int) -> list:
+def process_power(host_ip: str, details: dict, time: int) -> list:
     points = []
     try:
-        reading = float("{0:.2f}".format(metric["PowerControl"][0]["PowerConsumedWatts"]))
+        reading = float("{0:.2f}".format(details["PowerControl"][0]["PowerConsumedWatts"]))
         power_point = {
             "measurement": "Power",
             "time": time,
@@ -84,18 +86,22 @@ def process_power(host_ip: str, metric: dict, time: int) -> list:
         }
         points.append(power_point)
     except:
-        logging.error("Cannot find 'PowerConsumedWatts from BMC on host: %s", host_ip)
+        logging.error("Cannot find 'PowerConsumedWatts' from BMC on host: %s", host_ip)
     return points
 
 
-def process_bmc_health(host_ip: str, metric: dict, time: int) -> list:
+def process_bmc_health(host_ip: str, details: dict, time: int) -> list:
     points = []
     try:
-        if metric["Status"]["Health"] == "OK":
+        if details["Status"]["Health"] == "OK":
             reading = 0
-        else:
+        elif details["Status"]["Health"] == "Warning":
             reading = 1
-        power_point = {
+        elif details["Status"]["Health"] == "Critical":
+            reading = 2
+        else:
+            reading = -1
+        bmc_health_point = {
             "measurement": "Health",
             "time": time,
             "tags": {
@@ -106,20 +112,24 @@ def process_bmc_health(host_ip: str, metric: dict, time: int) -> list:
                 "Reading": reading
             }
         }
-        points.append(power_point)
+        points.append(bmc_health_point)
     except:
-        logging.error("Cannot find 'BMC Health from BMC on host: %s", host_ip)
+        logging.error("Cannot find 'BMC Health' from BMC on host: %s", host_ip)
     return points
 
 
-def process_sys_health(host_ip: str, metric: dict, time: int) -> list:
+def process_sys_health(host_ip: str, details: dict, time: int) -> list:
     points = []
     try:
-        if metric["Status"]["Health"] == "OK":
+        if details["Status"]["Health"] == "OK":
             reading = 0
-        else:
+        elif details["Status"]["Health"] == "Warning":
             reading = 1
-        power_point = {
+        elif details["Status"]["Health"] == "Critical":
+            reading = 2
+        else:
+            reading = -1
+        sys_health_point = {
             "measurement": "Health",
             "time": time,
             "tags": {
@@ -130,7 +140,7 @@ def process_sys_health(host_ip: str, metric: dict, time: int) -> list:
                 "Reading": reading
             }
         }
-        points.append(power_point)
+        points.append(sys_health_point)
     except:
-        logging.error("Cannot find 'System Health from BMC on host: %s", host_ip)
+        logging.error("Cannot find 'System Health' from BMC on host: %s", host_ip)
     return points
