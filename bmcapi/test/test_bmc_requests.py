@@ -33,7 +33,7 @@ config = {
         "connect": 15,
         "read": 40
     },
-    "max_retries": 3,
+    "max_retries": 5,
     "ssl_verify": False,
     "hostlist": "../../hostlist"
 }
@@ -79,7 +79,7 @@ def get_bmc_thread(config: dict, bmc_urls: list, session: object, bmcapi_adapter
         for i in range(len(bmc_urls)):
             q.put((i, bmc_urls[i]))
         
-        for url in bmc_urls:
+        for i in range(len(bmc_urls)):
             worker = threading.Thread(target=get_bmc_detail, args=(q, config, session, bmcapi_adapter, bmc_metrics))
             # x = threading.Thread(target=get_bmc_detail, args=(config, url, session, bmcapi_adapter, bmc_metrics))
             worker.setDaemon(True)
@@ -88,6 +88,7 @@ def get_bmc_thread(config: dict, bmc_urls: list, session: object, bmcapi_adapter
         q.join()
 
     except Exception as err:
+        print("get_bmc_thread ERROR", end=" ")
         print(err)
     
     return bmc_metrics
@@ -112,6 +113,7 @@ def get_bmc_detail(q: object, config: dict, session: object, bmcapi_adapter: obj
             )
             details = bmc_response.json()
         except Exception as err:
+            print("get_bmc_detail ERROR", end=" ")
             print(err)
             logging.error("Cannot get BMC details from: %s", bmc_url)
         
