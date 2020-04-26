@@ -66,21 +66,12 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     bmc_metrics = []
 
-    pq = Queue(maxsize=0)
 
-    processes = []
-    for i in range(cores):
-        bmc_urls = urls_set[i]
-        t = multiprocessing.Process(target=get_bmc_thread, args = (config, bmc_urls, pq ))
-        processes.append(t)
-        t.start()
-
-    for process in processes:
-        process.join()
-
-    while not pq.empty():
-        bmc_metrics.extend(pq.get())
-
+    with multiprocessing.Pool(processes=cores) as pool:
+        responses = [pool.apply_async(get_bmc_thread, args = (config, bmc_urls)) for bmc_urls in urls_set]
+    
+        for response in responses:
+            bmc_metrics += response.get()
     # bmc_metrics = get_bmc_thread(config, urls)
     
     print(json.dumps(bmc_metrics, indent=4))
@@ -95,7 +86,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return True
 
 
-def get_bmc_thread(config: dict, bmc_urls: list, pq: object) -> None:
+def get_bmc_thread(config: dict, bmc_urls: list) -> list:
     q = Queue(maxsize=0)
     bmc_metrics = [{} for url in bmc_urls]
     try:
@@ -113,9 +104,8 @@ def get_bmc_thread(config: dict, bmc_urls: list, pq: object) -> None:
     except Exception as err:
         print("get_bmc_thread ERROR", end=" ")
         print(err)
-
-    pq.put(bmc_metrics)
-    return True
+    
+    return bmc_metrics
 
 def get_bmc_detail(q: object, config: dict, bmc_metrics: list) -> None:
     while not q.empty():
