@@ -50,15 +50,16 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     # cpu_count = multiprocessing.cpu_count()
     urls = generate_urls(hostlist)
-    bmcapi_adapter = HTTPAdapter(max_retries=config["max_retries"])
+    connections = len(urls)
 
     bmc_metrics = []
     with requests.Session() as session:
+        session.mount("https://", HTTPAdapter(pool_connections = connections, pool_maxsize = connections, max_retries=config["max_retries"]))
         # # epoch_time = int(round(time.time() * 1000000000))
         # get_bmc_detail_args = zip(repeat(config), urls, repeat(session), repeat(bmcapi_adapter))
         # with multiprocessing.Pool(processes=cpu_count) as pool:
         #     bmc_details = pool.starmap(get_bmc_detail, get_bmc_detail_args)
-        bmc_metrics = get_bmc_thread(config, urls, session, bmcapi_adapter)
+        bmc_metrics = get_bmc_thread(config, urls, session)
     
     print(json.dumps(bmc_metrics, indent=4))
     print(len(bmc_metrics))
@@ -72,7 +73,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return True
 
 
-def get_bmc_thread(config: dict, bmc_urls: list, session: object, bmcapi_adapter: object) -> list:
+def get_bmc_thread(config: dict, bmc_urls: list, session: object) -> list:
     q = Queue(maxsize=0)
     bmc_metrics = [{} for url in bmc_urls]
     try:
@@ -80,7 +81,7 @@ def get_bmc_thread(config: dict, bmc_urls: list, session: object, bmcapi_adapter
             q.put((i, bmc_urls[i]))
         
         for i in range(len(bmc_urls)):
-            worker = threading.Thread(target=get_bmc_detail, args=(q, config, session, bmcapi_adapter, bmc_metrics))
+            worker = threading.Thread(target=get_bmc_detail, args=(q, config, session, bmc_metrics))
             # x = threading.Thread(target=get_bmc_detail, args=(config, url, session, bmcapi_adapter, bmc_metrics))
             worker.setDaemon(True)
             worker.start()
@@ -93,24 +94,22 @@ def get_bmc_thread(config: dict, bmc_urls: list, session: object, bmcapi_adapter
     
     return bmc_metrics
 
-def get_bmc_detail(q: object, config: dict, session: object, bmcapi_adapter: object, bmc_metrics: list) -> None:
+def get_bmc_detail(q: object, config: dict, session: object, bmc_metrics: list) -> None:
     while not q.empty():
         work = q.get()
         index = work[0]
         bmc_url = work[1]
         
-        session.mount(bmc_url, bmcapi_adapter)
         host_ip = bmc_url.split("/")[2]
         feature = bmc_url.split("/")[-2]
         details = {}
         try:
-            # bmc_response = session.get(
-            #     bmc_url, verify = config["ssl_verify"], 
-            #     timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
-            #     auth=HTTPBasicAuth(config["user"], config["password"])
-            # )
-            # details = bmc_response.json()
-            details = "dummy"
+            bmc_response = session.get(
+                bmc_url, verify = config["ssl_verify"], 
+                timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
+                auth=HTTPBasicAuth(config["user"], config["password"])
+            )
+            details = bmc_response.json()
             
         except Exception as err:
             print("get_bmc_detail ERROR", end=" ")
