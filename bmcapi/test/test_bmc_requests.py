@@ -49,7 +49,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     # all_bmc_points = []
 
     # cpu_count = multiprocessing.cpu_count()
-    urls = generate_urls(hostlist)[:50]
+    urls = generate_urls(hostlist)
     bmcapi_adapter = HTTPAdapter(max_retries=config["max_retries"])
 
     bmc_metrics = []
@@ -61,6 +61,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         bmc_metrics = get_bmc_thread(config, urls, session, bmcapi_adapter)
     
     print(json.dumps(bmc_metrics, indent=4))
+    print(len(bmc_metrics))
 
     # valid = 0
     # for detail in bmc_metrics:
@@ -129,10 +130,10 @@ def generate_urls(hostlist:list) -> list:
     for host in hostlist:
         thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
         urls.append(thermal_url)
-    # Power
-    for host in hostlist:
-        power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
-        urls.append(power_url)
+    # # Power
+    # for host in hostlist:
+    #     power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
+    #     urls.append(power_url)
     # # BMC health
     # for host in hostlist:
     #     bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
