@@ -74,7 +74,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
 def get_bmc_thread(config: dict, bmc_urls: list, session: object, bmcapi_adapter: object) -> list:
     q = Queue(maxsize=0)
-    bmc_metrics = []
+    bmc_metrics = [{} for url in bmc_urls]
     try:
         for i in range(len(bmc_urls)):
             q.put((i, bmc_urls[i]))
