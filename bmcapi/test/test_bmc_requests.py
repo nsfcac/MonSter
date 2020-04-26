@@ -33,7 +33,7 @@ config = {
         "connect": 15,
         "read": 40
     },
-    "max_retries": 5,
+    "max_retries": 3,
     "ssl_verify": False,
     "hostlist": "../../hostlist"
 }
@@ -102,7 +102,7 @@ def get_bmc_detail(q: object, config: dict, session: object, bmcapi_adapter: obj
         session.mount(bmc_url, bmcapi_adapter)
         host_ip = bmc_url.split("/")[2]
         feature = bmc_url.split("/")[-2]
-
+        details = {}
         try:
             bmc_response = session.get(
                 bmc_url, verify = config["ssl_verify"], 
@@ -110,21 +110,17 @@ def get_bmc_detail(q: object, config: dict, session: object, bmcapi_adapter: obj
                 auth=HTTPBasicAuth(config["user"], config["password"])
             )
             details = bmc_response.json()
-            metric = {
-                "host": host_ip,
-                "feature": feature,
-                "details": details
-            }
+            
         except Exception as err:
             print("get_bmc_detail ERROR", end=" ")
             print(err)
-
-            metric = {
-                "host": host_ip,
-                "feature": feature,
-                "details": {}
-            }
             # logging.error("Cannot get BMC details from: %s", bmc_url)
+
+        metric = {
+            "host": host_ip,
+            "feature": feature,
+            "details": details
+        }
         
         bmc_metrics[index] = metric
         q.task_done()
