@@ -143,7 +143,7 @@ def get_bmc_detail(q: object, config: dict, bmc_metrics: list) -> None:
     return True
 
 def generate_urls(hostlist:list) -> list:
-    # For testing
+    # Testing cmd
     # curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k
     urls = []
     # Thermal URLS
