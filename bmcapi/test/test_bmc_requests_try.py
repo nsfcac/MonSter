@@ -96,7 +96,6 @@ def get_bmc_thread(config: dict, bmc_urls: list) -> list:
         
         for i in range(len(bmc_urls)):
             worker = threading.Thread(target=get_bmc_detail, args=(q, config, bmc_metrics))
-            # x = threading.Thread(target=get_bmc_detail, args=(config, url, session, bmcapi_adapter, bmc_metrics))
             worker.setDaemon(True)
             worker.start()
         
