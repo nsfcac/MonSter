@@ -19,7 +19,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # curl --insecure -X GET "https://redfish.hpcc.ttu.edu:8080/v1/metrics?start=2020-04-12T12%3A00%3A00%2B00%3A00&end=2020-04-18T12%3A00%3A00%2B00%3A00&interval=5m&value=max&compress=false" -H "accept: application/json"
 
 logging.basicConfig(
-    level=logging.warning,
+    level=logging.error,
     filename='test_bmcapi.log',
     filemode='w',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
