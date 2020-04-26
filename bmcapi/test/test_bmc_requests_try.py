@@ -73,7 +73,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         bmc_urls = urls_set[i]
         t = multiprocessing.Process(target=get_bmc_thread, args = (config, bmc_urls, pq ))
         processes.append(t)
-        t.start
+        t.start()
 
     for process in processes:
         process.join()
