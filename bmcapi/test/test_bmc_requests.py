@@ -2,7 +2,10 @@ import json
 import time
 import logging
 import multiprocessing
+# import concurrent.futures
+import threading
 
+from Queue import Queue
 from itertools import repeat
 import requests
 from requests.adapters import HTTPAdapter
@@ -42,43 +45,81 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     """
 
     # bmc_metrics = []
-    bmc_details = []
+    # bmc_details = []
     # all_bmc_points = []
 
-    cpu_count = multiprocessing.cpu_count()
-    urls = generate_urls(hostlist)
-    bmcapi_adapter = HTTPAdapter(config["max_retries"])
+    # cpu_count = multiprocessing.cpu_count()
+    urls = generate_urls(hostlist)[:50]
+    bmcapi_adapter = HTTPAdapter(max_retries=config["max_retries"])
 
+    bmc_metrics = []
     with requests.Session() as session:
-        # epoch_time = int(round(time.time() * 1000000000))
-        get_bmc_detail_args = zip(repeat(config), urls, repeat(session), repeat(bmcapi_adapter))
-        with multiprocessing.Pool(processes=cpu_count) as pool:
-            bmc_details = pool.starmap(get_bmc_detail, get_bmc_detail_args)
-        print(json.dumps(bmc_details, indent=4))
+        # # epoch_time = int(round(time.time() * 1000000000))
+        # get_bmc_detail_args = zip(repeat(config), urls, repeat(session), repeat(bmcapi_adapter))
+        # with multiprocessing.Pool(processes=cpu_count) as pool:
+        #     bmc_details = pool.starmap(get_bmc_detail, get_bmc_detail_args)
+        bmc_metrics = get_bmc_thread(config, urls, session, bmcapi_adapter)
+    
+    print(json.dumps(bmc_metrics, indent=4))
 
-    valid = 0
-    for detail in bmc_details:
-        if detail:
-            valid += 1
-    print("Valid metrics: ", valid)
+    # valid = 0
+    # for detail in bmc_metrics:
+    #     if detail:
+    #         valid += 1
+    # print("Valid metrics: ", valid)
 
-    return
+    return True
 
 
-def get_bmc_detail(config: dict, bmc_url: str, session: object, bmcapi_adapter: object) -> dict:
-    session.mount(bmc_url, bmcapi_adapter)
-    bmc_metric = {}
+def get_bmc_thread(config: dict, bmc_urls: list, session: object, bmcapi_adapter: object) -> list:
+    q = Queue(maxsize=0)
+    bmc_metrics = []
     try:
-        bmc_response = session.get(
-            bmc_url, verify = config["ssl_verify"], 
-            timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
-            auth=HTTPBasicAuth(config["user"], config["password"])
-        )
-        bmc_metric = bmc_response.json()
+        for url in bmc_urls:
+            q.put(url)
+        
+        for url in bmc_urls:
+            worker = threading.Thread(target=get_bmc_detail, args=(q, config, session, bmcapi_adapter, bmc_metrics))
+            # x = threading.Thread(target=get_bmc_detail, args=(config, url, session, bmcapi_adapter, bmc_metrics))
+            worker.setDaemon(True)
+            worker.start()
+        
+        q.join()
+
     except Exception as err:
         print(err)
-        logging.error("Cannot get BMC details from: %s", bmc_url)
-    return bmc_metric
+    
+    return bmc_metrics
+
+def get_bmc_detail(q: object, config: dict, session: object, bmcapi_adapter: object, bmc_metrics: list) -> None:
+    while not q.empty():
+        bmc_url = q.get()
+        
+        session.mount(bmc_url, bmcapi_adapter)
+        metric = {}
+        host_ip = bmc_url.split("/")[2]
+        feature = bmc_url.split("/")[-2]
+        details = {}
+
+        try:
+            bmc_response = session.get(
+                bmc_url, verify = config["ssl_verify"], 
+                timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
+                auth=HTTPBasicAuth(config["user"], config["password"])
+            )
+            details = bmc_response.json()
+        except Exception as err:
+            print(err)
+            logging.error("Cannot get BMC details from: %s", bmc_url)
+        
+        metric.update({
+            "host": host_ip,
+            "feature": feature,
+            "details": details
+        })
+        bmc_metrics.append(metric)
+        q.task_done()
+    return True
 
 def generate_urls(hostlist:list) -> list:
     # For testing
@@ -88,10 +129,10 @@ def generate_urls(hostlist:list) -> list:
     for host in hostlist:
         thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
         urls.append(thermal_url)
-    # # Power
-    # for host in hostlist:
-    #     power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
-    #     urls.append(power_url)
+    # Power
+    for host in hostlist:
+        power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
+        urls.append(power_url)
     # # BMC health
     # for host in hostlist:
     #     bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
@@ -117,7 +158,7 @@ def get_hostlist(hostlist_dir: str) -> list:
     return hostlist
 
 
-hostlist = get_hostlist(config["hostlist"])
-# hostlist = ["10.101.1.1"]
+# hostlist = get_hostlist(config["hostlist"])
+hostlist = ["10.101.1.1"]
 
 fetch_bmc(config, hostlist)
