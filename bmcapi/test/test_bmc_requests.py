@@ -4,6 +4,8 @@ import logging
 import multiprocessing
 # import concurrent.futures
 import threading
+local = threading.local()
+vars(local)
 
 from queue import Queue
 from itertools import repeat
