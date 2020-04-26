@@ -104,12 +104,13 @@ def get_bmc_detail(q: object, config: dict, session: object, bmcapi_adapter: obj
         feature = bmc_url.split("/")[-2]
         details = {}
         try:
-            bmc_response = session.get(
-                bmc_url, verify = config["ssl_verify"], 
-                timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
-                auth=HTTPBasicAuth(config["user"], config["password"])
-            )
-            details = bmc_response.json()
+            # bmc_response = session.get(
+            #     bmc_url, verify = config["ssl_verify"], 
+            #     timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
+            #     auth=HTTPBasicAuth(config["user"], config["password"])
+            # )
+            # details = bmc_response.json()
+            details = "dummy"
             
         except Exception as err:
             print("get_bmc_detail ERROR", end=" ")
