@@ -64,7 +64,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
             increment += 1
     # connections = len(urls)
 
-    rint(json.dumps(urls_set, indent=4))
+    print(json.dumps(urls_set, indent=4))
     # # Paritition urls
 
     # bmc_metrics = []
