@@ -3,6 +3,7 @@ import time
 import logging
 import multiprocessing
 import threading
+thread_local = threading.local()
 
 from queue import Queue
 from itertools import repeat
@@ -118,14 +119,14 @@ def get_bmc_detail(q: object, config: dict, bmc_metrics: list) -> None:
         feature = bmc_url.split("/")[-2]
         details = {}
         try:
-            with requests.Session() as session:
-                session.mount(bmc_url, bmcapi_adapter)
-                bmc_response = session.get(
-                    bmc_url, verify = config["ssl_verify"], 
-                    timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
-                    auth=HTTPBasicAuth(config["user"], config["password"])
-                )
-                details = bmc_response.json()
+            session = get_session()
+            session.mount(bmc_url, bmcapi_adapter)
+            bmc_response = session.get(
+                bmc_url, verify = config["ssl_verify"], 
+                timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
+                auth=HTTPBasicAuth(config["user"], config["password"])
+            )
+            details = bmc_response.json()
             
         except Exception as err:
             print("get_bmc_detail ERROR", end=" ")
@@ -177,6 +178,11 @@ def get_hostlist(hostlist_dir: str) -> list:
     except Exception as err:
         print(err)
     return hostlist
+
+def get_session():
+    if not hasattr(thread_local, "session"):
+        thread_local.session = requests.Session()
+    return thread_local.session
 
 
 hostlist = get_hostlist(config["hostlist"])
