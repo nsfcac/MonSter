@@ -50,11 +50,11 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     cores= multiprocessing.cpu_count()
 
     urls = generate_urls(hostlist)
-    urls_set = []
 
+    # Paritition urls
+    urls_set = []
     urls_per_core = len(urls) // cores
     surplux_urls = len(urls) % cores
-
     increment = 1
     for i in range(cores):
         if(surplux_urls != 0 and i == (cores-1)):
@@ -62,18 +62,28 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         else:
             urls_set.append(urls[i * urls_per_core : increment * urls_per_core])
             increment += 1
-    # connections = len(urls)
+    # print(json.dumps(urls_set, indent=4))
 
-    print(json.dumps(urls_set, indent=4))
-    # # Paritition urls
+    bmc_metrics = []
 
-    # bmc_metrics = []
+    pq = Queue(maxsize=0)
 
-    # q = Queue(maxsize=0)
+    processes = []
+    for i in range(cores):
+        bmc_urls = urls_set[i]
+        t = multiprocessing.Process(target=get_bmc_thread, args = (config, bmc_urls, pq ))
+        processes.append(t)
+        t.start
+
+    for process in processes:
+        process.join()
+
+    while not pq.empty():
+        bmc_metrics.extend(pq.get())
 
     # bmc_metrics = get_bmc_thread(config, urls)
     
-    # print(json.dumps(bmc_metrics, indent=4))
+    print(json.dumps(bmc_metrics, indent=4))
     # print(len(bmc_metrics))
 
     # valid = 0
@@ -85,7 +95,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return True
 
 
-def get_bmc_thread(config: dict, bmc_urls: list) -> list:
+def get_bmc_thread(config: dict, bmc_urls: list, pq: object) -> None:
     q = Queue(maxsize=0)
     bmc_metrics = [{} for url in bmc_urls]
     try:
@@ -103,8 +113,9 @@ def get_bmc_thread(config: dict, bmc_urls: list) -> list:
     except Exception as err:
         print("get_bmc_thread ERROR", end=" ")
         print(err)
-    
-    return bmc_metrics
+
+    pq.put(bmc_metrics)
+    return True
 
 def get_bmc_detail(q: object, config: dict, bmc_metrics: list) -> None:
     while not q.empty():
