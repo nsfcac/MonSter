@@ -50,30 +50,28 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     # bmc_details = []
     # all_bmc_points = []
 
-    # cores= multiprocessing.cpu_count()
+    cores= multiprocessing.cpu_count()
     urls = generate_urls(hostlist)
-    # # Paritition urls
-    # urls_set = []
-    # urls_per_core = len(urls) // cores
-    # surplux_urls = len(urls) % cores
-    # increment = 1
-    # for i in range(cores):
-    #     if(surplux_urls != 0 and i == (cores-1)):
-    #         urls_set.append(urls[i * urls_per_core:])
-    #     else:
-    #         urls_set.append(urls[i * urls_per_core : increment * urls_per_core])
-    #         increment += 1
-    # # print(json.dumps(urls_set, indent=4))
-
-    bmcapi_adapter = HTTPAdapter(pool_maxsize = 5, max_retries=config["max_retries"])
+    # Paritition urls
+    urls_set = []
+    urls_per_core = len(urls) // cores
+    surplux_urls = len(urls) % cores
+    increment = 1
+    for i in range(cores):
+        if(surplux_urls != 0 and i == (cores-1)):
+            urls_set.append(urls[i * urls_per_core:])
+        else:
+            urls_set.append(urls[i * urls_per_core : increment * urls_per_core])
+            increment += 1
+    # print(json.dumps(urls_set, indent=4))
 
     bmc_metrics = []
-    # with requests.Session() as session:
-        # # epoch_time = int(round(time.time() * 1000000000))
-        # get_bmc_detail_args = zip(repeat(config), urls, repeat(session), repeat(bmcapi_adapter))
-        # with multiprocessing.Pool(processes=cpu_count) as pool:
-        #     bmc_details = pool.starmap(get_bmc_detail, get_bmc_detail_args)
-    bmc_metrics = get_bmc_thread(config, urls, bmcapi_adapter)
+    with multiprocessing.Pool(processes=cores) as pool:
+        responses = [pool.apply_async(get_bmc_thread, args = (config, bmc_urls)) for bmc_urls in urls_set]
+    
+        for response in responses:
+            bmc_metrics += response.get()
+    # bmc_metrics = get_bmc_thread(config, urls)
     
     print(json.dumps(bmc_metrics, indent=4))
     print(len(bmc_metrics))
@@ -87,9 +85,10 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return True
 
 
-def get_bmc_thread(config: dict, bmc_urls: list, bmcapi_adapter: object) -> list:
+def get_bmc_thread(config: dict, bmc_urls: list) -> list:
     q = Queue(maxsize=0)
     bmc_metrics = [{} for url in bmc_urls]
+    bmcapi_adapter = HTTPAdapter(pool_maxsize = 5, max_retries=config["max_retries"])
     try:
         with requests.Session() as session:
             for i in range(len(bmc_urls)):
