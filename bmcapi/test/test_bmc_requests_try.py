@@ -51,7 +51,6 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     # cpu_count = multiprocessing.cpu_count()
     urls = generate_urls(hostlist)
     # connections = len(urls)
-    bmcapi_adapter = HTTPAdapter(pool_maxsize = 5, max_retries=config["max_retries"])
 
     bmc_metrics = []
     # with requests.Session() as session:
@@ -59,7 +58,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         # get_bmc_detail_args = zip(repeat(config), urls, repeat(session), repeat(bmcapi_adapter))
         # with multiprocessing.Pool(processes=cpu_count) as pool:
         #     bmc_details = pool.starmap(get_bmc_detail, get_bmc_detail_args)
-    bmc_metrics = get_bmc_thread(config, urls, bmcapi_adapter)
+    bmc_metrics = get_bmc_thread(config, urls)
     
     print(json.dumps(bmc_metrics, indent=4))
     print(len(bmc_metrics))
@@ -73,7 +72,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     return True
 
 
-def get_bmc_thread(config: dict, bmc_urls: list,bmcapi_adapter: object) -> list:
+def get_bmc_thread(config: dict, bmc_urls: list) -> list:
     q = Queue(maxsize=0)
     bmc_metrics = [{} for url in bmc_urls]
     try:
@@ -81,7 +80,7 @@ def get_bmc_thread(config: dict, bmc_urls: list,bmcapi_adapter: object) -> list:
             q.put((i, bmc_urls[i]))
         
         for i in range(len(bmc_urls)):
-            worker = threading.Thread(target=get_bmc_detail, args=(q, config, bmcapi_adapter, bmc_metrics))
+            worker = threading.Thread(target=get_bmc_detail, args=(q, config, bmc_metrics))
             # x = threading.Thread(target=get_bmc_detail, args=(config, url, session, bmcapi_adapter, bmc_metrics))
             worker.setDaemon(True)
             worker.start()
@@ -94,12 +93,13 @@ def get_bmc_thread(config: dict, bmc_urls: list,bmcapi_adapter: object) -> list:
     
     return bmc_metrics
 
-def get_bmc_detail(q: object, config: dict, bmcapi_adapter: object, bmc_metrics: list) -> None:
+def get_bmc_detail(q: object, config: dict, bmc_metrics: list) -> None:
     while not q.empty():
         work = q.get()
         index = work[0]
         bmc_url = work[1]
         
+        bmcapi_adapter = HTTPAdapter(max_retries=config["max_retries"])
         host_ip = bmc_url.split("/")[2]
         feature = bmc_url.split("/")[-2]
         details = {}
