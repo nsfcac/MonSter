@@ -98,27 +98,31 @@ def process_bmc_health(host_ip: str, details: dict, time: int) -> list:
     points = []
     try:
         if details["Status"]["Health"] == "OK":
-            reading = 0
+            # Do not save normal status
+            return points
+            # reading = 0
         elif details["Status"]["Health"] == "Warning":
             reading = 1
         elif details["Status"]["Health"] == "Critical":
             reading = 2
         else:
             reading = -1
-        bmc_health_point = {
-            "measurement": "Health",
-            "time": time,
-            "tags": {
-                "Label": "BMC",
-                "NodeId": host_ip
-            }, 
-            "fields": {
-                "Reading": reading
-            }
-        }
-        points.append(bmc_health_point)
     except:
+        reading = -2
         logging.error("Cannot find 'BMC Health' from BMC on host: %s", host_ip)
+
+    bmc_health_point = {
+        "measurement": "Health",
+        "time": time,
+        "tags": {
+            "Label": "BMC",
+            "NodeId": host_ip
+        }, 
+        "fields": {
+            "Reading": reading
+        }
+    }
+    points.append(bmc_health_point)
     return points
 
 
@@ -126,25 +130,29 @@ def process_sys_health(host_ip: str, details: dict, time: int) -> list:
     points = []
     try:
         if details["Status"]["Health"] == "OK":
-            reading = 0
+            # Do not save normal status
+            return points
+            # reading = 0
         elif details["Status"]["Health"] == "Warning":
             reading = 1
         elif details["Status"]["Health"] == "Critical":
             reading = 2
         else:
             reading = -1
-        sys_health_point = {
-            "measurement": "Health",
-            "time": time,
-            "tags": {
-                "Label": "System",
-                "NodeId": host_ip
-            }, 
-            "fields": {
-                "Reading": reading
-            }
-        }
-        points.append(sys_health_point)
     except:
+        reading = -1
         logging.error("Cannot find 'System Health' from BMC on host: %s", host_ip)
+
+    sys_health_point = {
+        "measurement": "Health",
+        "time": time,
+        "tags": {
+            "Label": "System",
+            "NodeId": host_ip
+        }, 
+        "fields": {
+            "Reading": reading
+        }
+    }
+    points.append(sys_health_point)
     return points
