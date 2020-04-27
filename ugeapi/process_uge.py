@@ -113,7 +113,7 @@ def process_host(host_data: object, time: int) -> list:
                 },
                 "time": time,
                 "fields": {
-                    "JobList": list(set(joblist))
+                    "JobList": str(list(set(joblist)))
                 }
             }
         except:
