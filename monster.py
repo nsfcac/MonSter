@@ -116,6 +116,7 @@ def update_job(client: object, job_id: str, finishtime: int) -> None:
     history_job = {}
     try:
         job_info = fetch_job(client, job_id).raw
+        print(json.dumps(job_info, indent=4))
         if job_info:
             for index, item in enumerate(job_info["series"][0]["columns"]):
                 history_job[item] = job_info["series"][0]["values"][0][index]
