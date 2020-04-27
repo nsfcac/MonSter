@@ -5,7 +5,7 @@ influxdb:
   password: 'li29729'
   database: 'test_monster'
 
-frequency: 30 # in seconds
+frequency: 60 # in seconds
 
 hostlistdir: './hostlist'
 
