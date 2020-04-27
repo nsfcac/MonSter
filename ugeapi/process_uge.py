@@ -4,10 +4,7 @@ import logging
 from dateutil.parser import parse
 
 from datetime import datetime
-from ugeapi.convert import get_hostip
-
-## For testing
-# from convert import get_hostip
+from ugeapi.get_hostip import get_hostip
 
 
 def process_host(host_data: object, time: int) -> list:
