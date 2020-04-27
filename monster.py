@@ -57,7 +57,7 @@ def main():
 def write_db(client: object, config: object, hostlist: list, prev_joblist: list) -> None:
     all_points = []
     curr_joblist = []
-    # print(json.dumps(prev_joblist, indent=4))
+    print(json.dumps(prev_joblist, indent=4))
     try:
         # Fetch UGE information
         uge_info = fetch_uge(config["uge"])
