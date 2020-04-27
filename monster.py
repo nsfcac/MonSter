@@ -90,7 +90,8 @@ def write_db(client: object, config: object, hostlist: list, prev_joblist: list)
         client.write_points(all_points)
         # print(json.dumps(all_points, indent=4))
 
-    except:
+    except Exception as err:
+        print(err)
         logging.error("Cannot write data points to influxDB")
     return
 
