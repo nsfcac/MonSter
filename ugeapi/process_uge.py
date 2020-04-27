@@ -89,20 +89,20 @@ def process_host(host_data: object, time: int) -> list:
                             "FinishTime": None,
                             "JobName": jobname,
                             "User": user,
-                            "totalnodes": 1,
-                            "cpucores": 1
+                            "TotalNodes": 1,
+                            "CPUCores": 1
                         }
                     }
                 else:
-                    cpucores = jobs_detail[job_id]["fields"]["cpucores"] + 1
+                    cpucores = jobs_detail[job_id]["fields"]["CPUCores"] + 1
                     jobs_detail[job_id]["fields"].update({
-                        "cpucores": cpucores
+                        "CPUCores": cpucores
                     })
 
                 nodelist = [host_ip + "-" + str(cpucores)]
 
                 jobs_detail[job_id]["fields"].update({
-                    "nodelist": nodelist
+                    "NodeList": nodelist
                 })
 
             # NodeJobs
@@ -149,19 +149,19 @@ def aggregate_node_jobs(node_jobs: dict) -> list:
                     jobset.append(job)
                     jobs_data[job] = job_detail
                 else:
-                    cpucores = jobs_data[job]["fields"]["cpucores"] + job_detail["fields"]["cpucores"]
-                    totalnodes = jobs_data[job]["fields"]["totalnodes"] + 1
-                    nodelist = jobs_data[job]["fields"]["nodelist"] + job_detail["fields"]["nodelist"]
+                    cpucores = jobs_data[job]["fields"]["CPUCores"] + job_detail["fields"]["CPUCores"]
+                    totalnodes = jobs_data[job]["fields"]["TotalNodes"] + 1
+                    nodelist = jobs_data[job]["fields"]["NodeList"] + job_detail["fields"]["NodeList"]
                     jobs_data[job]["fields"].update({
-                        "cpucores": cpucores,
-                        "totalnodes": totalnodes,
-                        "nodelist": nodelist
+                        "CPUCores": cpucores,
+                        "TotalNodes": totalnodes,
+                        "NodeList": nodelist
                     })
         
         for job, job_detail in jobs_data.items():
-            nodelist_str = str(job_detail["fields"]["nodelist"])
+            nodelist_str = str(job_detail["fields"]["NodeList"])
             jobs_data[job]["fields"].update({
-                "nodelist": nodelist_str
+                "NodeList": nodelist_str
             })
 
         all_job_points = list(jobs_data.values())
