@@ -17,7 +17,6 @@ redfish:
     read: 45
   max_retries: 2
   ssl_verify: False   # Secure Sockets Layer Verify
-  hostlist: "./hostlist"
 
 uge:
   host: '129.118.104.35'
