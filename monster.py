@@ -49,7 +49,11 @@ def write_db(client: object, config: object, hostlist: list) -> None:
     try:
         with open("previous_jobs.json", "w+") as prev_job_file:
             # load previous job list
-            prev_joblist = json.load(prev_job_file)
+            try:
+                prev_joblist = json.load(prev_job_file)
+            except:
+                prev_joblist = []
+                
             print(prev_joblist)
             # Fetch UGE information
             uge_info = fetch_uge(config["uge"])
