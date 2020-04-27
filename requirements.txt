@@ -4,6 +4,7 @@ PyYAML
 schedule
 requests
 python-dateutil
+python-crontab
 
 # aiohttp
 # uvloop
