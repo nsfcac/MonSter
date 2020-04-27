@@ -132,8 +132,9 @@ def update_job(client: object, job_id: str, finishtime: int) -> None:
                     "cpucores": history_job["cpucores"]
                 }
             }
-    except:
-       logging.error("Failed to update job: %s", job_id)
+    except Exception as err:
+        print(err)
+        logging.error("Failed to update job: %s", job_id)
 
     return updated_job
 
