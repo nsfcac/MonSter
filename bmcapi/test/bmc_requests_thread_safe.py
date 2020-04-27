@@ -68,15 +68,14 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     bmc_metrics = []
     epoch_time = int(round(time.time() * 1000000000))
 
+    query_start = time.time()
+
     with multiprocessing.Pool(processes=cores) as pool:
         responses = [pool.apply_async(get_bmc_thread, args = (config, bmc_urls)) for bmc_urls in urls_set]
     
         for response in responses:
             bmc_metrics += response.get()
     
-    # print(json.dumps(bmc_metrics, indent=4))
-
-    # chunksize = len(urls)/cores
     # Generate data points
     process_bmc_args = zip(bmc_metrics, repeat(epoch_time))
     with multiprocessing.Pool(processes=cores) as pool:
@@ -84,6 +83,11 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     for points_set in bmc_points_set:
         all_bmc_points += points_set
+
+    total_elapsed = float("{0:.2f}".format(time.time() - query_start)) 
+
+    print("Total elapsed time: ", end=" ")
+    print(total_elapsed)
 
     print(json.dumps(all_bmc_points, indent=4))
     return True
@@ -127,11 +131,8 @@ def get_bmc_detail(q: object, config: dict, bmc_metrics: list) -> None:
                 auth=HTTPBasicAuth(config["user"], config["password"])
             )
             details = bmc_response.json()
-            
-        except Exception as err:
-            print("get_bmc_detail ERROR", end=" ")
-            print(err)
-            # logging.error("Cannot get BMC details from: %s", bmc_url)
+        except:
+            logging.error("Cannot get BMC metrics from: %s", bmc_url)
 
         metric = {
             "host": host_ip,
