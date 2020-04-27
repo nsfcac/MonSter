@@ -54,7 +54,7 @@ def write_db(client: object, config: object, hostlist: list) -> None:
             except:
                 prev_joblist = []
 
-            print(prev_joblist)
+            # print(prev_joblist)
             # Fetch UGE information
             uge_info = fetch_uge(config["uge"])
 
@@ -78,13 +78,14 @@ def write_db(client: object, config: object, hostlist: list) -> None:
                     if updated_job:
                         all_points.append(updated_job)
 
-            # # Fetch BMC information
-            # bmc_points = fetch_bmc(config["redfish"], hostlist)
-            # all_points.extend(bmc_points)
+            # Fetch BMC information
+            bmc_points = fetch_bmc(config["redfish"], hostlist)
+            all_points.extend(bmc_points)
 
-            # # Write points into influxdb
-            # client.write_points(all_points)
-            print(curr_joblist)
+            # Write points into influxdb
+            client.write_points(all_points)
+
+            # Update previous jobs
             prev_job_file.seek(0)
             json.dump(curr_joblist, prev_job_file)
             # print(json.dumps(all_points, indent=4))
