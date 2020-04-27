@@ -66,7 +66,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     # print(json.dumps(urls_set, indent=4))
 
     bmc_metrics = []
-    epoch_time = int(round(time.time() * 1000000000))
+    # epoch_time = int(round(time.time() * 1000000000))
 
     query_start = time.time()
 
@@ -84,10 +84,10 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     for points_set in bmc_points_set:
         all_bmc_points += points_set
 
-    total_elapsed = float("{0:.2f}".format(time.time() - query_start)) 
+    # total_elapsed = float("{0:.2f}".format(time.time() - query_start)) 
 
-    print("Total elapsed time: ", end=" ")
-    print(total_elapsed)
+    # print("Total elapsed time: ", end=" ")
+    # print(total_elapsed)
 
     print(json.dumps(all_bmc_points, indent=4))
     return True
