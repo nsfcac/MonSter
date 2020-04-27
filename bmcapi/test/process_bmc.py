@@ -47,8 +47,12 @@ def process_thermal(host_ip: str, details: dict, time: int) -> list:
                 }
             }
             points.append(temp_point)
+    except:
+        logging.error("Cannot find 'Temperatures' from BMC on host: %s", host_ip)
+    
+    try:
         # Fans
-        fans = metric["Fans"]
+        fans = details["Fans"]
         for fan in fans:
             name = fan["Name"]
             reading = float("{0:.2f}".format(fan["Reading"]))
@@ -65,7 +69,7 @@ def process_thermal(host_ip: str, details: dict, time: int) -> list:
             }
             points.append(fan_point)
     except:
-        logging.error("Cannot find 'Temperatures' or 'Fans' from BMC on host: %s", host_ip)
+        logging.error("Cannot find 'Fans' from BMC on host: %s", host_ip)
     return points
 
 
