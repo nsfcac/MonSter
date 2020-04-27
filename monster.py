@@ -15,8 +15,6 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
 
-prev_joblist = []
-
 
 def main():
     config = parse_config()
@@ -44,7 +42,6 @@ def main():
     return 
 
 def write_db(client: object, config: object, hostlist: list) -> None:
-    global prev_joblist
     all_points = []
     curr_joblist = []
 
