@@ -27,8 +27,6 @@ def main():
         return
     
     try:
-        global prev_joblist
-
         # Initialize influxdb
         host = config["influxdb"]["host"]
         port = config["influxdb"]["port"]
@@ -59,7 +57,7 @@ def write_db(client: object, config: object, hostlist: list) -> None:
     all_points = []
     curr_joblist = []
 
-    print(json.dumps(prev_joblist, indent=4))
+    # print(json.dumps(prev_joblist, indent=4))
     try:
         # Fetch UGE information
         uge_info = fetch_uge(config["uge"])
@@ -120,24 +118,25 @@ def update_job(client: object, job_id: str, finishtime: int) -> None:
         job_info = fetch_job(client, job_id).raw
         if job_info:
             print(json.dumps(job_info, indent=4))
-            # for index, item in enumerate(job_info["series"][0]["columns"]):
-            #     history_job[item] = job_info["series"][0]["values"][0][index]
-            # updated_job = {
-            #     "measurement": "JobsInfo",
-            #     "tags": {
-            #         "JobId": job_id,
-            #     },
-            #     "time": history_job["time"],
-            #     "fields": {
-            #         "StartTime": history_job["StartTime"],
-            #         "SubmitTime": history_job["SubmitTime"],
-            #         "FinishTime": finishtime,
-            #         "JobName": history_job["JobName"],
-            #         "User": history_job["User"],
-            #         "totalnodes": history_job["totalnodes"],
-            #         "cpucores": history_job["cpucores"]
-            #     }
-            # }
+            for index, item in enumerate(job_info["series"][0]["columns"]):
+                history_job[item] = job_info["series"][0]["values"][0][index]
+            updated_job = {
+                "measurement": "JobsInfo",
+                "tags": {
+                    "JobId": job_id,
+                },
+                "time": history_job["time"],
+                "fields": {
+                    "StartTime": history_job["StartTime"],
+                    "SubmitTime": history_job["SubmitTime"],
+                    "FinishTime": finishtime,
+                    "JobName": history_job["JobName"],
+                    "User": history_job["User"],
+                    "totalnodes": history_job["totalnodes"],
+                    "cpucores": history_job["cpucores"]
+                }
+            }
+            print(json.dumps(updated_job, indent=4))
     except Exception as err:
         print(err)
         logging.error("Failed to update job: %s", job_id)
