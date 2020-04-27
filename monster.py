@@ -47,7 +47,7 @@ def write_db(client: object, config: object, hostlist: list) -> None:
 
     # print(json.dumps(prev_joblist, indent=4))
     try:
-        with open("previous_jobs.json", "w+") as prev_job_file:
+        with open("previous_jobs.json", "r+") as prev_job_file:
             # load previous job list
             try:
                 prev_joblist = json.loads(prev_job_file.read())
