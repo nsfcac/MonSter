@@ -15,6 +15,9 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
 
+prev_joblist = []
+
+
 def main():
     config = parse_config()
 
@@ -24,6 +27,8 @@ def main():
         return
     
     try:
+        global prev_joblist
+
         # Initialize influxdb
         host = config["influxdb"]["host"]
         port = config["influxdb"]["port"]
@@ -31,12 +36,10 @@ def main():
         hostlist = get_hostlist(config["hostlistdir"])
         client = InfluxDBClient(host=host, port=port, database=dbname)
 
-        prev_joblist = []
         # Monitoring frequency
         freq = config["frequency"]
-
+        
         # write_db(client, config, hostlist, prev_joblist)
-
         schedule.every(freq).seconds.do(write_db, client, config, hostlist, prev_joblist)
 
         # # while 1:
@@ -54,7 +57,7 @@ def main():
 def write_db(client: object, config: object, hostlist: list, prev_joblist: list) -> None:
     all_points = []
     curr_joblist = []
-    print(json.dumps(prev_joblist, indent=4))
+    # print(json.dumps(prev_joblist, indent=4))
     try:
         # Fetch UGE information
         uge_info = fetch_uge(config["uge"])
