@@ -117,7 +117,6 @@ def update_job(client: object, job_id: str, finishtime: int) -> None:
     try:
         job_info = fetch_job(client, job_id).raw
         if job_info:
-            print(json.dumps(job_info, indent=4))
             for index, item in enumerate(job_info["series"][0]["columns"]):
                 history_job[item] = job_info["series"][0]["values"][0][index]
             updated_job = {
@@ -129,7 +128,7 @@ def update_job(client: object, job_id: str, finishtime: int) -> None:
                 "fields": {
                     "StartTime": history_job["StartTime"],
                     "SubmitTime": history_job["SubmitTime"],
-                    "FinishTime": finishtime,
+                    "FinishTime": int(finishtime/1000000000),
                     "JobName": history_job["JobName"],
                     "User": history_job["User"],
                     "totalnodes": history_job["totalnodes"],
