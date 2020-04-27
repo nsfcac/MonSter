@@ -19,7 +19,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # curl --insecure -X GET "https://redfish.hpcc.ttu.edu:8080/v1/metrics?start=2020-04-12T12%3A00%3A00%2B00%3A00&end=2020-04-18T12%3A00%3A00%2B00%3A00&interval=5m&value=max&compress=false" -H "accept: application/json"
 
 logging.basicConfig(
-    # level=logging.error,
+    level=logging.ERROR,
     filename='test_bmcapi.log',
     filemode='w',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -80,7 +80,9 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     # Generate data points
     process_bmc_args = zip(bmc_metrics, repeat(epoch_time))
     with multiprocessing.Pool(processes=cores) as pool:
-        all_bmc_points = pool.starmap(process_bmc_metrics, process_bmc_args)
+        bmc_points_set = pool.starmap(process_bmc_metrics, process_bmc_args)
+
+    all_bmc_points = [all_bmc_points.extend(points_set) for points_set in bmc_points_set]
 
     print(json.dumps(all_bmc_points, indent=4))
     return True
@@ -101,8 +103,7 @@ def get_bmc_thread(config: dict, bmc_urls: list) -> list:
         q.join()
 
     except Exception as err:
-        print("get_bmc_thread ERROR", end=" ")
-        print(err)
+        logging.error(err)
     
     return bmc_metrics
 
