@@ -39,8 +39,8 @@ def main():
         # Monitoring frequency
         freq = config["frequency"]
         
-        # write_db(client, config, hostlist, prev_joblist)
-        schedule.every(freq).seconds.do(write_db, client, config, hostlist, prev_joblist)
+        # write_db(client, config, hostlist)
+        schedule.every(freq).seconds.do(write_db, client, config, hostlist)
 
         # # while 1:
         # #     schedule.run_pending()
@@ -54,9 +54,11 @@ def main():
         print(err)
     return 
 
-def write_db(client: object, config: object, hostlist: list, prev_joblist: list) -> None:
+def write_db(client: object, config: object, hostlist: list) -> None:
+    global prev_joblist
     all_points = []
     curr_joblist = []
+
     print(json.dumps(prev_joblist, indent=4))
     try:
         # Fetch UGE information
