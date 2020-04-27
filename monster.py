@@ -50,9 +50,8 @@ def write_db(client: object, config: object, hostlist: list) -> None:
         with open("previous_jobs.json", "r+") as prev_job_file:
             # load previous job list
             try:
-                prev_joblist = json.loads(prev_job_file.read())
-            except Exception as err:
-                print(err)
+                prev_joblist = json.load(prev_job_file)
+            except:
                 prev_joblist = []
 
             print(prev_joblist)
