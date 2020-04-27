@@ -160,7 +160,7 @@ def aggregate_node_jobs(node_jobs: dict) -> list:
         
         for job, job_detail in jobs_data.items():
             nodelist_str = str(job_detail["fields"]["nodelist"])
-            jobs_data[job].update({
+            jobs_data[job]["fields"].update({
                 "nodelist": nodelist_str
             })
 
