@@ -44,7 +44,7 @@ def main():
         # #     schedule.run_pending()
         # #     time.sleep(freq)
 
-        for i in range(10):
+        for i in range(5):
             schedule.run_pending()
             time.sleep(freq)
 
@@ -85,9 +85,9 @@ def write_db(client: object, config: object, hostlist: list) -> None:
         # Save current job list to previous job list
         prev_joblist = curr_joblist
 
-        # # Fetch BMC information
-        # bmc_points = fetch_bmc(config["redfish"], hostlist)
-        # all_points.extend(bmc_points)
+        # Fetch BMC information
+        bmc_points = fetch_bmc(config["redfish"], hostlist)
+        all_points.extend(bmc_points)
 
         # Write points into influxdb
         client.write_points(all_points)
