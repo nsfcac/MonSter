@@ -1,83 +1,149 @@
 import json
 import time
 import logging
-import asyncio
-import aiohttp
-import async_timeout
-import tenacity
-import uvloop
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+import multiprocessing
+import threading
+thread_local = threading.local()
+
+from queue import Queue
+from itertools import repeat
+import requests
+from requests.adapters import HTTPAdapter
+from requests.auth import HTTPBasicAuth
 
 from bmcapi.process_bmc import process_bmc_metrics
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# curl --insecure -X GET "https://redfish.hpcc.ttu.edu:8080/v1/metrics?start=2020-04-12T12%3A00%3A00%2B00%3A00&end=2020-04-18T12%3A00%3A00%2B00%3A00&interval=5m&value=max&compress=false" -H "accept: application/json"
+
 # logging.basicConfig(
-#     level=logging.DEBUG,
-#     filename='bmcapi.log',
+#     level=logging.ERROR,
+#     filename='test_bmcapi.log',
+#     filemode='w',
 #     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 #     datefmt='%Y-%m-%d %H:%M:%S %Z'
 # )
 
+# config = {
+#     "user": "password",
+#     "password": "monster",
+#     "timeout": {
+#         "connect": 15,
+#         "read": 45
+#     },
+#     "max_retries": 2,
+#     "ssl_verify": False,
+#     "hostlist": "../../hostlist"
+# }
+
 
 def fetch_bmc(config: object, hostlist: list) -> object:
     """
-    Fetch bmc metrics from Redfish, average query and process time is: ---s
+    Fetch bmc metrics from Redfish, average query and process time is: 11.57s
     """
 
     all_bmc_points = []
-    try:
-        conn = aiohttp.TCPConnector(limit=0, limit_per_host=0, ssl=config["ssl_verify"])
-        auth = aiohttp.BasicAuth(config["user"], password=config["password"])
 
-        # Generate urls for accessing BMC metrics
-        urls = generate_urls(hostlist)
+    cores= multiprocessing.cpu_count()
+    urls = generate_urls(hostlist)
 
-        # Fetch BMC metrics in asynchronous
-        loop = asyncio.get_event_loop()
+    # Paritition urls
+    urls_set = []
+    urls_per_core = len(urls) // cores
+    surplux_urls = len(urls) % cores
+    increment = 1
+    for i in range(cores):
+        if(surplux_urls != 0 and i == (cores-1)):
+            urls_set.append(urls[i * urls_per_core:])
+        else:
+            urls_set.append(urls[i * urls_per_core : increment * urls_per_core])
+            increment += 1
+    # print(json.dumps(urls_set, indent=4))
 
-        epoch_time = int(round(time.time() * 1000000000))
+    bmc_metrics = []
+    epoch_time = int(round(time.time() * 1000000000))
 
-        future = asyncio.ensure_future(download_bmc(urls, conn, auth, config))
-        bmc_metrics = loop.run_until_complete(future)
+    # query_start = time.time()
 
-        # Process BMC metrics and convert them to data points
-        all_bmc_points = process_bmc_metrics(urls, bmc_metrics, epoch_time)
-    except:
-        logging.error("Cannot get BMC data points")
+    with multiprocessing.Pool(processes=cores) as pool:
+        responses = [pool.apply_async(get_bmc_thread, args = (config, bmc_urls)) for bmc_urls in urls_set]
+    
+        for response in responses:
+            bmc_metrics += response.get()
+    
+    # Generate data points
+    process_bmc_args = zip(bmc_metrics, repeat(epoch_time))
+    with multiprocessing.Pool(processes=cores) as pool:
+        bmc_points_set = pool.starmap(process_bmc_metrics, process_bmc_args)
 
+    for points_set in bmc_points_set:
+        all_bmc_points += points_set
+
+    # total_elapsed = float("{0:.2f}".format(time.time() - query_start)) 
+
+    # print("Total elapsed time: ", end=" ")
+    # print(total_elapsed)
+
+    # print(json.dumps(all_bmc_points, indent=4))
     return all_bmc_points
 
 
-async def download_bmc(urls: list, conn: object, auth: object, config: dict) -> None:
-    tasks = []
+def get_bmc_thread(config: dict, bmc_urls: list) -> list:
+    q = Queue(maxsize=0)
+    bmc_metrics = [{} for url in bmc_urls]
     try:
-        async with aiohttp.ClientSession(connector= conn, auth=auth) as session:
-            for url in urls:
-                task = asyncio.ensure_future(fetch(url, session, config))
-                tasks.append(task)
-            
-            responses =  await asyncio.gather(*tasks)
-            return responses
-    except:
-        return None
+        for i in range(len(bmc_urls)):
+            q.put((i, bmc_urls[i]))
+        
+        for i in range(len(bmc_urls)):
+            worker = threading.Thread(target=get_bmc_detail, args=(q, config, bmc_metrics))
+            worker.setDaemon(True)
+            worker.start()
+        
+        q.join()
 
+    except Exception as err:
+        logging.error(err)
+    
+    return bmc_metrics
 
-def return_last_value(retry_state):
-    url = retry_state.args[0]
-    logging.error("Cannot connect to %s", url)
-    return None
+def get_bmc_detail(q: object, config: dict, bmc_metrics: list) -> None:
+    while not q.empty():
+        work = q.get()
+        index = work[0]
+        bmc_url = work[1]
+        
+        bmcapi_adapter = HTTPAdapter(max_retries=config["max_retries"])
+        host_ip = bmc_url.split("/")[2]
+        feature = bmc_url.split("/")[-2]
+        details = {}
+        try:
+            session = get_session()
+            session.mount(bmc_url, bmcapi_adapter)
+            bmc_response = session.get(
+                bmc_url, verify = config["ssl_verify"], 
+                timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
+                auth=HTTPBasicAuth(config["user"], config["password"])
+            )
+            details = bmc_response.json()
+        except:
+            logging.error("Cannot get BMC metrics from: %s", bmc_url)
 
-
-@tenacity.retry(stop=tenacity.stop_after_attempt(3),
-                wait=tenacity.wait_random(min=1, max=3),
-                retry_error_callback=return_last_value,)      
-async def fetch(url: str, session:object, config: dict) -> dict:
-    timeout = config["timeout"]
-    with async_timeout.timeout(timeout):
-        async with session.get(url) as response:
-            return await response.json()
-
+        metric = {
+            "host": host_ip,
+            "feature": feature,
+            "details": details
+        }
+        
+        bmc_metrics[index] = metric
+        q.task_done()
+    return True
 
 def generate_urls(hostlist:list) -> list:
+    # Testing cmd
+    # curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k
     urls = []
     # Thermal URLS
     for host in hostlist:
@@ -87,14 +153,14 @@ def generate_urls(hostlist:list) -> list:
     for host in hostlist:
         power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
         urls.append(power_url)
-    # # BMC health
-    # for host in hostlist:
-    #     bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
-    #     urls.append(bmc_health_url)
-    # # System health
-    # for host in hostlist:
-    #     system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
-    #     urls.append(system_health_url)
+    # BMC health
+    for host in hostlist:
+        bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
+        urls.append(bmc_health_url)
+    # System health
+    for host in hostlist:
+        system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
+        urls.append(system_health_url)
     return urls
 
 
@@ -110,3 +176,8 @@ def get_hostlist(hostlist_dir: str) -> list:
     except Exception as err:
         print(err)
     return hostlist
+
+def get_session():
+    if not hasattr(thread_local, "session"):
+        thread_local.session = requests.Session()
+    return thread_local.session
