@@ -76,11 +76,11 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     
     # print(json.dumps(bmc_metrics, indent=4))
 
-    chunksize = len(urls)/cores
+    # chunksize = len(urls)/cores
     # Generate data points
     process_bmc_args = zip(bmc_metrics, repeat(epoch_time))
     with multiprocessing.Pool(processes=cores) as pool:
-        all_bmc_points = pool.starmap(process_bmc_metrics, process_bmc_args, chunksize)
+        all_bmc_points = pool.starmap(process_bmc_metrics, process_bmc_args)
 
     print(json.dumps(all_bmc_points, indent=4))
     return True
