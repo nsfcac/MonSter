@@ -46,7 +46,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
 
     # bmc_metrics = []
     # bmc_details = []
-    # all_bmc_points = []
+    all_bmc_points = []
 
     cores= multiprocessing.cpu_count()
 
@@ -66,24 +66,23 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     # print(json.dumps(urls_set, indent=4))
 
     bmc_metrics = []
-
+    epoch_time = int(round(time.time() * 1000000000))
 
     with multiprocessing.Pool(processes=cores) as pool:
         responses = [pool.apply_async(get_bmc_thread, args = (config, bmc_urls)) for bmc_urls in urls_set]
     
         for response in responses:
             bmc_metrics += response.get()
-    # bmc_metrics = get_bmc_thread(config, urls)
     
-    print(json.dumps(bmc_metrics, indent=4))
-    # print(len(bmc_metrics))
+    # print(json.dumps(bmc_metrics, indent=4))
 
-    # valid = 0
-    # for detail in bmc_metrics:
-    #     if detail:
-    #         valid += 1
-    # print("Valid metrics: ", valid)
+    chunksize = len(urls)/cores
+    # Generate data points
+    process_bmc_args = zip(bmc_metrics, repeat(epoch_time))
+    with multiprocessing.Pool(processes=cores) as pool:
+        all_bmc_points = pool.starmap(process_bmc_metrics, process_bmc_args, chunksize)
 
+    print(json.dumps(all_bmc_points, indent=4))
     return True
 
 
