@@ -76,7 +76,6 @@ def write_db(client: object, config: object, hostlist: list, prev_joblist: list)
             if job_id not in curr_joblist:
                 updated_job = update_job(client, job_id, uge_epoch_time)
                 if updated_job:
-                    print(json.dumps(updated_job, indent=4))
                     all_points.append(updated_job)
         
         # Save current job list to previous job list
@@ -114,24 +113,25 @@ def update_job(client: object, job_id: str, finishtime: int) -> None:
     try:
         job_info = fetch_job(client, job_id).raw
         if job_info:
-            for index, item in enumerate(job_info["series"][0]["columns"]):
-                history_job[item] = job_info["series"][0]["values"][0][index]
-            updated_job = {
-                "measurement": "JobsInfo",
-                "tags": {
-                    "JobId": job_id,
-                },
-                "time": history_job["time"],
-                "fields": {
-                    "StartTime": history_job["StartTime"],
-                    "SubmitTime": history_job["SubmitTime"],
-                    "FinishTime": finishtime,
-                    "JobName": history_job["JobName"],
-                    "User": history_job["User"],
-                    "totalnodes": history_job["totalnodes"],
-                    "cpucores": history_job["cpucores"]
-                }
-            }
+            print(json.dumps(job_info, indent=4))
+            # for index, item in enumerate(job_info["series"][0]["columns"]):
+            #     history_job[item] = job_info["series"][0]["values"][0][index]
+            # updated_job = {
+            #     "measurement": "JobsInfo",
+            #     "tags": {
+            #         "JobId": job_id,
+            #     },
+            #     "time": history_job["time"],
+            #     "fields": {
+            #         "StartTime": history_job["StartTime"],
+            #         "SubmitTime": history_job["SubmitTime"],
+            #         "FinishTime": finishtime,
+            #         "JobName": history_job["JobName"],
+            #         "User": history_job["User"],
+            #         "totalnodes": history_job["totalnodes"],
+            #         "cpucores": history_job["cpucores"]
+            #     }
+            # }
     except Exception as err:
         print(err)
         logging.error("Failed to update job: %s", job_id)
