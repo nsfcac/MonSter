@@ -82,7 +82,8 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     with multiprocessing.Pool(processes=cores) as pool:
         bmc_points_set = pool.starmap(process_bmc_metrics, process_bmc_args)
 
-    all_bmc_points = [all_bmc_points.extend(points_set) for points_set in bmc_points_set]
+    for points_set in bmc_points_set:
+        all_bmc_points += points_set
 
     print(json.dumps(all_bmc_points, indent=4))
     return True
