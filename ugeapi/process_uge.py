@@ -158,6 +158,12 @@ def aggregate_node_jobs(node_jobs: dict) -> list:
                         "nodelist": nodelist
                     })
         
+        for job, job_detail in jobs_data.items():
+            nodelist_str = str(job_detail["fields"]["nodelist"])
+            jobs_data[job].update({
+                "nodelist": nodelist_str
+            })
+
         all_job_points = list(jobs_data.values())
     except:
         logging.error("Cannot aggregate jobs information")
