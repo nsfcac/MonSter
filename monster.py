@@ -131,8 +131,9 @@ def update_job(client: object, job_id: str, finishtime: int) -> None:
                     "FinishTime": int(finishtime/1000000000),
                     "JobName": history_job["JobName"],
                     "User": history_job["User"],
-                    "totalnodes": history_job["totalnodes"],
-                    "cpucores": history_job["cpucores"]
+                    "TotalNodes": history_job["TotalNodes"],
+                    "CPUCores": history_job["CPUCores"],
+                    "NodeList": history_job["NodeList"]
                 }
             }
             print(json.dumps(updated_job, indent=4))
