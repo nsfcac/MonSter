@@ -50,39 +50,41 @@ def write_db(client: object, config: object, hostlist: list) -> None:
 
     # print(json.dumps(prev_joblist, indent=4))
     try:
-        # Fetch UGE information
-        uge_info = fetch_uge(config["uge"])
+        with open("previous_jobs.json", "w+") as prev_job_file:
+            # load previous job list
+            prev_joblist = json.loads(prev_job_file.read())
+            # Fetch UGE information
+            uge_info = fetch_uge(config["uge"])
 
-        uge_host_points = uge_info["all_host_points"]
-        all_points.extend(uge_host_points)
+            uge_host_points = uge_info["all_host_points"]
+            all_points.extend(uge_host_points)
 
-        uge_job_points = uge_info["all_job_points"]
-        uge_epoch_time = uge_info["epoch_time"]
-        
-        for job_point in uge_job_points:
-            job_id = job_point["tags"]["JobId"]
-            curr_joblist.append(job_id)
-            if not fetch_job(client, job_id):
-                all_points.append(job_point)
+            uge_job_points = uge_info["all_job_points"]
+            uge_epoch_time = uge_info["epoch_time"]
+            
+            for job_point in uge_job_points:
+                job_id = job_point["tags"]["JobId"]
+                curr_joblist.append(job_id)
+                if not fetch_job(client, job_id):
+                    all_points.append(job_point)
 
-        # Compare current job list with previous job list and update finish time
-        for job_id in prev_joblist:
-            # This job is finished 
-            if job_id not in curr_joblist:
-                updated_job = update_job(client, job_id, uge_epoch_time)
-                if updated_job:
-                    all_points.append(updated_job)
-        
-        # Save current job list to previous job list
-        prev_joblist = curr_joblist
+            # Compare current job list with previous job list and update finish time
+            for job_id in prev_joblist:
+                # This job is finished 
+                if job_id not in curr_joblist:
+                    updated_job = update_job(client, job_id, uge_epoch_time)
+                    if updated_job:
+                        all_points.append(updated_job)
 
-        # Fetch BMC information
-        bmc_points = fetch_bmc(config["redfish"], hostlist)
-        all_points.extend(bmc_points)
+            # # Fetch BMC information
+            # bmc_points = fetch_bmc(config["redfish"], hostlist)
+            # all_points.extend(bmc_points)
 
-        # Write points into influxdb
-        client.write_points(all_points)
-        # print(json.dumps(all_points, indent=4))
+            # Write points into influxdb
+            client.write_points(all_points)
+            prev_job_file.seek(0)
+            json.dump(curr_joblist, prev_job_file)
+            # print(json.dumps(all_points, indent=4))
 
     except Exception as err:
         print(err)
