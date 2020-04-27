@@ -53,6 +53,7 @@ def write_db(client: object, config: object, hostlist: list) -> None:
         with open("previous_jobs.json", "w+") as prev_job_file:
             # load previous job list
             prev_joblist = json.loads(prev_job_file.read())
+            print(prev_joblist)
             # Fetch UGE information
             uge_info = fetch_uge(config["uge"])
 
@@ -80,8 +81,9 @@ def write_db(client: object, config: object, hostlist: list) -> None:
             # bmc_points = fetch_bmc(config["redfish"], hostlist)
             # all_points.extend(bmc_points)
 
-            # Write points into influxdb
-            client.write_points(all_points)
+            # # Write points into influxdb
+            # client.write_points(all_points)
+            print(curr_joblist)
             prev_job_file.seek(0)
             json.dump(curr_joblist, prev_job_file)
             # print(json.dumps(all_points, indent=4))
@@ -103,7 +105,7 @@ def fetch_job(client: object, job_id: str) -> object:
         
     return data
 
-# {'statement_id': 0, 'series': [{'name': 'brushEvents', 'tags': {'user': 'Carol'}, 'columns': ['time', 'duration'], 'values': [['2018-03-28T08:01:00Z', 127], ['2018-03-29T08:04:00Z', 132], ['2018-03-30T08:02:00Z', 129]]}]}
+
 def update_job(client: object, job_id: str, finishtime: int) -> None:
     updated_job = {}
     history_job = {}
