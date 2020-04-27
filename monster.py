@@ -116,7 +116,6 @@ def update_job(client: object, job_id: str, finishtime: int) -> None:
     history_job = {}
     try:
         job_info = fetch_job(client, job_id).raw
-        print(json.dumps(job_info, indent=4))
         if job_info:
             for index, item in enumerate(job_info["series"][0]["columns"]):
                 history_job[item] = job_info["series"][0]["values"][0][index]
@@ -137,9 +136,7 @@ def update_job(client: object, job_id: str, finishtime: int) -> None:
                     "NodeList": history_job["NodeList"]
                 }
             }
-            print(json.dumps(updated_job, indent=4))
-    except Exception as err:
-        print(err)
+    except:
         logging.error("Failed to update job: %s", job_id)
 
     return updated_job
