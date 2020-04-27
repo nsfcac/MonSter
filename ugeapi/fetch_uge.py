@@ -9,32 +9,9 @@ from itertools import repeat
 from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-from ugeapi.convert import get_hostip
+from ugeapi.get_hostip import get_hostip
 from ugeapi.process_uge import process_host, aggregate_node_jobs
 
-# logging.basicConfig(
-#     filename='ugeapi.log',
-#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-#     datefmt='%Y-%m-%d %H:%M:%S %Z'
-# )
-
-# # For testing
-# from convert import get_hostip
-# from process_uge import process_host, aggregate_node_jobs
-
-# config = {
-#     "host": "129.118.104.35",
-#     "port": "8182",
-#     "user": "username",
-#     "password": "password",
-#     "timeout": {
-#         "connect": 2,
-#         "read": 6
-#     },
-#     "max_retries": 3,
-#     "ssl_verify": False
-#     "computing_hosts": 467
-# }
 
 def fetch_uge(config: object) -> object:
     """
@@ -77,7 +54,8 @@ def fetch_uge(config: object) -> object:
 
         uge_info = {
             "all_job_points": all_job_points,
-            "all_host_points": all_host_points
+            "all_host_points": all_host_points,
+            "epoch_time": epoch_time
         }
 
     except:

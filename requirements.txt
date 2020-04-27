@@ -4,12 +4,13 @@ PyYAML
 schedule
 requests
 python-dateutil
-aiohttp
-uvloop
-tenacity
 
-gevent
-requests-futures
+# aiohttp
+# uvloop
+# tenacity
 
-aiohttp-retry
-aiomultiprocess
+# gevent
+# requests-futures
+
+# aiohttp-retry
+# aiomultiprocess

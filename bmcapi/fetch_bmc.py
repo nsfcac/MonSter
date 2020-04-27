@@ -18,30 +18,10 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # curl --insecure -X GET "https://redfish.hpcc.ttu.edu:8080/v1/metrics?start=2020-04-12T12%3A00%3A00%2B00%3A00&end=2020-04-18T12%3A00%3A00%2B00%3A00&interval=5m&value=max&compress=false" -H "accept: application/json"
 
-# logging.basicConfig(
-#     level=logging.ERROR,
-#     filename='test_bmcapi.log',
-#     filemode='w',
-#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-#     datefmt='%Y-%m-%d %H:%M:%S %Z'
-# )
-
-# config = {
-#     "user": "password",
-#     "password": "monster",
-#     "timeout": {
-#         "connect": 15,
-#         "read": 45
-#     },
-#     "max_retries": 2,
-#     "ssl_verify": False,
-#     "hostlist": "../../hostlist"
-# }
-
 
 def fetch_bmc(config: object, hostlist: list) -> object:
     """
-    Fetch bmc metrics from Redfish, average query and process time is: 11.57s
+    Fetch bmc metrics from Redfish, average query and process time is: 49.97s
     """
 
     all_bmc_points = []
@@ -60,13 +40,11 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         else:
             urls_set.append(urls[i * urls_per_core : increment * urls_per_core])
             increment += 1
-    # print(json.dumps(urls_set, indent=4))
 
     bmc_metrics = []
     epoch_time = int(round(time.time() * 1000000000))
 
-    # query_start = time.time()
-
+    # Query BMC metrics
     with multiprocessing.Pool(processes=cores) as pool:
         responses = [pool.apply_async(get_bmc_thread, args = (config, bmc_urls)) for bmc_urls in urls_set]
     
@@ -81,12 +59,6 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     for points_set in bmc_points_set:
         all_bmc_points += points_set
 
-    # total_elapsed = float("{0:.2f}".format(time.time() - query_start)) 
-
-    # print("Total elapsed time: ", end=" ")
-    # print(total_elapsed)
-
-    # print(json.dumps(all_bmc_points, indent=4))
     return all_bmc_points
 
 
@@ -163,19 +135,6 @@ def generate_urls(hostlist:list) -> list:
         urls.append(system_health_url)
     return urls
 
-
-def get_hostlist(hostlist_dir: str) -> list:
-    """
-    Parse host IP from file
-    """
-    hostlist = []
-    try:
-        with open(hostlist_dir, "r") as hostlist_file:
-            hostname_list = hostlist_file.read()[1:-1].split(", ")
-            hostlist = [host.split(":")[0][1:] for host in hostname_list]
-    except Exception as err:
-        print(err)
-    return hostlist
 
 def get_session():
     if not hasattr(thread_local, "session"):

@@ -41,7 +41,7 @@ config = {
 
 def fetch_bmc(config: object, hostlist: list) -> object:
     """
-    Fetch bmc metrics from Redfish, average query and process time is: 11.57s
+    Fetch bmc metrics from Redfish, average query and process time is: 49.97s
     """
 
     # bmc_metrics = []
