@@ -32,3 +32,6 @@ $ pip install -r requirements.txt
 4. Modify `config.yml` to match your infuxdb __port__, __credentials__ and the __database__ where the data will be stored. You may also specify the frequency(in seconds) for retrieving the slurm data. The default is set to 1, which means the slurm data is read and saved into influxdb every 1 second. Comment out the attribute under slurm_metrics if you do not want to keep it.
 
 5. Run: `$ python3 monster.py`, stop: `ctrl + c`. Run the monitoring script in background: `$ bash run.sh`, kill the monitoring process: `$ bash kill.sh`.
+
+ python3.6 -m venv env
+ source env/bin/activate
