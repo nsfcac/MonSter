@@ -3,6 +3,7 @@ influxdb
 PyYAML
 requests
 python-dateutil
+schedule
 
 # aiohttp
 # uvloop
