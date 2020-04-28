@@ -60,10 +60,7 @@ def run_write_db(write_db, client, config, hostlist):
     job_thread.start()
 
 
-def write_db(client: object, config: object, hostlist: list) -> None:
-
-    print(time.ctime())
-    
+def write_db(client: object, config: object, hostlist: list) -> None:    
     global prev_joblist
     all_points = []
     curr_joblist = []
