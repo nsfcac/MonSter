@@ -40,18 +40,19 @@ def main():
         # Monitoring frequency
         freq = config["frequency"]
         
-        print("Test")
-        write_db(client, config, hostlist)
-        print("Test Done")
-        # schedule.every(freq).minutes.do(write_db, client, config, hostlist)
+        # print("Test")
+        # write_db(client, config, hostlist)
+        # print("Test Done")
+        
+        schedule.every(freq).seconds.do(write_db, client, config, hostlist)
 
         # # while True:
         # #     schedule.run_pending()
         # #     time.sleep(1)
 
-        # for i in range(5):
-        #     schedule.run_pending()
-        #     time.sleep(freq)
+        for i in range(5):
+            schedule.run_pending()
+            time.sleep(1)
 
     except Exception as err:
         print(err)
