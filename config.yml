@@ -6,7 +6,7 @@ influxdb:
   # database: 'monster_hpcc'
   database: 'test_monster'
 
-frequency: 1 # in minutes
+frequency: 60 # in seconds
 
 hostlistdir: './hostlist'
 
