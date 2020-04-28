@@ -4,7 +4,6 @@ influxdb:
   user: 'lijie'
   password: 'li29729'
   database: 'monster_hpcc'
-  # database: 'test_monster'
 
 frequency: 60 # in seconds
 
