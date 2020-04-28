@@ -54,6 +54,9 @@ def main():
     return 
 
 def write_db(client: object, config: object, hostlist: list) -> None:
+
+    print(time.ctime())
+    
     global prev_joblist
     all_points = []
     curr_joblist = []
