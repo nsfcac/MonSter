@@ -1,6 +1,5 @@
 import json
 import time
-import schedule
 from influxdb import InfluxDBClient
 import logging
 
