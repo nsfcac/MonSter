@@ -48,7 +48,7 @@ def main():
 
         for i in range(10):
             schedule.run_pending()
-            time.sleep(1)
+            time.sleep(freq)
 
     except Exception as err:
         print(err)
