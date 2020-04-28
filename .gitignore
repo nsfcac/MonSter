@@ -2,6 +2,6 @@
 .DS_Store
 
 # Ignore folders
+.vscode/
 env/
-menv/
 __pycache__/
