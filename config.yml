@@ -3,9 +3,10 @@ influxdb:
   port: '8086'
   user: 'lijie'
   password: 'li29729'
+  # database: 'monster_hpcc'
   database: 'test_monster'
 
-frequency: 1 # in minutes
+# frequency: 1 # in minutes
 
 hostlistdir: './hostlist'
 

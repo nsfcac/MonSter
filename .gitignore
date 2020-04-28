@@ -3,4 +3,5 @@
 
 # Ignore folders
 env/
+menv/
 __pycache__/
