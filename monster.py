@@ -44,17 +44,21 @@ def main():
         # write_db(client, config, hostlist)
         # print("Test Done")
 
-        schedule.every(60).seconds.do(write_db, client, config, hostlist)
+        print("Test")
+        schedule.every(freq).seconds.do(write_db, client, config, hostlist)
 
         # # while True:
         # #     schedule.run_pending()
         # #     time.sleep(1)
 
         for i in range(5):
+            print(i)
             schedule.run_pending()
             time.sleep(1)
 
+        print("Done")
     except Exception as err:
+        print("Something is wrong")
         print(err)
     return 
 
