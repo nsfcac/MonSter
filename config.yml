@@ -3,8 +3,8 @@ influxdb:
   port: '8086'
   user: 'lijie'
   password: 'li29729'
-  # database: 'monster_hpcc'
-  database: 'test_monster'
+  database: 'monster_hpcc'
+  # database: 'test_monster'
 
 frequency: 60 # in seconds
 
