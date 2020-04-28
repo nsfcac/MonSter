@@ -8,6 +8,7 @@ import schedule
 from helper import parse_config, check_config, get_hostlist
 from ugeapi.fetch_uge import fetch_uge
 from bmcapi.fetch_bmc import fetch_bmc
+import threading
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -40,7 +41,7 @@ def main():
         # Monitoring frequency
         freq = config["frequency"]
         
-        schedule.every(freq).seconds.do(write_db, client, config, hostlist)
+        schedule.every(freq).seconds.do(run_write_db, write_db, client, config, hostlist)
 
         while True:
             try:
@@ -52,6 +53,12 @@ def main():
     except Exception as err:
         print(err)
     return 
+
+
+def run_write_db(write_db, client, config, hostlist):
+    job_thread = threading.Thread(target=write_db, args=(client, config, hostlist))
+    job_thread.start()
+
 
 def write_db(client: object, config: object, hostlist: list) -> None:
 
