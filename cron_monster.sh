@@ -10,10 +10,10 @@ if [ $1 == 0 ]
 then
     echo > previous_jobs.json
     echo "Start MonSTer cron job..."
-    crontab cornfile
+    crontab /home/lijie/MonSter/cornfile
     crontab -l
 else
     echo "Stop MonSTer cron job..."
-    crontab -l > cornfile
+    crontab -l > /home/lijie/MonSter/cornfile
     crontab -r
 fi
