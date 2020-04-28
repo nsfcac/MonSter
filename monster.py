@@ -43,8 +43,8 @@ def main():
         # print("Test")
         # write_db(client, config, hostlist)
         # print("Test Done")
-        
-        schedule.every(freq).seconds.do(write_db, client, config, hostlist)
+
+        schedule.every(60).seconds.do(write_db, client, config, hostlist)
 
         # # while True:
         # #     schedule.run_pending()
