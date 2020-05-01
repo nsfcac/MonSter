@@ -1,14 +1,14 @@
 # MonSter
-This is a monitoring tool for fetching Slurm-related data and saving data into influxDB.
-
-Currenty it only supports running locally, since it utilizes the Slurm libraries and header files and calls SlurmAPI.
+This is a tool for monitoring status of High Performance Computing platforms. It fetches metircs from Resource Manager(Current it supports Univa Grid Engine and Slurm) and metrics from BMC(Support Redfish Protocol), it correlates these metrics and saves into influxDB.
 
 ### Prerequisites
-* [Slurm](https://www.schedmd.com)
+* [UGE](https:www.univa.com/) or [Slurm](https://www.schedmd.com/)
+* [Redfish](https://www.dmtf.org/standards/redfish) supported BMCs
+* [Python3.6+](https://www.python.org/)
 * [Conda Package Manager](https://docs.conda.io/en/latest/)
 
 This branch has been tested with:
-* Slurm 18.08.0, 17.11.7
+* UGE 8.5.5; Slurm 18.08.0, 17.11.7
 
 ### Running MonSter locally
 1. Clone this repo and `cd` into it:
@@ -17,7 +17,7 @@ This branch has been tested with:
 $ git clone https://github.com/nsfcac/MonSter.git
 $ cd MonSter
 ```
-2. Change the pyslurm version in __requirements.txt__ according to the version of Slurm running on your host, pyslurm history version can be found [here](https://pypi.org/project/pyslurm/#history).
+2. The default resource manager is UGE, if you need to use Slurm, change the pyslurm version in __requirements.txt__ according to the version of Slurm running on your host, pyslurm history version can be found [here](https://pypi.org/project/pyslurm/#history). 
 
 3. Set up __conda__ env with the following commands:
 
@@ -29,10 +29,8 @@ $ conda install -c anaconda gcc --yes
 $ pip install -r requirements.txt
 ```
 
-4. Modify `config.yml` to match your infuxdb __port__, __credentials__ and the __database__ where the data will be stored. You may also specify the frequency(in seconds) for retrieving the slurm data. The default is set to 1, which means the slurm data is read and saved into influxdb every 1 second. Comment out the attribute under slurm_metrics if you do not want to keep it.
+4. Modify `config.yml` to match your infuxdb __port__, __credentials__ and the __database__ where the data will be stored. You may also specify the frequency(in seconds) for retrieving the monitoring data. The default is set to 60, which means the slurm data is read and saved into influxdb every 60 seconds. 
 
-5. Run: `$ python3 monster.py`, stop: `ctrl + c`. Run the monitoring script in background: `$ bash run.sh`, kill the monitoring process: `$ bash kill.sh`.
+5. Run: `$./control.sh 0` to start MonSter, the monitoring script will be running on background. Run `$./control.sh 1` to stop MonSter. 
 
- python3.6 -m venv env
- source env/bin/activate
- pip install -r requirements.txt
+6. Running error logs are saved in to `running.log`. MonSter logs are saved into `monster.log`.
