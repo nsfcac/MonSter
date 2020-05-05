@@ -1,5 +1,5 @@
 # MonSter
-This is a tool for monitoring status of High Performance Computing platforms. It fetches metrics from Resource Manager(Current it supports Univa Grid Engine and Slurm) and metrics from BMC(Support Redfish Protocol), it correlates these metrics and saves into influxDB.
+MonSter is a tool for monitoring High Performance Computing platforms. It fetches metrics from resource managers (currently supports Univa Grid Engine and Slurm) and from BMCs (via the Redfish protocol), correlates these metrics, and saves them into influxDB. 
 
 ### Prerequisites
 * [UGE](https:www.univa.com/) or [Slurm](https://www.schedmd.com/)
