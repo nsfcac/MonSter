@@ -15,6 +15,7 @@ This branch has been tested with:
 
 ``` bash
 $ git clone https://github.com/nsfcac/MonSter.git
+$ git checkout slurm
 $ cd MonSter
 ```
 2. The default resource manager is UGE, if you need to use Slurm, change the pyslurm version in __requirements.txt__ according to the version of Slurm running on your host, pyslurm history version can be found [here](https://pypi.org/project/pyslurm/#history). 
