@@ -19,7 +19,7 @@ def check_config(cfg: object) -> bool:
         redfish = cfg["redfish"]
         ugeapi = cfg["uge"]
         scheduler = cfg["scheduler"]
-        if scheduler != "uge" or scheduler != "slurm":
+        if scheduler != "uge" and scheduler != "slurm":
             print(f"Error: {scheduler} is not a valid scheduler, it should be uge or slurm")
             return False
         # Slurm config
