@@ -26,9 +26,10 @@ $ git checkout slurm
 $ conda create --prefix env python=3 --yes
 $ conda activate env/
 $ conda install cython --yes
-$ conda install -c anaconda gcc --yes
+$ conda install gcc_linux-64
 $ pip install -r requirements.txt
 ```
+If install pyslurm fails, please refer to [PySlurm](https://github.com/PySlurm/pyslurm) for manual installation.
 
 4. Modify `config.yml` to match your infuxdb __port__, __credentials__ and the __database__ where the data will be stored. You may also specify the frequency(in seconds) for retrieving the monitoring data. The default is set to 60, which means the slurm data is read and saved into influxdb every 60 seconds. 
 
