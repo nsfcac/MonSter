@@ -8,6 +8,7 @@ import schedule
 from helper import parse_config, check_config, get_hostlist
 from ugeapi.fetch_uge import fetch_uge
 from bmcapi.fetch_bmc import fetch_bmc
+from slurmapi.fetch_slurm import fetch_slurm
 import threading
 
 logging.basicConfig(
@@ -40,8 +41,13 @@ def main():
 
         # Monitoring frequency
         freq = config["frequency"]
-        
-        schedule.every(freq).seconds.do(run_write_db, write_db, client, config, hostlist)
+        # Scheduler
+        scheduler = config["scheduler"]
+
+        if scheduler == "slurm":
+            schedule.every(freq).seconds.do(write_slurm_db, client, config)
+        else:
+            schedule.every(freq).seconds.do(run_write_db, write_db, client, config, hostlist)
 
         while True:
             try:
@@ -146,6 +152,17 @@ def update_job(client: object, job_id: str, finishtime: int) -> None:
         logging.error("Failed to update job: %s", job_id)
 
     return updated_job
+
+
+def write_slurm_db(client: object, config: object) -> None:
+    # Fetch slurm information
+    slurm_info = fetch_slurm(config["slurm"])
+
+    # Write points into influxdb
+    client.write_points(slurm_info["job_info"])
+    client.write_points(slurm_info["node_info"])
+    client.write_points(slurm_info["stat_info"])
+    return
 
 if __name__ == '__main__':
     main()

@@ -1,9 +1,9 @@
 influxdb:
-  host: '10.10.1.3'
+  host: 'localhost'
   port: '8086'
   user: 'lijie'
   password: 'li29729'
-  database: 'monster_hpcc'
+  database: 'test_slurm'
 
 frequency: 60 # in seconds
 
@@ -18,6 +18,8 @@ redfish:
   max_retries: 2
   ssl_verify: False   # Secure Sockets Layer Verify
 
+scheduler: slurm
+
 uge:
   host: '129.118.104.35'
   port: '8182'
@@ -29,3 +31,32 @@ uge:
   max_retries: 2
   ssl_verify: False
   computing_hosts: 467
+
+slurm:
+  job:
+    - submit_time
+    - start_time
+    - suspend_time
+    - end_time
+    - run_time
+    - job_state
+    - nodes
+    - num_cpus
+    - num_nodes
+  node:
+    - cpus
+    - cores
+    - sockets
+    - free_mem
+    - real_memory
+    - cpu_load
+    - threads
+    - current_watts
+    - consumed_energy
+    - state
+  statistics:
+    - jobs_submitted
+    - jobs_started
+    - jobs_completed
+    - jobs_canceled
+    - jobs_failed
