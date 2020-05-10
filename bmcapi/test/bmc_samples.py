@@ -195,10 +195,12 @@ def check_power(bmc_metrics: list) -> dict:
     all_valid_host = 0
     total_missing = 0
     missing_host = []
+    valid_host = []
     result = {
         "all_valid_host": 0,
         "total_missing": 0,
-        "missing_host": missing_host
+        "missing_host": missing_host,
+        "valid_host": valid_host
     }
 
     for bmc_metric in bmc_metrics:
@@ -208,6 +210,7 @@ def check_power(bmc_metrics: list) -> dict:
             details = bmc_metric["details"]
             try:
                 reading = details["PowerControl"][0]["PowerConsumedWatts"]
+                valid_host.append(host_ip)
             except:
                 total_missing += 1
                 missing_host.append(host_ip)
@@ -216,7 +219,8 @@ def check_power(bmc_metrics: list) -> dict:
     result.update({
         "all_valid_host": all_valid_host,
         "total_missing": total_missing,
-        "missing_host": missing_host
+        "missing_host": missing_host,
+        "valid_host": valid_host
     })
     return result
 
