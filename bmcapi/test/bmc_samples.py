@@ -75,6 +75,8 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     
         for response in responses:
             bmc_metrics += response.get()
+
+    result = check_power(bmc_metrics)
     
     # # Generate data points
     # process_bmc_args = zip(bmc_metrics, repeat(epoch_time))
@@ -89,7 +91,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
     # print("Total elapsed time: ", end=" ")
     # print(total_elapsed)
 
-    print(json.dumps(bmc_metrics, indent=4))
+    print(json.dumps(result, indent=4))
     return True
 
 
@@ -149,21 +151,21 @@ def generate_urls(hostlist:list) -> list:
     # curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k
     urls = []
     # Thermal URLS
-    for host in hostlist:
-        thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
-        urls.append(thermal_url)
+    # for host in hostlist:
+    #     thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
+    #     urls.append(thermal_url)
     # Power
     for host in hostlist:
         power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
         urls.append(power_url)
     # BMC health
-    for host in hostlist:
-        bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
-        urls.append(bmc_health_url)
-    # System health
-    for host in hostlist:
-        system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
-        urls.append(system_health_url)
+    # for host in hostlist:
+    #     bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
+    #     urls.append(bmc_health_url)
+    # # System health
+    # for host in hostlist:
+    #     system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
+    #     urls.append(system_health_url)
     return urls
 
 
@@ -186,7 +188,36 @@ def get_session():
     return thread_local.session
 
 
-# hostlist = get_hostlist(config["hostlist"])
-hostlist = ["10.101.1.1"]
+hostlist = get_hostlist(config["hostlist"])
+# hostlist = ["10.101.1.1"]
+
+def check_power(bmc_metrics: list) -> dict:
+    all_valid_host = 0
+    total_missing = 0
+    missing_host = []
+    result = {
+        "all_valid_host": 0,
+        "total_missing": 0,
+        "missing_host": missing_host
+    }
+
+    for bmc_metric in bmc_metrics:
+        if bmc_metric:
+            all_valid_host += 1
+            host_ip = bmc_metric["host"]
+            details = bmc_metric["details"]
+            try:
+                reading = details["PowerControl"][0]["PowerConsumedWatts"]
+            except:
+                total_missing += 1
+                missing_host.append(host_ip)
+                logging.error("Cannot find 'PowerConsumedWatts' from BMC on host: %s", host_ip)
+    
+    result.update({
+        "all_valid_host": all_valid_host,
+        "total_missing": total_missing,
+        "missing_host": missing_host
+    })
+    return result
 
 fetch_bmc(config, hostlist)
