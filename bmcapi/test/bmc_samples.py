@@ -16,7 +16,6 @@ from process_bmc import process_bmc_metrics
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# curl --insecure -X GET "https://redfish.hpcc.ttu.edu:8080/v1/metrics?start=2020-04-12T12%3A00%3A00%2B00%3A00&end=2020-04-18T12%3A00%3A00%2B00%3A00&interval=5m&value=max&compress=false" -H "accept: application/json"
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -76,8 +75,8 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         for response in responses:
             bmc_metrics += response.get()
 
-    # result = check_thermal(bmc_metrics)
-    result = check_power(bmc_metrics)
+    result = check_thermal(bmc_metrics)
+    # result = check_power(bmc_metrics)
     
     # # Generate data points
     # process_bmc_args = zip(bmc_metrics, repeat(epoch_time))
@@ -150,6 +149,7 @@ def get_bmc_detail(q: object, config: dict, bmc_metrics: list) -> None:
 def generate_urls(hostlist:list) -> list:
     # Testing cmd
     # curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k
+    # curl --user password:monster https://10.101.1.1/redfish/v1/Managers/iDRAC.Embedded.1 -k
     urls = []
     # Thermal URLS
     for host in hostlist:
