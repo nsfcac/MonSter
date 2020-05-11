@@ -267,9 +267,9 @@ def check_thermal(bmc_metrics: list) -> dict:
     result = {
         "all_valid_host": all_valid_host,
         "temp_missing": temp_missing,
+        "fans_missing": fans_missing,
         "temp_missing_host": temp_missing_host,
         "temp_valid_host": temp_valid_host,
-        "fans_missing": fans_missing,
         "fans_missing_host": fans_missing_host,
         "fans_valid_host": fans_valid_host
     }
