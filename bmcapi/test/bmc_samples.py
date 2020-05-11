@@ -76,7 +76,8 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         for response in responses:
             bmc_metrics += response.get()
 
-    result = check_thermal(bmc_metrics)
+    # result = check_thermal(bmc_metrics)
+    result = check_power(bmc_metrics)
     
     # # Generate data points
     # process_bmc_args = zip(bmc_metrics, repeat(epoch_time))
