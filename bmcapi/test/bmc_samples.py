@@ -76,7 +76,7 @@ def fetch_bmc(config: object, hostlist: list) -> object:
         for response in responses:
             bmc_metrics += response.get()
 
-    result = check_power(bmc_metrics)
+    result = check_thermal(bmc_metrics)
     
     # # Generate data points
     # process_bmc_args = zip(bmc_metrics, repeat(epoch_time))
@@ -151,13 +151,13 @@ def generate_urls(hostlist:list) -> list:
     # curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k
     urls = []
     # Thermal URLS
-    # for host in hostlist:
-    #     thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
-    #     urls.append(thermal_url)
-    # Power
     for host in hostlist:
-        power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
-        urls.append(power_url)
+        thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
+        urls.append(thermal_url)
+    # Power
+    # for host in hostlist:
+    #     power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
+    #     urls.append(power_url)
     # BMC health
     # for host in hostlist:
     #     bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
@@ -222,6 +222,57 @@ def check_power(bmc_metrics: list) -> dict:
         "missing_host": missing_host,
         "valid_host": valid_host
     })
+    return result
+
+
+def check_thermal(bmc_metrics: list) -> dict:
+    all_valid_host = 0
+    # total_missing = 0
+    temp_missing = 0
+    temp_missing_host = []
+    temp_valid_host = []
+    fans_missing = 0
+    fans_missing_host = []
+    fans_valid_host = []
+    result = {
+        "all_valid_host": 0,
+        "temp_missing": 0,
+        "temp_missing_host": temp_missing_host,
+        "temp_valid_host": temp_valid_host,
+        "fans_missing": 0,
+        "fans_missing_host": fans_missing_host,
+        "fans_valid_host": fans_valid_host
+    }
+
+    for bmc_metric in bmc_metrics:
+        if bmc_metric:
+            all_valid_host += 1
+            host_ip = bmc_metric["host"]
+            details = bmc_metric["details"]
+            try:
+                temperatures = details["Temperatures"]
+                temp_valid_host.append(host_ip)
+            except:
+                temp_missing += 1
+                temp_missing_host.append(host_ip)
+                logging.error("Cannot find 'Temperatures' from BMC on host: %s", host_ip)
+            try:
+                fans = details["Fans"]
+                fans_valid_host.append(host_ip)
+            except:
+                fans_missing += 1
+                fans_missing_host.append(host_ip)
+                logging.error("Cannot find 'Fans' from BMC on host: %s", host_ip)
+    
+    result = {
+        "all_valid_host": all_valid_host,
+        "temp_missing": temp_missing,
+        "temp_missing_host": temp_missing_host,
+        "temp_valid_host": temp_valid_host,
+        "fans_missing": fans_missing,
+        "fans_missing_host": fans_missing_host,
+        "fans_valid_host": fans_valid_host
+    }
     return result
 
 fetch_bmc(config, hostlist)
