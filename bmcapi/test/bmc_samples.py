@@ -150,6 +150,8 @@ def generate_urls(hostlist:list) -> list:
     # Testing cmd
     # curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k
     # curl --user password:monster https://10.101.1.1/redfish/v1/Managers/iDRAC.Embedded.1 -k
+    # curl --user password:monster https://10.101.7.43/redfish/v1/Chassis/System.Embedded.1/Power/ -k
+    # 
     urls = []
     # Thermal URLS
     for host in hostlist:
