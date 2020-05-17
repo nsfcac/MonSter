@@ -1,0 +1,676 @@
+1259653.1
+{
+  "npprior": 0.5,
+  "shares": 9.197998562036253e-06,
+  "taskid": null,
+  "priority": 5.000126670176979,
+  "ppri": 0,
+  "state": "r",
+  "timeStamp": {
+    "startEpoch": 1585821446146,
+    "start": "Thu Apr 02 04:57:26 CDT 2020",
+    "submitEpoch": 1584541685997,
+    "submit": "Wed Mar 18 09:28:05 CDT 2020"
+  },
+  "jobEnvironment": [
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/bin:/opt/ohpc/pub/libs/intel/python2/2.7.14/libexec/gnuplot/5.0:/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/bin:/opt/ohpc/pub/libs/intel/impi/lammps/16Mar18/bin:/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/bin:/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/bin_ohpc:/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/bin:/opt/intel/compilers_and_libraries_2018.3.222/linux/bin/intel64:/tmp/1259640.1.omni:/home/rafiisla/amber17/bin:/export/uge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin",
+      "name": "PATH"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl/bin/pkgconfig",
+      "name": "PKG_CONFIG_PATH"
+    },
+    {
+      "value": "ignoredups",
+      "name": "HISTCONTROL"
+    },
+    {
+      "value": "undefined",
+      "name": "SGE_TASK_STEPSIZE"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/lib",
+      "name": "NETCDF_LIB"
+    },
+    {
+      "value": "/export/uge",
+      "name": "SGE_ROOT"
+    },
+    {
+      "value": "/export/uge/default/spool/compute-8-52/compute-8-52/active_jobs/1259640.1",
+      "name": "SGE_JOB_SPOOL_DIR"
+    },
+    {
+      "value": "no",
+      "name": "LMOD_SETTARG_FULL_SUPPORT"
+    },
+    {
+      "value": "/lustre/scratch/rafiisla/ProbeRheologyProject/PolymerGelSimulation/StrandLength40/BoxSize50/11.ProbeRheology/3.ActiveRheology",
+      "name": "SGE_CWD_PATH"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0",
+      "name": "NETCDF_DIR"
+    },
+    {
+      "value": "/opt/ohpc/pub/modulefiles/intel/18.0.3.222:/opt/ohpc/pub/moduledeps/intel/impi/2018.3.222:/opt/ohpc/pub/moduledeps/intel-impi/phdf5/1.10.1:/opt/ohpc/pub/moduledeps/intel-impi/lammps/16Mar18:/opt/ohpc/pub/moduledeps/intel-impi/netcdf/4.5.0:/opt/ohpc/pub/moduledeps/intel/python2/2.7.14",
+      "name": "_LMFILES_"
+    },
+    {
+      "value": "/opt/intel/debugger_2018/mpm/mic/bin/start_mpm.sh",
+      "name": "MPM_LAUNCHER"
+    },
+    {
+      "value": "FILE:/tmp/krb5cc_98742_kieqF8",
+      "name": "KRB5CCNAME"
+    },
+    {
+      "value": "XT0ibmV0Y2RmLzQuNS4wIixbImxvYWRPcmRlciJdPTUscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ibmV0Y2RmIix9LHBoZGY1PXtbImZuIl09Ii9vcHQvb2hwYy9wdWIvbW9kdWxlZGVwcy9pbnRlbC1pbXBpL3BoZGY1LzEuMTAuMSIsWyJmdWxsTmFtZSJdPSJwaGRmNS8xLjEwLjEiLFsibG9hZE9yZGVyIl09Myxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJwaGRmNSIsfSxweXRob24yPXtbImZuIl09Ii9vcHQvb2hwYy9wdWIvbW9kdWxlZGVwcy9pbnRlbC9weXRob24yLzIuNy4xNCIsWyJmdWxsTmFtZSJdPSJweXRob24yLzIuNy4xNCIsWyJsb2FkT3Jk",
+      "name": "_ModuleTable003_"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/lib:/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/lib:/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/lib:/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib:/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/mic/lib:/opt/intel/compilers_and_libraries_2018.3.222/linux/compiler/lib/intel64:/opt/intel/compilers_and_libraries_2018.3.222/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.3.222/linux/tbb/lib/intel64/gcc4.1:/opt/intel/debugger_2018/iga/lib:/opt/intel/debugger_2018/libipt/intel64/lib",
+      "name": "LD_LIBRARY_PATH"
+    },
+    {
+      "value": "/opt/ohpc/username/lmod/lmod/libexec",
+      "name": "LMOD_DIR"
+    },
+    {
+      "value": "/lustre/scratch/rafiisla/ProbeRheologyProject/PolymerGelSimulation/StrandLength40/BoxSize50/11.ProbeRheology/3.ActiveRheology/JOBNAME.o1259640",
+      "name": "SGE_STDERR_PATH"
+    },
+    {
+      "value": "/export/uge/bin/lx-amd64",
+      "name": "SGE_BINARY_PATH"
+    },
+    {
+      "value": "sge",
+      "name": "SGE_ACCOUNT"
+    },
+    {
+      "value": "/lustre/scratch/rafiisla/ProbeRheologyProject/PolymerGelSimulation/StrandLength40/BoxSize50/11.ProbeRheology/3.ActiveRheology/S3/0.0009/R2",
+      "name": "PWD"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/include:/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/include:/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/include",
+      "name": "INCLUDE"
+    },
+    {
+      "value": "JOBNAME",
+      "name": "REQNAME"
+    },
+    {
+      "value": "/dev/null",
+      "name": "SGE_STDIN_PATH"
+    },
+    {
+      "value": "en_US.UTF-8",
+      "name": "LANGUAGE"
+    },
+    {
+      "value": "7.7.14",
+      "name": "LMOD_VERSION"
+    },
+    {
+      "value": "||/usr/bin/lesspipe.sh %s",
+      "name": "LESSOPEN"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/share/man}:1;/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/share/man:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/man:2;/opt/intel/documentation_2018/en/debugger/gdb-ia/man:1;/opt/intel/documentation_2018/en/debugger/gdb-igfx/man:1;/export/uge/man:1;/usr/share/man:1;/usr/local/share/man:1",
+      "name": "__LMOD_REF_COUNT_MANPATH"
+    },
+    {
+      "value": "1",
+      "name": "QT_GRAPHICSSYSTEM_CHECKED"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/mpi.jar:2",
+      "name": "__LMOD_REF_COUNT_CLASSPATH"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/lib",
+      "name": "PYTHON_LIB"
+    },
+    {
+      "value": "/opt/intel/debugger_2018/python/intel64/",
+      "name": "INTEL_PYTHONHOME"
+    },
+    {
+      "value": "1",
+      "name": "NHOSTS"
+    },
+    {
+      "value": "LjIyMiIsWyJmdWxsTmFtZSJdPSJpbnRlbC8xOC4wLjMuMjIyIixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0iaW50ZWwiLH0sbGFtbXBzPXtbImZuIl09Ii9vcHQvb2hwYy9wdWIvbW9kdWxlZGVwcy9pbnRlbC1pbXBpL2xhbW1wcy8xNk1hcjE4IixbImZ1bGxOYW1lIl09ImxhbW1wcy8xNk1hcjE4IixbImxvYWRPcmRlciJdPTQscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ibGFtbXBzIix9LG5ldGNkZj17WyJmbiJdPSIvb3B0L29ocGMvcHViL21vZHVsZWRlcHMvaW50ZWwtaW1waS9uZXRjZGYvNC41LjAiLFsiZnVsbE5hbWUi",
+      "name": "_ModuleTable002_"
+    },
+    {
+      "value": "5.300G",
+      "name": "SGE_HGR_h_vmem"
+    },
+    {
+      "value": "/var/spool/mail/rafiisla",
+      "name": "SGE_O_MAIL"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/include",
+      "name": "HDF5_INC"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14",
+      "name": "PYTHON_DIR"
+    },
+    {
+      "value": "quanah",
+      "name": "SGE_O_HOST"
+    },
+    {
+      "value": "lx-amd64",
+      "name": "ARC"
+    },
+    {
+      "value": "/bin/bash",
+      "name": "SGE_O_SHELL"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/bin:/opt/ohpc/pub/libs/intel/python2/2.7.14/libexec/gnuplot/5.0:/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/bin:/opt/ohpc/pub/libs/intel/impi/lammps/16Mar18/bin:/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/bin:/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/bin_ohpc:/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/bin:/opt/intel/compilers_and_libraries_2018.3.222/linux/bin/intel64:/tmp/1259640.1.omni:/home/rafiisla/amber17/bin:/export/uge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin",
+      "name": "__SGE_PREFIX__O_PATH"
+    },
+    {
+      "value": "en_US.UTF-8",
+      "name": "LC_ALL"
+    },
+    {
+      "value": "en_US.UTF-8",
+      "name": "LC_CTYPE"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl/include:/opt/intel/compilers_and_libraries_2018.3.222/linux/pstl/include:/opt/intel/compilers_and_libraries_2018.3.222/linux/tbb/include",
+      "name": "CPATH"
+    },
+    {
+      "value": "/lustre/scratch/rafiisla/ProbeRheologyProject/PolymerGelSimulation/StrandLength40/BoxSize50/11.ProbeRheology/3.ActiveRheology/JOBNAME.o1259640",
+      "name": "SGE_STDOUT_PATH"
+    },
+    {
+      "value": "3",
+      "name": "SHLVL"
+    },
+    {
+      "value": "/export/uge/default/spool/compute-8-52/compute-8-52/active_jobs/1259640.1/pe_hostfile",
+      "name": "PE_HOSTFILE"
+    },
+    {
+      "value": "1259640",
+      "name": "JOB_ID"
+    },
+    {
+      "value": "/var/spool/mail/rafiisla",
+      "name": "__SGE_PREFIX__O_MAIL"
+    },
+    {
+      "value": "intel/18.0.3.222:impi/2018.3.222:phdf5/1.10.1:lammps/16Mar18:netcdf/4.5.0:python2/2.7.14",
+      "name": "LOADEDMODULES"
+    },
+    {
+      "value": "1000",
+      "name": "HISTSIZE"
+    },
+    {
+      "value": "no",
+      "name": "LMOD_FULL_SETTARG_SUPPORT"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi",
+      "name": "I_MPI_ROOT"
+    },
+    {
+      "value": "rafiisla",
+      "name": "__SGE_PREFIX__O_LOGNAME"
+    },
+    {
+      "value": "X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXtbIk1QSSJdPSJpbXBpIixbImNvbXBpbGVyIl09ImludGVsIixbImhkZjUiXT0icGhkZjUiLH0sbVQ9e2ltcGk9e1siZm4iXT0iL29wdC9vaHBjL3B1Yi9tb2R1bGVkZXBzL2ludGVsL2ltcGkvMjAxOC4zLjIyMiIsWyJmdWxsTmFtZSJdPSJpbXBpLzIwMTguMy4yMjIiLFsibG9hZE9yZGVyIl09Mixwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJpbXBpIix9LGludGVsPXtbImZuIl09Ii9vcHQvb2hwYy9wdWIvbW9kdWxlZmlsZXMvaW50ZWwvMTguMC4z",
+      "name": "_ModuleTable001_"
+    },
+    {
+      "value": "1",
+      "name": "NSLOTS"
+    },
+    {
+      "value": "/home/rafiisla",
+      "name": "SGE_O_HOME"
+    },
+    {
+      "value": "xterm",
+      "name": "TERM"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14:1;/opt/ohpc/pub/libs/intel/python2/2.7.14/lib/python2.7/site-packages:1",
+      "name": "__LMOD_REF_COUNT_PYTHONPATH"
+    },
+    {
+      "value": "19126",
+      "name": "XDG_SESSION_ID"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/lib:1;/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/lib:1;/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/lib:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib:2;/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/mic/lib:2;/opt/intel/compilers_and_libraries_2018.3.222/linux/compiler/lib/intel64:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/compiler/lib/intel64_lin:2;/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl/lib/intel64_lin:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/tbb/lib/intel64/gcc4.1:2;/opt/intel/debugger_2018/iga/lib:1;/opt/intel/debugger_2018/libipt/intel64/lib:1",
+      "name": "__LMOD_REF_COUNT_LD_LIBRARY_PATH"
+    },
+    {
+      "value": "4",
+      "name": "_ModuleTable_Sz_"
+    },
+    {
+      "value": "/opt/intel/debugger_2018/gdb/targets/intel64/x200/bin/gdbserver",
+      "name": "GDBSERVER_MIC"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/bin",
+      "name": "HDF5_BIN"
+    },
+    {
+      "value": "6555",
+      "name": "SGE_EXECD_PORT"
+    },
+    {
+      "value": "2018.3.222",
+      "name": "LMOD_FAMILY_MPI_VERSION"
+    },
+    {
+      "value": "0",
+      "name": "SGE_RERUN_REQUESTED"
+    },
+    {
+      "value": "intel",
+      "name": "LMOD_FAMILY_COMPILER"
+    },
+    {
+      "value": "/export/uge/bin/lx-amd64/qsub",
+      "name": "_"
+    },
+    {
+      "value": "18.0.3.222",
+      "name": "LMOD_FAMILY_COMPILER_VERSION"
+    },
+    {
+      "value": ":",
+      "name": "LMOD_SETTARG_CMD"
+    },
+    {
+      "value": "p6554",
+      "name": "SGE_CLUSTER_NAME"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/include",
+      "name": "NETCDF_INC"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/compiler/lib/intel64_lin:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl/lib/intel64_lin:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/tbb/lib/intel64/gcc4.1:2",
+      "name": "__LMOD_REF_COUNT_LIBRARY_PATH"
+    },
+    {
+      "value": "/opt/ohpc/pub/modulefiles/intel/18.0.3.222:1;/opt/ohpc/pub/moduledeps/intel/impi/2018.3.222:1;/opt/ohpc/pub/moduledeps/intel-impi/phdf5/1.10.1:1;/opt/ohpc/pub/moduledeps/intel-impi/lammps/16Mar18:1;/opt/ohpc/pub/moduledeps/intel-impi/netcdf/4.5.0:1;/opt/ohpc/pub/moduledeps/intel/python2/2.7.14:1",
+      "name": "__LMOD_REF_COUNT__LMFILES_"
+    },
+    {
+      "value": "129.118.165.5 50643 22",
+      "name": "SSH_CLIENT"
+    },
+    {
+      "value": "/dev/pts/19",
+      "name": "SSH_TTY"
+    },
+    {
+      "value": "omni",
+      "name": "QUEUE"
+    },
+    {
+      "value": "0",
+      "name": "SGE_RERUN_JOB"
+    },
+    {
+      "value": "/home/rafiisla",
+      "name": "__SGE_PREFIX__O_HOME"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/include:1;/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/include:1;/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/include:1",
+      "name": "__LMOD_REF_COUNT_INCLUDE"
+    },
+    {
+      "value": "builtin",
+      "name": "SGE_RSH_COMMAND"
+    },
+    {
+      "value": "129.118.165.5 50643 129.118.104.8 22",
+      "name": "SSH_CONNECTION"
+    },
+    {
+      "value": "JOBNAME",
+      "name": "REQUEST"
+    },
+    {
+      "value": "/bin/bash",
+      "name": "__SGE_PREFIX__O_SHELL"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/compiler/lib/intel64/locale/%l_%t/%N:/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl/lib/intel64_lin/locale/%l_%t/%N:/opt/intel/debugger_2018/gdb/intel64/share/locale/%l_%t/%N",
+      "name": "NLSPATH"
+    },
+    {
+      "value": "/lustre/scratch/rafiisla/ProbeRheologyProject/PolymerGelSimulation/StrandLength40/BoxSize50/11.ProbeRheology/3.ActiveRheology",
+      "name": "SGE_O_WORKDIR"
+    },
+    {
+      "value": "() {  eval $($LMOD_CMD bash \"$@\") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)\n}",
+      "name": "BASH_FUNC_module()"
+    },
+    {
+      "value": "normal",
+      "name": "LMOD_PREPEND_BLOCK"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/include",
+      "name": "PYTHON_INC"
+    },
+    {
+      "value": "1",
+      "name": "NQUEUES"
+    },
+    {
+      "value": "/opt/intel/debugger_2018/gdb/intel64/bin/gdb-ia",
+      "name": "GDB_CROSS"
+    },
+    {
+      "value": "default",
+      "name": "SGE_CELL"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/tbb",
+      "name": "TBBROOT"
+    },
+    {
+      "value": "undefined",
+      "name": "SGE_TASK_LAST"
+    },
+    {
+      "value": "/opt/ohpc/pub/moduledeps/intel-impi:/opt/ohpc/pub/moduledeps/intel:/opt/apps/nfs/module/modulefiles:/opt/ohpc/pub/modulefiles",
+      "name": "MODULEPATH"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/bin:1;/opt/ohpc/pub/libs/intel/python2/2.7.14/libexec/gnuplot/5.0:1;/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/bin:1;/opt/ohpc/pub/libs/intel/impi/lammps/16Mar18/bin:1;/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/bin:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/bin_ohpc:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/bin:2;/opt/intel/compilers_and_libraries_2018.3.222/linux/bin/intel64:1;/tmp/1259640.1.omni:1;/home/rafiisla/amber17/bin:1;/export/uge/bin/lx-amd64:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1",
+      "name": "__LMOD_REF_COUNT_PATH"
+    },
+    {
+      "value": "/var/spool/mail/rafiisla",
+      "name": "MAIL"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/bin",
+      "name": "NETCDF_BIN"
+    },
+    {
+      "value": "lx-amd64",
+      "name": "SGE_ARCH"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl/include:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/pstl/include:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/tbb/include:2",
+      "name": "__LMOD_REF_COUNT_CPATH"
+    },
+    {
+      "value": "rafiisla",
+      "name": "LOGNAME"
+    },
+    {
+      "value": "impi",
+      "name": "LMOD_FAMILY_MPI"
+    },
+    {
+      "value": "0",
+      "name": "RESTARTED"
+    },
+    {
+      "value": "/opt/intel/documentation_2018/en/debugger/gdb-ia/info:/opt/intel/documentation_2018/en/debugger/gdb-igfx/info",
+      "name": "INFOPATH"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14:/opt/ohpc/pub/libs/intel/python2/2.7.14/lib/python2.7/site-packages",
+      "name": "PYTHONPATH"
+    },
+    {
+      "value": "/bin/bash",
+      "name": "SHELL"
+    },
+    {
+      "value": "/opt/ohpc/username/lmod/lmod/libexec/lmod",
+      "name": "LMOD_CMD"
+    },
+    {
+      "value": "/opt/ohpc/username/lmod/lmod/init/bash",
+      "name": "BASH_ENV"
+    },
+    {
+      "value": "/lustre/scratch/rafiisla/ProbeRheologyProject/PolymerGelSimulation/StrandLength40/BoxSize50/11.ProbeRheology/3.ActiveRheology/S3/0.0009",
+      "name": "OLDPWD"
+    },
+    {
+      "value": "/tmp/1259640.1.omni",
+      "name": "TMPDIR"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.3.222/linux/tbb/lib/intel64/gcc4.1",
+      "name": "LIBRARY_PATH"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/pstl",
+      "name": "PSTLROOT"
+    },
+    {
+      "value": "/home/rafiisla/amber17",
+      "name": "AMBER17"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/bin:/opt/ohpc/pub/libs/intel/python2/2.7.14/libexec/gnuplot/5.0:/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/bin:/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/bin:/opt/ohpc/pub/libs/intel/impi/lammps/16Mar18/bin:/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/bin_ohpc:/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/bin:/opt/intel/compilers_and_libraries_2018.3.222/linux/bin/intel64:/home/rafiisla/amber17/bin:/export/uge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin",
+      "name": "SGE_O_PATH"
+    },
+    {
+      "value": "compute-8-52",
+      "name": "__SGE_PREFIX__O_HOST"
+    },
+    {
+      "name": "LS_COLORS"
+    },
+    {
+      "value": "1.10.1",
+      "name": "LMOD_FAMILY_HDF5_VERSION"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl",
+      "name": "MKLROOT"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/python2/2.7.14/share/man}:/opt/ohpc/pub/libs/intel/impi/netcdf/4.5.0/share/man:/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/man::/opt/intel/documentation_2018/en/debugger/gdb-ia/man:/opt/intel/documentation_2018/en/debugger/gdb-igfx/man:/export/uge/man:/usr/share/man:/usr/local/share/man",
+      "name": "MANPATH"
+    },
+    {
+      "value": "6554",
+      "name": "SGE_QMASTER_PORT"
+    },
+    {
+      "value": "BATCH",
+      "name": "ENVIRONMENT"
+    },
+    {
+      "value": "quanah",
+      "name": "SHOST"
+    },
+    {
+      "value": "en_US.UTF-8",
+      "name": "LANG"
+    },
+    {
+      "value": "JOBNAME",
+      "name": "JOB_NAME"
+    },
+    {
+      "value": "/opt/ohpc/username/lmod/lmod",
+      "name": "LMOD_PKG"
+    },
+    {
+      "value": "() {  eval $($LMOD_DIR/ml_cmd \"$@\")\n}",
+      "name": "BASH_FUNC_ml()"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1/lib",
+      "name": "HDF5_LIB"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/compiler/lib/intel64/locale/%l_%t/%N:1;/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl/lib/intel64_lin/locale/%l_%t/%N:1;/opt/intel/debugger_2018/gdb/intel64/share/locale/%l_%t/%N:1",
+      "name": "__LMOD_REF_COUNT_NLSPATH"
+    },
+    {
+      "value": "/opt/ohpc/pub/libs/intel/impi/hdf5/1.10.1",
+      "name": "HDF5_DIR"
+    },
+    {
+      "value": "false",
+      "name": "USE_SYSTEMD"
+    },
+    {
+      "value": "no",
+      "name": "LMOD_COLORIZE"
+    },
+    {
+      "value": "/export/uge/default/spool/compute-8-52/compute-8-52/job_scripts/1259640",
+      "name": "JOB_SCRIPT"
+    },
+    {
+      "value": "undefined",
+      "name": "SGE_TASK_FIRST"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/mkl/bin/pkgconfig:1",
+      "name": "__LMOD_REF_COUNT_PKG_CONFIG_PATH"
+    },
+    {
+      "value": "intel/18.0.3.222:1;impi/2018.3.222:1;phdf5/1.10.1:1;lammps/16Mar18:1;netcdf/4.5.0:1;python2/2.7.14:1",
+      "name": "__LMOD_REF_COUNT_LOADEDMODULES"
+    },
+    {
+      "value": "rafiisla",
+      "name": "USER"
+    },
+    {
+      "value": "/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/mpi.jar",
+      "name": "CLASSPATH"
+    },
+    {
+      "value": "/lustre/work/rafiisla/lammps-12Dec18/src/lmp_mpi",
+      "name": "LAMMPS"
+    },
+    {
+      "value": "compute-8-52.localdomain",
+      "name": "HOSTNAME"
+    },
+    {
+      "value": "sm",
+      "name": "PE"
+    },
+    {
+      "value": "undefined",
+      "name": "SGE_TASK_ID"
+    },
+    {
+      "value": "/tmp/1259640.1.omni",
+      "name": "TMP"
+    },
+    {
+      "value": "/opt/ohpc/username/lmod/lmod",
+      "name": "MODULESHOME"
+    },
+    {
+      "value": "ZXIiXT02LHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09InB5dGhvbjIiLH0sfSxtcGF0aEE9eyIvb3B0L29ocGMvcHViL21vZHVsZWRlcHMvaW50ZWwtaW1waSIsIi9vcHQvb2hwYy9wdWIvbW9kdWxlZGVwcy9pbnRlbCIsIi9vcHQvYXBwcy9uZnMvbW9kdWxlL21vZHVsZWZpbGVzIiwiL29wdC9vaHBjL3B1Yi9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvb3B0L2FwcHMvbmZzL21vZHVsZS9tb2R1bGVmaWxlczovb3B0L29ocGMvcHViL21vZHVsZWZpbGVzIix9",
+      "name": "_ModuleTable004_"
+    },
+    {
+      "value": "/opt/intel/documentation_2018/en/debugger/gdb-ia/info:1;/opt/intel/documentation_2018/en/debugger/gdb-igfx/info:1",
+      "name": "__LMOD_REF_COUNT_INFOPATH"
+    },
+    {
+      "value": "rafiisla",
+      "name": "SGE_O_LOGNAME"
+    },
+    {
+      "value": "phdf5",
+      "name": "LMOD_FAMILY_HDF5"
+    },
+    {
+      "value": "/lustre/scratch/rafiisla/ProbeRheologyProject/PolymerGelSimulation/StrandLength40/BoxSize50/11.ProbeRheology/3.ActiveRheology/S3/0.0009/R2",
+      "name": "__SGE_PREFIX__O_WORKDIR"
+    },
+    {
+      "value": "/run/user/98742",
+      "name": "XDG_RUNTIME_DIR"
+    },
+    {
+      "value": "/home/rafiisla",
+      "name": "HOME"
+    }
+  ],
+  "user": "rafiisla",
+  "grantedPE": "mpi",
+  "ntickets": 1.256701769784945e-05,
+  "softRequestedQueues": [],
+  "parallelEnv": "mpi",
+  "mailOpt": {
+    "begin": false,
+    "abort": false,
+    "suspend": false,
+    "end": false
+  },
+  "jc_name": null,
+  "project": "quanah",
+  "checkpointEnv": null,
+  "command": "script.sh",
+  "npri": 5.000126670176979,
+  "resources": {
+    "soft": [],
+    "hard": [
+      {
+        "value": "172800",
+        "name": "h_rt"
+      },
+      {
+        "value": "172800",
+        "name": "s_rt"
+      },
+      {
+        "value": "5.3G",
+        "name": "h_vmem"
+      }
+    ]
+  },
+  "tasks": [],
+  "contextVars": [],
+  "parallelEnvRange": "360",
+  "hardRequestedQueues": [
+    "omni"
+  ],
+  "usage": {
+    "ioops": 0,
+    "wallclock": 0,
+    "vmem": 0,
+    "maxvmem": 0,
+    "iow": 0,
+    "mem": 0,
+    "io": 0,
+    "cpu": 0
+  },
+  "department": "defaultdepartment",
+  "account": "sge",
+  "name": "GL40.S3.0.0009.R2",
+  "nurg": 1,
+  "queue": "omni@compute-8-60.localdomain",
+  "slots": 360,
+  "jobid": 1259653
+}
