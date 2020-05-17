@@ -1,0 +1,39 @@
+influxdb:
+    host: 'localhost'
+    port: '8086'
+    user: 'root'
+    password: '1234'
+    database: 'slurmdb'
+  
+slurm_freq:
+  1
+
+slurm_metrics:
+  job:
+    - submit_time
+    - start_time
+    - suspend_time
+    - end_time
+    - run_time
+    - job_state
+    - nodes
+    - num_cpus
+    - num_nodes
+    - user_id
+  node:
+    - cpus
+    - cores
+    - sockets
+    - free_mem
+    - real_memory
+    - cpu_load
+    - threads
+    - current_watts
+    - consumed_energy
+    - state
+  statistics:
+    - jobs_submitted
+    - jobs_started
+    - jobs_completed
+    - jobs_canceled
+    - jobs_failed
