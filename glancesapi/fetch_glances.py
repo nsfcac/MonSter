@@ -6,7 +6,7 @@ from classes.AsyncRequests import AsyncRequests
 from monster.helper import parse_config, parse_hostlist
 
 
-def fetch_glances(hostlist: list) -> object:
+def fetch_glances() -> object:
     config = parse_config('../config.yml')
     try:
         api = config["glances"]["api"]
@@ -21,4 +21,4 @@ def fetch_glances(hostlist: list) -> object:
         print(e)
 
 
-# fetch_glances()
+fetch_glances()
