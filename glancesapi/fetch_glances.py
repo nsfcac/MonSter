@@ -1,4 +1,6 @@
 import json
+import sys
+sys.path.append('../')
 
 from classes.AsyncRequests import AsyncRequests
 from monster.helper import parse_config, parse_hostlist
