@@ -27,7 +27,7 @@ class AsyncioRequests:
         except (TimeoutError):
             self.retry += 1
             if self.retry >= self.max_retries:
-                raise TimeoutError()
+                return {}
             return await self.__fetch_json(url, session)
 
 
