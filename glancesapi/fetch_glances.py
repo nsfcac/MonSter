@@ -19,6 +19,7 @@ def fetch_glances() -> object:
         glances = AsyncioRequests()
         metrics = glances.bulk_fetch(urls)
 
+        print(metrics[0])
         process = ProcessGlances(metrics[0], hosts[0])
         datapoints = process.get_datapoints()
         print(datapoints)
