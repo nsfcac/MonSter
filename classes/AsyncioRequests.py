@@ -6,9 +6,10 @@ class AsyncioRequests:
     Asyncio requests to urls
     """
     import aiohttp
-    from asyncio import gather
+    import asyncio
     from aiohttp import ClientSession
-
+    loop = asyncio.get_event_loop()
+    gather = asyncio.gather()
 
     def __init__(self):
         self.result = []
@@ -24,10 +25,15 @@ class AsyncioRequests:
         return json
 
 
-    async def request(self, urls: list) -> list:
+    async def __requests(self, urls: list) -> list:
         async with self.ClientSession() as session:
             tasks = []
             for url in urls:
                 tasks.append(self.__fetch_json(url=url, session=session))
-            self.result = await self.gather(*tasks)
+            return await self.gather(*tasks)
+
+
+    def bulk_fetch(self, urls: list) -> list:
+        self.result = self.loop.run_until_complete(self.__requests(urls))
+        self.loop.close()
         return self.result
