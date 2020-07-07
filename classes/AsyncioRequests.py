@@ -15,7 +15,7 @@ class AsyncioRequests:
         self.loop = self.asyncio.get_event_loop()
         self.timeout = self.aiohttp.ClientTimeout(connect=timeout[0], total=timeout[1])
         self.max_retries = max_retries
-        if auth:
+        if not auth[0] and not auth[1]:
             self.auth = self.aiohttp.BasicAuth(login = auth[0], password = auth[1])
         else:
             self.auth = None
