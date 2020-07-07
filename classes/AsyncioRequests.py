@@ -16,6 +16,7 @@ class AsyncioRequests:
         self.timeout = self.aiohttp.ClientTimeout(connect=timeout[0], total=timeout[1])
         self.max_retries = max_retries
     
+    
     async def __fetch_json(self, url: str, session: ClientSession) -> dict:
         """
         Get request wrapper to fetch json data from API
