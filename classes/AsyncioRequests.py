@@ -13,9 +13,12 @@ class AsyncioRequests:
     def __init__(self, auth: tuple = (), timeout: tuple = (15, 45), max_retries: int = 3):
         self.retry = 0
         self.loop = self.asyncio.get_event_loop()
-        self.auth = self.aiohttp.BasicAuth(*auth)
         self.timeout = self.aiohttp.ClientTimeout(*timeout)
         self.max_retries = max_retries
+        if auth:
+            self.auth = self.aiohttp.BasicAuth(*auth)
+        else:
+            self.auth = None
         print(self.auth)
     
     
