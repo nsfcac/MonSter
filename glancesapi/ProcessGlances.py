@@ -45,11 +45,11 @@ class ProcessGlances():
         """
         Return all datapoints
         """
-        self.process_cpu
-        self.process_memory
-        self.process_network
-        self.process_diskio
-        self.process_sensors
+        self.process_cpu()
+        self.process_memory()
+        self.process_network()
+        self.process_diskio()
+        self.process_sensors()
 
         return self.datapoints
 
