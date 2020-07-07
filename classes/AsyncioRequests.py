@@ -10,9 +10,10 @@ class AsyncioRequests:
     from aiohttp import ClientSession
 
 
-    def __init__(self, timeout: tuple = (15, 45), max_retries: int = 3):
+    def __init__(self, auth: tuple = (None, None), timeout: tuple = (15, 45), max_retries: int = 3):
         self.retry = 0
         self.loop = self.asyncio.get_event_loop()
+        self.auth = self.aiohttp.BasicAuth(login = auth[0], password = auth[1])
         self.timeout = self.aiohttp.ClientTimeout(connect=timeout[0], total=timeout[1])
         self.max_retries = max_retries
     
@@ -35,7 +36,7 @@ class AsyncioRequests:
 
 
     async def __requests(self, urls: list) -> list:
-        async with self.ClientSession(timeout = self.timeout) as session:
+        async with self.ClientSession(auth = self.auth, timeout = self.timeout) as session:
             tasks = []
             for url in urls:
                 tasks.append(self.__fetch_json(url=url, session=session))
