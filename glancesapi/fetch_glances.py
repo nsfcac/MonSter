@@ -16,7 +16,7 @@ def fetch_glances() -> object:
         urls = ["http://" + host + ":" + str(port) + api for host in hosts]
 
         glances = AsyncioRequests()
-        result = glances.requests(urls)
+        result = glances.request(urls)
         print(result)
     except Exception as e:
         print(e)
