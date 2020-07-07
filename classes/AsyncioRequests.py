@@ -8,12 +8,11 @@ class AsyncioRequests:
     import aiohttp
     import asyncio
     from aiohttp import ClientSession
-    # gather = asyncio.gather()
-    # loop = asyncio.get_event_loop()
-    # wait = asyncio.wait()
 
-    def __init__(self):
+
+    def __init__(self, timeout: tuple = (15, 45)):
         self.loop = self.asyncio.get_event_loop()
+        self.timeout = self.aiohttp.ClientTimeout(connect=timeout[0], total=timeout[1])
     
     async def __fetch_json(self, url: str, session: ClientSession) -> dict:
         """
@@ -25,7 +24,7 @@ class AsyncioRequests:
 
 
     async def __requests(self, urls: list) -> list:
-        async with self.ClientSession() as session:
+        async with self.ClientSession(timeout = self.timeout) as session:
             tasks = []
             for url in urls:
                 tasks.append(self.__fetch_json(url=url, session=session))
