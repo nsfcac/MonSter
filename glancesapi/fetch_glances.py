@@ -19,10 +19,9 @@ def fetch_glances() -> object:
         glances = AsyncioRequests()
         metrics = glances.bulk_fetch(urls)
 
-        print(metrics[0])
         process = ProcessGlances(metrics[0], hosts[0])
         datapoints = process.get_datapoints()
-        print(datapoints)
+        print(json.dumps(datapoints, indent = 4))
 
     except Exception as e:
         print(e)
