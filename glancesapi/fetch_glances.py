@@ -1,4 +1,5 @@
 import json
+import asyncio
 import sys
 sys.path.append('../')
 
@@ -15,8 +16,10 @@ def fetch_glances() -> object:
 
         urls = ["http://" + host + ":" + str(port) + api for host in hosts]
 
+        loop = asyncio.get_event_loop()
         glances = AsyncioRequests()
-        result = glances.request(urls)
+        result = loop.run_until_complete(glances.request(urls))
+        
         print(result)
     except Exception as e:
         print(e)
