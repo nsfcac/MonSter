@@ -29,6 +29,8 @@ class AsyncioRequests:
             if self.retry >= self.max_retries:
                 return {}
             return await self.__fetch_json(url, session)
+        except:
+            return {}
 
 
     async def __requests(self, urls: list) -> list:
