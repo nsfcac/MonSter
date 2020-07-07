@@ -13,8 +13,7 @@ class AsyncioRequests:
     # wait = asyncio.wait()
 
     def __init__(self):
-        self.result = []
-
+        self.loop = self.asyncio.get_event_loop()
     
     async def __fetch_json(self, url: str, session: ClientSession) -> dict:
         """
@@ -22,8 +21,7 @@ class AsyncioRequests:
         """
         resp = await session.request(method='GET', url=url)
         resp.raise_for_status()
-        json = await resp.json()
-        return json
+        return await resp.json()
 
 
     async def __requests(self, urls: list) -> list:
@@ -35,6 +33,4 @@ class AsyncioRequests:
 
 
     def bulk_fetch(self, urls: list) -> list:
-        loop = self.asyncio.get_event_loop()
-        self.result = loop.run_until_complete(self.asyncio.wait(self.__requests(urls)))
-        return self.result
+        return self.loop.run_until_complete(self.__requests(urls))
