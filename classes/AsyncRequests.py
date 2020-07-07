@@ -14,7 +14,8 @@ class AsyncRequests:
     """
     Async requests to urls
     """
-    def __init__(self, ssl_verify=False, max_retries=3, timeout=(15, 45), auth=()):
+    def __init__(self, ssl_verify: bool = False, max_retries: int = 3,
+                 timeout: tuple = (15, 45), auth: tuple = ()):
         self.result = []
         self.ssl_verify = ssl_verify
         self.max_retries = max_retries
