@@ -14,12 +14,12 @@ class AsyncRequests:
     """
     Async requests to urls
     """
-    def __init__(self, ssl_verify: bool, max_retries: int, timeout: tuple, auth: tuple):
+    def __init__(self, ssl_verify=False, max_retries=3, timeout=(15, 45), auth=()):
         self.result = []
-        self.ssl_verify = False
-        self.max_retries = 3
-        self.timeout = (15, 45)
-        self.auth = ()
+        self.ssl_verify = ssl_verify
+        self.max_retries = max_retries
+        self.timeout = timeout
+        self.auth = auth
 
 
     def requests(self, urls: list) -> list:
