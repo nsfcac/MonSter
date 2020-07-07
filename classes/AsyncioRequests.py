@@ -8,8 +8,9 @@ class AsyncioRequests:
     import aiohttp
     import asyncio
     from aiohttp import ClientSession
-    run = asyncio.run()
-    gather = asyncio.gather()
+    # gather = asyncio.gather()
+    # loop = asyncio.get_event_loop()
+    # wait = asyncio.wait()
 
     def __init__(self):
         self.result = []
@@ -30,9 +31,10 @@ class AsyncioRequests:
             tasks = []
             for url in urls:
                 tasks.append(self.__fetch_json(url=url, session=session))
-            return await self.gather(*tasks)
+            return await self.asyncio.gather(*tasks)
 
 
     def bulk_fetch(self, urls: list) -> list:
-        self.result = self.run(self.__requests(urls=urls))
+        loop = self.asyncio.get_event_loop()
+        self.result = loop.run_until_complete(self.asyncio.wait(self.__requests(urls)))
         return self.result
