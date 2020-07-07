@@ -41,20 +41,7 @@ class ProcessGlances():
         return datapoint
     
 
-    def get_datapoints(self) -> list:
-        """
-        Return all datapoints
-        """
-        self.process_cpu()
-        self.process_memory()
-        self.process_network()
-        self.process_diskio()
-        self.process_sensors()
-
-        return self.datapoints
-
-
-    def process_cpu(self) -> None:
+    def __process_cpu(self) -> None:
         """
         Process total CPU usage for each CPU, in %
         """
@@ -70,7 +57,7 @@ class ProcessGlances():
         return
 
     
-    def process_memory(self) -> None:
+    def __process_memory(self) -> None:
         """
         Process total memory usage for each node, in %
         """
@@ -84,7 +71,7 @@ class ProcessGlances():
         return
 
 
-    def process_network(self) -> None:
+    def __process_network(self) -> None:
         """
         Process network interface bit rate each node, in bit/s.
         tx: transmit, rx: receive
@@ -109,7 +96,7 @@ class ProcessGlances():
         return
 
     
-    def process_diskio(self) -> None:
+    def __process_diskio(self) -> None:
         """
         Process disk IO throughput, in Bytes/s. Accumulate sda and sdb IO
         """
@@ -129,7 +116,7 @@ class ProcessGlances():
         return
     
 
-    def process_sensors(self) -> None:
+    def __process_sensors(self) -> None:
         """
         Process sensors information, in Celsius. Deduplicated repeated items.
         """
@@ -145,6 +132,19 @@ class ProcessGlances():
                     datapoint = self.__gen_datapoint(measurement, label, value)
                     self.datapoints.append(datapoint)
         return
+    
+
+    def get_datapoints(self) -> list:
+        """
+        Return all datapoints
+        """
+        self.__process_cpu()
+        self.__process_memory()
+        self.__process_network()
+        self.__process_diskio()
+        self.__process_sensors()
+
+        return self.datapoints
 
 # curl http://10.10.1.4:61208/api/3/pluginslist | python -m json.tool
 # curl http://10.10.1.4:61208/api/3/percpu | python -m json.tool
