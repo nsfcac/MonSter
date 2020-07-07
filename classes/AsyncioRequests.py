@@ -19,7 +19,6 @@ class AsyncioRequests:
             self.auth = self.aiohttp.BasicAuth(*auth)
         else:
             self.auth = None
-        print(self.auth)
     
     
     async def __fetch_json(self, url: str, session: ClientSession) -> dict:
