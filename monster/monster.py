@@ -21,7 +21,7 @@ prev_joblist = []
 
 
 def main():
-    config = parse_config()
+    config = parse_config('../config.yml')
 
     # Check sanity
     if not check_config(config):

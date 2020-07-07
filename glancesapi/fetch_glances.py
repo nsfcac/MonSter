@@ -1,19 +1,22 @@
 import json
 
 from classes.AsyncRequests import AsyncRequests
+from monster.helper import parse_config, parse_hostlist
 
-glances_url = "http://10.10.1.4:61208/api/3/all"
 
+def fetch_glances(hostlist: list) -> object:
+    config = parse_config('../config.yml')
+    try:
+        api = config["glances"]["api"]
+        port = config["glances"]["port"]
+        hosts = parse_hostlist(config["glances"]["hosts"])
 
-# def fetch_glances(hostlist: list) -> object:
+        urls = ["http://" + host + ":" + str(port) + api for host in hosts]
 
-def generate_urls(hostlist: list) -> list:
-    """
-    Generate query urls according to the Glances RESTful JSON API:
-    https://github.com/nicolargo/glances/wiki/The-Glances-RESTFULL-JSON-API
-    """
-    urls = ["http://" + host + ":61208/api/3/all" for host in hostlist]
-    return urls
+        glances = AsyncRequests()
+        result = glances.requests(urls)
+    except Exception as e:
+        print(e)
 
 
 # fetch_glances()
