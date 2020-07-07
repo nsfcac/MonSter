@@ -3,6 +3,7 @@ import sys
 sys.path.append('../')
 
 from classes.AsyncioRequests import AsyncioRequests
+from glancesapi.ProcessGlances import ProcessGlances
 from monster.helper import parse_config, parse_hostlist
 
 
@@ -16,9 +17,12 @@ def fetch_glances() -> object:
         urls = ["http://" + host + ":" + str(port) + api for host in hosts]
 
         glances = AsyncioRequests()
-        result = glances.bulk_fetch(urls)
+        metrics = glances.bulk_fetch(urls)
 
-        print(result)
+        process = ProcessGlances(metrics[0], hosts[0])
+        datapoints = process.get_datapoints()
+        print(datapoints)
+
     except Exception as e:
         print(e)
 
