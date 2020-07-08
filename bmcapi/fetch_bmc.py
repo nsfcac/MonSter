@@ -28,15 +28,15 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         cores= multiprocessing.cpu_count()
 
-        query_start = time.time()
+        # query_start = time.time()
 
         thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
         power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
         bmc_health_metrics = parallel_fetch(bmc_config, bmc_health_urls, nodes, cores)
         sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
 
-        total_elapsed = float("{0:.2f}".format(time.time() - query_start))
-        print(f"Time elapsed: {total_elapsed}")
+        # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
+        # print(f"Time elapsed: {total_elapsed}")
 
         metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
 
@@ -86,6 +86,9 @@ def parallel_fetch(bmc_config: dict, urls: list, nodes: list, cores: int) -> lis
 
 
 def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
+    """
+    Use AsyncioRequests to query urls
+    """
     bmc = AsyncioRequests(auth=(bmc_config['user'], bmc_config['password']),
                           timeout=(bmc_config['timeout']['connect'], bmc_config['timeout']['read']),
                           max_retries=bmc_config['max_retries'])
