@@ -1,16 +1,18 @@
 import json
 import multiprocessing
-import sys
 import time
+from itertools import repeat
+import sys
 sys.path.append('../')
 
 from classes.AsyncioRequests import AsyncioRequests
+from bmcapi.ProcessThermal import ProcessThermal
 from monster.helper import parse_nodelist
 
 
 def fetch_bmc(bmc_config: dict) -> list:
     """
-    fetch iDrac metrics from Redfish API. 
+    fetch metrics from Redfish API. 
     Examples of using Redfish API:
     curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k | jq '.'
     """
@@ -30,6 +32,7 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         # query_start = time.time()
 
+        # Parallel fetch metrics
         thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
         power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
         bmc_health_metrics = parallel_fetch(bmc_config, bmc_health_urls, nodes, cores)
@@ -38,9 +41,12 @@ def fetch_bmc(bmc_config: dict) -> list:
         # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
         # print(f"Time elapsed: {total_elapsed}")
 
-        metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
+        # Parallel process metrics
+        thermal_dpoints = parallel_process(thermal_metrics, "thermal")
 
-        print(json.dumps(metrics, indent=4))
+        # metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
+
+        print(json.dumps(thermal_dpoints, indent=4))
     except Exception as e:
         print(e)
 
@@ -94,3 +100,33 @@ def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
                           max_retries=bmc_config['max_retries'])
     bmc_metrics = bmc.bulk_fetch(urls, nodes)
     return bmc_metrics
+
+
+def parallel_process(node_metrics: list, category: str) -> list:
+    process_args = zip(node_metrics, repeat(category))
+    with multiprocessing.Pool() as pool:
+        datapoints = pool.starmap(process, process_args)
+    flat_datapoints = [item for sublist in datapoints for item in sublist]
+    return flat_datapoints
+    
+
+def process(node_metric: dict, category: str) -> list:
+    """
+    Process metrics accroding to its category
+    """
+    datapoints = []
+
+    if category == "thermal":
+        process = ProcessThermal(node_metric)
+    elif category == "power":
+        pass
+    elif category == "bmc_health":
+        pass
+    elif category == "sys_health":
+        pass
+    else:
+        return datapoints
+
+    datapoints = process.get_datapoints()
+
+    return datapoints
