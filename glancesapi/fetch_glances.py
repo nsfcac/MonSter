@@ -44,12 +44,3 @@ def process_metric(node_metric: dict) -> list:
     process = ProcessGlances(node_metric)
     datapoints = process.get_datapoints()
     return datapoints
-
-
-glances_config = {
-    'api': '/api/3/all',
-    'port': 61208,
-    'nodes': '10.10.1/4'
-}
-datapoints = fetch_glances(glances_config)
-print(json.dumps(datapoints, indent=4))
