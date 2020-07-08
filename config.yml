@@ -1,5 +1,5 @@
 influxdb:
-  host: '10.10.1.3'
+  node: '10.10.1.3'
   port: '8086'
   user: 'lijie'
   password: 'li29729'
@@ -15,7 +15,7 @@ redfish:
     read: 45
   max_retries: 2
   ssl_verify: False   # Secure Sockets Layer Verify
-  hostlist:
+  nodelist:
     - '10.101.1/1-60'
     - '10.101.2/1-60'
     - '10.101.3/1-56'
@@ -28,7 +28,7 @@ redfish:
     - '10.101.10/25-44'
 
 uge:
-  host: '129.118.104.35'
+  node: '129.118.104.35'
   port: '8182'
   user: 'username'
   password: 'password'
@@ -37,10 +37,10 @@ uge:
     read: 6
   max_retries: 2
   ssl_verify: False
-  computing_hosts: 467
+  computing_nodes: 467
 
 glances:
   api: '/api/3/all'
   port: 61208
-  hosts:
+  nodes:
     - '10.10.1/4'  
