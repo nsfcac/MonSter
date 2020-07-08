@@ -42,11 +42,9 @@ def fetch_bmc(bmc_config: dict) -> list:
         # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
         # print(f"Time elapsed: {total_elapsed}")
 
-        print(json.dumps(power_metrics, indent=4))
-
         # # Parallel process metrics
         # thermal_points = parallel_process(thermal_metrics, "thermal")
-        # power_points = parallel_process(power_metrics, "power")
+        power_points = parallel_process(power_metrics, "power")
         
         # print(json.dumps(power_points, indent=4))
         # metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
