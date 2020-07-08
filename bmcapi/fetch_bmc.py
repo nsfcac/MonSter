@@ -46,7 +46,7 @@ def fetch_bmc(bmc_config: dict) -> list:
         # thermal_points = parallel_process(thermal_metrics, "thermal")
         power_points = parallel_process(power_metrics, "power")
         
-        # print(json.dumps(power_points, indent=4))
+        print(json.dumps(power_points, indent=4))
         # metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
 
     except Exception as e:
