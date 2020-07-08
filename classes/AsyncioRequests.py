@@ -42,6 +42,7 @@ class AsyncioRequests:
         async with self.ClientSession(auth = self.auth, timeout = self.timeout) as session:
             tasks = []
             for i, url in enumerate(urls):
+                print(url)
                 tasks.append(self.__fetch_json(url=url, host=hosts[i], session=session))
             return await self.asyncio.gather(*tasks)
 
