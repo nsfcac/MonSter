@@ -41,8 +41,13 @@ def fetch_bmc(bmc_config: dict) -> list:
         # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
         # print(f"Time elapsed: {total_elapsed}")
 
+        query_start = time.time()
+
         # Parallel process metrics
         thermal_dpoints = parallel_process(thermal_metrics, "thermal")
+
+        total_elapsed = float("{0:.2f}".format(time.time() - query_start))
+        print(f"Time elapsed: {total_elapsed}")
 
         # metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
 
@@ -108,7 +113,7 @@ def parallel_process(node_metrics: list, category: str) -> list:
         datapoints = pool.starmap(process, process_args)
     flat_datapoints = [item for sublist in datapoints for item in sublist]
     return flat_datapoints
-    
+
 
 def process(node_metric: dict, category: str) -> list:
     """
