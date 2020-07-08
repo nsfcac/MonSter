@@ -11,6 +11,7 @@ class AsyncioRequests:
 
 
     def __init__(self, auth: tuple = (), timeout: tuple = (15, 45), max_retries: int = 3):
+        self.metrics = {}
         self.retry = 0
         self.loop = self.asyncio.get_event_loop()
         self.timeout = self.aiohttp.ClientTimeout(*timeout)
@@ -28,9 +29,7 @@ class AsyncioRequests:
         try:
             resp = await session.request(method='GET', url=url)
             resp.raise_for_status()
-            json = await resp.json()
-            return await {host: json}
-            # return await resp.json()
+            return await resp.json()
         except (TimeoutError):
             self.retry += 1
             if self.retry >= self.max_retries:
@@ -49,4 +48,6 @@ class AsyncioRequests:
 
 
     def bulk_fetch(self, urls: list, hosts: list) -> list:
-        return self.loop.run_until_complete(self.__requests(urls, hosts))
+        self.metrics =  self.loop.run_until_complete(self.__requests(urls, hosts))
+        self.loop.close()
+        return self.metrics
