@@ -67,5 +67,5 @@ def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
                           timeout=(bmc_config['timeout']['connect'], bmc_config['timeout']['read']),
                           max_retries=bmc_config['max_retries'])
     bmc_metrics = bmc.bulk_fetch(urls, nodes)
-    print(json.dumps(bmc_metrics))
+    print(json.dumps(bmc_metrics, indent=4))
     return
