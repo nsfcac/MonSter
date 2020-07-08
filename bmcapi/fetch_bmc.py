@@ -34,24 +34,26 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         # Parallel fetch metrics
         thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
-        power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
-        bmc_health_metrics = parallel_fetch(bmc_config, bmc_health_urls, nodes, cores)
-        sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
+        # power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
+        # bmc_health_metrics = parallel_fetch(bmc_config, bmc_health_urls, nodes, cores)
+        # sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
+
+        print(json.dumps(thermal_metrics, indent=4))
 
         # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
         # print(f"Time elapsed: {total_elapsed}")
 
-        query_start = time.time()
+        # query_start = time.time()
 
-        # Parallel process metrics
-        thermal_dpoints = parallel_process(thermal_metrics, "thermal")
+        # # Parallel process metrics
+        # thermal_dpoints = parallel_process(thermal_metrics, "thermal")
 
-        total_elapsed = float("{0:.2f}".format(time.time() - query_start))
-        print(f"Time elapsed: {total_elapsed}")
+        # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
+        # print(f"Time elapsed: {total_elapsed}")
 
         # metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
 
-        print(json.dumps(thermal_dpoints, indent=4))
+        # print(json.dumps(thermal_dpoints, indent=4))
     except Exception as e:
         print(e)
 
