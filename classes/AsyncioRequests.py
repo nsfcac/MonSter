@@ -28,7 +28,9 @@ class AsyncioRequests:
         try:
             resp = await session.request(method='GET', url=url)
             resp.raise_for_status()
-            return await resp.json()
+            json = await resp.json()
+            return await {host: json}
+            # return await resp.json()
         except (TimeoutError):
             self.retry += 1
             if self.retry >= self.max_retries:
