@@ -1,4 +1,7 @@
 import json
+import sys
+sys.path.append('../../')
+
 from glancesapi.fetch_glances import *
 
 glances_config = {
