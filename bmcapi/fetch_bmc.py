@@ -1,140 +1,71 @@
 import json
-import time
-import logging
 import multiprocessing
-import threading
-thread_local = threading.local()
+import sys
+sys.path.append('../')
 
-from queue import Queue
-from itertools import repeat
-import requests
-from requests.adapters import HTTPAdapter
-from requests.auth import HTTPBasicAuth
-
-from bmcapi.process_bmc import process_bmc_metrics
-
-import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from classes.AsyncioRequests import AsyncioRequests
+from monster.helper import parse_nodelist
 
 
-def fetch_bmc(config: object, hostlist: list) -> object:
+def fetch_bmc(bmc_config: dict) -> list:
     """
-    Fetch bmc metrics from Redfish, average query and process time is: 49.97s
+    fetch iDrac metrics from Redfish API. 
+    Examples of using Redfish API:
+    curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k | jq '.'
     """
+    try:
+        thermal_api = bmc_config["apis"]["thermal"]
+        power_api = bmc_config["apis"]["power"]
+        bmc_health_api = bmc_config["apis"]["bmc_health"]
+        sys_health_api = bmc_config["apis"]["sys_health"]
+        nodes = parse_nodelist(bmc_config["nodelist"])
 
-    all_bmc_points = []
+        thermal_urls = ["https://" + node + thermal_api for node in nodes]
+        power_urls = ["https://" + node + power_api for node in nodes]
+        bmc_health_urls = ["https://" + node + bmc_health_api for node in nodes]
+        sys_health_urls = ["https://" + node + sys_health_api for node in nodes]
 
-    cores= multiprocessing.cpu_count()
-    urls = generate_urls(hostlist)
+        # cores= multiprocessing.cpu_count()
+        # parallel_fetch(thermal_urls, nodes, cores)
 
-    # Paritition urls
-    urls_set = []
-    urls_per_core = len(urls) // cores
-    surplux_urls = len(urls) % cores
+        fetch(bmc_config, thermal_urls[:50], nodes[:50])
+    except Exception as e:
+        print(e)
+
+
+def partition(arr:list, cores: int) -> list:
+    """
+    Partition urls/nodes into several groups based on # of cores
+    """
+    groups = []
+    arr_len = len(arr)
+    arr_per_core = arr_len // cores
+    arr_surplus = arr_len % cores
+
     increment = 1
     for i in range(cores):
-        if(surplux_urls != 0 and i == (cores-1)):
-            urls_set.append(urls[i * urls_per_core:])
+        if(arr_surplus != 0 and i == (cores-1)):
+            groups.append(arr[i * arr_per_core:])
         else:
-            urls_set.append(urls[i * urls_per_core : increment * urls_per_core])
+            groups.append(arr[i * arr_per_core : increment * arr_per_core])
             increment += 1
-
-    bmc_metrics = []
-    epoch_time = int(round(time.time() * 1000000000))
-
-    # Query BMC metrics
-    with multiprocessing.Pool(processes=cores) as pool:
-        responses = [pool.apply_async(get_bmc_thread, args = (config, bmc_urls)) for bmc_urls in urls_set]
-    
-        for response in responses:
-            bmc_metrics += response.get()
-    
-    # Generate data points
-    process_bmc_args = zip(bmc_metrics, repeat(epoch_time))
-    with multiprocessing.Pool(processes=cores) as pool:
-        bmc_points_set = pool.starmap(process_bmc_metrics, process_bmc_args)
-
-    for points_set in bmc_points_set:
-        all_bmc_points += points_set
-
-    return all_bmc_points
+    return groups
 
 
-def get_bmc_thread(config: dict, bmc_urls: list) -> list:
-    q = Queue(maxsize=0)
-    bmc_metrics = [{} for url in bmc_urls]
-    try:
-        for i in range(len(bmc_urls)):
-            q.put((i, bmc_urls[i]))
-        
-        for i in range(len(bmc_urls)):
-            worker = threading.Thread(target=get_bmc_detail, args=(q, config, bmc_metrics))
-            worker.setDaemon(True)
-            worker.start()
-        
-        q.join()
-
-    except Exception as err:
-        logging.error(err)
-    
-    return bmc_metrics
-
-def get_bmc_detail(q: object, config: dict, bmc_metrics: list) -> None:
-    while not q.empty():
-        work = q.get()
-        index = work[0]
-        bmc_url = work[1]
-        
-        bmcapi_adapter = HTTPAdapter(max_retries=config["max_retries"])
-        host_ip = bmc_url.split("/")[2]
-        feature = bmc_url.split("/")[-2]
-        details = {}
-        try:
-            session = get_session()
-            session.mount(bmc_url, bmcapi_adapter)
-            bmc_response = session.get(
-                bmc_url, verify = config["ssl_verify"], 
-                timeout = (config["timeout"]["connect"], config["timeout"]["read"]),
-                auth=HTTPBasicAuth(config["user"], config["password"])
-            )
-            details = bmc_response.json()
-        except:
-            logging.error("Cannot get BMC metrics from: %s", bmc_url)
-
-        metric = {
-            "host": host_ip,
-            "feature": feature,
-            "details": details
-        }
-        
-        bmc_metrics[index] = metric
-        q.task_done()
-    return True
-
-def generate_urls(hostlist:list) -> list:
-    # Testing cmd
-    # curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k
-    urls = []
-    # Thermal URLS
-    for host in hostlist:
-        thermal_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Thermal/"
-        urls.append(thermal_url)
-    # Power
-    for host in hostlist:
-        power_url = "https://" + host + "/redfish/v1/Chassis/System.Embedded.1/Power/"
-        urls.append(power_url)
-    # BMC health
-    for host in hostlist:
-        bmc_health_url = "https://" + host + "/redfish/v1/Managers/iDRAC.Embedded.1"
-        urls.append(bmc_health_url)
-    # System health
-    for host in hostlist:
-        system_health_url = "https://" + host + "/redfish/v1/Systems/System.Embedded.1"
-        urls.append(system_health_url)
-    return urls
+def parallel_fetch(urls: list, nodes: list, cores: int) -> list:
+    """
+    Spread fetching across cores
+    """
+    # Partition
+    urls_group = partition(urls, cores)
+    nodes_group = partition(nodes, cores)
+    return
 
 
-def get_session():
-    if not hasattr(thread_local, "session"):
-        thread_local.session = requests.Session()
-    return thread_local.session
+def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
+    bmc = AsyncioRequests(auth=(bmc_config['user'], bmc_config['password']),
+                          timeout=(bmc_config['timeout']['connect'], bmc_config['timeout']['read']),
+                          max_retries=bmc_config['max_retries'])
+    bmc_metrics = bmc.bulk_fetch(urls, nodes)
+    print(json.dumps(bmc_metrics))
+    return
