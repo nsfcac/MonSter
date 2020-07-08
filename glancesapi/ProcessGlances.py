@@ -4,10 +4,12 @@ from dateutil.parser import parse
 
 
 class ProcessGlances():
-    """Generate data points from the glances API metrics"""
+    """
+    Generate data points from the glances API metrics
+    """
 
 
-    def __init__(self, node_metrics: dict) -> list:
+    def __init__(self, node_metrics: dict) -> None:
         self.datapoints = []
         self.node_id = node_metrics["node"]
         self.metrics = node_metrics["metrics"]
