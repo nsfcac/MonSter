@@ -1,6 +1,7 @@
 import json
 import multiprocessing
 import sys
+import time
 sys.path.append('../')
 
 from classes.AsyncioRequests import AsyncioRequests
@@ -26,9 +27,20 @@ def fetch_bmc(bmc_config: dict) -> list:
         sys_health_urls = ["https://" + node + sys_health_api for node in nodes]
 
         cores= multiprocessing.cpu_count()
-        parallel_fetch(bmc_config, thermal_urls, nodes, cores)
 
-        # fetch(bmc_config, thermal_urls[:50], nodes[:50])
+        query_start = time.time()
+
+        thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
+        power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
+        bmc_health_metrics = parallel_fetch(bmc_config, bmc_health_urls, nodes, cores)
+        sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
+
+        total_elapsed = float("{0:.2f}".format(time.time() - query_start))
+        print(f"Time elapsed: {total_elapsed}")
+
+        metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
+
+        print(json.dumps(metrics, indent=4))
     except Exception as e:
         print(e)
 
@@ -56,7 +68,7 @@ def parallel_fetch(bmc_config: dict, urls: list, nodes: list, cores: int) -> lis
     """
     Spread fetching across cores
     """
-    flat_metrics = []
+    metrics = []
     # Partition
     urls_group = partition(urls, cores)
     nodes_group = partition(nodes, cores)
@@ -70,11 +82,7 @@ def parallel_fetch(bmc_config: dict, urls: list, nodes: list, cores: int) -> lis
     with multiprocessing.Pool() as pool:
         metrics = pool.starmap(fetch, fetch_args)
 
-    flat_metrics = [item for sublist in metrics for item in sublist]
-
-    print(len(flat_metrics))
-    print(json.dumps(flat_metrics, indent=4))
-    return
+    return metrics
 
 
 def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
