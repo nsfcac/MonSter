@@ -38,7 +38,7 @@ class AsyncioRequests:
             if self.retry >= self.max_retries:
                 return {}
             return await self.__fetch_json(url, node, session)
-        except Exception as e:
+        except:
             return {}
 
 
