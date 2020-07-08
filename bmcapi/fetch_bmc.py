@@ -7,6 +7,7 @@ sys.path.append('../')
 
 from classes.AsyncioRequests import AsyncioRequests
 from bmcapi.ProcessThermal import ProcessThermal
+from bmcapi.ProcessPower import ProcessPower
 from monster.helper import parse_nodelist
 
 
@@ -34,24 +35,19 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         # Parallel fetch metrics
         thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
-        # power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
-        # bmc_health_metrics = parallel_fetch(bmc_config, bmc_health_urls, nodes, cores)
-        # sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
-
-        # print(json.dumps(thermal_metrics, indent=4))
+        power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
+        bmc_health_metrics = parallel_fetch(bmc_config, bmc_health_urls, nodes, cores)
+        sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
 
         # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
         # print(f"Time elapsed: {total_elapsed}")
 
-        query_start = time.time()
 
         # Parallel process metrics
-        thermal_dpoints = parallel_process(thermal_metrics, "thermal")
-
-        total_elapsed = float("{0:.2f}".format(time.time() - query_start))
-        print(f"Time elapsed: {total_elapsed}")
-        print(json.dumps(thermal_dpoints, indent=4))
-
+        thermal_points = parallel_process(thermal_metrics, "thermal")
+        power_points = parallel_process(power_metrics, "power")
+        
+        print(json.dumps(power_points, indent=4))
         # metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
 
     except Exception as e:
@@ -135,7 +131,7 @@ def process(node_metrics: dict, category: str) -> list:
     if category == "thermal":
         process = ProcessThermal(node_metrics)
     elif category == "power":
-        pass
+        process = ProcessPower(node_metrics)
     elif category == "bmc_health":
         pass
     elif category == "sys_health":
