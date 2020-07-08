@@ -38,7 +38,7 @@ class ProcessPower():
         """
         power_ctrl = self.metrics.get("PowerControl", None)
         if power_ctrl:
-            power_cons = power_ctrl.get("PowerConsumedWatts", None)
+            power_cons = power_ctrl[0].get("PowerConsumedWatts", None)
             if power_cons:
                 measurement = "Power"
                 label = "NodePower"
