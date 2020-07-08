@@ -66,6 +66,5 @@ class ProcessThermal():
         """
         self.__process_fans()
         self.__process_temps()
-        print(self.node_id)
         return self.datapoints
 
