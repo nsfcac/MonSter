@@ -1,4 +1,5 @@
 import json
+import multiprocessing
 import sys
 sys.path.append('../')
 
@@ -26,13 +27,22 @@ def fetch_glances() -> object:
         glances = AsyncioRequests()
         node_metrics = glances.bulk_fetch(urls, nodes)
 
-        # Process metrics and generate data points
-        process_metrics = ProcessGlances(node_metrics[0])
-        datapoints = process_metrics.get_datapoints()
-        print(json.dumps(datapoints, indent = 4))
+        # Process metrics and generate data points using multiprocessing
+        with multiprocessing.Pool() as pool:
+            all_datapoints = pool.map(process_metric, node_metrics)
+
+        # process_metrics = ProcessGlances(node_metrics[0])
+        # datapoints = process_metrics.get_datapoints()
+        print(json.dumps(all_datapoints, indent = 4))
 
     except Exception as e:
         print(e)
+
+
+def process_metric(node_metric: dict) -> list:
+    process = ProcessGlances(node_metric)
+    datapoints = process.get_datapoints()
+    return datapoints
 
 
 fetch_glances()
