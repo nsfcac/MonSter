@@ -34,13 +34,11 @@ class AsyncioRequests:
             json = await resp.json()
             return {"node": node, "metrics": json}
         except (TimeoutError):
-            print("Timeout Error")
             self.retry += 1
             if self.retry >= self.max_retries:
                 return {}
             return await self.__fetch_json(url, node, session)
         except Exception as e:
-            print(e)
             return {}
 
 
