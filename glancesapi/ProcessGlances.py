@@ -1,5 +1,6 @@
 import time
 from datetime import datetime
+from dateutil.parser import parse
 
 
 class ProcessGlances():
@@ -18,7 +19,7 @@ class ProcessGlances():
         Convert time string to epoch, if does not have a time string, return current epoch time
         """
         if time_str:
-            return int(datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S %Z").timestamp()) * 1000000
+            return int(parse(time_str).timestamp()) * 1000000
         else:
             return int(time.time()) * 1000000
 
@@ -145,6 +146,3 @@ class ProcessGlances():
         self.__process_sensors()
 
         return self.datapoints
-
-# curl http://10.10.1.4:61208/api/3/pluginslist | python -m json.tool
-# curl http://10.10.1.4:61208/api/3/percpu | python -m json.tool
