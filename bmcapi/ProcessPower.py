@@ -53,6 +53,7 @@ class ProcessPower():
         Return all datapoints
         """
         if self.metrics:
+            print(self.node_id)
             self.__process_power()
         return self.datapoints
 
