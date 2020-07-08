@@ -38,13 +38,14 @@ class ProcessPower():
         """
         power_ctrl = self.metrics.get("PowerControl", None)
         if power_ctrl:
-            power_cons = power_ctrl[0].get("PowerConsumedWatts", None)
-            if power_cons:
-                measurement = "Power"
-                label = "NodePower"
-                value = power_cons
-                datapoint = self.__gen_datapoint(measurement, label, value)
-                self.datapoints.append(datapoint)
+            for item in power_ctrl:
+                power_cons = item.get("PowerConsumedWatts", None)
+                if power_cons:
+                    measurement = "Power"
+                    label = "NodePower"
+                    value = power_cons
+                    datapoint = self.__gen_datapoint(measurement, label, value)
+                    self.datapoints.append(datapoint)
 
     
     def get_datapoints(self) -> list:
