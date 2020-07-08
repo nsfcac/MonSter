@@ -4,7 +4,7 @@ sys.path.append('../')
 
 from classes.AsyncioRequests import AsyncioRequests
 from glancesapi.ProcessGlances import ProcessGlances
-from monster.helper import parse_config, parse_hostlist
+from monster.helper import parse_config, parse_nodelist
 
 
 def fetch_glances() -> object:
@@ -18,19 +18,18 @@ def fetch_glances() -> object:
     try:
         api = config["glances"]["api"]
         port = config["glances"]["port"]
-        hosts = parse_hostlist(config["glances"]["hosts"])
+        nodes = parse_nodelist(config["glances"]["nodes"])
 
-        urls = ["http://" + host + ":" + str(port) + api for host in hosts]
+        urls = ["http://" + node + ":" + str(port) + api for node in nodes]
 
         # Asynchronously fetch glances metrics from all nodes
         glances = AsyncioRequests()
-        metrics = glances.bulk_fetch(urls, hosts)
-        print(json.dumps(metrics, indent = 4))
+        node_metrics = glances.bulk_fetch(urls, nodes)
 
         # Process metrics and generate data points
-        # process = ProcessGlances(metrics[0], hosts[0])
-        # datapoints = process.get_datapoints()
-        # print(json.dumps(datapoints, indent = 4))
+        process_metrics = ProcessGlances(node_metrics[0])
+        datapoints = process_metrics.get_datapoints()
+        print(json.dumps(datapoints, indent = 4))
 
     except Exception as e:
         print(e)
