@@ -104,14 +104,20 @@ def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
     """
     Use AsyncioRequests to query urls
     """
-    bmc = AsyncioRequests(auth=(bmc_config['user'], bmc_config['password']),
-                          timeout=(bmc_config['timeout']['connect'], bmc_config['timeout']['read']),
-                          max_retries=bmc_config['max_retries'])
+    bmc = AsyncioRequests(auth = (bmc_config['user'], 
+                                  bmc_config['password']),
+                          timeout = (bmc_config['timeout']['connect'], 
+                                     bmc_config['timeout']['read']),
+                          max_retries = bmc_config['max_retries'])
     bmc_metrics = bmc.bulk_fetch(urls, nodes)
     return bmc_metrics
 
 
 def parallel_process(node_metrics: list, category: str) -> list:
+    """
+    Parallel process metrics, 
+    node_metrics refer to a list of {'node': node_id, 'metrics': metric}
+    """
     process_args = zip(node_metrics, repeat(category))
     with multiprocessing.Pool() as pool:
         datapoints = pool.starmap(process, process_args)
@@ -121,7 +127,8 @@ def parallel_process(node_metrics: list, category: str) -> list:
 
 def process(node_metrics: dict, category: str) -> list:
     """
-    Process metrics accroding to its category
+    Process metrics accroding to its category, 
+    node_metrics refer to {'node': node_id, 'metrics': metric}
     """
     datapoints = []
 
