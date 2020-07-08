@@ -7,10 +7,10 @@ class ProcessGlances():
     """Generate data points from the glances API metrics"""
 
 
-    def __init__(self, metrics: dict, node_id: str) -> list:
+    def __init__(self, node_metrics: dict) -> list:
         self.datapoints = []
-        self.metrics = metrics
-        self.node_id = node_id
+        self.node_id = node_metrics["node"]
+        self.metrics = node_metrics["metrics"]
         self.timestamp = self.__get_epochtime(self.metrics.get("now", None))
     
 
