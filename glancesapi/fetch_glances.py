@@ -24,12 +24,13 @@ def fetch_glances() -> object:
 
         # Asynchronously fetch glances metrics from all nodes
         glances = AsyncioRequests()
-        metrics = glances.bulk_fetch(urls)
+        metrics = glances.bulk_fetch(urls, hosts)
+        print(json.dumps(metrics, indent = 4))
 
         # Process metrics and generate data points
-        process = ProcessGlances(metrics[0], hosts[0])
-        datapoints = process.get_datapoints()
-        print(json.dumps(datapoints, indent = 4))
+        # process = ProcessGlances(metrics[0], hosts[0])
+        # datapoints = process.get_datapoints()
+        # print(json.dumps(datapoints, indent = 4))
 
     except Exception as e:
         print(e)

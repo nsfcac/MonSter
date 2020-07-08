@@ -21,30 +21,30 @@ class AsyncioRequests:
             self.auth = None
     
     
-    async def __fetch_json(self, url: str, session: ClientSession) -> dict:
+    async def __fetch_json(self, url: str, host: str, session: ClientSession) -> dict:
         """
         Get request wrapper to fetch json data from API
         """
         try:
             resp = await session.request(method='GET', url=url)
             resp.raise_for_status()
-            return await resp.json()
+            return await {host: resp.json()}
         except (TimeoutError):
             self.retry += 1
             if self.retry >= self.max_retries:
                 return {}
-            return await self.__fetch_json(url, session)
+            return await self.__fetch_json(url, host, session)
         except:
             return {}
 
 
-    async def __requests(self, urls: list) -> list:
+    async def __requests(self, urls: list, hosts: list) -> list:
         async with self.ClientSession(auth = self.auth, timeout = self.timeout) as session:
             tasks = []
-            for url in urls:
-                tasks.append(self.__fetch_json(url=url, session=session))
+            for i, url in enumerate(urls):
+                tasks.append(self.__fetch_json(url=url, host=hosts[i], session=session))
             return await self.asyncio.gather(*tasks)
 
 
-    def bulk_fetch(self, urls: list) -> list:
-        return self.loop.run_until_complete(self.__requests(urls))
+    def bulk_fetch(self, urls: list, hosts: list) -> list:
+        return self.loop.run_until_complete(self.__requests(urls, hosts))
