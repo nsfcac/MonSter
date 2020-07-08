@@ -2,7 +2,7 @@ import json
 import sys
 sys.path.append('../../')
 
-from glancesapi.fetch_glances import *
+from glancesapi.fetch_glances import fetch_glances
 
 glances_config = {
     'api': '/api/3/all',
