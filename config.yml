@@ -7,7 +7,7 @@ influxdb:
 
 frequency: 60 # in seconds
 
-redfish:
+bmc:
   user: 'root'
   password: 'nivipnut'
   timeout: 
@@ -15,6 +15,11 @@ redfish:
     read: 45
   max_retries: 2
   ssl_verify: False   # Secure Sockets Layer Verify
+  apis:
+    thermal: '/redfish/v1/Chassis/System.Embedded.1/Thermal/'
+    power: '/redfish/v1/Chassis/System.Embedded.1/Power/'
+    bmc_health: '/redfish/v1/Managers/iDRAC.Embedded.1'
+    sys_health: '/redfish/v1/Systems/System.Embedded.1'
   nodelist:
     - '10.101.1/1-60'
     - '10.101.2/1-60'
@@ -42,5 +47,5 @@ uge:
 glances:
   api: '/api/3/all'
   port: 61208
-  nodes:
+  nodelist:
     - '10.10.1/4'  

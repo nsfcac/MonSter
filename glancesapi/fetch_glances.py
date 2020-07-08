@@ -5,10 +5,10 @@ sys.path.append('../')
 
 from classes.AsyncioRequests import AsyncioRequests
 from glancesapi.ProcessGlances import ProcessGlances
-from monster.helper import parse_config, parse_nodelist
+from monster.helper import parse_nodelist
 
 
-def fetch_glances(glances_config: dict) -> object:
+def fetch_glances(glances_config: dict) -> list:
     """
     fetch OS metrics from glances API. 
     Examples of using glances API:
@@ -18,7 +18,7 @@ def fetch_glances(glances_config: dict) -> object:
     try:
         api = glances_config["api"]
         port = glances_config["port"]
-        nodes = parse_nodelist(glances_config["nodes"])
+        nodes = parse_nodelist(glances_config["nodelist"])
 
         # Generate glances API urls for the specified nodes
         urls = ["http://" + node + ":" + str(port) + api for node in nodes]

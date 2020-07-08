@@ -7,7 +7,7 @@ from glancesapi.fetch_glances import fetch_glances
 glances_config = {
     'api': '/api/3/all',
     'port': 61208,
-    'nodes': ['10.10.1/4']
+    'nodelist': ['10.10.1/4']
 }
 
 
