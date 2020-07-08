@@ -25,10 +25,10 @@ def fetch_bmc(bmc_config: dict) -> list:
         bmc_health_urls = ["https://" + node + bmc_health_api for node in nodes]
         sys_health_urls = ["https://" + node + sys_health_api for node in nodes]
 
-        # cores= multiprocessing.cpu_count()
-        # parallel_fetch(thermal_urls, nodes, cores)
+        cores= multiprocessing.cpu_count()
+        parallel_fetch(bmc_config, thermal_urls, nodes, cores)
 
-        fetch(bmc_config, thermal_urls[:50], nodes[:50])
+        # fetch(bmc_config, thermal_urls[:50], nodes[:50])
     except Exception as e:
         print(e)
 
@@ -52,13 +52,25 @@ def partition(arr:list, cores: int) -> list:
     return groups
 
 
-def parallel_fetch(urls: list, nodes: list, cores: int) -> list:
+def parallel_fetch(bmc_config: dict, urls: list, nodes: list, cores: int) -> list:
     """
     Spread fetching across cores
     """
+    metrics = []
     # Partition
     urls_group = partition(urls, cores)
     nodes_group = partition(nodes, cores)
+
+    fetch_args = []
+    for i in range(cores):
+        urls = urls_group[i]
+        nodes = nodes_group[i]
+        fetch_args.append((bmc_config, urls, nodes))
+
+    with multiprocessing.Pool() as pool:
+        metrics = pool.starmap(fetch, fetch_args)
+
+    print(json.dumps(metrics, indent=4))
     return
 
 
@@ -67,5 +79,4 @@ def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
                           timeout=(bmc_config['timeout']['connect'], bmc_config['timeout']['read']),
                           max_retries=bmc_config['max_retries'])
     bmc_metrics = bmc.bulk_fetch(urls, nodes)
-    print(json.dumps(bmc_metrics, indent=4))
-    return
+    return bmc_metrics
