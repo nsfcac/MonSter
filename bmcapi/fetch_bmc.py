@@ -38,22 +38,22 @@ def fetch_bmc(bmc_config: dict) -> list:
         # bmc_health_metrics = parallel_fetch(bmc_config, bmc_health_urls, nodes, cores)
         # sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
 
-        print(json.dumps(thermal_metrics, indent=4))
+        # print(json.dumps(thermal_metrics, indent=4))
 
         # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
         # print(f"Time elapsed: {total_elapsed}")
 
-        # query_start = time.time()
+        query_start = time.time()
 
-        # # Parallel process metrics
-        # thermal_dpoints = parallel_process(thermal_metrics, "thermal")
+        # Parallel process metrics
+        thermal_dpoints = parallel_process(thermal_metrics, "thermal")
 
-        # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
-        # print(f"Time elapsed: {total_elapsed}")
+        total_elapsed = float("{0:.2f}".format(time.time() - query_start))
+        print(f"Time elapsed: {total_elapsed}")
+        print(json.dumps(thermal_dpoints, indent=4))
 
         # metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
 
-        # print(json.dumps(thermal_dpoints, indent=4))
     except Exception as e:
         print(e)
 
@@ -96,7 +96,7 @@ def parallel_fetch(bmc_config: dict, urls: list, nodes: list, cores: int) -> lis
         metrics = pool.starmap(fetch, fetch_args)
 
     flatten_metrics = [item for sublist in metrics for item in sublist]
-    
+
     return flatten_metrics
 
 
