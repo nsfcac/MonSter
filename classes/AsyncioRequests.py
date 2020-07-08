@@ -27,12 +27,11 @@ class AsyncioRequests:
         Get request wrapper to fetch json data from API
         """
         try:
-            print(host)
             resp = await session.request(method='GET', url=url)
             resp.raise_for_status()
-            # json = await resp.json()
-            # return await {host: json}
-            return await resp.json()
+            json = await resp.json()
+            return {host: json}
+            # return await resp.json()
         except (TimeoutError):
             self.retry += 1
             if self.retry >= self.max_retries:
