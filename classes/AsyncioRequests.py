@@ -14,7 +14,7 @@ class AsyncioRequests:
                  timeout: tuple = (15, 45), max_retries: int = 3):
         self.metrics = {}
         self.retry = 0
-        self.verify_ssl = verify_ssl
+        self.connector=self.aiohttp.TCPConnector(verify_ssl=verify_ssl)
         if auth:
             self.auth = self.aiohttp.BasicAuth(*auth)
         else:
@@ -36,15 +36,16 @@ class AsyncioRequests:
         except (TimeoutError):
             self.retry += 1
             if self.retry >= self.max_retries:
-                return {}
+                return {"node": node, "metrics": {}}
             return await self.__fetch_json(url, node, session)
         except:
-            return {}
+            return {"node": node, "metrics": {}}
 
 
     async def __requests(self, urls: list, nodes: list) -> list:
-        async with self.ClientSession(connector=self.aiohttp.TCPConnector(verify_ssl=self.verify_ssl), 
-                                      auth = self.auth, timeout = self.timeout) as session:
+        async with self.ClientSession(connector=self.connector, 
+                                      auth = self.auth, 
+                                      timeout = self.timeout) as session:
             tasks = []
             for i, url in enumerate(urls):
                 tasks.append(self.__fetch_json(url=url, node=nodes[i], session=session))
