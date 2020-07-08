@@ -81,7 +81,7 @@ def parallel_fetch(bmc_config: dict, urls: list, nodes: list, cores: int) -> lis
     """
     Spread fetching across cores
     """
-    metrics = []
+    flatten_metrics = []
     # Partition
     urls_group = partition(urls, cores)
     nodes_group = partition(nodes, cores)
@@ -95,7 +95,9 @@ def parallel_fetch(bmc_config: dict, urls: list, nodes: list, cores: int) -> lis
     with multiprocessing.Pool() as pool:
         metrics = pool.starmap(fetch, fetch_args)
 
-    return metrics
+    flatten_metrics = [item for sublist in metrics for item in sublist]
+    
+    return flatten_metrics
 
 
 def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
