@@ -64,7 +64,8 @@ class ProcessThermal():
         """
         Return all datapoints
         """
-        self.__process_fans()
-        self.__process_temps()
+        if self.metrics:
+            self.__process_fans()
+            self.__process_temps()
         return self.datapoints
 
