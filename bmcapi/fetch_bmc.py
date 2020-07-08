@@ -70,6 +70,7 @@ def parallel_fetch(bmc_config: dict, urls: list, nodes: list, cores: int) -> lis
     with multiprocessing.Pool() as pool:
         metrics = pool.starmap(fetch, fetch_args)
 
+    print(len(metrics))
     print(json.dumps(metrics, indent=4))
     return
 
