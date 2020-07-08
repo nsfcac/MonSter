@@ -29,11 +29,12 @@ def fetch_glances() -> object:
 
         # Process metrics and generate data points using multiprocessing
         with multiprocessing.Pool() as pool:
-            all_datapoints = pool.map(process_metric, node_metrics)
+            datapoints = pool.map(process_metric, node_metrics)
 
-        # process_metrics = ProcessGlances(node_metrics[0])
-        # datapoints = process_metrics.get_datapoints()
-        print(json.dumps(all_datapoints, indent = 4))
+        # Flatten the datapoints of each node
+        flat_datapoints = [item for sublist in datapoints for item in sublist]
+
+        print(json.dumps(flat_datapoints, indent = 4))
 
     except Exception as e:
         print(e)
