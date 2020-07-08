@@ -119,14 +119,14 @@ def parallel_process(node_metrics: list, category: str) -> list:
     return flat_datapoints
 
 
-def process(node_metric: dict, category: str) -> list:
+def process(node_metrics: dict, category: str) -> list:
     """
     Process metrics accroding to its category
     """
     datapoints = []
 
     if category == "thermal":
-        process = ProcessThermal(node_metric)
+        process = ProcessThermal(node_metrics)
     elif category == "power":
         pass
     elif category == "bmc_health":
