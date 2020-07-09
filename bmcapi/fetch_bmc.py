@@ -16,7 +16,7 @@ def fetch_bmc(bmc_config: dict) -> list:
     """
     fetch metrics from Redfish API. 
     Examples of using Redfish API:
-    curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k | jq '.'
+    curl --user login:password https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k | jq '.'
     """
     all_datapoints = []
     try:
