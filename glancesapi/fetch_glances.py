@@ -3,7 +3,7 @@ import multiprocessing
 import sys
 sys.path.append('../')
 
-from classes.AsyncioRequests import AsyncioRequests
+from Classes.AsyncioRequests import AsyncioRequests
 from glancesapi.ProcessGlances import ProcessGlances
 from monster.helper import parse_nodelist
 
@@ -15,6 +15,7 @@ def fetch_glances(glances_config: dict) -> list:
     curl http://10.10.1.4:61208/api/3/pluginslist | python -m json.tool
     curl http://10.10.1.4:61208/api/3/percpu | python -m json.tool
     """
+    all_datapoints = []
     try:
         api = glances_config["api"]
         port = glances_config["port"]
@@ -32,9 +33,9 @@ def fetch_glances(glances_config: dict) -> list:
             datapoints = pool.map(process_metric, node_metrics)
 
         # Flatten the datapoints
-        flat_datapoints = [item for sublist in datapoints for item in sublist]
+        all_datapoints = [item for sublist in datapoints for item in sublist]
 
-        return flat_datapoints
+        return all_datapoints
 
     except Exception as e:
         print(e)
