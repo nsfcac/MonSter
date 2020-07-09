@@ -33,7 +33,7 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         cores= multiprocessing.cpu_count()
 
-        query_start = time.time()
+        # query_start = time.time()
 
         # Parallel fetch metrics
         thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
@@ -49,11 +49,12 @@ def fetch_bmc(bmc_config: dict) -> list:
         
         # Merge datapoints
         all_datapoints = thermal_points + power_points + bmc_health_points + sys_health_points
+        print(json.dumps(all_datapoints, indent=4))
 
-        total_elapsed = float("{0:.2f}".format(time.time() - query_start))
+        # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
 
-        print(f"Time elapsed: {total_elapsed}")
-        print(f"Total datapoints: {len(all_datapoints)}")
+        # print(f"Time elapsed: {total_elapsed}")
+        # print(f"Total datapoints: {len(all_datapoints)}")
 
     except Exception as e:
         print(e)
