@@ -18,6 +18,7 @@ def fetch_bmc(bmc_config: dict) -> list:
     Examples of using Redfish API:
     curl --user password:monster https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k | jq '.'
     """
+    all_datapoints = []
     try:
         thermal_api = bmc_config["apis"]["thermal"]
         power_api = bmc_config["apis"]["power"]
@@ -32,25 +33,27 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         cores= multiprocessing.cpu_count()
 
-        # query_start = time.time()
+        query_start = time.time()
 
-        # # Parallel fetch metrics
-        # thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
-        # power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
+        # Parallel fetch metrics
+        thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
+        power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
         bmc_health_metrics = parallel_fetch(bmc_config, bmc_health_urls, nodes, cores)
         sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
 
-        # # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
-        # # print(f"Time elapsed: {total_elapsed}")
-
-        # # Parallel process metrics
-        # thermal_points = parallel_process(thermal_metrics, "thermal")
-        # power_points = parallel_process(power_metrics, "power")
+        # Parallel process metrics
+        thermal_points = parallel_process(thermal_metrics, "thermal")
+        power_points = parallel_process(power_metrics, "power")
         bmc_health_points = parallel_process(bmc_health_metrics, "bmc_health")
         sys_health_points = parallel_process(sys_health_metrics, "sys_health")
         
-        print(json.dumps([bmc_health_metrics, sys_health_metrics], indent=4))
-        # metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
+        # Merge datapoints
+        all_datapoints = thermal_points + power_points + bmc_health_points + sys_health_points
+
+        total_elapsed = float("{0:.2f}".format(time.time() - query_start))
+
+        print(f"Time elapsed: {total_elapsed}")
+        print(f"Total datapoints: {len(all_datapoints)}")
 
     except Exception as e:
         print(e)
