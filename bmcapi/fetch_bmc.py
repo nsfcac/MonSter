@@ -5,7 +5,7 @@ from itertools import repeat
 import sys
 sys.path.append('../')
 
-from classes.AsyncioRequests import AsyncioRequests
+from Classes.AsyncioRequests import AsyncioRequests
 from bmcapi.ProcessThermal import ProcessThermal
 from bmcapi.ProcessHealth import ProcessHealth
 from bmcapi.ProcessPower import ProcessPower
@@ -55,6 +55,8 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         # print(f"Time elapsed: {total_elapsed}")
         # print(f"Total datapoints: {len(all_datapoints)}")
+
+        return all_datapoints
 
     except Exception as e:
         print(e)
