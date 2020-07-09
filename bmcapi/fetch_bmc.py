@@ -7,6 +7,7 @@ sys.path.append('../')
 
 from classes.AsyncioRequests import AsyncioRequests
 from bmcapi.ProcessThermal import ProcessThermal
+from bmcapi.ProcessHealth import ProcessHealth
 from bmcapi.ProcessPower import ProcessPower
 from monster.helper import parse_nodelist
 
@@ -33,20 +34,22 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         # query_start = time.time()
 
-        # Parallel fetch metrics
-        thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
-        power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
+        # # Parallel fetch metrics
+        # thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
+        # power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
         bmc_health_metrics = parallel_fetch(bmc_config, bmc_health_urls, nodes, cores)
         sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
 
-        # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
-        # print(f"Time elapsed: {total_elapsed}")
+        # # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
+        # # print(f"Time elapsed: {total_elapsed}")
 
         # # Parallel process metrics
         # thermal_points = parallel_process(thermal_metrics, "thermal")
-        power_points = parallel_process(power_metrics, "power")
+        # power_points = parallel_process(power_metrics, "power")
+        bmc_health_points = parallel_process(bmc_health_metrics, "bmc_health")
+        sys_health_points = parallel_process(sys_health_metrics, "sys_health")
         
-        print(json.dumps(power_points, indent=4))
+        print(json.dumps([bmc_health_points, sys_health_points], indent=4))
         # metrics = [thermal_metrics, power_metrics, bmc_health_metrics, sys_health_metrics]
 
     except Exception as e:
@@ -132,9 +135,9 @@ def process(node_metrics: dict, category: str) -> list:
     elif category == "power":
         process = ProcessPower(node_metrics)
     elif category == "bmc_health":
-        pass
+        process = ProcessHealth(node_metrics, "BMC")
     elif category == "sys_health":
-        pass
+        process = ProcessHealth(node_metrics, "System")
     else:
         return datapoints
 
