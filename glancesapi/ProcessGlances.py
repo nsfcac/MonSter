@@ -1,5 +1,4 @@
 import time
-from datetime import datetime
 from dateutil.parser import parse
 
 
