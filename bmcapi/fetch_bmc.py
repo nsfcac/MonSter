@@ -52,7 +52,6 @@ def fetch_bmc(bmc_config: dict) -> list:
         
         # Merge datapoints
         all_datapoints = thermal_points + power_points + bmc_health_points + sys_health_points
-        # print(json.dumps(all_datapoints, indent=4))
 
         # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
 
