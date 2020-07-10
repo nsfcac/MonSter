@@ -34,4 +34,5 @@ bmc_config = {
   }
 
 
-fetch_bmc(bmc_config)
+datapoints = fetch_bmc(bmc_config)
+print(json.dumps(datapoints, indent=4))
