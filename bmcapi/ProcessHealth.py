@@ -8,22 +8,19 @@ class ProcessHealth():
     """
 
 
-    def __init__(self, node_metrics: dict, label: str) -> None:
+    def __init__(self, node_metrics: dict, label: str, timestamp: int) -> None:
         self.datapoints = []
         self.node_id = node_metrics["node"]
         self.metrics = node_metrics["metrics"]
         self.label = label
-        self.timestamp = self.__get_epochtime(self.metrics.get("DateTime", None))
+        self.timestamp = self.__get_epochtime(self.metrics.get("DateTime", timestamp))
 
     
     def __get_epochtime(self, time_str: str) -> int:
         """
-        Convert time string to epoch, if does not have a time string, return current epoch time
+        Convert time string to epoch, if does not have a time string
         """
-        if time_str:
-            return int(parse(time_str).timestamp()) * 1000000
-        else:
-            return int(time.time()) * 1000000
+        return int(parse(time_str).timestamp()) * 1000000
     
 
     def __gen_datapoint(self, measurement: str, label: str, value: float) -> dict:

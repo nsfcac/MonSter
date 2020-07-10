@@ -7,11 +7,11 @@ class ProcessPower():
     """
 
 
-    def __init__(self, node_metrics: dict) -> None:
+    def __init__(self, node_metrics: dict, timestamp: int) -> None:
         self.datapoints = []
         self.node_id = node_metrics["node"]
         self.metrics = node_metrics["metrics"]
-        self.timestamp = int(time.time()) * 1000000
+        self.timestamp = timestamp
     
 
     def __gen_datapoint(self, measurement: str, label: str, value: float) -> dict:
