@@ -1,11 +1,12 @@
 import json
 import multiprocessing
 import time
-from itertools import repeat
 import sys
 sys.path.append('../')
 
-from Classes.AsyncioRequests import AsyncioRequests
+from itertools import repeat
+
+from sharings.AsyncioRequests import AsyncioRequests
 from bmcapi.ProcessThermal import ProcessThermal
 from bmcapi.ProcessHealth import ProcessHealth
 from bmcapi.ProcessPower import ProcessPower
