@@ -1,83 +1,51 @@
 import json
 import time
+import multiprocessing
+import sys
+sys.path.append('../')
 
 import requests
-import multiprocessing
-import logging 
-
-from itertools import repeat
-from requests.exceptions import Timeout
 from requests.adapters import HTTPAdapter
 
-from ugeapi.get_hostip import get_hostip
-from ugeapi.process_uge import process_host, aggregate_node_jobs
 
-
-def fetch_uge(config: object) -> object:
+def fetch_uge(uge_config: dict) -> list:
     """
-    Fetch metrics from UGE api, average query and process time is: 1.4088s
+    fetch UGE metrics from UGE API. 
+    Examples of using UGE API:
+    curl http://129.118.104.35:8182/jobs | python -m json.tool
+    curl http://129.118.104.35:8182/hostsummary/compute/467 | python -m json.tool
     """
-    uge_info = {}
-    # Get cpu counts
+    all_datapoints = []
     try:
-        cpu_count = multiprocessing.cpu_count()
+        api = uge_config["api"]
+        job_list_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}"
+        host_summary_url = f"http://{api['hostname']}:{api['port']}{api['host_summary']}"
 
-        uge_url = "http://" + config["host"] + ":" + config["port"]
-        ugeapi_adapter = HTTPAdapter(max_retries=config["max_retries"])
+        # Fetch UGE metrics from urls
+        host_summary = fetch(uge_config, host_summary_url)
 
-        node_jobs = {}
-        all_host_points = []
-        all_job_points = []
+        all_datapoints = host_summary
+        
+        return all_datapoints
+    except Exception as e:
+        print(e)
+    
 
-        with requests.Session() as session:
-
-            epoch_time = int(round(time.time() * 1000000000))
-
-            # Get hosts detail
-            host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter)
-
-            # Process hosts info
-            process_host_args = zip(host_detail, repeat(epoch_time))
-            with multiprocessing.Pool(processes=cpu_count) as pool:
-                processed_host_detail = pool.starmap(process_host, process_host_args)
-
-            exechosts = [item["hostname"] for item in host_detail]
-            for index, host in enumerate(exechosts):
-                host_ip = get_hostip(host)
-                if processed_host_detail[index]["data_points"]:
-                    all_host_points.extend(processed_host_detail[index]["data_points"])
-                if processed_host_detail[index]["jobs_detail"]:
-                    node_jobs[host_ip] = processed_host_detail[index]["jobs_detail"]
-
-            # Process jobs info
-            all_job_points = aggregate_node_jobs(node_jobs)
-
-        uge_info = {
-            "all_job_points": all_job_points,
-            "all_host_points": all_host_points,
-            "epoch_time": epoch_time
-        }
-
-    except:
-        logging.error("Cannot get UGE data points")
-
-    return uge_info
-
-
-def get_host_detail(config: dict, uge_url: str, session: object, ugeapi_adapter: object) -> list:
+def fetch(uge_config:dict, url: str) -> list:
     """
-    Get host details
+    Use requests to query url
     """
-    host = None
-    host_url = uge_url + "/hostsummary/" + "compute/" + str(config["computing_hosts"])
-    session.mount(host_url, ugeapi_adapter)
-    try:
-        host_response = session.get(
-            host_url, verify = config["ssl_verify"], 
-            timeout = (config["timeout"]["connect"], config["timeout"]["read"])
-        )
-        host = host_response.json()
-    except:
-        logging.error("Cannot get host details from UGE")
-
-    return host
+    metrics = []
+    adapter = HTTPAdapter(max_retries=uge_config["max_retries"])
+    with requests.Session() as session:
+        session.mount(url, adapter)
+        try:
+            response = session.get(
+                url, verify = uge_config["ssl_verify"],
+                timeout = (uge_config["timeout"]["connect"], uge_config["timeout"]["read"])
+            )
+            metrics = response.json()
+        except Exception as e:
+            print(e)
+    return metrics
+    
