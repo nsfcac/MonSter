@@ -1,9 +1,10 @@
 import json
 import multiprocessing
 import time
-from itertools import repeat
 import sys
 sys.path.append('../')
+
+from itertools import repeat
 
 from Classes.AsyncioRequests import AsyncioRequests
 from bmcapi.ProcessThermal import ProcessThermal
@@ -35,6 +36,8 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         # query_start = time.time()
 
+        timestamp = int(time.time()) * 1000000
+
         # Parallel fetch metrics
         thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
         power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
@@ -42,10 +45,10 @@ def fetch_bmc(bmc_config: dict) -> list:
         sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
 
         # Parallel process metrics
-        thermal_points = parallel_process(thermal_metrics, "thermal")
-        power_points = parallel_process(power_metrics, "power")
-        bmc_health_points = parallel_process(bmc_health_metrics, "bmc_health")
-        sys_health_points = parallel_process(sys_health_metrics, "sys_health")
+        thermal_points = parallel_process(thermal_metrics, "thermal", timestamp)
+        power_points = parallel_process(power_metrics, "power", timestamp)
+        bmc_health_points = parallel_process(bmc_health_metrics, "bmc_health", timestamp)
+        sys_health_points = parallel_process(sys_health_metrics, "sys_health", timestamp)
         
         # Merge datapoints
         all_datapoints = thermal_points + power_points + bmc_health_points + sys_health_points
@@ -117,19 +120,20 @@ def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
     return bmc_metrics
 
 
-def parallel_process(node_metrics: list, category: str) -> list:
+def parallel_process(node_metrics: list, category: str, timestamp: int) -> list:
     """
     Parallel process metrics, 
     node_metrics refer to a list of {'node': node_id, 'metrics': metric}
     """
-    process_args = zip(node_metrics, repeat(category))
+    flat_datapoints = []
+    process_args = zip(node_metrics, repeat(category), repeat(timestamp))
     with multiprocessing.Pool() as pool:
         datapoints = pool.starmap(process, process_args)
     flat_datapoints = [item for sublist in datapoints for item in sublist]
     return flat_datapoints
 
 
-def process(node_metrics: dict, category: str) -> list:
+def process(node_metrics: dict, category: str, timestamp: int) -> list:
     """
     Process metrics accroding to its category, 
     node_metrics refer to {'node': node_id, 'metrics': metric}
@@ -137,13 +141,13 @@ def process(node_metrics: dict, category: str) -> list:
     datapoints = []
 
     if category == "thermal":
-        process = ProcessThermal(node_metrics)
+        process = ProcessThermal(node_metrics, timestamp)
     elif category == "power":
-        process = ProcessPower(node_metrics)
+        process = ProcessPower(node_metrics, timestamp)
     elif category == "bmc_health":
-        process = ProcessHealth(node_metrics, "BMC")
+        process = ProcessHealth(node_metrics, "BMC", timestamp)
     elif category == "sys_health":
-        process = ProcessHealth(node_metrics, "System")
+        process = ProcessHealth(node_metrics, "System", timestamp)
     else:
         return datapoints
 

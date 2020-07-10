@@ -1,11 +1,14 @@
 import json
 import time
+import requests
 import multiprocessing
 import sys
 sys.path.append('../')
 
-import requests
+from itertools import repeat
+
 from requests.adapters import HTTPAdapter
+from ugeapi.ProcessUge import ProcessUge
 
 
 def fetch_uge(uge_config: dict) -> list:
@@ -21,11 +24,13 @@ def fetch_uge(uge_config: dict) -> list:
         job_list_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}"
         host_summary_url = f"http://{api['hostname']}:{api['port']}{api['host_summary']}"
 
+        timestamp = int(time.time()) * 1000000
         # Fetch UGE metrics from urls
         host_summary = fetch(uge_config, host_summary_url)
-        print(f"Host summary length: {len(host_summary)}")
-        
-        all_datapoints = host_summary
+        # print(f"Host summary length: {len(host_summary)}")
+
+        # Parallel process metrics
+        all_datapoints = parallel_process(host_summary, timestamp)
 
         return all_datapoints
     except Exception as e:
@@ -34,7 +39,7 @@ def fetch_uge(uge_config: dict) -> list:
 
 def fetch(uge_config:dict, url: str) -> list:
     """
-    Use requests to query url
+    Use requests to query the url
     """
     metrics = []
     adapter = HTTPAdapter(max_retries=uge_config["max_retries"])
@@ -49,4 +54,28 @@ def fetch(uge_config:dict, url: str) -> list:
         except Exception as e:
             print(e)
     return metrics
+
+
+def parallel_process(metrics: list, timestamp: int) -> list:
+    """
+    Parallel process metrics
+    """
+    flat_datapoints = []
+    process_args = zip(metrics, repeat(timestamp))
+    with multiprocessing.Pool() as pool:
+        datapoints = pool.map(process, process_args)
+    flat_datapoints = [item for sublist in datapoints for item in sublist]
+    return flat_datapoints
+
+
+def process(metrics: dict, timestamp: int) -> list:
+    """
+    Process UGE metrics
+    """
+    datapoints = []
+    process = ProcessUge(metrics, timestamp)
+    datapoints = process.get_datapoints()
+
+    return datapoints
+
     
