@@ -3,7 +3,7 @@ import multiprocessing
 import sys
 sys.path.append('../')
 
-from Classes.AsyncioRequests import AsyncioRequests
+from sharings.AsyncioRequests import AsyncioRequests
 from glancesapi.ProcessGlances import ProcessGlances
 from monster.helper import parse_nodelist
 
