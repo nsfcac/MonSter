@@ -23,9 +23,10 @@ def fetch_uge(uge_config: dict) -> list:
 
         # Fetch UGE metrics from urls
         host_summary = fetch(uge_config, host_summary_url)
-
-        all_datapoints = host_summary
+        print(f"Host summary length: {len(host_summary)}")
         
+        all_datapoints = host_summary
+
         return all_datapoints
     except Exception as e:
         print(e)
