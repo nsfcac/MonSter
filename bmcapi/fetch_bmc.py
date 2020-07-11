@@ -10,7 +10,7 @@ from sharings.AsyncioRequests import AsyncioRequests
 from bmcapi.ProcessThermal import ProcessThermal
 from bmcapi.ProcessHealth import ProcessHealth
 from bmcapi.ProcessPower import ProcessPower
-from monster.helper import parse_nodelist
+from monster.utils import parse_nodelist
 
 
 def fetch_bmc(bmc_config: dict) -> list:

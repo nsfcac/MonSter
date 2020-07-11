@@ -5,7 +5,7 @@ sys.path.append('../')
 
 from sharings.AsyncioRequests import AsyncioRequests
 from glancesapi.ProcessGlances import ProcessGlances
-from monster.helper import parse_nodelist
+from monster.utils import parse_nodelist
 
 
 def fetch_glances(glances_config: dict) -> list:
