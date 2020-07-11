@@ -109,7 +109,10 @@ def fetch_datapoints(bmc_config: dict, uge_config: dict) -> list:
     prev_joblist = curr_joblist
 
     # Contatenate all data points
-    all_datapoints = bmc_datapoints + uge_datapoints + job_datapoints
+    print(type(bmc_datapoints))
+    print(type(uge_datapoints))
+    print(type(job_datapoints))
+    # all_datapoints = bmc_datapoints + uge_datapoints + job_datapoints
 
     # print(f"BMC data points length: {len(bmc_datapoints)}")
     # print(f"UGE data points length: {len(uge_datapoints)}")
