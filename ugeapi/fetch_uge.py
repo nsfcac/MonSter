@@ -30,7 +30,10 @@ def fetch_uge(uge_config: dict) -> list:
         # print(f"Host summary length: {len(host_summary)}")
 
         # Parallel process metrics
-        all_datapoints = parallel_process(host_summary, timestamp)
+        all_data = parallel_process(host_summary, timestamp)
+
+        # Aggregate processed metrics
+        all_datapoints = aggregate(all_data)
 
         return all_datapoints
     except Exception as e:
@@ -78,9 +81,33 @@ def process(metrics: dict, timestamp: int) -> list:
     return datapoints
 
 
-# def aggregate(all_data: dict) -> None:
-#     all_datapoints = []
-#     for data in all_data:
-#         datapoints = data["datapoints"]
+def aggregate(all_data: dict) -> list:
+    """
+    Aggregate datapoints, total nodes and total cores for each job
+    """
+    all_datapoints = []
+    all_jobpoints = []
+    all_job_info = {}
+    for data in all_data:
+        datapoints = data["datapoints"]
+        all_datapoints.extend(datapoints)
+        job_info = data["job_info"]
+        job_list = list(job_info.keys())
+        for job in job_list:
+            if job not in all_job_info:
+                all_job_info.update({
+                    job: job_info[job]
+                })
+            else:
+                pre_cores = all_job_info[job]["fields"]["CPUCores"]
+                cur_cores = job_info[job]["fields"]["CPUCores"]
+                pre_nodes = all_job_info[job]["fields"]["TotalNodes"]
+                all_job_info[job]["fields"].update({
+                    "TotalNodes": pre_nodes + 1,
+                    "TotalCores": pre_cores + cur_cores
+                })
+    all_jobpoints = list(all_job_info.values())
+    all_datapoints.extend(all_jobpoints)
 
+    return all_datapoints
     
