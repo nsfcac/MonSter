@@ -156,8 +156,10 @@ class ProcessUge():
         Return all datapoints
         """
         self.__process_cpu_mem()
-        self.__process_job_list()
         self.__process_job()
+        # job list is calculated based on the self.job_info, 
+        # it should be put after self.__process_job()
+        self.__process_job_list()
 
         all_info = {
             "node": self.node_id,
