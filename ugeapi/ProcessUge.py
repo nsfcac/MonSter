@@ -63,6 +63,7 @@ class ProcessUge():
                 "SubmitTime": submit_time,
                 "FinishTime": None,
                 "JobName": job_name,
+                "User": user,
                 "TotalNodes": 1,
                 "CPUCores": 1
             }

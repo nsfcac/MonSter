@@ -83,7 +83,7 @@ def process(metrics: dict, timestamp: int) -> list:
 
 def aggregate(all_data: dict) -> list:
     """
-    Aggregate datapoints, total nodes and total cores for each job
+    Aggregate datapoints, total nodes and cpu cores for each job
     """
     all_datapoints = []
     all_jobpoints = []
