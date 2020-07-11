@@ -17,7 +17,7 @@ def fetch_bmc(bmc_config: dict) -> list:
     Examples of using Redfish API:
     curl --user login:password https://10.101.1.1/redfish/v1/Chassis/System.Embedded.1/Thermal/ -k | jq '.'
     """
-    all_datapoints = []
+    bmc_datapoints = []
     try:
         thermal_api = bmc_config["apis"]["thermal"]
         power_api = bmc_config["apis"]["power"]
@@ -49,14 +49,14 @@ def fetch_bmc(bmc_config: dict) -> list:
         sys_health_points = parallel_process(sys_health_metrics, "sys_health", timestamp)
         
         # Merge datapoints
-        all_datapoints = thermal_points + power_points + bmc_health_points + sys_health_points
+        bmc_datapoints = thermal_points + power_points + bmc_health_points + sys_health_points
 
         # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
 
         # print(f"Time elapsed: {total_elapsed}")
-        # print(f"Total datapoints: {len(all_datapoints)}")
+        # print(f"Total datapoints: {len(bmc_datapoints)}")
 
-        return all_datapoints
+        return bmc_datapoints
 
     except Exception as e:
         print(e)

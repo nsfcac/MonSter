@@ -27,6 +27,8 @@ def main():
         bmc_config = config['bmc']
         uge_config = config['uge']
         
+        all_datapoints = fetch_datapoints(bmc_config, uge_config)
+
         return
     except Exception as err:
         print(err)
@@ -34,25 +36,44 @@ def main():
 
 
 def fetch_datapoints(bmc_config: dict, uge_config: dict) -> list:
-    # Fetch BMC and uge data points
+    """
+    Fetch and concatenate BMC data points, UGE data points, 
+    and estimate job finish time
+    """
+    all_datapoints = []
+    global prev_joblist
+    # Fetch BMC datapoints and uge metrics
     bmc_datapoints = fetch_bmc(bmc_config)
-    uge_datapoints = fetch_uge(uge_config)
+    uge_metrics = fetch_uge(uge_config)
 
-    # Aggregate data points
-    all_datapoints = bmc_datapoints + uge_datapoints["datapoints"]
+    # UGE metrics
+    uge_datapoints = uge_metrics["datapoints"]
+    timestamp = uge_metrics["timestamp"]
+    jobs_info = uge_metrics["jobs_info"]
 
-    all_jobspoints = uge_datapoints["jobspoints"]
-    curr_joblist = get_joblist(all_jobspoints)
+    # Current job list
+    curr_joblist = list(jobs_info.keys())
+    
+    # Compare the current job list with the previous job list and update finish time
+    for job in prev_joblist:
+        if job not in curr_joblist:
+            jobs_info[job]["fields"].update({
+                "FinishTime": timestamp
+            })
+    job_datapoints = list(jobs_info.values())
 
-    # 
+    # Update previous job list
+    prev_joblist = curr_joblist
 
-def get_joblist(jobspoints: list) -> list:
-    """
-    Get job list from the jobs points
-    """
-    joblist = [ job["tags"]["JobId"] for job in jobspoints ]
-    return joblist
+    # Contatenate all data points
+    all_datapoints = bmc_datapoints + uge_datapoints + job_datapoints
 
+    print(f"BMC data points length: {len(bmc_datapoints)}")
+    print(f"UGE data points length: {len(uge_datapoints)}")
+    print(f"Job data points length: {len(job_datapoints)}")
+    print(json.dumps(all_datapoints, indent=4))
+
+    return all_datapoints
 
 if __name__ == '__main__':
     main()
