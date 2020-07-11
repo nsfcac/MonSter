@@ -62,12 +62,10 @@ def parallel_process(metrics: list, timestamp: int) -> list:
     """
     flat_datapoints = []
     process_args = zip(metrics, repeat(timestamp))
-    print(type(metrics))
-    print(len(metrics))
-    print(timestamp)
-    # with multiprocessing.Pool() as pool:
-    #     datapoints = pool.map(process, process_args)
+    with multiprocessing.Pool() as pool:
+        datapoints = pool.map(process, process_args)
     # flat_datapoints = [item for sublist in datapoints for item in sublist]
+    flat_datapoints = datapoints
     return flat_datapoints
 
 
