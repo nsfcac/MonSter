@@ -34,7 +34,7 @@ def fetch_uge(uge_config: dict) -> list:
         all_data = parallel_process(host_summary, timestamp)
 
         # Aggregate processed metrics
-        uge_points = aggregate(all_data)
+        uge_points = aggregate(all_data, timestamp)
 
         return uge_points
     except Exception as e:
@@ -82,7 +82,7 @@ def process(metrics: dict, timestamp: int) -> list:
     return datapoints
 
 
-def aggregate(all_data: dict) -> list:
+def aggregate(all_data: dict, timestamp: int) -> list:
     """
     Aggregate datapoints, total nodes and cpu cores for each job
     """
@@ -94,22 +94,22 @@ def aggregate(all_data: dict) -> list:
     for data in all_data:
         datapoints = data["datapoints"]
         all_datapoints.extend(datapoints)
-        job_info = data["job_info"]
-        job_list = list(job_info.keys())
+        jobs_info = data["jobs_info"]
+        job_list = list(jobs_info.keys())
         # all_job_list.extend(job_list)
         for job in job_list:
             if job not in all_jobs_info:
                 all_jobs_info.update({
-                    job: job_info[job]
+                    job: jobs_info[job]
                 })
             else:
                 pre_cores = all_jobs_info[job]["fields"]["CPUCores"]
-                cur_cores = job_info[job]["fields"]["CPUCores"]
+                cur_cores = jobs_info[job]["fields"]["CPUCores"]
 
                 pre_nodes = all_jobs_info[job]["fields"]["TotalNodes"]
 
                 pre_node_list = all_jobs_info[job]["fields"]["NodeList"]
-                cur_node_list = job_info[job]["fields"]["NodeList"]
+                cur_node_list = jobs_info[job]["fields"]["NodeList"]
 
                 all_jobs_info[job]["fields"].update({
                     "TotalNodes": pre_nodes + 1,
@@ -118,15 +118,16 @@ def aggregate(all_data: dict) -> list:
                 })
 
     # Stringify NodeList in job info
-    for job_info in all_jobs_info.values():
-        node_list = job_info["fields"]["NodeList"]
-        job_info["fields"].update({
+    for jobs_info in all_jobs_info.values():
+        node_list = jobs_info["fields"]["NodeList"]
+        jobs_info["fields"].update({
             "NodeList": str(node_list)
         })
 
     all_jobspoints = list(all_jobs_info.values())
 
     uge_points.update({
+        "timestamp": timestamp,
         "datapoints": all_datapoints,
         "jobspoints": all_jobspoints
     })
