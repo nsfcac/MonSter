@@ -116,6 +116,14 @@ def aggregate(all_data: dict) -> list:
                     "CPUCores": pre_cores + cur_cores,
                     "NodeList": pre_node_list + cur_node_list
                 })
+
+    # Stringify NodeList in job info
+    for job_info in all_jobs_info:
+        node_list = job_info["fields"]["NodeList"]
+        job_info.update({
+            "NodeList": str(node_list)
+        })
+        
     all_jobspoints = list(all_jobs_info.values())
 
     uge_points.update({
