@@ -88,14 +88,14 @@ def aggregate(all_data: dict) -> list:
     """
     all_datapoints = []
     all_jobpoints = []
-    all_job_list = []
+    # all_job_list = []
     all_job_info = {}
     for data in all_data:
         datapoints = data["datapoints"]
         all_datapoints.extend(datapoints)
         job_info = data["job_info"]
         job_list = list(job_info.keys())
-        all_job_list.extend(job_list)
+        # all_job_list.extend(job_list)
         for job in job_list:
             if job not in all_job_info:
                 all_job_info.update({
@@ -111,9 +111,8 @@ def aggregate(all_data: dict) -> list:
                 })
     all_jobpoints = list(all_job_info.values())
 
-    print(f"Job Points length: {len(all_jobpoints)}")
-    # print(f"Job List length: {len(list(set(all_job_list)))}")
-    print(json.dumps(all_jobpoints, indent=4))
+    # print(f"Job Points length: {len(all_jobpoints)}")
+    # print(json.dumps(all_jobpoints, indent=4))
     # all_datapoints.extend(all_jobpoints)
 
     return all_datapoints
