@@ -60,6 +60,7 @@ def parallel_process(metrics: list, timestamp: int) -> list:
     """
     Parallel process metrics
     """
+    print("parallel_process func")
     flat_datapoints = []
     process_args = zip(metrics, repeat(timestamp))
     with multiprocessing.Pool() as pool:
@@ -72,6 +73,7 @@ def process(metrics: dict, timestamp: int) -> list:
     """
     Process UGE metrics
     """
+    print("process func")
     datapoints = []
     process = ProcessUge(metrics, timestamp)
     datapoints = process.get_datapoints()
