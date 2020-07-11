@@ -11,7 +11,6 @@ class ProcessUge():
     def __init__(self, metrics: dict, timestamp: int) -> None:
         self.datapoints = []
         self.job_list_points = []
-        self.job_list = []
         self.job_info = {}
         self.metrics = metrics
         self.timestamp = timestamp
@@ -122,7 +121,6 @@ class ProcessUge():
                     else:
                         job_id = f"{job['id']}"
                         # Collect unique job info
-                        self.job_list.append(job_id)
                         if job_id not in self.job_info:
                             # Preprocess time
                             start_time = int(parse(job["startTime"]).timestamp()) * 1000000
@@ -147,7 +145,7 @@ class ProcessUge():
         """
         measurement = "NodeJobs"
         label = "JobList"
-        value = str(list(set(self.job_list)))
+        value = str(list(self.job_info.keys()))
         datapoint = self.__gen_datapoint(measurement, label, value)
         self.job_list_points.append(datapoint)
         return
@@ -160,7 +158,7 @@ class ProcessUge():
         self.__process_cpu_mem()
         self.__process_job()
         # job list is calculated based on the self.job_info, 
-        # it should be put after self.__process_job()
+        # it should be put after self.__process_job
         self.__process_job_list()
 
         all_info = {
