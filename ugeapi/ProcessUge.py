@@ -125,25 +125,25 @@ class ProcessUge():
                 if job["masterQueue"] != "MASTER":
                     if "taskId" in job:
                         job_id = f"{job['id']}.{job['taskId']}"
-                        print(f"TASKID: {job_id}")
+                        # print(f"TASKID: {job_id}")
                     else:
                         job_id = f"{job['id']}"
-                        # Collect unique job info
-                        if job_id not in self.job_info:
-                            # Preprocess time
-                            start_time = int(parse(job["startTime"]).timestamp()) * 1000000
-                            submit_time = int(parse(job["submitTime"]).timestamp()) * 1000000
-                            job_name = job["name"]
-                            user = job["user"]
-                            # Get job info data point
-                            job_info = self.__gen_jobpoint(job_id, start_time, submit_time, job_name, user)
-                            # Add job info of job_id
-                            self.job_info.update({
-                                job_id: job_info
-                            })
-                        else:
-                            # Update cores info of the job
-                            self.__update_cores(job_id)
+                    # Collect unique job info
+                    if job_id not in self.job_info:
+                        # Preprocess time
+                        start_time = int(parse(job["startTime"]).timestamp()) * 1000000
+                        submit_time = int(parse(job["submitTime"]).timestamp()) * 1000000
+                        job_name = job["name"]
+                        user = job["user"]
+                        # Get job info data point
+                        job_info = self.__gen_jobpoint(job_id, start_time, submit_time, job_name, user)
+                        # Add job info of job_id
+                        self.job_info.update({
+                            job_id: job_info
+                        })
+                    else:
+                        # Update cores info of the job
+                        self.__update_cores(job_id)
         return
 
 
