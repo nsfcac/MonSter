@@ -24,6 +24,9 @@ def fetch_uge(uge_config: dict) -> list:
 
         timestamp = int(time.time()) * 1000000
         # Fetch UGE metrics from urls
+        job_list_url = fetch(uge_config, job_list_url)
+        print(f"Job list length: {len(job_list_url)}")
+
         host_summary = fetch(uge_config, host_summary_url)
         # print(f"Host summary length: {len(host_summary)}")
 
@@ -105,7 +108,8 @@ def aggregate(all_data: dict) -> list:
                     "CPUCores": pre_cores + cur_cores
                 })
     all_jobpoints = list(all_job_info.values())
-    all_datapoints.extend(all_jobpoints)
+    print(f"Job datapoints length: {len(all_jobpoints)}")
+    # all_datapoints.extend(all_jobpoints)
 
     return all_datapoints
     

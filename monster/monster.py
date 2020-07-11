@@ -4,7 +4,6 @@ import json
 import sys
 sys.path.append('../')
 
-
 from bmcapi.fetch_bmc import fetch_bmc
 from ugeapi.fetch_uge import fetch_uge
 from sharings.utils import parse_config, check_config
@@ -36,5 +35,4 @@ def main():
 
 
 if __name__ == '__main__':
-    datapoints = main()
-    print(datapoints)
+    main()
