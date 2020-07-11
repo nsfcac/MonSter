@@ -33,6 +33,8 @@ def main():
         uge_config = config['uge']
         influx_config = config['influxdb']
 
+        fetch_datapoints(bmc_config, uge_config)
+
         # Initialize influxdb
         host = influx_config["host"]
         port = influx_config["port"]
@@ -40,7 +42,6 @@ def main():
 
         influx_client = InfluxDBClient(host=host, port=port, database=dbname)
 
-        run_monster(monster, bmc_config, uge_config, influx_client)
 
         # # Schedule run_monster
         # schedule.every(freq).seconds.do(run_monster, monster, 
