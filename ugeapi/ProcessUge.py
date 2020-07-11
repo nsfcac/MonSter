@@ -146,8 +146,7 @@ class ProcessUge():
         measurement = "NodeJobs"
         label = "JobList"
         value = str(list(self.job_info.keys()))
-        datapoint = self.__gen_datapoint(measurement, label, value)
-        self.job_list_points.append(datapoint)
+        self.job_list_points = self.__gen_datapoint(measurement, label, value)
         return
 
 
