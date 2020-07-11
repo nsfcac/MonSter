@@ -16,7 +16,7 @@ def fetch_uge(uge_config: dict) -> list:
     curl http://129.118.104.35:8182/jobs | python -m json.tool
     curl http://129.118.104.35:8182/hostsummary/compute/467 | python -m json.tool
     """
-    uge_points = {}
+    uge_metrics = {}
     try:
         api = uge_config["api"]
         job_list_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}"
@@ -34,9 +34,9 @@ def fetch_uge(uge_config: dict) -> list:
         all_data = parallel_process(host_summary, timestamp)
 
         # Aggregate processed metrics
-        uge_points = aggregate(all_data, timestamp)
+        uge_metrics = aggregate(all_data, timestamp)
 
-        return uge_points
+        return uge_metrics
     except Exception as e:
         print(e)
     
@@ -86,7 +86,7 @@ def aggregate(all_data: dict, timestamp: int) -> list:
     """
     Aggregate datapoints, total nodes and cpu cores for each job
     """
-    uge_points = {}
+    uge_metrics = {}
     all_datapoints = []
     all_jobspoints = []
     # all_job_list = []
@@ -124,13 +124,13 @@ def aggregate(all_data: dict, timestamp: int) -> list:
             "NodeList": str(node_list)
         })
 
-    all_jobspoints = list(all_jobs_info.values())
+    # all_jobspoints = list(all_jobs_info.values())
 
-    uge_points.update({
+    uge_metrics.update({
         "timestamp": timestamp,
-        "datapoints": all_datapoints,
-        "jobspoints": all_jobspoints
+        "jobs_info": all_jobs_info,
+        "datapoints": all_datapoints
     })
 
-    return uge_points
+    return uge_metrics
     
