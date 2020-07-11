@@ -57,7 +57,7 @@ class ProcessUge():
             "tags": {
                 "JobId": job_id
             },
-            "time": self.timestamp,
+            "time": 0,
             "fields": {
                 "StartTime": start_time,
                 "SubmitTime": submit_time,
@@ -178,9 +178,8 @@ class ProcessUge():
         self.__process_job_list()
 
         all_data = {
-            "node": self.node_id,
             "datapoints": self.datapoints,
-            "job_info": self.jobs_info
+            "jobs_info": self.jobs_info
         }
 
         return all_data
