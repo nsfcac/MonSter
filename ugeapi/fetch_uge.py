@@ -16,7 +16,7 @@ def fetch_uge(uge_config: dict) -> list:
     curl http://129.118.104.35:8182/jobs | python -m json.tool
     curl http://129.118.104.35:8182/hostsummary/compute/467 | python -m json.tool
     """
-    all_datapoints = []
+    uge_points = {}
     try:
         api = uge_config["api"]
         job_list_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}"
@@ -127,8 +127,8 @@ def aggregate(all_data: dict) -> list:
     all_jobspoints = list(all_jobs_info.values())
 
     uge_points.update({
-        "all_datapoints": all_datapoints,
-        "all_jobspoints": all_jobspoints
+        "datapoints": all_datapoints,
+        "jobspoints": all_jobspoints
     })
 
     return uge_points

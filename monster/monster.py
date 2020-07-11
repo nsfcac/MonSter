@@ -26,9 +26,13 @@ def main():
         uge_datapoints = fetch_uge(uge_config)
 
         # Aggregate data points
-        all_datapoints = bmc_datapoints + uge_datapoints
+        all_datapoints = bmc_datapoints + uge_datapoints["datapoints"]
+        print(f"All datapoints length: {len(all_datapoints)}")
+
+        all_jobspoints = uge_datapoints["jobspoints"]
+        print(f"All jobspoints length: {len(all_jobspoints)}")
         
-        return all_datapoints
+        return
     except Exception as err:
         print(err)
     return
