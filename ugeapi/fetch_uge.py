@@ -34,9 +34,9 @@ def fetch_uge(uge_config: dict) -> list:
         all_data = parallel_process(host_summary, timestamp)
 
         # Aggregate processed metrics
-        all_datapoints = aggregate(all_data)
+        uge_points = aggregate(all_data)
 
-        return all_datapoints
+        return uge_points
     except Exception as e:
         print(e)
     
@@ -86,10 +86,11 @@ def aggregate(all_data: dict) -> list:
     """
     Aggregate datapoints, total nodes and cpu cores for each job
     """
+    uge_points = {}
     all_datapoints = []
-    all_jobpoints = []
+    all_jobspoints = []
     # all_job_list = []
-    all_job_info = {}
+    all_jobs_info = {}
     for data in all_data:
         datapoints = data["datapoints"]
         all_datapoints.extend(datapoints)
@@ -97,23 +98,30 @@ def aggregate(all_data: dict) -> list:
         job_list = list(job_info.keys())
         # all_job_list.extend(job_list)
         for job in job_list:
-            if job not in all_job_info:
-                all_job_info.update({
+            if job not in all_jobs_info:
+                all_jobs_info.update({
                     job: job_info[job]
                 })
             else:
-                pre_cores = all_job_info[job]["fields"]["CPUCores"]
+                pre_cores = all_jobs_info[job]["fields"]["CPUCores"]
                 cur_cores = job_info[job]["fields"]["CPUCores"]
-                pre_nodes = all_job_info[job]["fields"]["TotalNodes"]
-                all_job_info[job]["fields"].update({
+
+                pre_nodes = all_jobs_info[job]["fields"]["TotalNodes"]
+
+                pre_node_list = all_jobs_info[job]["fields"]["NodeList"]
+                cur_node_list = job_info[job]["fields"]["NodeList"]
+
+                all_jobs_info[job]["fields"].update({
                     "TotalNodes": pre_nodes + 1,
-                    "CPUCores": pre_cores + cur_cores
+                    "CPUCores": pre_cores + cur_cores,
+                    "NodeList": pre_node_list + cur_node_list
                 })
-    all_jobpoints = list(all_job_info.values())
+    all_jobspoints = list(all_jobs_info.values())
 
-    # print(f"Job Points length: {len(all_jobpoints)}")
-    # print(json.dumps(all_jobpoints, indent=4))
-    # all_datapoints.extend(all_jobpoints)
+    uge_points.update({
+        "all_datapoints": all_datapoints,
+        "all_jobspoints": all_jobspoints
+    })
 
-    return all_datapoints
+    return uge_points
     
