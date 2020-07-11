@@ -34,11 +34,11 @@ def main():
         influx_config = config['influxdb']
 
         # Initialize influxdb
-        host = influx_config["node"]
+        host = influx_config["host"]
         port = influx_config["port"]
         dbname = influx_config["database"]
 
-        influx_client = InfluxDBClient(host=node, port=port, database=dbname)
+        influx_client = InfluxDBClient(host=host, port=port, database=dbname)
 
         # Schedule run_monster
         schedule.every(freq).seconds.do(run_monster, monster, 
