@@ -125,6 +125,7 @@ class ProcessUge():
                 if job["masterQueue"] != "MASTER":
                     if "taskId" in job:
                         job_id = f"{job['id']}.{job['taskId']}"
+                        print(f"TASKID: {job_id}")
                     else:
                         job_id = f"{job['id']}"
                         # Collect unique job info
