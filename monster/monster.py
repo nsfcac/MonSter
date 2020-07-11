@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import json
-import sys
-sys.path.append('../')
+# import sys
+# sys.path.append('../')
 
 
 from bmcapi.fetch_bmc import fetch_bmc
