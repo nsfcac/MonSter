@@ -14,15 +14,15 @@ class ProcessUge():
         self.job_info = {}
         self.metrics = metrics
         self.timestamp = timestamp
-        self.node_id = __get_node_id(self.metrics)
+        self.node_id = self.__get_node_id()
     
 
-    def __get_node_id(self, metrics) -> str:
+    def __get_node_id(self) -> str:
         """
         Get node id (i.e. ip address, 10.101.1.1) from hostname ('compute-1-1.localdomain'),
         This method only applies for the Quanah cluster
         """
-        hostname = metrics.get("hostname", None)
+        hostname = self.metrics.get("hostname", None)
         if "-" in hostname:
             h0, h1, h2 = hostname.split('-')
             return '10.101.' + h1 + '.' + h2.split('.')[0]
