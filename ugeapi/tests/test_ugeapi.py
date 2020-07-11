@@ -21,4 +21,4 @@ uge_config = {
 
 datapoints = fetch_uge(uge_config)
 # print(f"UGE metrics length: {len(datapoints)}")
-print(json.dumps(datapoints, indent=4))
+# print(json.dumps(datapoints, indent=4))

@@ -47,10 +47,10 @@ class ProcessUge():
         return datapoint
     
 
-    def __process_job_info(self, job_id: int, start_time: int, submit_time: int, 
+    def __gen_jobpoint(self, job_id: int, start_time: int, submit_time: int, 
                            job_name: str, user: str) -> dict:
         """
-        Generate job info data point
+        Generate job data point
         """
         datapoint = {
             "measurement": "JobsInfo",
@@ -88,22 +88,28 @@ class ProcessUge():
         """
         resource = self.metrics.get("resourceNumericValues")
         if resource:
-            # CPU usage
-            cpu = resource.get("cpu", None)
-            if cpu:
+            # CPU usage, since CPU usage in UGE is not accurate (probably wrong),
+            # We use np_load_short, which is the load average in the last minute 
+            # divided by the number of process, to represent the CPU usage. If 
+            # it's value is larger than 1, the CPU usage will be 100%
+            np_load_short = resource.get("cpu", None)
+            if np_load_short:
                 measurement = "CPUUsage"
                 label = "UGE"
-                value = float("{0:.2f}".format(cpu))
+                if np_load_short >= 1:
+                    value = float("{0:.2f}".format(100))
+                else:
+                    value = float("{0:.2f}".format( np_load_short * 100 ))
                 datapoint = self.__gen_datapoint(measurement, label, value)
                 self.datapoints.append(datapoint)
 
             # Memory usage
-            mem_free = resource.get("mem_free", None)
+            mem_used = resource.get("mem_used", None)
             mem_total = resource.get("mem_total", None)
-            if mem_free and mem_total:
+            if mem_used and mem_total:
                 measurement = "MemUsage"
                 label = "UGE"
-                value = float("{0:.2f}".format( (mem_total-mem_free)/mem_total * 100 ))
+                value = float("{0:.2f}".format( mem_used/mem_total * 100 ))
                 datapoint = self.__gen_datapoint(measurement, label, value)
                 self.datapoints.append(datapoint)
         return
@@ -129,7 +135,7 @@ class ProcessUge():
                             job_name = job["name"]
                             user = job["user"]
                             # Get job info data point
-                            job_info = self.__process_job_info(job_id, start_time, submit_time, job_name, user)
+                            job_info = self.__gen_jobpoint(job_id, start_time, submit_time, job_name, user)
                             # Add job info of job_id
                             self.job_info.update({
                                 job_id: job_info
