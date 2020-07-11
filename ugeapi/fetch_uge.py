@@ -118,12 +118,12 @@ def aggregate(all_data: dict) -> list:
                 })
 
     # Stringify NodeList in job info
-    for job_info in all_jobs_info:
+    for job_info in all_jobs_info.values():
         node_list = job_info["fields"]["NodeList"]
         job_info.update({
             "NodeList": str(node_list)
         })
-        
+
     all_jobspoints = list(all_jobs_info.values())
 
     uge_points.update({
