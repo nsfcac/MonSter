@@ -60,13 +60,11 @@ def parallel_process(metrics: list, timestamp: int) -> list:
     """
     Parallel process metrics
     """
-    flat_datapoints = []
+    all_data = []
     process_args = zip(metrics, repeat(timestamp))
     with multiprocessing.Pool() as pool:
-        datapoints = pool.starmap(process, process_args)
-    # flat_datapoints = [item for sublist in datapoints for item in sublist]
-    flat_datapoints = datapoints
-    return flat_datapoints
+        all_data = pool.starmap(process, process_args)
+    return all_data
 
 
 def process(metrics: dict, timestamp: int) -> list:
@@ -78,5 +76,11 @@ def process(metrics: dict, timestamp: int) -> list:
     datapoints = process.get_datapoints()
 
     return datapoints
+
+
+# def aggregate(all_data: dict) -> None:
+#     all_datapoints = []
+#     for data in all_data:
+#         datapoints = data["datapoints"]
 
     
