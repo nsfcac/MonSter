@@ -40,16 +40,18 @@ def main():
 
         influx_client = InfluxDBClient(host=host, port=port, database=dbname)
 
-        # Schedule run_monster
-        schedule.every(freq).seconds.do(run_monster, monster, 
-                                        bmc_config, uge_config, influx_client)
+        run_monster(monster, bmc_config, uge_config, influx_client)
+
+        # # Schedule run_monster
+        # schedule.every(freq).seconds.do(run_monster, monster, 
+        #                                 bmc_config, uge_config, influx_client)
         
-        while True:
-            try:
-                schedule.run_pending()
-                time.sleep(schedule.idle_seconds())
-            except KeyboardInterrupt:
-                break   
+        # while True:
+        #     try:
+        #         schedule.run_pending()
+        #         time.sleep(schedule.idle_seconds())
+        #     except KeyboardInterrupt:
+        #         break   
 
         return
     except Exception as err:
@@ -71,7 +73,8 @@ def monster(bmc_config: dict, uge_config: dict, influx_client: object) -> None:
     Fetch and write datapoints into influxdb
     """
     all_datapoints = fetch_datapoints(bmc_config, uge_config)
-    influx_client.write_points(all_datapoints)
+    print(json.dumps(all_datapoints, indent=4))
+    # influx_client.write_points(all_datapoints)
     return
 
 
