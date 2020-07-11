@@ -2,8 +2,6 @@ import json
 import time
 import requests
 import multiprocessing
-import sys
-sys.path.append('../')
 
 from itertools import repeat
 
