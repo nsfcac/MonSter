@@ -104,7 +104,7 @@ def aggregate(all_data: dict) -> list:
                 pre_nodes = all_job_info[job]["fields"]["TotalNodes"]
                 all_job_info[job]["fields"].update({
                     "TotalNodes": pre_nodes + 1,
-                    "TotalCores": pre_cores + cur_cores
+                    "CPUCores": pre_cores + cur_cores
                 })
     all_jobpoints = list(all_job_info.values())
     all_datapoints.extend(all_jobpoints)
