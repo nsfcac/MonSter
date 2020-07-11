@@ -146,7 +146,7 @@ class ProcessUge():
         measurement = "NodeJobs"
         label = "JobList"
         value = str(list(self.job_info.keys()))
-        self.job_list_points = self.__gen_datapoint(measurement, label, value)
+        self.datapoints = self.__gen_datapoint(measurement, label, value)
         return
 
 
@@ -160,11 +160,10 @@ class ProcessUge():
         # it should be put after self.__process_job
         self.__process_job_list()
 
-        all_info = {
+        all_data = {
             "node": self.node_id,
             "datapoints": self.datapoints,
-            "job_list_points": self.job_list_points,
             "job_info": self.job_info
         }
 
-        return all_info
+        return all_data
