@@ -11,7 +11,7 @@ class ProcessUge():
     def __init__(self, metrics: dict, timestamp: int) -> None:
         self.datapoints = []
         self.job_list_points = []
-        self.job_info = {}
+        self.jobs_info = {}
         self.metrics = metrics
         self.timestamp = timestamp
         self.node_id = self.__get_node_id()
@@ -65,7 +65,8 @@ class ProcessUge():
                 "JobName": job_name,
                 "User": user,
                 "TotalNodes": 1,
-                "CPUCores": 1
+                "CPUCores": 1,
+                "NodeList":[]
             }
         }
         return datapoint
@@ -75,8 +76,8 @@ class ProcessUge():
         """
         Update CPUCores of the job info
         """
-        current_cores = self.job_info[job_id]["fields"]["CPUCores"]
-        self.job_info[job_id]["fields"].update({
+        current_cores = self.jobs_info[job_id]["fields"]["CPUCores"]
+        self.jobs_info[job_id]["fields"].update({
             "CPUCores": current_cores + 1
         })
         return
@@ -129,7 +130,7 @@ class ProcessUge():
                     else:
                         job_id = f"{job['id']}"
                     # Collect unique job info
-                    if job_id not in self.job_info:
+                    if job_id not in self.jobs_info:
                         # Preprocess time
                         start_time = int(parse(job["startTime"]).timestamp()) * 1000000
                         submit_time = int(parse(job["submitTime"]).timestamp()) * 1000000
@@ -138,12 +139,19 @@ class ProcessUge():
                         # Get job info data point
                         job_info = self.__gen_jobpoint(job_id, start_time, submit_time, job_name, user)
                         # Add job info of job_id
-                        self.job_info.update({
+                        self.jobs_info.update({
                             job_id: job_info
                         })
                     else:
                         # Update cores info of the job
                         self.__update_cores(job_id)
+            # Update NodeList: node_id - cores
+            for job_info in self.jobs_info.values():
+                cores = job_info["fields"]["CPUCores"]
+                node_list = [f"{self.node_id}-{cores}"]
+                job_info["fields"].update({
+                    "NodeList": node_list
+                })
         return
 
 
@@ -153,7 +161,7 @@ class ProcessUge():
         """
         measurement = "NodeJobs"
         label = "JobList"
-        value = str(list(self.job_info.keys()))
+        value = str(list(self.jobs_info.keys()))
         datapoint = self.__gen_datapoint(measurement, label, value)
         self.datapoints.append(datapoint)
         return
@@ -165,14 +173,14 @@ class ProcessUge():
         """
         self.__process_cpu_mem()
         self.__process_job()
-        # job list is calculated based on the self.job_info, 
+        # job list is calculated based on the self.jobs_info, 
         # it should be put after self.__process_job
         self.__process_job_list()
 
         all_data = {
             "node": self.node_id,
             "datapoints": self.datapoints,
-            "job_info": self.job_info
+            "job_info": self.jobs_info
         }
 
         return all_data
