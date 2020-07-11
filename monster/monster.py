@@ -37,4 +37,4 @@ def main():
 
 if __name__ == '__main__':
     datapoints = main()
-    print(len(datapoints))
+    print(datapoints)
