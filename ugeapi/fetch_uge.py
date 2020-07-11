@@ -112,7 +112,8 @@ def aggregate(all_data: dict) -> list:
     all_jobpoints = list(all_job_info.values())
 
     print(f"Job Points length: {len(all_jobpoints)}")
-    print(f"Job List length: {len(list(set(all_job_list)))}")
+    # print(f"Job List length: {len(list(set(all_job_list)))}")
+    print(json.dumps(all_jobpoints, indent=4))
     # all_datapoints.extend(all_jobpoints)
 
     return all_datapoints
