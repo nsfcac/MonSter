@@ -132,8 +132,8 @@ class ProcessUge():
                     # Collect unique job info
                     if job_id not in self.jobs_info:
                         # Preprocess time
-                        start_time = int(parse(job["startTime"]).timestamp()) * 1000000
-                        submit_time = int(parse(job["submitTime"]).timestamp()) * 1000000
+                        start_time = int(parse(job["startTime"]).timestamp()) * 1000000000
+                        submit_time = int(parse(job["submitTime"]).timestamp()) * 1000000000
                         job_name = job["name"]
                         user = job["user"]
                         # Get job info data point
