@@ -13,9 +13,12 @@ from bmcapi.fetch_bmc import fetch_bmc
 from ugeapi.fetch_uge import fetch_uge
 from sharings.utils import parse_config, check_config
 
+path = os.getcwd()
+logging_path = path + '/MonSter/monster.log'
+
 logging.basicConfig(
     level=logging.ERROR,
-    filename='monster.log',
+    filename= logging_path,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
@@ -23,7 +26,7 @@ logging.basicConfig(
 
 def main():
     # Read configuration file
-    config_path = os.getcwd() + '/MonSter/config.yml'
+    config_path = path + '/MonSter/config.yml'
     config = parse_config(config_path)
 
     # Check sanity
