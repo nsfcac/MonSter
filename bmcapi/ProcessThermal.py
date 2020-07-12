@@ -40,10 +40,12 @@ class ProcessThermal():
         if fans:
             measurement = "FanSensor"
             for fan in fans:
-                label = fan["Name"]
-                value = int(fan["Reading"])
-                datapoint = self.__gen_datapoint(measurement, label, value)
-                self.datapoints.append(datapoint)
+                reading = fan.get("Reading", None)
+                if reading:
+                    label = fan["Name"]
+                    value = int(reading)
+                    datapoint = self.__gen_datapoint(measurement, label, value)
+                    self.datapoints.append(datapoint)
     
 
     def __process_temps(self) -> None:
@@ -54,10 +56,12 @@ class ProcessThermal():
         if temps:
             measurement = "TempSensor"
             for temp in temps:
-                label = temp["Name"]
-                value = float("{0:.2f}".format(temp["ReadingCelsius"]))
-                datapoint = self.__gen_datapoint(measurement, label, value)
-                self.datapoints.append(datapoint)
+                reading = temp.get("ReadingCelsius", None)
+                if reading:
+                    label = temp["Name"]
+                    value = float("{0:.2f}".format(reading))
+                    datapoint = self.__gen_datapoint(measurement, label, value)
+                    self.datapoints.append(datapoint)
 
     
     def get_datapoints(self) -> list:
