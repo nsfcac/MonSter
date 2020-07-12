@@ -2,13 +2,13 @@ import yaml
 import json
 
 
-def parse_config(route: str) -> object:
+def parse_config(path: str) -> object:
     """
     Read configuration file
     """
     cfg = []
     try:
-        with open(route, 'r') as ymlfile:
+        with open(path, 'r') as ymlfile:
             cfg = yaml.safe_load(ymlfile)
         return cfg
     except Exception as err:
