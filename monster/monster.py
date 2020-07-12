@@ -23,7 +23,7 @@ logging.basicConfig(
 # Temporarily store previous job list; compared with the current job list and
 # estimate the Finish time of the job; If it is in the previous list but not in
 # the current job list, its finish time should before the current time stamp
-prev_joblist = []
+prev_jobs_info = {}
 
 
 def main():
@@ -98,7 +98,8 @@ def fetch_datapoints(bmc_config: dict, uge_config: dict) -> list:
     and estimate job finish time
     """
     all_datapoints = []
-    global prev_joblist
+    job_datapoints = []
+    global prev_jobs_info
     try:
         # Fetch BMC datapoints and uge metrics
         bmc_datapoints = fetch_bmc(bmc_config)
@@ -107,21 +108,20 @@ def fetch_datapoints(bmc_config: dict, uge_config: dict) -> list:
         # UGE metrics
         uge_datapoints = uge_metrics["datapoints"]
         timestamp = uge_metrics["timestamp"]
-        jobs_info = uge_metrics["jobs_info"]
-
-        # Current job list
-        curr_joblist = list(jobs_info.keys())
+        curr_jobs_info = uge_metrics["jobs_info"]
         
         # Compare the current job list with the previous job list and update finish time
-        # for job in prev_joblist:
-        #     if job not in curr_joblist:
-        #         jobs_info[job]["fields"].update({
-        #             "FinishTime": timestamp
-        #         })
-        job_datapoints = list(jobs_info.values())
+        for job in prev_jobs_info:
+            if job not in curr_jobs_info:
+                prev_jobs_info[job]["fields"].update({
+                    "FinishTime": timestamp
+                })
+                job_datapoints.append(prev_jobs_info[job])
+
+        job_datapoints.extend(list(curr_jobs_info.values()))
 
         # Update previous job list
-        prev_joblist = curr_joblist
+        prev_jobs_info = curr_jobs_info
 
         # Contatenate all data points
         all_datapoints.extend(bmc_datapoints)
