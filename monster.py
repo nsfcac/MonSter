@@ -24,6 +24,7 @@ logging.basicConfig(
 def main():
     # Read configuration file
     config_path = os.getcwd() + '/config.yml'
+    print(config_path)
     config = parse_config(config_path)
 
     # Check sanity
