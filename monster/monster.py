@@ -6,7 +6,7 @@ import logging
 import threading
 from influxdb import InfluxDBClient
 import sys
-sys.path.append('../')
+sys.path.append('/home/monster/TestMonSter/MonSter/')
 
 from bmcapi.fetch_bmc import fetch_bmc
 from ugeapi.fetch_uge import fetch_uge
