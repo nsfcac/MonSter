@@ -141,6 +141,9 @@ def process(node_metrics: dict, category: str, timestamp: int) -> list:
     """
     datapoints = []
 
+    # If node metrics is None, does not need process
+    if not node_metrics:
+        return datapoints
     if category == "thermal":
         process = ProcessThermal(node_metrics, timestamp)
     elif category == "power":
