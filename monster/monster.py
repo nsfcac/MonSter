@@ -113,11 +113,11 @@ def fetch_datapoints(bmc_config: dict, uge_config: dict) -> list:
         curr_joblist = list(jobs_info.keys())
         
         # Compare the current job list with the previous job list and update finish time
-        for job in prev_joblist:
-            if job not in curr_joblist:
-                jobs_info[job]["fields"].update({
-                    "FinishTime": timestamp
-                })
+        # for job in prev_joblist:
+        #     if job not in curr_joblist:
+        #         jobs_info[job]["fields"].update({
+        #             "FinishTime": timestamp
+        #         })
         job_datapoints = list(jobs_info.values())
 
         # Update previous job list
