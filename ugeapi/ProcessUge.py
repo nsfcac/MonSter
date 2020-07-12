@@ -93,7 +93,7 @@ class ProcessUge():
             # We use np_load_short, which is the load average in the last minute 
             # divided by the number of process, to represent the CPU usage. If 
             # it's value is larger than 1, the CPU usage will be 100%
-            np_load_short = resource.get("cpu", None)
+            np_load_short = resource.get("np_load_short", None)
             if np_load_short:
                 measurement = "CPUUsage"
                 label = "UGE"
