@@ -2,6 +2,7 @@
 
 import json
 import time
+import logging
 import threading
 import schedule
 from influxdb import InfluxDBClient
@@ -12,6 +13,12 @@ from bmcapi.fetch_bmc import fetch_bmc
 from ugeapi.fetch_uge import fetch_uge
 from sharings.utils import parse_config, check_config
 
+logging.basicConfig(
+    level=logging.ERROR,
+    filename='monster.log',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S %Z'
+)
 
 # Temporarily store previous job list; compared with the current job list and
 # estimate the Finish time of the job; If it is in the previous list but not in

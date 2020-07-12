@@ -1,5 +1,6 @@
 import json
 import time
+import logging
 import requests
 import multiprocessing
 
@@ -37,8 +38,8 @@ def fetch_uge(uge_config: dict) -> list:
         uge_metrics = aggregate(all_data, timestamp)
 
         return uge_metrics
-    except Exception as e:
-        print(e)
+    except Exception as err:
+        logging.error(f"Fetch UGE metrics error: {err}")
     
 
 def fetch(uge_config:dict, url: str) -> list:

@@ -1,6 +1,7 @@
 import json
-import multiprocessing
 import time
+import logging
+import multiprocessing
 
 from itertools import repeat
 
@@ -61,8 +62,8 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         return bmc_datapoints
 
-    except Exception as e:
-        print(e)
+    except Exception as err:
+        logging.error(f"Fetch BMC metrics error: {err}")
 
 
 def partition(arr:list, cores: int) -> list:
