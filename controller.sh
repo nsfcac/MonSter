@@ -6,4 +6,8 @@ source ${sourceFile}
 
 python $PWD/MonSter/monster.py
 
+# Submit cron job by:
+# crontab -e
 # */1 * * * * /home/monster/MonSter/controller.sh
+# Show cron job
+# crontab -l
