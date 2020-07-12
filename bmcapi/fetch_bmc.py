@@ -63,7 +63,7 @@ def fetch_bmc(bmc_config: dict) -> list:
         return bmc_datapoints
 
     except Exception as err:
-        logging.error(f"Fetch BMC metrics error: {err}")
+        logging.error(f"Fetch BMC metrics error : {err}")
 
 
 def partition(arr:list, cores: int) -> list:
@@ -84,7 +84,7 @@ def partition(arr:list, cores: int) -> list:
                 groups.append(arr[i * arr_per_core : increment * arr_per_core])
                 increment += 1
     except Exception as err:
-        logging.error(f"fetch_bmc : partition error: {err}")
+        logging.error(f"fetch_bmc : partition error : {err}")
     return groups
 
 
@@ -109,7 +109,7 @@ def parallel_fetch(bmc_config: dict, urls: list, nodes: list, cores: int) -> lis
 
         flatten_metrics = [item for sublist in metrics for item in sublist]
     except Exception as err:
-        logging.error(f"fetch_bmc : parallel_fetch error: {err}")
+        logging.error(f"fetch_bmc : parallel_fetch error : {err}")
 
     return flatten_metrics
 
@@ -126,7 +126,7 @@ def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
                             max_retries = bmc_config['max_retries'])
         bmc_metrics = bmc.bulk_fetch(urls, nodes)
     except Exception as err:
-        logging.error(f"fetch_bmc : parallel_fetch : fetch error: {err}")
+        logging.error(f"fetch_bmc : parallel_fetch : fetch error : {err}")
     return bmc_metrics
 
 
@@ -142,7 +142,7 @@ def parallel_process(node_metrics: list, category: str, timestamp: int) -> list:
             datapoints = pool.starmap(process, process_args)
         flat_datapoints = [item for sublist in datapoints for item in sublist]
     except Exception as err:
-        logging.error(f"fetch_bmc : parallel_process error: {err}")
+        logging.error(f"fetch_bmc : parallel_process error : {err}")
     return flat_datapoints
 
 
@@ -166,5 +166,5 @@ def process(node_metrics: dict, category: str, timestamp: int) -> list:
 
         datapoints = process.get_datapoints()
     except Exception as err:
-        logging.error(f"fetch_bmc : parallel_process : process error:{err}")
+        logging.error(f"fetch_bmc : parallel_process : process error : {err}")
     return datapoints
