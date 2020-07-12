@@ -64,7 +64,7 @@ def main():
 
         return
     except Exception as err:
-        print(err)
+        logging.error(f"main error : {err}")
     return
 
 
@@ -72,9 +72,12 @@ def run_monster(monster, bmc_config: dict, uge_config: dict, influx_client: obje
     """
     Create monster threads
     """
-    job_thread = threading.Thread(target=monster, 
-                                  args=(bmc_config, uge_config, influx_client))
-    job_thread.start()
+    try:
+        job_thread = threading.Thread(target=monster, 
+                                    args=(bmc_config, uge_config, influx_client))
+        job_thread.start()
+    except Exception as err:
+        logging.error(f"run_monster error : {err}")
 
 
 def monster(bmc_config: dict, uge_config: dict, influx_client: object) -> None:
@@ -84,8 +87,8 @@ def monster(bmc_config: dict, uge_config: dict, influx_client: object) -> None:
     try:
         all_datapoints = fetch_datapoints(bmc_config, uge_config)
         influx_client.write_points(all_datapoints)
-    except Exception as e:
-        print(e)
+    except Exception as err:
+        logging.error(f"monster error : {err}")
     return
 
 
@@ -96,38 +99,41 @@ def fetch_datapoints(bmc_config: dict, uge_config: dict) -> list:
     """
     all_datapoints = []
     global prev_joblist
-    # Fetch BMC datapoints and uge metrics
-    bmc_datapoints = fetch_bmc(bmc_config)
-    uge_metrics = fetch_uge(uge_config)
+    try:
+        # Fetch BMC datapoints and uge metrics
+        bmc_datapoints = fetch_bmc(bmc_config)
+        uge_metrics = fetch_uge(uge_config)
 
-    # UGE metrics
-    uge_datapoints = uge_metrics["datapoints"]
-    timestamp = uge_metrics["timestamp"]
-    jobs_info = uge_metrics["jobs_info"]
+        # UGE metrics
+        uge_datapoints = uge_metrics["datapoints"]
+        timestamp = uge_metrics["timestamp"]
+        jobs_info = uge_metrics["jobs_info"]
 
-    # Current job list
-    curr_joblist = list(jobs_info.keys())
-    
-    # Compare the current job list with the previous job list and update finish time
-    for job in prev_joblist:
-        if job not in curr_joblist:
-            jobs_info[job]["fields"].update({
-                "FinishTime": timestamp
-            })
-    job_datapoints = list(jobs_info.values())
+        # Current job list
+        curr_joblist = list(jobs_info.keys())
+        
+        # Compare the current job list with the previous job list and update finish time
+        for job in prev_joblist:
+            if job not in curr_joblist:
+                jobs_info[job]["fields"].update({
+                    "FinishTime": timestamp
+                })
+        job_datapoints = list(jobs_info.values())
 
-    # Update previous job list
-    prev_joblist = curr_joblist
+        # Update previous job list
+        prev_joblist = curr_joblist
 
-    # Contatenate all data points
-    all_datapoints.extend(bmc_datapoints)
-    all_datapoints.extend(uge_datapoints)
-    all_datapoints.extend(job_datapoints)
+        # Contatenate all data points
+        all_datapoints.extend(bmc_datapoints)
+        all_datapoints.extend(uge_datapoints)
+        all_datapoints.extend(job_datapoints)
 
-    # print(f"BMC data points length: {len(bmc_datapoints)}")
-    # print(f"UGE data points length: {len(uge_datapoints)}")
-    # print(f"Job data points length: {len(job_datapoints)}")
-    # print(json.dumps(all_datapoints, indent=4))
+        # print(f"BMC data points length: {len(bmc_datapoints)}")
+        # print(f"UGE data points length: {len(uge_datapoints)}")
+        # print(f"Job data points length: {len(job_datapoints)}")
+        # print(json.dumps(all_datapoints, indent=4))
+    except Exception as err:
+        logging.error(f"fetch_datapoints error : {err}")
 
     return all_datapoints
 
