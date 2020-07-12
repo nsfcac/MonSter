@@ -42,6 +42,7 @@ def main():
 
         influx_client = InfluxDBClient(host=host, port=port, database=dbname)
 
+        monster(bmc_config, uge_config, influx_client)
 
         # # Schedule run_monster
         # schedule.every(freq).seconds.do(run_monster, monster, 
@@ -74,8 +75,7 @@ def monster(bmc_config: dict, uge_config: dict, influx_client: object) -> None:
     Fetch and write datapoints into influxdb
     """
     all_datapoints = fetch_datapoints(bmc_config, uge_config)
-    print(json.dumps(all_datapoints, indent=4))
-    # influx_client.write_points(all_datapoints)
+    influx_client.write_points(all_datapoints)
     return
 
 
@@ -110,10 +110,8 @@ def fetch_datapoints(bmc_config: dict, uge_config: dict) -> list:
     prev_joblist = curr_joblist
 
     # Contatenate all data points
-    print(type(bmc_datapoints))
-    print(type(uge_datapoints))
-    print(type(job_datapoints))
-    # all_datapoints = bmc_datapoints + uge_datapoints + job_datapoints
+
+    all_datapoints = bmc_datapoints + uge_datapoints + job_datapoints
 
     # print(f"BMC data points length: {len(bmc_datapoints)}")
     # print(f"UGE data points length: {len(uge_datapoints)}")
