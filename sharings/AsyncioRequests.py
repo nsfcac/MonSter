@@ -40,8 +40,8 @@ class AsyncioRequests:
                 return {"node": node, "metrics": {}}
             return await self.__fetch_json(url, node, session)
         except:
-            return {"node": node, "metrics": {}}
             logging.error(f"Cannot fetch data from {node} : url")
+            return {"node": node, "metrics": {}}
 
 
     async def __requests(self, urls: list, nodes: list) -> list:
