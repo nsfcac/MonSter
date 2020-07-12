@@ -49,18 +49,16 @@ def main():
 
         influx_client = InfluxDBClient(host=host, port=port, database=dbname)
 
-        monster(bmc_config, uge_config, influx_client)
-
-        # # Schedule run_monster
-        # schedule.every(freq).seconds.do(run_monster, monster, 
-        #                                 bmc_config, uge_config, influx_client)
+        # Schedule run_monster
+        schedule.every(freq).seconds.do(run_monster, monster, 
+                                        bmc_config, uge_config, influx_client)
         
-        # while True:
-        #     try:
-        #         schedule.run_pending()
-        #         time.sleep(schedule.idle_seconds())
-        #     except KeyboardInterrupt:
-        #         break   
+        while True:
+            try:
+                schedule.run_pending()
+                time.sleep(schedule.idle_seconds())
+            except KeyboardInterrupt:
+                break   
 
         return
     except Exception as err:
