@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-readonly sourceFile="/home/monster/TestMonSter/MonSter/env/bin/activate"
+readonly sourceFile="$PWD/env/bin/activate"
 source ${sourceFile}
 
-python /home/monster/TestMonSter/MonSter/monster.py
+python $PWD/monster.py
