@@ -49,7 +49,10 @@ def fetch_bmc(bmc_config: dict) -> list:
         sys_health_points = parallel_process(sys_health_metrics, "sys_health", timestamp)
         
         # Merge datapoints
-        bmc_datapoints = thermal_points + power_points + bmc_health_points + sys_health_points
+        bmc_datapoints.extend(thermal_points)
+        bmc_datapoints.extend(power_points)
+        bmc_datapoints.extend(bmc_health_points)
+        bmc_datapoints.extend(sys_health_points)
 
         # total_elapsed = float("{0:.2f}".format(time.time() - query_start))
 
