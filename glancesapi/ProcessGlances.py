@@ -20,9 +20,9 @@ class ProcessGlances():
         Convert time string to epoch, if does not have a time string, return current epoch time
         """
         if time_str:
-            return int(parse(time_str).timestamp()) * 1000000
+            return int(parse(time_str).timestamp()) * 1000000000
         else:
-            return int(time.time()) * 1000000
+            return int(time.time()) * 1000000000
 
 
     def __gen_datapoint(self, measurement: str, label: str, value: float) -> dict:
