@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-readonly sourceFile="$PWD/env/bin/activate"
+readonly sourceFile="/home/monster/MonSter/env/bin/activate"
 
 source ${sourceFile}
 
-python $PWD/monster.py
+python /home/monster/MonSter/monster.py
 
 # */1 * * * * /home/monster/MonSter/controller.sh
