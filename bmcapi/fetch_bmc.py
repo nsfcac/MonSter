@@ -71,17 +71,20 @@ def partition(arr:list, cores: int) -> list:
     Partition urls/nodes into several groups based on # of cores
     """
     groups = []
-    arr_len = len(arr)
-    arr_per_core = arr_len // cores
-    arr_surplus = arr_len % cores
+    try:
+        arr_len = len(arr)
+        arr_per_core = arr_len // cores
+        arr_surplus = arr_len % cores
 
-    increment = 1
-    for i in range(cores):
-        if(arr_surplus != 0 and i == (cores-1)):
-            groups.append(arr[i * arr_per_core:])
-        else:
-            groups.append(arr[i * arr_per_core : increment * arr_per_core])
-            increment += 1
+        increment = 1
+        for i in range(cores):
+            if(arr_surplus != 0 and i == (cores-1)):
+                groups.append(arr[i * arr_per_core:])
+            else:
+                groups.append(arr[i * arr_per_core : increment * arr_per_core])
+                increment += 1
+    except Exception as err:
+        logging.error(f"fetch_bmc : partition error: {err}")
     return groups
 
 
@@ -90,20 +93,23 @@ def parallel_fetch(bmc_config: dict, urls: list, nodes: list, cores: int) -> lis
     Spread fetching across cores
     """
     flatten_metrics = []
-    # Partition
-    urls_group = partition(urls, cores)
-    nodes_group = partition(nodes, cores)
+    try:
+        # Partition
+        urls_group = partition(urls, cores)
+        nodes_group = partition(nodes, cores)
 
-    fetch_args = []
-    for i in range(cores):
-        urls = urls_group[i]
-        nodes = nodes_group[i]
-        fetch_args.append((bmc_config, urls, nodes))
+        fetch_args = []
+        for i in range(cores):
+            urls = urls_group[i]
+            nodes = nodes_group[i]
+            fetch_args.append((bmc_config, urls, nodes))
 
-    with multiprocessing.Pool() as pool:
-        metrics = pool.starmap(fetch, fetch_args)
+        with multiprocessing.Pool() as pool:
+            metrics = pool.starmap(fetch, fetch_args)
 
-    flatten_metrics = [item for sublist in metrics for item in sublist]
+        flatten_metrics = [item for sublist in metrics for item in sublist]
+    except Exception as err:
+        logging.error(f"fetch_bmc : parallel_fetch error: {err}")
 
     return flatten_metrics
 
@@ -112,12 +118,15 @@ def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
     """
     Use AsyncioRequests to query urls
     """
-    bmc = AsyncioRequests(auth = (bmc_config['user'], 
-                                  bmc_config['password']),
-                          timeout = (bmc_config['timeout']['connect'], 
-                                     bmc_config['timeout']['read']),
-                          max_retries = bmc_config['max_retries'])
-    bmc_metrics = bmc.bulk_fetch(urls, nodes)
+    try:
+        bmc = AsyncioRequests(auth = (bmc_config['user'], 
+                                    bmc_config['password']),
+                            timeout = (bmc_config['timeout']['connect'], 
+                                        bmc_config['timeout']['read']),
+                            max_retries = bmc_config['max_retries'])
+        bmc_metrics = bmc.bulk_fetch(urls, nodes)
+    except Exception as err:
+        logging.error(f"fetch_bmc : parallel_fetch : fetch error: {err}")
     return bmc_metrics
 
 
@@ -127,10 +136,13 @@ def parallel_process(node_metrics: list, category: str, timestamp: int) -> list:
     node_metrics refer to a list of {'node': node_id, 'metrics': metric}
     """
     flat_datapoints = []
-    process_args = zip(node_metrics, repeat(category), repeat(timestamp))
-    with multiprocessing.Pool() as pool:
-        datapoints = pool.starmap(process, process_args)
-    flat_datapoints = [item for sublist in datapoints for item in sublist]
+    try:
+        process_args = zip(node_metrics, repeat(category), repeat(timestamp))
+        with multiprocessing.Pool() as pool:
+            datapoints = pool.starmap(process, process_args)
+        flat_datapoints = [item for sublist in datapoints for item in sublist]
+    except Exception as err:
+        logging.error(f"fetch_bmc : parallel_process error: {err}")
     return flat_datapoints
 
 
@@ -140,21 +152,19 @@ def process(node_metrics: dict, category: str, timestamp: int) -> list:
     node_metrics refer to {'node': node_id, 'metrics': metric}
     """
     datapoints = []
+    try:
+        if category == "thermal":
+            process = ProcessThermal(node_metrics, timestamp)
+        elif category == "power":
+            process = ProcessPower(node_metrics, timestamp)
+        elif category == "bmc_health":
+            process = ProcessHealth(node_metrics, "BMC", timestamp)
+        elif category == "sys_health":
+            process = ProcessHealth(node_metrics, "System", timestamp)
+        else:
+            return datapoints
 
-    # If node metrics is None, does not need process
-    if not node_metrics:
-        return datapoints
-    if category == "thermal":
-        process = ProcessThermal(node_metrics, timestamp)
-    elif category == "power":
-        process = ProcessPower(node_metrics, timestamp)
-    elif category == "bmc_health":
-        process = ProcessHealth(node_metrics, "BMC", timestamp)
-    elif category == "sys_health":
-        process = ProcessHealth(node_metrics, "System", timestamp)
-    else:
-        return datapoints
-
-    datapoints = process.get_datapoints()
-
+        datapoints = process.get_datapoints()
+    except Exception as err:
+        logging.error(f"fetch_bmc : parallel_process : process error:{err}")
     return datapoints
