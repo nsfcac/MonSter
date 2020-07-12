@@ -23,7 +23,7 @@ def fetch_uge(uge_config: dict) -> list:
         job_list_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}"
         host_summary_url = f"http://{api['hostname']}:{api['port']}{api['host_summary']}"
 
-        timestamp = int(time.time()) * 1000000000
+        timestamp = int(round(time.time() * 1000000000))
         # Fetch UGE metrics from urls
         # job_list_url = fetch(uge_config, job_list_url)
         # print(f"Job list length: {len(job_list_url)}")
