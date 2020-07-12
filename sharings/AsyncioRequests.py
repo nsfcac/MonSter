@@ -1,4 +1,5 @@
 import json
+import time
 import logging
 
 
@@ -14,6 +15,7 @@ class AsyncioRequests:
     def __init__(self, verify_ssl: bool = False, auth: tuple = (), 
                  timeout: tuple = (15, 45), max_retries: int = 3):
         self.metrics = {}
+        self.timestamp = int(time.time() * 1000000000)
         self.retry = 0
         self.connector=self.aiohttp.TCPConnector(verify_ssl=verify_ssl)
         if auth:
@@ -33,16 +35,16 @@ class AsyncioRequests:
             resp = await session.request(method='GET', url=url)
             resp.raise_for_status()
             json = await resp.json()
-            return {"node": node, "metrics": json}
+            return {"node": node, "metrics": json, "timestamp": self.timestamp}
         except (TimeoutError):
             self.retry += 1
             if self.retry >= self.max_retries:
                 logging.error(f"Timeout Error : cannot fetch data from {node} : {url}")
-                return {"node": node, "metrics": {}}
+                return {"node": node, "metrics": {}, "timestamp": self.timestamp}
             return await self.__fetch_json(url, node, session)
         except:
             logging.error(f"Error : Cannot fetch data from {node} : {url}")
-            return {"node": node, "metrics": {}}
+            return {"node": node, "metrics": {}, "timestamp": self.timestamp}
 
 
     async def __requests(self, urls: list, nodes: list) -> list:

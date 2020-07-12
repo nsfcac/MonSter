@@ -35,8 +35,6 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         # query_start = time.time()
 
-        timestamp = int(time.time() * 1000000000)
-
         # Parallel fetch metrics
         thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)
         power_metrics = parallel_fetch(bmc_config, power_urls, nodes, cores)
@@ -44,10 +42,10 @@ def fetch_bmc(bmc_config: dict) -> list:
         sys_health_metrics = parallel_fetch(bmc_config, sys_health_urls, nodes, cores)
 
         # Parallel process metrics
-        thermal_points = parallel_process(thermal_metrics, "thermal", timestamp)
-        power_points = parallel_process(power_metrics, "power", timestamp)
-        bmc_health_points = parallel_process(bmc_health_metrics, "bmc_health", timestamp)
-        sys_health_points = parallel_process(sys_health_metrics, "sys_health", timestamp)
+        thermal_points = parallel_process(thermal_metrics, "thermal")
+        power_points = parallel_process(power_metrics, "power")
+        bmc_health_points = parallel_process(bmc_health_metrics, "bmc_health")
+        sys_health_points = parallel_process(sys_health_metrics, "sys_health")
         
         # Merge datapoints
         bmc_datapoints.extend(thermal_points)
@@ -130,14 +128,14 @@ def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
     return bmc_metrics
 
 
-def parallel_process(node_metrics: list, category: str, timestamp: int) -> list:
+def parallel_process(node_metrics: list, category: str) -> list:
     """
     Parallel process metrics, 
     node_metrics refer to a list of {'node': node_id, 'metrics': metric}
     """
     flat_datapoints = []
     try:
-        process_args = zip(node_metrics, repeat(category), repeat(timestamp))
+        process_args = zip(node_metrics, repeat(category))
         with multiprocessing.Pool() as pool:
             datapoints = pool.starmap(process, process_args)
         flat_datapoints = [item for sublist in datapoints for item in sublist]
@@ -146,7 +144,7 @@ def parallel_process(node_metrics: list, category: str, timestamp: int) -> list:
     return flat_datapoints
 
 
-def process(node_metrics: dict, category: str, timestamp: int) -> list:
+def process(node_metrics: dict, category: str) -> list:
     """
     Process metrics accroding to its category, 
     node_metrics refer to {'node': node_id, 'metrics': metric}
@@ -154,13 +152,13 @@ def process(node_metrics: dict, category: str, timestamp: int) -> list:
     datapoints = []
     try:
         if category == "thermal":
-            process = ProcessThermal(node_metrics, timestamp)
+            process = ProcessThermal(node_metrics)
         elif category == "power":
-            process = ProcessPower(node_metrics, timestamp)
+            process = ProcessPower(node_metrics)
         elif category == "bmc_health":
-            process = ProcessHealth(node_metrics, "BMC", timestamp)
+            process = ProcessHealth(node_metrics, "BMC")
         elif category == "sys_health":
-            process = ProcessHealth(node_metrics, "System", timestamp)
+            process = ProcessHealth(node_metrics, "System")
         else:
             return datapoints
 
