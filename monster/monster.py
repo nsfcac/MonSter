@@ -74,8 +74,11 @@ def monster(bmc_config: dict, uge_config: dict, influx_client: object) -> None:
     """
     Fetch and write datapoints into influxdb
     """
-    all_datapoints = fetch_datapoints(bmc_config, uge_config)
-    influx_client.write_points(all_datapoints)
+    try:
+        all_datapoints = fetch_datapoints(bmc_config, uge_config)
+        influx_client.write_points(all_datapoints)
+    except Exception as e:
+        print(e)
     return
 
 
