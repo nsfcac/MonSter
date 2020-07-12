@@ -14,7 +14,7 @@ class ProcessThermal():
         self.timestamp = timestamp
     
 
-    def __gen_datapoint(self, measurement: str, label: str, value: float) -> dict:
+    def __gen_datapoint(self, measurement: str, label: str, value) -> dict:
         """
         Generate data point for each metric
         """
@@ -41,7 +41,7 @@ class ProcessThermal():
             measurement = "FanSensor"
             for fan in fans:
                 label = fan["Name"]
-                value = fan["Reading"]
+                value = int(fan["Reading"])
                 datapoint = self.__gen_datapoint(measurement, label, value)
                 self.datapoints.append(datapoint)
     
@@ -55,7 +55,7 @@ class ProcessThermal():
             measurement = "TempSensor"
             for temp in temps:
                 label = temp["Name"]
-                value = temp["ReadingCelsius"]
+                value = float("{0:.2f}".format(temp["ReadingCelsius"]))
                 datapoint = self.__gen_datapoint(measurement, label, value)
                 self.datapoints.append(datapoint)
 
