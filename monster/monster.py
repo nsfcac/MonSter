@@ -29,6 +29,7 @@ prev_jobs_info = {}
 def main():
     # Read configuration file
     config = parse_config('./config.yml')
+
     # Check sanity
     if not check_config(config):
         return
@@ -44,7 +45,6 @@ def main():
         host = influx_config["host"]
         port = influx_config["port"]
         dbname = influx_config["database"]
-
         influx_client = InfluxDBClient(host=host, port=port, database=dbname)
 
         # Schedule run_monster
