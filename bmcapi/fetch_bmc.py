@@ -35,7 +35,7 @@ def fetch_bmc(bmc_config: dict) -> list:
 
         # query_start = time.time()
 
-        timestamp = int(round(time.time() * 1000000000))
+        timestamp = int(time.time() * 1000000000)
 
         # Parallel fetch metrics
         thermal_metrics = parallel_fetch(bmc_config, thermal_urls, nodes, cores)

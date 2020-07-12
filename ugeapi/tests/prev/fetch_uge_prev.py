@@ -31,7 +31,7 @@ def fetch_uge(config: object) -> object:
 
         with requests.Session() as session:
 
-            epoch_time = int(round(time.time() * 1000000000))
+            epoch_time = int(time.time() * 1000000000)
 
             # Get hosts detail
             host_detail = get_host_detail(config, uge_url, session, ugeapi_adapter)
