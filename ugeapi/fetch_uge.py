@@ -56,8 +56,8 @@ def fetch(uge_config:dict, url: str) -> list:
                 timeout = (uge_config["timeout"]["connect"], uge_config["timeout"]["read"])
             )
             metrics = response.json()
-        except Exception as e:
-            print(e)
+        except Exception as err:
+            logging.error(f"fetch_uge : fetch error : {err}")
     return metrics
 
 
@@ -66,9 +66,12 @@ def parallel_process(metrics: list, timestamp: int) -> list:
     Parallel process metrics
     """
     all_data = []
-    process_args = zip(metrics, repeat(timestamp))
-    with multiprocessing.Pool() as pool:
-        all_data = pool.starmap(process, process_args)
+    try:
+        process_args = zip(metrics, repeat(timestamp))
+        with multiprocessing.Pool() as pool:
+            all_data = pool.starmap(process, process_args)
+    except Exception as err:
+        logging.error(f"fetch_uge : parallel_process error : {err}")
     return all_data
 
 
@@ -76,10 +79,12 @@ def process(metrics: dict, timestamp: int) -> list:
     """
     Process UGE metrics
     """
-    datapoints = []
-    process = ProcessUge(metrics, timestamp)
-    datapoints = process.get_datapoints()
-
+    try:
+        datapoints = []
+        process = ProcessUge(metrics, timestamp)
+        datapoints = process.get_datapoints()
+    except Exception as err:
+        logging.error(f"fetch_uge : parallel_process : process error : {err}")
     return datapoints
 
 
@@ -92,46 +97,49 @@ def aggregate(all_data: dict, timestamp: int) -> list:
     all_jobspoints = []
     # all_job_list = []
     all_jobs_info = {}
-    for data in all_data:
-        datapoints = data["datapoints"]
-        all_datapoints.extend(datapoints)
-        jobs_info = data["jobs_info"]
-        job_list = list(jobs_info.keys())
-        # all_job_list.extend(job_list)
-        for job in job_list:
-            if job not in all_jobs_info:
-                all_jobs_info.update({
-                    job: jobs_info[job]
-                })
-            else:
-                pre_cores = all_jobs_info[job]["fields"]["CPUCores"]
-                cur_cores = jobs_info[job]["fields"]["CPUCores"]
+    try:
+        for data in all_data:
+            datapoints = data["datapoints"]
+            all_datapoints.extend(datapoints)
+            jobs_info = data["jobs_info"]
+            job_list = list(jobs_info.keys())
+            # all_job_list.extend(job_list)
+            for job in job_list:
+                if job not in all_jobs_info:
+                    all_jobs_info.update({
+                        job: jobs_info[job]
+                    })
+                else:
+                    pre_cores = all_jobs_info[job]["fields"]["CPUCores"]
+                    cur_cores = jobs_info[job]["fields"]["CPUCores"]
 
-                pre_nodes = all_jobs_info[job]["fields"]["TotalNodes"]
+                    pre_nodes = all_jobs_info[job]["fields"]["TotalNodes"]
 
-                pre_node_list = all_jobs_info[job]["fields"]["NodeList"]
-                cur_node_list = jobs_info[job]["fields"]["NodeList"]
+                    pre_node_list = all_jobs_info[job]["fields"]["NodeList"]
+                    cur_node_list = jobs_info[job]["fields"]["NodeList"]
 
-                all_jobs_info[job]["fields"].update({
-                    "TotalNodes": pre_nodes + 1,
-                    "CPUCores": pre_cores + cur_cores,
-                    "NodeList": pre_node_list + cur_node_list
-                })
+                    all_jobs_info[job]["fields"].update({
+                        "TotalNodes": pre_nodes + 1,
+                        "CPUCores": pre_cores + cur_cores,
+                        "NodeList": pre_node_list + cur_node_list
+                    })
 
-    # Stringify NodeList in job info
-    for jobs_info in all_jobs_info.values():
-        node_list = jobs_info["fields"]["NodeList"]
-        jobs_info["fields"].update({
-            "NodeList": str(node_list)
+        # Stringify NodeList in job info
+        for jobs_info in all_jobs_info.values():
+            node_list = jobs_info["fields"]["NodeList"]
+            jobs_info["fields"].update({
+                "NodeList": str(node_list)
+            })
+
+        # all_jobspoints = list(all_jobs_info.values())
+
+        uge_metrics.update({
+            "timestamp": timestamp,
+            "jobs_info": all_jobs_info,
+            "datapoints": all_datapoints
         })
-
-    # all_jobspoints = list(all_jobs_info.values())
-
-    uge_metrics.update({
-        "timestamp": timestamp,
-        "jobs_info": all_jobs_info,
-        "datapoints": all_datapoints
-    })
+    except Exception as err:
+        logging.error(f"fetch_uge : aggregate error : {err}")
 
     return uge_metrics
     
