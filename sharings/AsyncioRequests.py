@@ -37,10 +37,11 @@ class AsyncioRequests:
         except (TimeoutError):
             self.retry += 1
             if self.retry >= self.max_retries:
+                logging.error(f"Timeout Error : cannot fetch data from {node} : url")
                 return {"node": node, "metrics": {}}
             return await self.__fetch_json(url, node, session)
         except:
-            logging.error(f"Cannot fetch data from {node} : url")
+            logging.error(f"Error : Cannot fetch data from {node} : url")
             return {"node": node, "metrics": {}}
 
 
