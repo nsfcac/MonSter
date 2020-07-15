@@ -1,0 +1,552 @@
+[
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_0",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_1",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_2",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.0
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_3",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.3
+        }
+    },
+    {
+        "measurement": "MemUsage",
+        "tags": {
+            "Label": "Memory",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 7.8
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "wlan0_tx",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 1224
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "wlan0_rx",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 6303
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "eth0_tx",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 2840
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "eth0_rx",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 8679
+        }
+    },
+    {
+        "measurement": "DiskIO",
+        "tags": {
+            "Label": "Read",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0
+        }
+    },
+    {
+        "measurement": "DiskIO",
+        "tags": {
+            "Label": "Write",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0
+        }
+    },
+    {
+        "measurement": "Sensors",
+        "tags": {
+            "Label": "cpu_thermal 1",
+            "NodeId": "10.0.0.1"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 32
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_0",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_1",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_2",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.0
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_3",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.0
+        }
+    },
+    {
+        "measurement": "MemUsage",
+        "tags": {
+            "Label": "Memory",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 4.2
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "docker0_tx",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "docker0_rx",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "wlan0_tx",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 7362
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "wlan0_rx",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 44961
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "eth0_tx",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 18430
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "eth0_rx",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 39028
+        }
+    },
+    {
+        "measurement": "DiskIO",
+        "tags": {
+            "Label": "Read",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 81920
+        }
+    },
+    {
+        "measurement": "DiskIO",
+        "tags": {
+            "Label": "Write",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 139264
+        }
+    },
+    {
+        "measurement": "Sensors",
+        "tags": {
+            "Label": "cpu-thermal 1",
+            "NodeId": "10.0.0.2"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 37
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_0",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.3
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_1",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_2",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_3",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "MemUsage",
+        "tags": {
+            "Label": "Memory",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 4.1
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "wlan0_tx",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 9375
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "wlan0_rx",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 49959
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "eth0_tx",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 13234
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "eth0_rx",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 47376
+        }
+    },
+    {
+        "measurement": "DiskIO",
+        "tags": {
+            "Label": "Read",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 8790016
+        }
+    },
+    {
+        "measurement": "DiskIO",
+        "tags": {
+            "Label": "Write",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 2805760
+        }
+    },
+    {
+        "measurement": "Sensors",
+        "tags": {
+            "Label": "cpu-thermal 1",
+            "NodeId": "10.0.0.3"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 38
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_0",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_1",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_2",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "CPUUsage",
+        "tags": {
+            "Label": "CPU_3",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 0.2
+        }
+    },
+    {
+        "measurement": "MemUsage",
+        "tags": {
+            "Label": "Memory",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 4.1
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "wlan0_tx",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 9355
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "wlan0_rx",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 51679
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "eth0_tx",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 13609
+        }
+    },
+    {
+        "measurement": "Network",
+        "tags": {
+            "Label": "eth0_rx",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 47902
+        }
+    },
+    {
+        "measurement": "DiskIO",
+        "tags": {
+            "Label": "Read",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 7495680
+        }
+    },
+    {
+        "measurement": "DiskIO",
+        "tags": {
+            "Label": "Write",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 1892352
+        }
+    },
+    {
+        "measurement": "Sensors",
+        "tags": {
+            "Label": "cpu-thermal 1",
+            "NodeId": "10.0.0.4"
+        },
+        "time": 1594846766000000000,
+        "fields": {
+            "Value": 40
+        }
+    }
+]

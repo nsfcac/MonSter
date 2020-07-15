@@ -9,8 +9,7 @@ import os
 import sys
 sys.path.append(os.getcwd())
 
-from bmcapi.fetch_bmc import fetch_bmc
-from ugeapi.fetch_uge import fetch_uge
+from glancesapi.fetch_glances import fetch_glances
 from sharings.utils import parse_config, check_config
 
 path = os.getcwd()
@@ -33,8 +32,8 @@ def main():
     if not check_config(config):
         return
     try:
-        bmc_config = config['bmc']
-        uge_config = config['uge']
+        # Add decision to trigger corresponding monitoring modules
+        glances_config = config['glances']
         influx_config = config['influxdb']
 
         # Initialize influxdb
@@ -44,7 +43,7 @@ def main():
         influx_client = InfluxDBClient(host=host, port=port, database=dbname)
 
         # Fetch data points
-        all_datapoints = fetch_datapoints(bmc_config, uge_config)
+        all_datapoints = fetch_datapoints(glances_config)
 
         # Write data points
         influx_client.write_points(all_datapoints)
@@ -55,7 +54,7 @@ def main():
     return
 
 
-def fetch_datapoints(bmc_config: dict, uge_config: dict) -> list:
+def fetch_datapoints(glances_config: dict) -> list:
     """
     Fetch and concatenate BMC data points, UGE data points, 
     and estimate job finish time
@@ -63,25 +62,11 @@ def fetch_datapoints(bmc_config: dict, uge_config: dict) -> list:
     all_datapoints = []
     job_datapoints = []
     try:
-        # Fetch BMC datapoints and uge metrics
-        bmc_datapoints = fetch_bmc(bmc_config)
-        uge_metrics = fetch_uge(uge_config)
+        # Fetch Glances datapoints
+        glances_datapoints = fetch_glances(glances_config)
+        
+        all_datapoints.extend(glances_datapoints)
 
-        # UGE metrics
-        uge_datapoints = uge_metrics["datapoints"]
-        timestamp = uge_metrics["timestamp"]
-        curr_jobs_info = uge_metrics["jobs_info"]
-
-        job_datapoints = list(curr_jobs_info.values())
-
-        # Contatenate all data points
-        all_datapoints.extend(bmc_datapoints)
-        all_datapoints.extend(uge_datapoints)
-        all_datapoints.extend(job_datapoints)
-
-        # print(f"BMC data points length: {len(bmc_datapoints)}")
-        # print(f"UGE data points length: {len(uge_datapoints)}")
-        # print(f"Job data points length: {len(job_datapoints)}")
     except Exception as err:
         logging.error(f"fetch_datapoints error : {err}")
 

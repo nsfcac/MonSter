@@ -108,7 +108,7 @@ class ProcessGlances():
             read = 0
             write = 0
             for disk in diskio:
-                if disk["disk_name"] == "sda" or disk["disk_name"] == "sdb":
+                if disk["disk_name"] == "sda" or disk["disk_name"] == "sdb" or disk["disk_name"] == "mmcblk0":
                     read += disk["read_bytes"]
                     write += disk["write_bytes"]
             datapoint_r = self.__gen_datapoint(measurement, "Read", read)
