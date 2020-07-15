@@ -12,7 +12,8 @@ class ProcessGlances():
         self.datapoints = []
         self.node_id = node_metrics["node"]
         self.metrics = node_metrics["metrics"]
-        self.timestamp = self.__get_epochtime(self.metrics.get("now", None))
+        self.timestamp = int(time.time()) * 1000000000
+        # self.timestamp = self.__get_epochtime(self.metrics.get("now", None))
     
 
     def __get_epochtime(self, time_str: str) -> int:
