@@ -45,6 +45,7 @@ def main():
         # Fetch data points
         all_datapoints = fetch_datapoints(glances_config)
 
+        print(json.dumps(all_datapoints, indent=4))
         # Write data points
         influx_client.write_points(all_datapoints)
         
