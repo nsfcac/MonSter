@@ -116,6 +116,7 @@ def fetch(bmc_config: dict, urls: list, nodes: list) -> list:
     """
     Use AsyncioRequests to query urls
     """
+    bmc_metrics = []
     try:
         bmc = AsyncioRequests(auth = (bmc_config['user'], 
                                     bmc_config['password']),
