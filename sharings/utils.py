@@ -17,12 +17,11 @@ def parse_config(path: str) -> object:
 
 def check_config(cfg: dict) -> bool:
     """
-    Verify configuration, check if it has influxdb, bmc and uge fields.
+    Verify configuration, check if it has influxdb, glances fields.
     """
     influxdb = cfg.get("influxdb", None)
-    bmc = cfg.get("bmc", None)            
-    uge = cfg.get("uge", None)
-    if influxdb and bmc and uge:
+    glances = cfg.get("glances", None)
+    if influxdb and glances:
         return True
     return False
 
