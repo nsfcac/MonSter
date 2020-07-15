@@ -25,7 +25,7 @@ logging.basicConfig(
 
 def main():
     # Read configuration file
-    config_path = path + '/config.yml'
+    config_path = '/root/MonSter/config.yml'
     config = parse_config(config_path)
 
     # Check sanity
