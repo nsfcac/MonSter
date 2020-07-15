@@ -13,7 +13,7 @@ from glancesapi.fetch_glances import fetch_glances
 from sharings.utils import parse_config, check_config
 
 path = os.getcwd()
-logging_path = path + '/MonSter/monster.log'
+logging_path = path + '/monster.log'
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -25,7 +25,7 @@ logging.basicConfig(
 
 def main():
     # Read configuration file
-    config_path = path + '/MonSter/config.yml'
+    config_path = path + '/config.yml'
     config = parse_config(config_path)
 
     # Check sanity
