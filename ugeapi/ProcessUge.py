@@ -47,7 +47,7 @@ class ProcessUge():
         return datapoint
     
 
-    def __gen_jobpoint(self, job_id: int, start_time: int, submit_time: int, 
+    def __gen_jobpoint(self, job_id: str, start_time: int, submit_time: int, 
                            job_name: str, user: str) -> dict:
         """
         Generate job data point
@@ -72,7 +72,7 @@ class ProcessUge():
         return datapoint
 
     
-    def __update_cores(self, job_id: int) -> None:
+    def __update_cores(self, job_id: str) -> None:
         """
         Update CPUCores of the job info
         """
