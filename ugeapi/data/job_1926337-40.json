@@ -1,0 +1,299 @@
+{
+    "account": "sge",
+    "checkpointEnv": null,
+    "command": "AsubmitJob_smp_mon.sh",
+    "contextVars": [],
+    "department": "defaultdepartment",
+    "grantedPE": "sm",
+    "hardRequestedQueues": [
+        "omni"
+    ],
+    "jc_name": null,
+    "jobEnvironment": [
+        {
+            "name": "PATH",
+            "value": "/export/uge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
+        },
+        {
+            "name": "HISTCONTROL",
+            "value": "ignoredups"
+        },
+        {
+            "name": "SGE_CELL",
+            "value": "default"
+        },
+        {
+            "name": "MODULEPATH",
+            "value": "/opt/apps/nfs/module/modulefiles:/opt/ohpc/pub/modulefiles"
+        },
+        {
+            "name": "SGE_ROOT",
+            "value": "/export/uge"
+        },
+        {
+            "name": "LMOD_SETTARG_FULL_SUPPORT",
+            "value": "no"
+        },
+        {
+            "name": "MAIL",
+            "value": "/var/spool/mail/zhu40264"
+        },
+        {
+            "name": "KRB5CCNAME",
+            "value": "FILE:/tmp/krb5cc_99704_34NIPd"
+        },
+        {
+            "name": "LMOD_DIR",
+            "value": "/opt/ohpc/username/lmod/lmod/libexec"
+        },
+        {
+            "name": "LOGNAME",
+            "value": "zhu40264"
+        },
+        {
+            "name": "PWD",
+            "value": "/lustre/scratch/zhu40264/Tian/Black_Marble/COLD-master"
+        },
+        {
+            "name": "LANGUAGE",
+            "value": "en_US.UTF-8"
+        },
+        {
+            "name": "LMOD_VERSION",
+            "value": "7.7.14"
+        },
+        {
+            "name": "SHELL",
+            "value": "/bin/bash"
+        },
+        {
+            "name": "LMOD_CMD",
+            "value": "/opt/ohpc/username/lmod/lmod/libexec/lmod"
+        },
+        {
+            "name": "LESSOPEN",
+            "value": "||/usr/bin/lesspipe.sh %s"
+        },
+        {
+            "name": "QT_GRAPHICSSYSTEM_CHECKED",
+            "value": "1"
+        },
+        {
+            "name": "BASH_ENV",
+            "value": "/opt/ohpc/username/lmod/lmod/init/bash"
+        },
+        {
+            "name": "__SGE_PREFIX__O_PATH",
+            "value": "/export/uge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
+        },
+        {
+            "name": "LC_ALL",
+            "value": "en_US.UTF-8"
+        },
+        {
+            "name": "LC_CTYPE",
+            "value": "en_US.UTF-8"
+        },
+        {
+            "name": "__SGE_PREFIX__O_HOST",
+            "value": "quanah"
+        },
+        {
+            "name": "LS_COLORS"
+        },
+        {
+            "name": "SHLVL",
+            "value": "2"
+        },
+        {
+            "name": "__SGE_PREFIX__O_MAIL",
+            "value": "/var/spool/mail/zhu40264"
+        },
+        {
+            "name": "MANPATH",
+            "value": "/export/uge/man:/usr/share/man:/usr/local/share/man"
+        },
+        {
+            "name": "SGE_QMASTER_PORT",
+            "value": "6554"
+        },
+        {
+            "name": "HISTSIZE",
+            "value": "1000"
+        },
+        {
+            "name": "LMOD_FULL_SETTARG_SUPPORT",
+            "value": "no"
+        },
+        {
+            "name": "__SGE_PREFIX__O_LOGNAME",
+            "value": "zhu40264"
+        },
+        {
+            "name": "_ModuleTable001_",
+            "value": "X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXt9LG1wYXRoQT17Ii9vcHQvYXBwcy9uZnMvbW9kdWxlL21vZHVsZWZpbGVzIiwiL29wdC9vaHBjL3B1Yi9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvb3B0L2FwcHMvbmZzL21vZHVsZS9tb2R1bGVmaWxlczovb3B0L29ocGMvcHViL21vZHVsZWZpbGVzIix9"
+        },
+        {
+            "name": "SHOST",
+            "value": "quanah"
+        },
+        {
+            "name": "TERM",
+            "value": "xterm-256color"
+        },
+        {
+            "name": "LANG",
+            "value": "en_US.UTF-8"
+        },
+        {
+            "name": "XDG_SESSION_ID",
+            "value": "72102"
+        },
+        {
+            "name": "LMOD_PKG",
+            "value": "/opt/ohpc/username/lmod/lmod"
+        },
+        {
+            "name": "BASH_FUNC_ml()",
+            "value": "() {  eval $($LMOD_DIR/ml_cmd \"$@\")\n}"
+        },
+        {
+            "name": "_ModuleTable_Sz_",
+            "value": "1"
+        },
+        {
+            "name": "SGE_EXECD_PORT",
+            "value": "6555"
+        },
+        {
+            "name": "_",
+            "value": "/export/uge/bin/lx-amd64/qsub"
+        },
+        {
+            "name": "USE_SYSTEMD",
+            "value": "false"
+        },
+        {
+            "name": "LMOD_COLORIZE",
+            "value": "no"
+        },
+        {
+            "name": "LMOD_SETTARG_CMD",
+            "value": ":"
+        },
+        {
+            "name": "SGE_CLUSTER_NAME",
+            "value": "p6554"
+        },
+        {
+            "name": "SSH_CLIENT",
+            "value": "129.118.8.1 40419 22"
+        },
+        {
+            "name": "SSH_TTY",
+            "value": "/dev/pts/62"
+        },
+        {
+            "name": "USER",
+            "value": "zhu40264"
+        },
+        {
+            "name": "__SGE_PREFIX__O_HOME",
+            "value": "/home/zhu40264"
+        },
+        {
+            "name": "SSH_CONNECTION",
+            "value": "129.118.8.1 40419 129.118.104.8 22"
+        },
+        {
+            "name": "HOSTNAME",
+            "value": "quanah"
+        },
+        {
+            "name": "__SGE_PREFIX__O_SHELL",
+            "value": "/bin/bash"
+        },
+        {
+            "name": "MODULESHOME",
+            "value": "/opt/ohpc/username/lmod/lmod"
+        },
+        {
+            "name": "BASH_FUNC_module()",
+            "value": "() {  eval $($LMOD_CMD bash \"$@\") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)\n}"
+        },
+        {
+            "name": "LMOD_PREPEND_BLOCK",
+            "value": "normal"
+        },
+        {
+            "name": "__SGE_PREFIX__O_WORKDIR",
+            "value": "/lustre/scratch/zhu40264/Tian/Black_Marble/COLD-master"
+        },
+        {
+            "name": "XDG_RUNTIME_DIR",
+            "value": "/run/user/99704"
+        },
+        {
+            "name": "HOME",
+            "value": "/home/zhu40264"
+        }
+    ],
+    "jobid": 1926337,
+    "mailOpt": {
+        "abort": false,
+        "begin": false,
+        "end": false,
+        "suspend": false
+    },
+    "name": "smp_mon",
+    "npprior": 0.5,
+    "npri": 5.000199297041637,
+    "ntickets": 1.992963149776058e-05,
+    "nurg": 0.0007266592605935846,
+    "parallelEnv": "sm",
+    "parallelEnvRange": "1",
+    "ppri": 0,
+    "priority": 5.000199297041637,
+    "project": "quanah",
+    "queue": "omni@compute-3-14.localdomain",
+    "resources": {
+        "hard": [
+            {
+                "name": "h_rt",
+                "value": "172800"
+            },
+            {
+                "name": "s_rt",
+                "value": "172800"
+            },
+            {
+                "name": "h_vmem",
+                "value": "5.3G"
+            }
+        ],
+        "soft": []
+    },
+    "shares": 1.0213321014650799e-05,
+    "slots": 1,
+    "softRequestedQueues": [],
+    "state": "r",
+    "taskid": "40",
+    "tasks": [],
+    "timeStamp": {
+        "start": "Fri Jul 31 17:55:07 CDT 2020",
+        "startEpoch": 1596236107325,
+        "submit": "Fri Jul 31 17:55:05 CDT 2020",
+        "submitEpoch": 1596236105741
+    },
+    "usage": {
+        "cpu": 0,
+        "io": 0,
+        "ioops": 0,
+        "iow": 0,
+        "maxvmem": 0,
+        "mem": 0,
+        "vmem": 0,
+        "wallclock": 0
+    },
+    "user": "zhu40264"
+}
