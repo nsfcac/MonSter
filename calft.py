@@ -7,6 +7,7 @@ import time
 import logging
 import schedule
 import multiprocessing
+from itertools import repeat
 from influxdb import InfluxDBClient
 import os
 import sys
