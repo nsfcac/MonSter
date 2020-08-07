@@ -13,7 +13,7 @@ sys.path.append(os.getcwd())
 
 from ugeapi.fetch_uge import fetch
 from sharings.utils import parse_config, check_config
-from sharing.JobRequests import JobRequests
+from sharings.JobRequests import JobRequests
 
 path = os.getcwd()
 logging_path = path + '/MonSter/calft.log'
