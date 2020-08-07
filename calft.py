@@ -84,15 +84,13 @@ def update_ft(client:object, uge_config: object) -> None:
             if job_id not in curr_joblist:
                 fin_jobs.append(job_id)
         
-        # finish_time = int(time.time() * 1000000000)
-        finish_time = 5
+        finish_time = int(time.time() * 1000000000)
 
         # Generate SQLs for quering the JobsInfo
-        # sqls = generate_sqls(fin_jobs)
-        sqls = generate_sqls(curr_joblist)
+        sqls = generate_sqls(fin_jobs)
 
         # Query JobsInfo
-        jobs_data = query_influx(sqls, influx_client)
+        jobs_data = query_influx(sqls, client)
 
         # Update JobsInfo
         with multiprocessing.Pool() as pool:
