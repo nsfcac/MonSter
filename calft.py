@@ -92,16 +92,18 @@ def update_ft(client:object, uge_config: object) -> None:
         sqls = generate_sqls(curr_joblist)
 
         # Query JobsInfo
-        jobs_data = query_influx(sqls, client)
-
-        # print(json.dumps(jobs_data, indent = 4))
+        jobs_data = query_influx(sqls, influx_client)
 
         # Update JobsInfo
         with multiprocessing.Pool() as pool:
             update_jobs_args = zip(jobs_data, repeat(finish_time))
             updated_jobs_data = pool.starmap(update_jobs, update_jobs_args) 
 
-        print(json.dumps(updated_jobs_data, indent = 4))
+        # print(json.dumps(updated_jobs_data, indent = 4))
+
+        # Write updated job data points
+        if updated_jobs_data:
+            influx_client.write_points(updated_jobs_data)
 
     except Exception as err:
         logging.error(f"Update finish time error : {err}")
@@ -182,8 +184,6 @@ def update_jobs(job_data: dict, finish_time: int) -> list:
                 }
             }
             return datapoint
-        else:
-            return "NULL"
     except Exception as err:
         logging.error(f"Update job info error : {err}")
     return
