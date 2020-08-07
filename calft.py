@@ -82,7 +82,8 @@ def update_ft(client:object, uge_config: object) -> None:
                 fin_jobs.append(job_id)
         
         # Generate SQLs for quering the JobsInfo
-        sqls = generate_sqls(fin_jobs)
+        # sqls = generate_sqls(fin_jobs)
+        sqls = generate_sqls(curr_joblist)
 
         # Query JobsInfo
         job_data = query_influx(sqls, client)
