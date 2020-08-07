@@ -48,17 +48,18 @@ def main():
         dbname = influx_config["database"]
         influx_client = InfluxDBClient(host=host, port=port, database=dbname)
 
-        # Monitoring frequency
-        freq = config["frequency"]
+        update_ft(client, uge_config)
+        # # Monitoring frequency
+        # freq = config["frequency"]
         
-        schedule.every(freq).seconds.do(update_ft, influx_client, uge_config)
+        # schedule.every(freq).seconds.do(update_ft, influx_client, uge_config)
 
-        while True:
-            try:
-                schedule.run_pending()
-                time.sleep(schedule.idle_seconds())
-            except KeyboardInterrupt:
-                break
+        # while True:
+        #     try:
+        #         schedule.run_pending()
+        #         time.sleep(schedule.idle_seconds())
+        #     except KeyboardInterrupt:
+        #         break
         
         return
     except Exception as err:
@@ -81,14 +82,22 @@ def update_ft(client:object, uge_config: object) -> None:
             if job_id not in curr_joblist:
                 fin_jobs.append(job_id)
         
+        # finish_time = int(time.time() * 1000000000)
+        finish_time = 5
+
         # Generate SQLs for quering the JobsInfo
         # sqls = generate_sqls(fin_jobs)
-        sqls = generate_sqls(['1931512'])
+        sqls = generate_sqls(curr_joblist)
 
         # Query JobsInfo
-        job_data = query_influx(sqls, client)
+        jobs_data = query_influx(sqls, client)
 
-        print(json.dumps(job_data, indent = 4))
+        # Update JobsInfo
+        with multiprocessing.Pool() as pool:
+            update_jobs_args = zip(jobs_data, repeat(finish_time))
+            updated_jobs_data = pool.starmap(update_jobs) 
+
+        print(json.dumps(updated_jobs_data, indent = 4))
 
     except Exception as err:
         logging.error(f"Update finish time error : {err}")
@@ -141,6 +150,37 @@ def fetch_jobs(uge_config: dict) -> list:
         return job_list
     except Exception as err:
         logging.error(f"Fetch job list error : {err}")
+
+
+def update_jobs(jobs_data: list, finish_time: int) -> list:
+    """
+    update finish time of the job
+    """
+    try:
+        job_id = job_data["job"]
+        values = job_data["values"]
+        if values:
+            datapoint = {
+                "measurement": "JobsInfo",
+                "tags": {
+                    "JobId": job_id
+                },
+                "time": 0,
+                "fields": {
+                    "StartTime": values["StartTime"],
+                    "SubmitTime": values["SubmitTime"],
+                    "FinishTime": finish_time,
+                    "JobName": values["JobName"],
+                    "User": values["User"],
+                    "TotalNodes": values["TotalNodes"],
+                    "CPUCores": values["CPUCores"],
+                    "NodeList":values["NodeList"]
+                }
+            }
+            return datapoint
+    except:
+        logging.error(f"Update job info error : {err}")
+    return
 
 if __name__ == '__main__':
     main()
