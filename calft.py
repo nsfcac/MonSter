@@ -97,7 +97,7 @@ def update_ft(client:object, uge_config: object) -> None:
         # Update JobsInfo
         with multiprocessing.Pool() as pool:
             update_jobs_args = zip(jobs_data, repeat(finish_time))
-            updated_jobs_data = pool.starmap(update_jobs) 
+            updated_jobs_data = pool.starmap(update_jobs, update_jobs_args) 
 
         print(json.dumps(updated_jobs_data, indent = 4))
 
