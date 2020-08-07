@@ -103,7 +103,7 @@ def update_ft(client:object, uge_config: object) -> None:
 
         # Write updated job data points
         if updated_jobs_data:
-            influx_client.write_points(updated_jobs_data)
+            client.write_points(updated_jobs_data)
 
     except Exception as err:
         logging.error(f"Update finish time error : {err}")
