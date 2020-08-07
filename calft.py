@@ -51,17 +51,17 @@ def main():
         influx_client = InfluxDBClient(host=host, port=port, database=dbname)
 
         update_ft(influx_client, uge_config)
-        # # Monitoring frequency
-        # freq = config["frequency"]
+        # Monitoring frequency
+        freq = config["frequency"]
         
-        # schedule.every(freq).seconds.do(update_ft, influx_client, uge_config)
+        schedule.every(freq).seconds.do(update_ft, influx_client, uge_config)
 
-        # while True:
-        #     try:
-        #         schedule.run_pending()
-        #         time.sleep(schedule.idle_seconds())
-        #     except KeyboardInterrupt:
-        #         break
+        while True:
+            try:
+                schedule.run_pending()
+                time.sleep(schedule.idle_seconds())
+            except KeyboardInterrupt:
+                break
         
         return
     except Exception as err:
@@ -185,6 +185,7 @@ def update_jobs(job_data: dict, finish_time: int) -> list:
     except Exception as err:
         logging.error(f"Update job info error : {err}")
     return
+
 
 if __name__ == '__main__':
     main()
