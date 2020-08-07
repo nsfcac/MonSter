@@ -18,7 +18,7 @@ from sharings.utils import parse_config, check_config
 from sharings.JobRequests import JobRequests
 
 path = os.getcwd()
-logging_path = path + '/calft.log'
+logging_path = '/home/monster/MonSter/calft.log'
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -32,7 +32,7 @@ prev_joblist = []
 
 def main():
     # Read configuration file
-    config_path = path + '/config.yml'
+    config_path = '/home/monster/MonSter/config.yml'
     config = parse_config(config_path)
 
     # Check sanity
