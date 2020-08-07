@@ -11,3 +11,6 @@ python $PWD/MonSter/monster.py
 # */1 * * * * /home/lijie/MonSter/controller.sh
 # Show cron job
 # crontab -l
+
+# */1 * * * * /home/lijie/MonSter/controller.sh
+# * */2 * * * /home/lijie/MonSter/cleanlog.sh
