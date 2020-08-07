@@ -31,6 +31,11 @@ $ pip install -r requirements.txt
 
 4. Modify `config.yml` to match your infuxdb __port__, __credentials__ and the __database__ where the data will be stored. You may also specify the frequency(in seconds) for retrieving the monitoring data. The default is set to 60, which means the slurm data is read and saved into influxdb every 60 seconds. 
 
-5. Run: `$./control.sh 0` to start MonSter, the monitoring script will be running on background. Run `$./control.sh 1` to stop MonSter. 
+5. Start MonSter as cron job: 
+```bash
+$ crontab -e
+$ */1 * * * * /home/monster/MonSter/controller.sh
+```
+This will set MonSter to start for every one minute
 
-6. Running error logs are saved in to `running.log`. MonSter logs are saved into `monster.log`.
+6. `calft.py` is used to estimate finish time of jobs. This is only for UGE jobs info.
