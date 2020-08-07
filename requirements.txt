@@ -4,3 +4,4 @@ influxdb
 PyYAML
 requests
 python-dateutil
+schedule

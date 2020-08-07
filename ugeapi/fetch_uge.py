@@ -20,7 +20,7 @@ def fetch_uge(uge_config: dict) -> list:
     uge_metrics = {}
     try:
         api = uge_config["api"]
-        job_list_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}"
+        # job_list_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}"
         host_summary_url = f"http://{api['hostname']}:{api['port']}{api['host_summary']}"
 
         timestamp = int(time.time() * 1000000000)
