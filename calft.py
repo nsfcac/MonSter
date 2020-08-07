@@ -16,7 +16,8 @@ from sharings.utils import parse_config, check_config
 from sharings.JobRequests import JobRequests
 
 path = os.getcwd()
-logging_path = path + '/MonSter/calft.log'
+# logging_path = path + '/MonSter/calft.log'
+logging_path = path + '/calft.log'
 
 logging.basicConfig(
     level=logging.ERROR,
