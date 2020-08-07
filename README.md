@@ -38,4 +38,4 @@ $ */1 * * * * /home/monster/MonSter/controller.sh
 ```
 This will set MonSter to start for every one minute
 
-6. `calft.py` is used to estimate finish time of jobs. This is only for UGE jobs info.
+6. `calft.py` is used to estimate finish time of jobs. This is only used for UGE jobs info.
