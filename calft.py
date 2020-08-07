@@ -31,7 +31,8 @@ prev_joblist = []
 
 def main():
     # Read configuration file
-    config_path = path + '/MonSter/config.yml'
+    # config_path = path + '/MonSter/config.yml'
+    config_path = path + '/config.yml'
     config = parse_config(config_path)
 
     # Check sanity
