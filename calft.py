@@ -51,7 +51,7 @@ def main():
         # Monitoring frequency
         freq = config["frequency"]
         
-        schedule.every(freq).seconds.do(update_ft, client, uge_config)
+        schedule.every(freq).seconds.do(update_ft, influx_client, uge_config)
 
         while True:
             try:
