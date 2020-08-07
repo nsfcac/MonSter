@@ -61,7 +61,7 @@ class ProcessUge():
             "fields": {
                 "StartTime": start_time,
                 "SubmitTime": submit_time,
-                "FinishTime": 0,
+                "FinishTime": None,
                 "JobName": job_name,
                 "User": user,
                 "TotalNodes": 1,
