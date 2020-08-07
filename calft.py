@@ -48,7 +48,7 @@ def main():
         dbname = influx_config["database"]
         influx_client = InfluxDBClient(host=host, port=port, database=dbname)
 
-        update_ft(client, uge_config)
+        update_ft(influx_client, uge_config)
         # # Monitoring frequency
         # freq = config["frequency"]
         
