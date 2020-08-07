@@ -155,7 +155,7 @@ def fetch_jobs(uge_config: dict) -> list:
         logging.error(f"Fetch job list error : {err}")
 
 
-def update_jobs(jobs_data: list, finish_time: int) -> list:
+def update_jobs(job_data: dict, finish_time: int) -> list:
     """
     update finish time of the job
     """
