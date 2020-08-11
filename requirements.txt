@@ -4,4 +4,5 @@ influxdb
 PyYAML
 requests
 python-dateutil
+pathlib
 schedule
