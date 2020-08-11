@@ -19,11 +19,9 @@ def fetch_jobscript(uge_config: dict, job_id: str) -> str:
         if not job_info:
             return None
         
-        print(job_info['queue'])
-
         # Extract exec_host, work_dir, cmd from job info
         try:
-            exec_host = job_info['queue'].split('@')
+            exec_host = job_info['queue'].split('@')[1]
         except Exception:
             return None
 
