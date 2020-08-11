@@ -44,6 +44,7 @@ def fetch_jobscript(uge_config: dict, job_id: str) -> str:
             exec_host = exec_host.split('.')[0]
             # Find the spool directory
             uge_job_script = Path(uge_spool_dir).joinpath(exec_host).joinpath("job_scripts").joinpath(job_id)
+            print(uge_job_script)
             if not uge_job_script.exists():
                 uge_job_script = Path(uge_spool_dir).joinpath(exec_host).joinpath(exec_host)\
                     .joinpath("job_scripts").joinpath(job_id)
