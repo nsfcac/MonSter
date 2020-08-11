@@ -22,7 +22,7 @@ uge_config = {
 }
 
 # fetch_uge(uge_config)
-job_id = "1933754.1"
+job_id = "1933828.1"
 
 job_script = fetch_jobscript(uge_config, job_id)
 
