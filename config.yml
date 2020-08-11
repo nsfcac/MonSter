@@ -38,6 +38,7 @@ uge:
     port: 8182
     job_list: '/jobs'
     host_summary: '/hostsummary/compute/467'
+  spool_dirs: '/export/uge/default/spool'
   timeout: 
     connect: 2
     read: 6

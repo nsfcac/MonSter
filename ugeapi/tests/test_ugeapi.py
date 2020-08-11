@@ -2,7 +2,8 @@ import json
 import sys
 sys.path.append('../../')
 
-from ugeapi.fetch_uge import fetch_uge
+# from ugeapi.fetch_uge import fetch_uge
+from ugeapi.fetch_jobscript import fetch_jobscript
 
 uge_config = {
     "api": {
@@ -11,6 +12,7 @@ uge_config = {
       "job_list": "/jobs",
       "host_summary": "/hostsummary/compute/467"
     },
+    "spool_dirs": '/export/uge/default/spool',
     "timeout": {
       "connect": 2,
       "read": 6
@@ -19,8 +21,9 @@ uge_config = {
     "ssl_verify": False
 }
 
-fetch_uge(uge_config)
+# fetch_uge(uge_config)
+job_id = ""
 
-uge_points = fetch_uge(uge_config)
-# print(f"UGE metrics length: {len(datapoints)}")
-print(json.dumps(uge_points, indent=4))
+job_script = fetch_jobscript(uge_config, job_id)
+
+print(json.dumps(job_script, indent=4))
