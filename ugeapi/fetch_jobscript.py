@@ -1,4 +1,5 @@
 import logging
+import requests
 from requests.adapters import HTTPAdapter
 from pathlib import Path
 
