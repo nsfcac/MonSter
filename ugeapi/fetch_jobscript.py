@@ -18,9 +18,11 @@ def fetch_jobscript(uge_config: dict, job_id: str) -> str:
 
         if not job_info:
             return None
-            
+
         # Extract exec_host, work_dir, cmd from job info
         exec_host = job_info['queue'].split('@')
+
+        print(exec_host)
         try:
             for env in job_info['jobEnvironment']:
                 if env['name'] == 'PWD':
