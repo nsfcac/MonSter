@@ -1,3 +1,4 @@
+import logging
 from requests.adapters import HTTPAdapter
 from pathlib import Path
 
@@ -55,7 +56,9 @@ def fetch_jobscript(uge_config: dict, job_id: str) -> str:
             if uge_job_script.exists():
                 with open(uge_job_script.as_poxis(), mode='r') as job_script:
                     return job_script.read()
-    return None
+    except Exception as err:
+        logging.error(f"Fetch Job script error: {err}")
+        return None
 
 
 def fetch(uge_config:dict, url: str) -> list:
