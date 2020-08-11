@@ -17,8 +17,6 @@ def fetch_jobscript(uge_config: dict, job_id: str) -> str:
         job_info = fetch(uge_config, job_info_url)
 
         # Extract exec_host, work_dir, cmd from job info
-        print(job_info['queue'])
-        
         exec_host = job_info['queue'].split('@')
         try:
             for env in job_info['jobEnvironment']:
