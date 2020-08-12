@@ -6,6 +6,7 @@
 
     Jie Li (jie.li@ttu.edu)
 """
+import json
 import paramiko
 import logging
 import asyncio
@@ -67,7 +68,7 @@ def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
     try:
         api = uge_config["api"]
         urls = [f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}" for job_id in joblist]
-        
+        print(json.dumps(urls, indent=4))
         connector = aiohttp.TCPConnector(verify_ssl= False)
         timeout = aiohttp.ClientTimeout(15, 45)
 
