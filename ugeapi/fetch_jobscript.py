@@ -76,14 +76,12 @@ def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
 
         # Asyncio fetch all jobs info
         loop = asyncio.get_event_loop()
-        all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(urls, connector, timeout))
+        raw_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(urls, connector, timeout))
         loop.close()
 
         # Process jobs info
         with multiprocessing.Pool() as pool:
-            processed_jobinfo = pool.map(process_jobinfo, all_jobinfo)
-
-        return processed_jobinfo
+            all_jobinfo = pool.map(process_jobinfo, raw_jobinfo)
 
     except Exception as err:
         logging.error(f"fetch_jobscript : fetch_jobinfo : {err}")
