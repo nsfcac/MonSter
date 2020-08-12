@@ -53,7 +53,7 @@ def fetch_jobscript(uge_config: dict) -> list:
             # ftp_client.close()
             
             # ssh_client.close()
-        
+            return all_jobinfo
         # Copy jobs scripts from remote server (quanah)
     except Exception as err:
         logging.error(f"fetch Job script error: {err}")
@@ -68,7 +68,7 @@ def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
     try:
         api = uge_config["api"]
         urls = [f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}" for job_id in joblist]
-        print(json.dumps(urls, indent=4))
+
         connector = aiohttp.TCPConnector(verify_ssl= False)
         timeout = aiohttp.ClientTimeout(15, 45)
 
