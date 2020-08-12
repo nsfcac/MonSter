@@ -30,7 +30,7 @@ def fetch_jobscript(uge_config: dict) -> list:
     joblist = []
     try:
         # Initialize paramiko for SSH
-        ssh_key = paramiko.RSAKey.from_private_key_file('/home/monster/.ssh/id_rsa.pub')
+        ssh_key = paramiko.RSAKey.from_private_key_file('/home/monster/.ssh/id_rsa')
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh_client.connect(hostname='quanah.hpcc.ttu.edu', username='monster', pkey=ssh_key)
