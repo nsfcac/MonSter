@@ -114,7 +114,7 @@ async def asyncio_fetch_jobinfo(urls: list, connector: object, timeout: object) 
             tasks = []
             for i, url in enumerate(urls):
                 tasks.append(asyncio_fetch(url=url, session=session))
-            return await self.asyncio.gather(*tasks)
+            return await asyncio.gather(*tasks)
     except Exception as err:
         logging.error(f"fetch_jobscript : asyncio_fetch_jobinfo : {err}")
 
