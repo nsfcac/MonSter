@@ -63,10 +63,13 @@ def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
     """
     all_jobinfo = []
     try:
+        api = uge_config["api"]
+        urls = [f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}" for job_id in joblist]
+        
         adapter = HTTPAdapter(max_retries=uge_config["max_retries"])
         with requests.Session() as session:
             loop = asyncio.get_event_loop()
-            all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(uge_config, joblist, adapter, session))
+            all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(uge_config, urls, adapter, session))
     except Exception as err:
         logging.error(f"fetch_jobscript : fetch_jobinfo : {err}")
     return all_jobinfo
@@ -91,14 +94,14 @@ async def asyncio_fetch(uge_config: dict, job_id: str, session: object) -> dict:
     return {"job": job_id, "info": json}
 
 
-async def asyncio_fetch_jobinfo(uge_config: dict, joblist: list, adapter: object, session: object) -> list:
+async def asyncio_fetch_jobinfo(uge_config: dict, urls: list, adapter: object, session: object) -> list:
     """
     Asyncio fetch all jobs info
     """
     try:
         # async with requests.Session() as session:
         tasks = []
-        for i, job_id in enumerate(joblist):
+        for i, url in enumerate(urls):
             session.mount(url, adapter)
             tasks.append(asyncio_fetch(uge_config, job_id, session))
         return await asyncio.gather(*tasks)
