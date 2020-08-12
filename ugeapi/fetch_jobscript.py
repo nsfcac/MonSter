@@ -37,7 +37,7 @@ def fetch_jobscript(uge_config: dict) -> list:
                 joblist.append(job_id)
 
         if joblist:
-            all_jobinfo = asyncio_fetch_jobinfo(uge_config, joblist)
+            all_jobinfo = fetch_jobinfo(uge_config, joblist)
             # # Initialize paramiko for SSH
             # ssh_key = paramiko.RSAKey.from_private_key_file('/home/monster/.ssh/id_rsa')
             # ssh_client = paramiko.SSHClient()
@@ -57,7 +57,7 @@ def fetch_jobscript(uge_config: dict) -> list:
         return None
 
 
-def asyncio_fetch_jobinfo(uge_config: dict, joblist: list) -> list:
+def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
     """
     Fetch all jobs info
     """
