@@ -131,45 +131,43 @@ def process_jobinfo(job: dict) -> dict:
     Process job info, extract exec_host, work_dir, cmd from job info
     """
     processed_jobinfo = {}
+    
+    job_id = job['job']
+    job_info = job['info']
+
+    exec_host = None
+    work_dir = None
+    cmd = None
+
     try:
-        job_id = job['job']
-        job_info = job['info']
+        exec_host = job_info['queue'].split('@')[1]
+    except KeyError:
+        return None
 
-        exec_host = None
-        work_dir = None
-        cmd = None
+    try:
+        for env in job_info['jobEnvironment']:
+            if env['name'] == 'PWD':
+                work_dir = env['value']
+    except Exception:
+        pass
 
-        try:
-            exec_host = job_info['queue'].split('@')[1]
-        except KeyError:
-            return None
+    cmd = job_info['command']
 
-        try:
-            for env in job_info['jobEnvironment']:
-                if env['name'] == 'PWD':
-                    work_dir = env['value']
-        except Exception:
-            pass
+    # Do no proceed for the following typs of jobs
+    if cmd and any(q_cmd in cmd.lower() for q_cmd in ["qlogin", "qrsh"]):
+        return None
 
-        cmd = job_info['command']
+    job_info = {
+        'exec_host': exec_host,
+        'work_dir': work_dir,
+        'cmd': cmd
+    }
 
-        # Do no proceed for the following typs of jobs
-        if cmd and any(q_cmd in cmd.lower() for q_cmd in ["qlogin", "qrsh"]):
-            return None
-
-        job_info = {
-            'exec_host': exec_host,
-            'work_dir': work_dir,
-            'cmd': cmd
-        }
-
-        processed_jobinfo = {
-            'job': job_id,
-            'info': job_info
-        }
+    processed_jobinfo = {
+        'job': job_id,
+        'info': job_info
+    }
         
-    except Exception as err:
-        logging.error(f"fetch_jobscript : process_jobinfo : {err}")
     return processed_jobinfo
     
 
