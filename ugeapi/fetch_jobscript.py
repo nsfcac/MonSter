@@ -67,7 +67,7 @@ def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
         loop = asyncio.get_event_loop()
         all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(uge_config, joblist, adapter))
     except Exception as err:
-        logging.error(f"fetch_jobscript : asyncio_fetch_jobinfo : {err}")
+        logging.error(f"fetch_jobscript : fetch_jobinfo : {err}")
     return all_jobinfo
 
 
@@ -94,12 +94,15 @@ async def asyncio_fetch_jobinfo(uge_config: dict, joblist: list, adapter: object
     """
     Asyncio fetch all jobs info
     """
-    async with requests.Session() as session:
-        tasks = []
-        for i, job_id in enumerate(joblist):
-            session.mount(url, adapter)
-            tasks.append(asyncio_fetch(uge_config, job_id, session))
-        return await asyncio.gather(*tasks)
+    try:
+        async with requests.Session() as session:
+            tasks = []
+            for i, job_id in enumerate(joblist):
+                session.mount(url, adapter)
+                tasks.append(asyncio_fetch(uge_config, job_id, session))
+            return await asyncio.gather(*tasks)
+    except Exception as err:
+        logging.error(f"fetch_jobscript : asyncio_fetch_jobinfo : {err}")
 
 
 def gen_script_path(uge_config: dict, job_id: str) -> str:
