@@ -35,10 +35,11 @@ def fetch_jobscript(uge_config: dict) -> list:
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh_client.connect(hostname='quanah.hpcc.ttu.edu', username='monster', pkey=ssh_key)
         
-        stdin,stdout,stderr=ssh_client.exec_command("ls")
-
-        print(stdout.readlines())
-
+        # File transfer
+        ftp_client = ssh_client.open_sftp()
+        ftp_client.get('/home/monster/miniconda.sh', '/home/monster/MonSter/ugeapi/data')
+        ftp_client.close()
+        
         ssh_client.close()
         # # Get the new job ids
         # curr_joblist = fetch_jobs(uge_config)
