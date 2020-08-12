@@ -65,12 +65,14 @@ def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
     """
     all_jobinfo = []
     try:
+        api = uge_config["api"]
         urls = [f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}" for job_id in joblist]
+        
         connector = aiohttp.TCPConnector(verify_ssl= False)
         timeout = aiohttp.ClientTimeout(15, 45)
 
         loop = asyncio.get_event_loop()
-        
+
         all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(urls, connector, timeout))
 
         loop.close()
