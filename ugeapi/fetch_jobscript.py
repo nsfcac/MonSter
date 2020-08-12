@@ -8,10 +8,12 @@
 """
 import paramiko
 import logging
-import requests
 import asyncio
-from pathlib import Path
-from requests.adapters import HTTPAdapter
+import aiohttp
+from aiohttp import ClientSession
+# import requests
+# from pathlib import Path
+# from requests.adapters import HTTPAdapter
 
 import sys
 sys.path.append('../')
@@ -63,47 +65,54 @@ def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
     """
     all_jobinfo = []
     try:
-        adapter = HTTPAdapter(max_retries=uge_config["max_retries"])
-        with requests.Session() as session:
-            loop = asyncio.get_event_loop()
-            all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(uge_config, joblist, adapter, session))
+        urls = [f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}" for job_id in joblist]
+        connector = aiohttp.TCPConnector(verify_ssl= False)
+        timeout = aiohttp.ClientTimeout(15, 45)
+
+        loop = asyncio.get_event_loop()
+        
+        all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(urls, connector, timeout))
+
+        loop.close()
     except Exception as err:
         logging.error(f"fetch_jobscript : fetch_jobinfo : {err}")
     return all_jobinfo
 
 
-async def asyncio_fetch(uge_config: dict, url: str, session: object) -> dict:
+async def asyncio_fetch(url: str, session: ClientSession) -> dict:
     """
     Asyncio fetch each job info
     """
     json = {}
-    job_id = None
+    job_id = url.split('/')[-1]
+    retry = 0
     try:
-        job_id = url.split('/')[-1]
-        resp = await session.get(
-            url, verify = uge_config["ssl_verify"],
-            timeout = (uge_config["timeout"]["connect"], uge_config["timeout"]["read"])
-        )
-        if resp:
-            json = resp.json()
+        resp = await session.request(method='GET', url=url)
+        resp.raise_for_status()
+        json = await resp.json()
+        return {"job": job_id, "info": json}
+    except (TimeoutError):
+        retry += 1
+        if retry >= 3:
+            logging.error(f"Timeout Error : cannot fetch data from {job_id} : {url}")
+            return {"job": job_id, "info": json}
+        return await asyncio_fetch(url, session)
     except Exception as err:
         logging.error(f"fetch_jobscript : asyncio_fetch : {err}")
-    return {"job": job_id, "info": json}
+        return {"job": job_id, "info": json}
 
 
-async def asyncio_fetch_jobinfo(uge_config: dict, joblist: list, adapter: object, session: object) -> list:
+async def asyncio_fetch_jobinfo(urls: list, connector: object, timeout: object) -> list:
     """
     Asyncio fetch all jobs info
     """
     try:
-        api = uge_config["api"]
-        # async with requests.Session() as session:
-        tasks = []
-        for i, job_id in enumerate(joblist):
-            url = f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}"
-            session.mount(url, adapter)
-            tasks.append(asyncio_fetch(uge_config, url, session))
-        return await asyncio.gather(*tasks)
+        async with ClientSession(connector = connector, 
+                                 timeout = timeout) as session:
+            tasks = []
+            for i, url in enumerate(urls):
+                tasks.append(asyncio_fetch(url=url, session=session))
+            return await self.asyncio.gather(*tasks)
     except Exception as err:
         logging.error(f"fetch_jobscript : asyncio_fetch_jobinfo : {err}")
 
