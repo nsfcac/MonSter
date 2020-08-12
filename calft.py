@@ -13,7 +13,7 @@ import os
 import sys
 sys.path.append(os.getcwd())
 
-from ugeapi.fetch_uge import fetch
+from ugeapi.fetch_uge import fetch_jobs
 from sharings.utils import parse_config, check_config
 from sharings.JobRequests import JobRequests
 
@@ -133,25 +133,6 @@ def generate_sqls(job_ids: list) -> list:
         logging.error(f"query_jobdata : generate_sqls: cannot generate sql strings: {err}")
 
     return sqls
-
-
-def fetch_jobs(uge_config: dict) -> list:
-    """
-    fetch UGE metrics from UGE API. 
-    Examples of using UGE API:
-    curl http://129.118.104.35:8182/jobs | python -m json.tool
-    """
-    job_list = []
-    try:
-        api = uge_config["api"]
-        job_list_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}"
-
-        # Fetch UGE metrics from urls
-        job_list = fetch(uge_config, job_list_url)
-
-        return job_list
-    except Exception as err:
-        logging.error(f"Fetch job list error : {err}")
 
 
 def update_jobs(job_data: dict, finish_time: int) -> list:

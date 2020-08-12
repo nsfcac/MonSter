@@ -24,6 +24,6 @@ uge_config = {
 # fetch_uge(uge_config)
 job_id = "1933828.1"
 
-job_script = fetch_jobscript(uge_config, job_id)
+fetch_jobscript(uge_config)
 
-print(json.dumps(job_script, indent=4))
+# print(json.dumps(job_script, indent=4))
