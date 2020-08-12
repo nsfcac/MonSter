@@ -144,7 +144,7 @@ def process_jobinfo(job: dict) -> dict:
     # except KeyError:
     #     return None
 
-    if exec_host:
+    if job_info['queue']:
         exec_host = job_info['queue'].split('@')[1]
 
     for env in job_info['jobEnvironment']:
