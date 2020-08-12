@@ -98,7 +98,7 @@ async def asyncio_fetch_jobinfo(uge_config: dict, joblist: list, adapter: object
         async with requests.Session() as session:
             tasks = []
             for i, job_id in enumerate(joblist):
-                session.mount(url, adapter)
+                # session.mount(url, adapter)
                 tasks.append(asyncio_fetch(uge_config, job_id, session))
             return await asyncio.gather(*tasks)
     except Exception as err:
