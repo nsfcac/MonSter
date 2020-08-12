@@ -61,6 +61,25 @@ def fetch(uge_config:dict, url: str) -> list:
     return metrics
 
 
+def fetch_jobs(uge_config: dict) -> list:
+    """
+    fetch UGE metrics from UGE API. 
+    Examples of using UGE API:
+    curl http://129.118.104.35:8182/jobs | python -m json.tool
+    """
+    job_list = []
+    try:
+        api = uge_config["api"]
+        job_list_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}"
+
+        job_list = fetch(uge_config, job_list_url)
+
+    except Exception as err:
+        logging.error(f"fetch_jobs : fetch error : {err}")
+    
+    return job_list
+
+
 def parallel_process(metrics: list, timestamp: int) -> list:
     """
     Parallel process metrics
