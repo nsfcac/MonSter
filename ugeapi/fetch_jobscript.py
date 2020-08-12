@@ -37,7 +37,7 @@ def fetch_jobscript(uge_config: dict) -> list:
         
         # File transfer
         ftp_client = ssh_client.open_sftp()
-        ftp_client.get('/home/monster/miniconda.sh', '/home/monster/MonSter/ugeapi/data/miniconda_t.sh')
+        ftp_client.get('/home/monster/1.sh', '/home/monster/MonSter/ugeapi/data/miniconda_t.sh')
         ftp_client.close()
         
         ssh_client.close()
