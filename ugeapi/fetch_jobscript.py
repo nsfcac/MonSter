@@ -131,7 +131,7 @@ def process_jobinfo(job: dict) -> dict:
     Process job info, extract exec_host, work_dir, cmd from job info
     """
     processed_jobinfo = {}
-    
+
     job_id = job['job']
     job_info = job['info']
 
@@ -139,17 +139,17 @@ def process_jobinfo(job: dict) -> dict:
     work_dir = None
     cmd = None
 
-    try:
-        exec_host = job_info['queue'].split('@')[1]
-    except KeyError:
-        return None
+    # try:
+    #     exec_host = job_info['queue'].split('@')[1]
+    # except KeyError:
+    #     return None
 
-    try:
-        for env in job_info['jobEnvironment']:
-            if env['name'] == 'PWD':
-                work_dir = env['value']
-    except Exception:
-        pass
+    if exec_host:
+        exec_host = job_info['queue'].split('@')[1]
+
+    for env in job_info['jobEnvironment']:
+        if env['name'] == 'PWD':
+            work_dir = env['value']
 
     cmd = job_info['command']
 
