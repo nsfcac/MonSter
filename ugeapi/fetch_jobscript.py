@@ -81,7 +81,7 @@ def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
 
         # Process jobs info
         with multiprocessing.Pool() as pool:
-            processed_jobinfo = pool.map(all_jobinfo, all_jobinfo)
+            processed_jobinfo = pool.map(process_jobinfo, all_jobinfo)
 
         return processed_jobinfo
 
