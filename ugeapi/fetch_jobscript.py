@@ -63,26 +63,22 @@ def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
     """
     all_jobinfo = []
     try:
-        api = uge_config["api"]
-        urls = [f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}" for job_id in joblist]
-        
         adapter = HTTPAdapter(max_retries=uge_config["max_retries"])
         with requests.Session() as session:
             loop = asyncio.get_event_loop()
-            all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(uge_config, urls, adapter, session))
+            all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(uge_config, joblist, adapter, session))
     except Exception as err:
         logging.error(f"fetch_jobscript : fetch_jobinfo : {err}")
     return all_jobinfo
 
 
-async def asyncio_fetch(uge_config: dict, job_id: str, session: object) -> dict:
+async def asyncio_fetch(uge_config: dict, url: str, session: object) -> dict:
     """
     Asyncio fetch each job info
     """
     json = {}
-    api = uge_config["api"]
-    url = f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}"
     try:
+        job_id = url.split('/')[-1]
         resp = await session.get(
             url, verify = uge_config["ssl_verify"],
             timeout = (uge_config["timeout"]["connect"], uge_config["timeout"]["read"])
@@ -94,16 +90,18 @@ async def asyncio_fetch(uge_config: dict, job_id: str, session: object) -> dict:
     return {"job": job_id, "info": json}
 
 
-async def asyncio_fetch_jobinfo(uge_config: dict, urls: list, adapter: object, session: object) -> list:
+async def asyncio_fetch_jobinfo(uge_config: dict, joblist: list, adapter: object, session: object) -> list:
     """
     Asyncio fetch all jobs info
     """
     try:
+        api = uge_config["api"]
         # async with requests.Session() as session:
         tasks = []
-        for i, url in enumerate(urls):
+        for i, job_id in enumerate(joblist):
+            url = f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}"
             session.mount(url, adapter)
-            tasks.append(asyncio_fetch(uge_config, job_id, session))
+            tasks.append(asyncio_fetch(uge_config, url, session))
         return await asyncio.gather(*tasks)
     except Exception as err:
         logging.error(f"fetch_jobscript : asyncio_fetch_jobinfo : {err}")
