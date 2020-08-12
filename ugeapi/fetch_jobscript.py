@@ -153,6 +153,9 @@ def process_jobinfo(job: dict) -> dict:
 
     cmd = job_info['command']
 
+    if job_info['taskid']:
+        print(f"taskid: {job_info['taskid']}")
+
     # Do no proceed for the following typs of jobs
     if cmd and any(q_cmd in cmd.lower() for q_cmd in ["qlogin", "qrsh"]):
         return None
