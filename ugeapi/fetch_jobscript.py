@@ -30,7 +30,7 @@ def fetch_jobscript(uge_config: dict) -> list:
     joblist = []
     try:
         # Initialize paramiko for SSH
-        ssh_key = paramiko.rsakey.RSAKey('/home/monster/.ssh/id_rsa.pub')
+        # ssh_key = paramiko.rsakey.RSAKey('/home/monster/.ssh/id_rsa.pub')
         ssh_client = paramiko.SSHClient()
         # ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh_client.connect(hostname='quanah.hpcc.ttu.edu', username='monster', password='JIE2020li')
@@ -38,6 +38,8 @@ def fetch_jobscript(uge_config: dict) -> list:
         stdin,stdout,stderr=ssh_client.exec_command("ls")
 
         print(stdout.readlines())
+
+        ssh_client.clost()
         # # Get the new job ids
         # curr_joblist = fetch_jobs(uge_config)
         # for job_id in curr_joblist:
