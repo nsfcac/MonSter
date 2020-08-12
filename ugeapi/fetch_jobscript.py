@@ -77,6 +77,7 @@ async def asyncio_fetch(uge_config: dict, url: str, session: object) -> dict:
     Asyncio fetch each job info
     """
     json = {}
+    job_id = None
     try:
         job_id = url.split('/')[-1]
         resp = await session.get(
