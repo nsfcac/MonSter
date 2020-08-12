@@ -9,13 +9,14 @@
 import paramiko
 import logging
 import requests
+import asyncio
 from pathlib import Path
 from requests.adapters import HTTPAdapter
 
 import sys
 sys.path.append('../')
 
-from ugeapi.fetch_uge import fetch_jobs, fetch
+from ugeapi.fetch_uge import fetch_jobs
 
 all_joblist = []
 
@@ -29,23 +30,26 @@ def fetch_jobscript(uge_config: dict) -> list:
     global all_joblist
     joblist = []
     try:
-        # Initialize paramiko for SSH
-        ssh_key = paramiko.RSAKey.from_private_key_file('/home/monster/.ssh/id_rsa')
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname='quanah.hpcc.ttu.edu', username='monster', pkey=ssh_key)
-        
-        # File transfer
-        ftp_client = ssh_client.open_sftp()
-        ftp_client.get('/home/monster/1.sh', '/home/monster/MonSter/ugeapi/data/miniconda_t.sh')
-        ftp_client.close()
-        
-        ssh_client.close()
         # # Get the new job ids
-        # curr_joblist = fetch_jobs(uge_config)
-        # for job_id in curr_joblist:
-        #     if job_id not in all_joblist:
-        #         joblist.append(job_id)
+        curr_joblist = fetch_jobs(uge_config)
+        for job_id in curr_joblist:
+            if job_id not in all_joblist:
+                joblist.append(job_id)
+
+        if joblist:
+            all_jobinfo = asyncio_fetch_jobinfo(uge_config, joblist)
+            # # Initialize paramiko for SSH
+            # ssh_key = paramiko.RSAKey.from_private_key_file('/home/monster/.ssh/id_rsa')
+            # ssh_client = paramiko.SSHClient()
+            # ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            # ssh_client.connect(hostname='quanah.hpcc.ttu.edu', username='monster', pkey=ssh_key)
+            
+            # # Files transfer
+            # ftp_client = ssh_client.open_sftp()
+            # # ftp_client.get('/home/monster/miniconda.sh', '/home/monster/MonSter/ugeapi/data/miniconda_t.sh')
+            # ftp_client.close()
+            
+            # ssh_client.close()
         
         # Copy jobs scripts from remote server (quanah)
     except Exception as err:
@@ -53,9 +57,54 @@ def fetch_jobscript(uge_config: dict) -> list:
         return None
 
 
-def copy_jobscript(uge_config: dict, job_id: str, ssh_client: object) -> None:
+def asyncio_fetch_jobinfo(uge_config: dict, joblist: list) -> list:
     """
-    Copy the target job scripts to local.
+    Fetch all jobs info
+    """
+    all_jobinfo = []
+    try:
+        adapter = HTTPAdapter(max_retries=uge_config["max_retries"])
+        loop = asyncio.get_event_loop()
+        all_jobinfo = loop.run_until_complete(uge_config, joblist, adapter)
+    except Exception as err:
+        logging.error(f"fetch_jobscript : asyncio_fetch_jobinfo : {err}")
+    return all_jobinfo
+
+
+async def asyncio_fetch(uge_config: dict, job_id: str, session: object) -> dict:
+    """
+    Asyncio fetch each job info
+    """
+    json = {}
+    api = uge_config["api"]
+    url = f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}"
+    try:
+        resp = await session.get(
+            url, verify = uge_config["ssl_verify"],
+            timeout = (uge_config["timeout"]["connect"], uge_config["timeout"]["read"])
+        )
+        if resp:
+            json = resp.json()
+    except Exception as err:
+        logging.error(f"fetch_jobscript : asyncio_fetch : {err}")
+    return {"job": job_id, "info": json}
+
+
+async def asyncio_fetch_jobinfo(uge_config: dict, joblist: list, adapter: object) -> list:
+    """
+    Asyncio fetch all jobs info
+    """
+    async with requests.Session() as session:
+        tasks = []
+        for i, job_id in enumerate(joblist):
+            session.mount(url, adapter)
+            tasks.append(asyncio_fetch(uge_config, job_id, session))
+        return await asyncio.gather(*tasks)
+
+
+def gen_script_path(uge_config: dict, job_id: str) -> str:
+    """
+    Generate job script path.
     """
     try:
         # Get job info
