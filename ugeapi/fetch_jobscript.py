@@ -11,6 +11,8 @@ import paramiko
 import logging
 import asyncio
 import aiohttp
+import multiprocessing
+
 from aiohttp import ClientSession
 # import requests
 # from pathlib import Path
@@ -72,11 +74,17 @@ def fetch_jobinfo(uge_config: dict, joblist: list) -> list:
         connector = aiohttp.TCPConnector(verify_ssl= False)
         timeout = aiohttp.ClientTimeout(15, 45)
 
+        # Asyncio fetch all jobs info
         loop = asyncio.get_event_loop()
-
         all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(urls, connector, timeout))
-
         loop.close()
+
+        # Process jobs info
+        with multiprocessing.Pool() as pool:
+            processed_jobinfo = pool.map(all_jobinfo, all_jobinfo)
+
+        return processed_jobinfo
+
     except Exception as err:
         logging.error(f"fetch_jobscript : fetch_jobinfo : {err}")
     return all_jobinfo
@@ -119,6 +127,52 @@ async def asyncio_fetch_jobinfo(urls: list, connector: object, timeout: object) 
     except Exception as err:
         logging.error(f"fetch_jobscript : asyncio_fetch_jobinfo : {err}")
 
+
+def process_jobinfo(job: dict) -> dict:
+    """
+    Process job info, extract exec_host, work_dir, cmd from job info
+    """
+    processed_jobinfo = {}
+    try:
+        job_id = job['job']
+        job_info = job['info']
+
+        exec_host = None
+        work_dir = None
+        cmd = None
+
+        try:
+            exec_host = job_info['queue'].split('@')[1]
+        except KeyError:
+            return None
+
+        try:
+            for env in job_info['jobEnvironment']:
+                if env['name'] == 'PWD':
+                    work_dir = env['value']
+        except Exception:
+            pass
+
+        cmd = job_info['command']
+
+        # Do no proceed for the following typs of jobs
+        if cmd and any(q_cmd in cmd.lower() for q_cmd in ["qlogin", "qrsh"]):
+            return None
+
+        job_info = {
+            'exec_host': exec_host,
+            'work_dir': work_dir,
+            'cmd': cmd
+        }
+
+        processed_jobinfo = {
+            'job': job_id,
+            'info': job_info
+        }
+        
+    except Exception:
+        return None
+    
 
 def gen_script_path(uge_config: dict, job_id: str) -> str:
     """
