@@ -39,7 +39,7 @@ def fetch_jobscript(uge_config: dict) -> list:
 
         print(stdout.readlines())
 
-        ssh_client.clost()
+        ssh_client.close()
         # # Get the new job ids
         # curr_joblist = fetch_jobs(uge_config)
         # for job_id in curr_joblist:
