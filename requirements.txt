@@ -5,4 +5,5 @@ PyYAML
 requests
 python-dateutil
 pathlib
+paramiko
 schedule
