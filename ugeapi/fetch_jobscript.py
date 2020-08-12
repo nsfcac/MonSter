@@ -135,7 +135,6 @@ def process_jobinfo(job: dict) -> dict:
         job_id = job['job']
         job_info = job['info']
 
-        print(job_id)
         exec_host = None
         work_dir = None
         cmd = None
@@ -143,7 +142,6 @@ def process_jobinfo(job: dict) -> dict:
         try:
             exec_host = job_info['queue'].split('@')[1]
         except KeyError:
-            print(f"{job_id} - exec_host")
             return None
 
         try:
@@ -170,8 +168,9 @@ def process_jobinfo(job: dict) -> dict:
             'info': job_info
         }
         
-    except Exception:
-        return None
+    except Exception as err:
+        logging.error(f"fetch_jobscript : process_jobinfo : {err}")
+    return processed_jobinfo
     
 
 def gen_script_path(uge_config: dict, job_id: str) -> str:
