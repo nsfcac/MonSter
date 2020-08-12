@@ -65,7 +65,7 @@ def asyncio_fetch_jobinfo(uge_config: dict, joblist: list) -> list:
     try:
         adapter = HTTPAdapter(max_retries=uge_config["max_retries"])
         loop = asyncio.get_event_loop()
-        all_jobinfo = loop.run_until_complete(uge_config, joblist, adapter)
+        all_jobinfo = loop.run_until_complete(asyncio_fetch_jobinfo(uge_config, joblist, adapter))
     except Exception as err:
         logging.error(f"fetch_jobscript : asyncio_fetch_jobinfo : {err}")
     return all_jobinfo
