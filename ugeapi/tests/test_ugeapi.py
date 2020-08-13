@@ -26,4 +26,5 @@ job_id = "1933828.1"
 
 result = fetch_jobscript(uge_config)
 
-print(json.dumps(result, indent=4))
+print("Get Job Scripts Done!")
+# print(json.dumps(result, indent=4))
