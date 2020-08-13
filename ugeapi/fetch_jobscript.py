@@ -14,9 +14,6 @@ import aiohttp
 import multiprocessing
 
 from aiohttp import ClientSession
-# import requests
-# from pathlib import Path
-# from requests.adapters import HTTPAdapter
 
 import sys
 sys.path.append('../')
@@ -43,20 +40,40 @@ def fetch_jobscript(uge_config: dict) -> list:
 
         if joblist:
             all_jobinfo = fetch_jobinfo(uge_config, joblist)
-            # # Initialize paramiko for SSH
-            # ssh_key = paramiko.RSAKey.from_private_key_file('/home/monster/.ssh/id_rsa')
-            # ssh_client = paramiko.SSHClient()
-            # ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            # ssh_client.connect(hostname='quanah.hpcc.ttu.edu', username='monster', pkey=ssh_key)
+            # Initialize paramiko for SSH
+            ssh_key = paramiko.RSAKey.from_private_key_file('/home/monster/.ssh/id_rsa')
+            ssh_client = paramiko.SSHClient()
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh_client.connect(hostname='quanah.hpcc.ttu.edu', username='monster', pkey=ssh_key)
             
-            # # Files transfer
-            # ftp_client = ssh_client.open_sftp()
-            # # ftp_client.get('/home/monster/miniconda.sh', '/home/monster/MonSter/ugeapi/data/miniconda_t.sh')
-            # ftp_client.close()
-            
-            # ssh_client.close()
-            return all_jobinfo
-        # Copy jobs scripts from remote server (quanah)
+            # Copy jobs scripts from remote server (quanah)
+            ftp_client = ssh_client.open_sftp()
+            for job in all_jobinfo:
+                job_id = job['id']
+                job_info = job['info']
+                saved_path = '/home/monster/MonSter/ugeapi/data/' + job_id
+                try:
+                    script_path = get_script_path_exec(uge_config, job_id, job_info)
+                    ftp_client.get('script_path', saved_path)
+                except:
+                    if '.' in job_id:
+                        job_id = job_id.split('.')[0]
+                        saved_path = '/home/monster/MonSter/ugeapi/data/' + job_id
+                        try:
+                            script_path = get_script_path_exec(uge_config, job_id, job_info)
+                            ftp_client.get('script_path', saved_path)
+                        except:
+                            script_path = get_script_path_work(uge_config, job_info)
+                            ftp_client.get('script_path', saved_path)
+                    else:
+                        try:
+                            script_path = get_script_path_work(uge_config, job_info)
+                            ftp_client.get('script_path', saved_path)
+                        except:
+                            pass
+
+            ftp_client.close()
+            ssh_client.close()
     except Exception as err:
         logging.error(f"fetch Job script error: {err}")
         return None
@@ -139,11 +156,6 @@ def process_jobinfo(job: dict) -> dict:
     work_dir = None
     cmd = None
 
-    # try:
-    #     exec_host = job_info['queue'].split('@')[1]
-    # except KeyError:
-    #     return None
-
     if job_info['queue']:
         exec_host = job_info['queue'].split('@')[1]
 
@@ -152,9 +164,6 @@ def process_jobinfo(job: dict) -> dict:
             work_dir = env['value']
 
     cmd = job_info['command']
-
-    if job_info['taskid']:
-        print(f"job: {job_id}, taskid: {job_info['taskid']}")
 
     # Do no proceed for the following typs of jobs
     if cmd and any(q_cmd in cmd.lower() for q_cmd in ["qlogin", "qrsh"]):
@@ -167,39 +176,21 @@ def process_jobinfo(job: dict) -> dict:
     }
 
     processed_jobinfo = {
-        'job': job_id,
+        'id': job_id,
         'info': job_info
     }
         
     return processed_jobinfo
     
 
-def gen_script_path(uge_config: dict, job_id: str) -> str:
+def get_script_path_exec(uge_config: dict, job_id: str, job_info: str) -> str:
     """
     Generate job script path.
     """
+    job_script_path = None
     try:
-        # Get job info
-        api = uge_config["api"]
-        job_info_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}"
-        job_info = fetch(uge_config, job_info_url)
-
-        if not job_info:
-            return None
-
-        # Extract exec_host, work_dir, cmd from job info
-        try:
-            exec_host = job_info['queue'].split('@')[1]
-        except Exception:
-            return None
-
-        try:
-            for env in job_info['jobEnvironment']:
-                if env['name'] == 'PWD':
-                    work_dir = env['value']
-        except Exception:
-            pass
-        cmd = job_info['command']
+        exec_host = job_info['exec_host']
+        cmd = job_info['cmd']
 
         # Do no proceed for the following typs of job
         if cmd and any(q_cmd in cmd.lower() for q_cmd in ["qlogin", "qrsh"]):
@@ -211,46 +202,44 @@ def gen_script_path(uge_config: dict, job_id: str) -> str:
             exec_host = exec_host.split('.')[0]
             # Find the job script directory
             job_script_path = f"{uge_spool_dir}/{exec_host}/{exec_host}/job_scripts/{job_id}"
-        
+            return job_script_path
+            
     except Exception as err:
-        logging.error(f"Copy Job script error: {err}")
+        logging.error(f"fetch_jobscript : get_script_path_exec : {err}")
         return None
-    return
 
 
-def fetch_script(uge_config: dict, job_id: str) -> str:
+def get_script_path_work(uge_config: dict, job_info: dict) -> str:
+    """
+    Generate job script path.
+    """
+    job_script_path = None
+    try:
+        work_dir = job_info['work_dir']
+        cmd = job_info['cmd']
+
+        # Do no proceed for the following typs of job
+        if cmd and any(q_cmd in cmd.lower() for q_cmd in ["qlogin", "qrsh"]):
+            return None
+
+        if work_dir and cmd:
+            script_file = cmd.split()[-1]
+            # Look into user's directory and try to find the script file
+            job_script_path = f"{work_dir}/{script_file}"
+            return job_script_path
+            
+    except Exception as err:
+        logging.error(f"fetch_jobscript : get_script_path_work : {err}")
+        return None
+
+
+def get_script_path(uge_config: dict, job_id: str) -> str:
     """
     Get job script from spool directory or from the script file under user directory
     Refer to HPC_Provenance developed by Misha ahmadian (misha.ahmadian@ttu.edu)
     """
     job_script = ""
     try:
-        api = uge_config["api"]
-        job_info_url = f"http://{api['hostname']}:{api['port']}{api['job_list']}/{job_id}"
-
-        job_info = fetch(uge_config, job_info_url)
-
-        if not job_info:
-            return None
-        
-        # Extract exec_host, work_dir, cmd from job info
-        try:
-            exec_host = job_info['queue'].split('@')[1]
-        except Exception:
-            return None
-
-        try:
-            for env in job_info['jobEnvironment']:
-                if env['name'] == 'PWD':
-                    work_dir = env['value']
-        except KeyError:
-            pass
-        cmd = job_info['command']
-
-        # Do no proceed for the following yteps of job
-        if cmd and any(q_cmd in cmd.lower() for q_cmd in ["qlogin", "qrsh"]):
-            return None
-        
         # The location of UGE Spool Directory for the cluster
         uge_spool_dir = uge_config["spool_dirs"]
         # First check the spool directory for the script file. That's the most reliable version
