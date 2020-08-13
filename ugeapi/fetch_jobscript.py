@@ -48,7 +48,7 @@ def fetch_jobscript(uge_config: dict) -> list:
             
             # Copy jobs scripts from remote server (quanah)
             ftp_client = ssh_client.open_sftp()
-            ftp_client.get('/home/monster/miniconda.sh', '/home/monster/MonSter/ugeapi/data/')
+            ftp_client.get('/home/monster/miniconda.sh', '/home/monster/MonSter/ugeapi/data/miniconda.sh')
             # for job in all_jobinfo:
             #     job_id = job['id']
             #     job_info = job['info']
