@@ -63,14 +63,14 @@ def fetch_jobscript(uge_config: dict) -> list:
                         # print(f"job_id : {job_id}, script_path : {script_path}")
                         ftp_client.get(script_path, saved_path)
                 except Exception as err:
-                    print(f"job_id : {job_id}, err : {err}")
+                    print(f"job_id : {job_id}, exec: err : {err}")
                     try:
                         script_path = get_script_path_work(uge_config, job_info)
                         if script_path:
                             # print(f"job_id : {job_id}, script_path : {script_path}")
                             ftp_client.get(script_path, saved_path)
                     except Exception as err:
-                        print(f"job_id : {job_id}, err : {err}")
+                        print(f"job_id : {job_id}, work: err : {err}")
 
             ftp_client.close()
             ssh_client.close()
