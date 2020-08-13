@@ -59,11 +59,13 @@ def fetch_jobscript(uge_config: dict) -> list:
                         job_id = job_id.split('.')[0]
                         saved_path = '/home/monster/MonSter/ugeapi/data/jobscripts/' + job_id
                     script_path = get_script_path_exec(uge_config, job_id, job_info)
+                    print(f"script_path : {script_path}")
                     if script_path:
                         ftp_client.get(script_path, saved_path)
                 except:
                     try:
                         script_path = get_script_path_work(uge_config, job_info)
+                        print(f"script_path : {script_path}")
                         if script_path:
                             ftp_client.get(script_path, saved_path)
                     except:
