@@ -53,28 +53,19 @@ def fetch_jobscript(uge_config: dict) -> list:
                 job_id = job['id']
                 job_info = job['info']
                 saved_path = '/home/monster/MonSter/ugeapi/data/' + job_id
+
                 try:
-                    script_path = get_script_path_exec(uge_config, job_id, job_info)
-                    ftp_client.get(script_path, saved_path)
-                except:
                     if '.' in job_id:
                         job_id = job_id.split('.')[0]
                         saved_path = '/home/monster/MonSter/ugeapi/data/' + job_id
-                        try:
-                            script_path = get_script_path_exec(uge_config, job_id, job_info)
-                            ftp_client.get(script_path, saved_path)
-                        except:
-                            try:
-                                script_path = get_script_path_work(uge_config, job_info)
-                                ftp_client.get(script_path, saved_path)
-                            except:
-                                pass
-                    else:
-                        try:
-                            script_path = get_script_path_work(uge_config, job_info)
-                            ftp_client.get(script_path, saved_path)
-                        except:
-                            pass
+                    script_path = get_script_path_exec(uge_config, job_id, job_info)
+                    ftp_client.get(script_path, saved_path)
+                except:
+                    try:
+                        script_path = get_script_path_work(uge_config, job_info)
+                        ftp_client.get(script_path, saved_path)
+                    except:
+                        pass
 
             ftp_client.close()
             ssh_client.close()
