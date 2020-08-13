@@ -57,7 +57,7 @@ def fetch_jobscript(uge_config: dict) -> list:
                 try:
                     if '.' in job_id:
                         job_id = job_id.split('.')[0]
-                        saved_path = '/home/monster/MonSter/ugeapi/data/jobscripts' + job_id
+                        saved_path = '/home/monster/MonSter/ugeapi/data/jobscripts/' + job_id
                     script_path = get_script_path_exec(uge_config, job_id, job_info)
                     if script_path:
                         ftp_client.get(script_path, saved_path)
@@ -227,7 +227,7 @@ def get_script_path_work(uge_config: dict, job_info: dict) -> str:
             
     except Exception as err:
         logging.error(f"fetch_jobscript : get_script_path_work : {err}")
-        return None
+    return None
 
 
 def get_script_path(uge_config: dict, job_id: str) -> str:
