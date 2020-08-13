@@ -203,7 +203,7 @@ def get_script_path_exec(uge_config: dict, job_id: str, job_info: str) -> str:
             
     except Exception as err:
         logging.error(f"fetch_jobscript : get_script_path_exec : {err}")
-        return None
+    return None
 
 
 def get_script_path_work(uge_config: dict, job_info: dict) -> str:
