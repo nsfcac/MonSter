@@ -55,6 +55,7 @@ def fetch_jobscript(uge_config: dict) -> list:
                 try:
                     script_path = get_script_path_exec(uge_config, job_id, job_info)
                     ftp_client.get('script_path', saved_path)
+                    print(script_path)
                 except:
                     if '.' in job_id:
                         job_id = job_id.split('.')[0]
