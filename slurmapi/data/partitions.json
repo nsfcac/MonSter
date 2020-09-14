@@ -1,0 +1,44 @@
+HTTP/1.1 200 OK
+Content-Length: 1034
+
+{
+   "errors": [
+   ],
+   "partitions": {
+     "normal": {
+       "flags": [
+         "default"
+       ],
+       "preemption_mode": [
+         "requeue",
+         "gang_schedule"
+       ],
+       "allowed_allocation_nodes": "",
+       "allowed_accounts": "",
+       "allowed_groups": "",
+       "allowed_qos": "",
+       "alternative": "",
+       "billing_weights": "",
+       "default_memory_per_cpu": 0,
+       "default_time_limit": null,
+       "denied_accounts": "",
+       "denied_qos": "",
+       "preemption_grace_time": 0,
+       "maximum_cpus_per_node": "INFINITE",
+       "maximum_memory_per_node": 0,
+       "maximum_nodes_per_job": "INFINITE",
+       "max_time_limit": 1440,
+       "min nodes per job": 0,
+       "name": "normal",
+       "nodes": "compute-14-[13-14]",
+       "over_time_limit": null,
+       "priority_job_factor": 1,
+       "priority_tier": 1,
+       "qos": "",
+       "nodes_online": 3,
+       "total_cpus": 24,
+       "total_nodes": 2,
+       "tres": "cpu=24,mem=48186M,node=2,billing=24"
+     }
+   }
+ }
