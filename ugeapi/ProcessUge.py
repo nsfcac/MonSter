@@ -116,6 +116,41 @@ class ProcessUge():
         return
 
     
+    def __process_load(self) -> None:
+        """
+        Process the average load over the last one minute
+        """
+        resource = self.metrics.get("resourceNumericValues")
+        if resource:
+            load_short = resource.get("load_short", None)
+            if load_short:
+                measurement = "Load"
+                label = "UGE"
+                value = load_short
+                datapoint = self.__gen_datapoint(measurement, label, value)
+                self.datapoints.append(datapoint)
+        return
+
+    
+    def __process_swap(self) -> None:
+        """
+        Process the swap usage, which records the percentage of virtual memory
+        that is currently being used to temporarily store inactive pages from
+        the main physical memory
+        """
+        resource = self.metrics.get("resourceNumericValues")
+        if resource:
+            swap_used = resource.get("swap_used", None)
+            swap_total = resource.get("swap_total", None)
+            if swap_used and swap_total:
+                measurement = "SwapUsage"
+                label = "UGE"
+                value = float("{0:.2f}".format( swap_used/swap_total * 100 ))
+                datapoint = self.__gen_datapoint(measurement, label, value)
+                self.datapoints.append(datapoint)
+        return
+
+    
     def __process_job(self) -> None:
         """
         Process job list, discard masterQueue:"MASTER", deduplicate repeated jobs
@@ -172,6 +207,8 @@ class ProcessUge():
         Return all datapoints
         """
         self.__process_cpu_mem()
+        self.__process_load()
+        self.__process_swap()
         self.__process_job()
         # job list is calculated based on the self.jobs_info, 
         # it should be put after self.__process_job
