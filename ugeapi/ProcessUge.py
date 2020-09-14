@@ -126,7 +126,7 @@ class ProcessUge():
             if load_short:
                 measurement = "Load"
                 label = "UGE"
-                value = load_short
+                value = float("{0:.2f}".format(load_short))
                 datapoint = self.__gen_datapoint(measurement, label, value)
                 self.datapoints.append(datapoint)
         return
