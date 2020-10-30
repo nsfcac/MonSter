@@ -15,8 +15,13 @@ def main():
               "timelimitraw","reqmem"]
     command = ["sacct --format=" + ",".join(format) + " -p"]
 
-    returnstr = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
-    print(returnstr)
+    # Get strings from command line
+    rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
+    
+    # Split strings by line
+    rtn_str_arr = rtn_str_arr.splitlines()
+
+    print(rtn_str_arr)
     return
 
 
