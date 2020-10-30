@@ -7,7 +7,7 @@ Jie Li (jie.li@ttu.edu)
 """
 import json
 import subprocess
-from multiprocessing import Proces, Queue
+from multiprocessing import Process, Queue
 
 
 def main():
