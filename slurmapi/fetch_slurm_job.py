@@ -39,7 +39,7 @@ def process_str(format: list, job_str: str) -> dict:
     job_data = {}
     job_str_arr = job_str.split("|")
     
-    for i in range(format):
+    for i in range(len(format)):
         job_data.update({
             format[i]: job_str_arr[i]
         })
