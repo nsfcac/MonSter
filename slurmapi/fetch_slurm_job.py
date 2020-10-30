@@ -7,6 +7,7 @@ Jie Li (jie.li@ttu.edu)
 """
 import json
 import subprocess
+from multiprocessing import Proces, Queue
 
 
 def main():
@@ -25,12 +26,12 @@ def main():
     # Split strings by line, and discard the first line that indicates the metrics name
     rtn_str_arr = rtn_str.splitlines()[1:]
 
-    # Parallel process the accouting information
-
-    for job_str in rtn_str_arr:
-        processed = str_2_json(format, job_str)
+    # Generate all job data dict
+    for i in rtn_str_arr:
+        processed = str_2_json(format, i)
         print(json.dumps(processed, indent=4))
     return
+
 
 def str_2_json(format: list, job_str: str) -> dict:
     """
@@ -45,11 +46,40 @@ def str_2_json(format: list, job_str: str) -> dict:
             format[i]: job_str_arr[i]
         })
     
+    # Unfold metrics in treusageintot and tresusageoutot
+    if job_data.get("tresusageintot", None):
+        unfolded_metrics = unfold(job_data["tresusageintot"])
+        job_date.update(unfolded_metrics)
+        job_data.pop("tresusageintot")
+    
+    if job_data.get("tresusageouttot", None):
+        unfolded_metrics = unfold(job_data["tresusageouttot"])
+        job_date.update(unfolded_metrics)
+        job_data.pop("tresusageouttot")
+    
     job_dict = {
         job_data["jobid"]: job_data
     }
 
     return job_dict
+
+
+def unfold(metric_str: str) -> dict:
+    """
+    Unfold the metrics under the same metric name(such as tresusageintot, tresusageouttot)
+    """
+    metric_dict = {}
+    for item in metric_str.split(","):
+        item_pair = item.split("=")
+        metric_dict.update({
+            item_pair[0]: item_pair[1]
+        })
+
+    return metric_dict
+
+
+def process_job_dict(rtn_str_arr: arr, job_dict_all: dict) -> dict:
+    return
 
 if __name__ == '__main__':
     main()
