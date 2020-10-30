@@ -126,7 +126,8 @@ def aggregate_job_dict(job_dict_all: dict) -> dict:
     for job_id in job_id_list:
         if ".batch" not in job_id:
             job_id_batch = job_id + ".batch"
-            job_data = merge_metrics(job_dict_all[job_id], job_dict_all[job_id_batch])
+            if job_dict_all.get(job_id_batch, None):
+                job_data = merge_metrics(job_dict_all[job_id], job_dict_all[job_id_batch])
             
             # Unfold metrics in treusageintot and tresusageoutot
             folded_metrics = job_data.get("tresusageintot", None)
