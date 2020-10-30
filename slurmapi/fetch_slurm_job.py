@@ -15,7 +15,7 @@ def main():
               "timelimitraw","reqmem"]
     command = ["sacct --format=" + ",".join(format) + " -p"]
 
-    returnstr = subprocess.run(command, stdout=subprocess.PIPE).stdout.decode('utf-8')
+    returnstr = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
     print(returnstr)
     return
 
