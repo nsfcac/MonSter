@@ -31,10 +31,8 @@ def main():
 
     # Aggregate job data
     aggregated_job_dict = aggregate_job_dict(job_dict_all)
-    print(json.dumps(aggregated_job_dict, indent=4))
-    # for i in rtn_str_arr:
-    #     processed = str_2_json(format, i)
-    #     print(json.dumps(processed, indent=4))
+    # print(json.dumps(aggregated_job_dict, indent=4))
+    
     return
 
 
@@ -70,6 +68,9 @@ def unfold(metric_str: str) -> dict:
             item_pair[0]: item_pair[1]
         })
 
+        if item_pair[0] == "fs/disk":
+            print(item_pair[1])
+
     return metric_dict
 
 
@@ -93,6 +94,23 @@ def process_job_dict(format: list, rtn_str_arr: list) -> dict:
         p.join()
 
     return job_dict_all
+
+
+def merge_metrics(job_metircs: dict, batch_metrics: dict) -> dict:
+    """
+    Merge metrics in jobid.batch to metrics in jobid.
+    """
+    merged_metrics = {}
+    for key, value in job_metircs.items():
+        if value == "":
+            merged_metrics.update({
+                key: batch_metrics[key]
+            })
+        else:
+            merged_metrics.update({
+                key: value
+            })
+    return merged_metrics
 
 
 def aggregate_job_dict(job_dict_all: dict) -> dict:
@@ -124,25 +142,56 @@ def aggregate_job_dict(job_dict_all: dict) -> dict:
                 job_id: job_data
             })
     return aggregated_job_dict
-    
-
-def merge_metrics(job_metircs: dict, batch_metrics: dict) -> dict:
-    """
-    Merge metrics under jobid.batch to metrics under jobid.
-    """
-    merged_metrics = {}
-    for key, value in job_metircs.items():
-        if value == "":
-            merged_metrics.update({
-                key: batch_metrics[key]
-            })
-        else:
-            merged_metrics.update({
-                key: value
-            })
-    return merged_metrics
-
 
 
 if __name__ == '__main__':
     main()
+
+
+    # "81": {
+    #     "partition": "normal",
+    #     "nodelist": "compute-14-14",
+    #     "group": "users",
+    #     "user": "monster",
+    #     "jobname": "run_mpi_2.sh",
+    #     "jobid": "81",
+    #     "submit": "2020-10-29T20:35:47",
+    #     "start": "2020-10-29T20:35:47",
+    #     "end": "2020-10-29T20:37:08",
+    #     "exitcode": "0:0",
+    #     "cputimeraw": "972",
+    #     "tresusageintot": "cpu=00:11:44,energy=0,fs/disk=1086846,mem=39884K,pages=152,vmem=140712K",
+    #     "tresusageouttot": "energy=0,fs/disk=7138",
+    #     "maxvmsize": "140712K",
+    #     "alloccpus": "12",
+    #     "ntasks": "1",
+    #     "cluster": "genius",
+    #     "timelimitraw": "2",
+    #     "reqmem": "24093Mn"
+    # }
+
+    # "81": {
+    #     "partition": "normal",
+    #     "nodelist": "compute-14-14",
+    #     "group": "users",
+    #     "user": "monster",
+    #     "jobname": "run_mpi_2.sh",
+    #     "jobid": "81",
+    #     "submit": "2020-10-29T20:35:47",
+    #     "start": "2020-10-29T20:35:47",
+    #     "end": "2020-10-29T20:37:08",
+    #     "exitcode": "0:0",
+    #     "cputimeraw": "972",
+    #     "maxvmsize": "140712K",
+    #     "alloccpus": "12",
+    #     "ntasks": "1",
+    #     "cluster": "genius",
+    #     "timelimitraw": "2",
+    #     "reqmem": "24093Mn",
+    #     "cpu": "00:11:44",
+    #     "energy": "0",
+    #     "fs/disk": "7138",
+    #     "mem": "39884K",
+    #     "pages": "152",
+    #     "vmem": "140712K"
+    # }
