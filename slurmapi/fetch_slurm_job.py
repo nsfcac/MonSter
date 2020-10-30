@@ -107,18 +107,18 @@ def aggregate_job_dict(job_dict_all: dict) -> dict:
             job_id_batch = job_id + ".batch"
             job_data = merge_metrics(job_dict_all[job_id], job_dict_all[job_id_batch])
             
-            # # Unfold metrics in treusageintot and tresusageoutot
-            # folded_metrics = job_data.get("tresusageintot", None)
-            # if folded_metrics:
-            #     unfolded_metrics = unfold(folded_metrics)
-            #     job_data.update(unfolded_metrics)
-            #     job_data.pop("tresusageintot")
+            # Unfold metrics in treusageintot and tresusageoutot
+            folded_metrics = job_data.get("tresusageintot", None)
+            if folded_metrics:
+                unfolded_metrics = unfold(folded_metrics)
+                job_data.update(unfolded_metrics)
+                job_data.pop("tresusageintot")
             
-            # folded_metrics = job_data.get("tresusageouttot", None)
-            # if folded_metrics:
-            #     unfolded_metrics = unfold(folded_metrics)
-            #     job_data.update(unfolded_metrics)
-            #     job_data.pop("tresusageouttot")
+            folded_metrics = job_data.get("tresusageouttot", None)
+            if folded_metrics:
+                unfolded_metrics = unfold(folded_metrics)
+                job_data.update(unfolded_metrics)
+                job_data.pop("tresusageouttot")
             
             aggregated_job_dict.update({
                 job_id: job_data
