@@ -78,7 +78,7 @@ def unfold(metric_str: str) -> dict:
     return metric_dict
 
 
-def process_job_dict(rtn_str_arr: arr, job_dict_all: dict) -> dict:
+def process_job_dict(rtn_str_arr: list, job_dict_all: dict) -> dict:
     return
 
 if __name__ == '__main__':
