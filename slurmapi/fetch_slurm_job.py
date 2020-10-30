@@ -28,14 +28,15 @@ def main():
     # Parallel process the accouting information
 
     for job_str in rtn_str_arr:
-        processed = process_str(format, job_str)
+        processed = str_2_json(format, job_str)
         print(json.dumps(processed, indent=4))
     return
 
-def process_str(format: list, job_str: str) -> dict:
+def str_2_json(format: list, job_str: str) -> dict:
     """
-    Process the job string, and generate the job data in json format
+    Process the job string, and generate the json format job data corresponding to job id.
     """
+    job_dict = {}
     job_data = {}
     job_str_arr = job_str.split("|")
     
@@ -43,8 +44,12 @@ def process_str(format: list, job_str: str) -> dict:
         job_data.update({
             format[i]: job_str_arr[i]
         })
+    
+    job_dict = {
+        job_data["jobid"]: job_data
+    }
 
-    return job_data
+    return job_dict
 
 if __name__ == '__main__':
     main()
