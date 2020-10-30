@@ -31,7 +31,7 @@ def main():
 
     # Aggregate job data
     aggregated_job_dict = aggregate_job_dict(job_dict_all)
-    # print(json.dumps(aggregated_job_dict, indent=4))
+    print(json.dumps(aggregated_job_dict, indent=4))
     
     return
 
@@ -66,7 +66,7 @@ def unfold(metric_str: str, type: str) -> dict:
         item_pair = item.split("=")
 
         if item_pair[0] == "fs/disk" or item_pair[0] == "energy":
-            key_name = item_pair[0] + type
+            key_name = item_pair[0] + "_" + type
         else:
             key_name = item_pair[0]
 
