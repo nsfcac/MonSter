@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 This module calls sacct in Slurm to obtain detailed accouting information about
-individual jobs or job steps. The can only be used in Python 3.5 or above.
+individual jobs or job steps. This module can only be used in Python 3.5 or above.
 
 Jie Li (jie.li@ttu.edu)
 """
+import json
 import subprocess
+
 
 def main():
     # Job data format, should be configurable
@@ -13,6 +15,8 @@ def main():
               "submit","start","end","exitcode","cputimeraw","tresusageintot", \
               "tresusageouttot","maxvmsize","alloccpus","ntasks","cluster",\
               "timelimitraw","reqmem"]
+    
+    # The command used in command line
     command = ["sacct --format=" + ",".join(format) + " -p"]
 
     # Get strings from command line
@@ -23,9 +27,24 @@ def main():
 
     # Parallel process the accouting information
 
-    print(rtn_str_arr)
+    for job_str in rtn_str_arr:
+        processed = process_str(format, job_str)
+        print(json.dumps(processed, indent=4))
     return
 
+def process_str(format: list, job_str: str) -> dict:
+    """
+    Process the job string, and generate the job data in json format
+    """
+    job_data = {}
+    job_str_arr = job_str.split("|")
+    
+    for i in range(format):
+        job_data.update({
+            format[i]: job_str_arr[i]
+        })
+
+    return job_data
 
 if __name__ == '__main__':
     main()
