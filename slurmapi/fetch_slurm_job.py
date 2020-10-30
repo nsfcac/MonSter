@@ -13,10 +13,10 @@ def main():
               "submit","start","end","exitcode","cputimeraw","tresusageintot", \
               "tresusageouttot","maxvmsize","alloccpus","ntasks","cluster",\
               "timelimitraw","reqmem"]
-    command = "sacct --format=" + ",".join(format) + " -p"
+    command = ["sacct --format=" + ",".join(format) + " -p"]
 
-    returnstr = subprocess.run([command], stdout=subprocess.PIPE).stdout.decode('utf-8')
-    print(command)
+    returnstr = subprocess.run(command, stdout=subprocess.PIPE).stdout.decode('utf-8')
+    print(returnstr)
     return
 
 
