@@ -132,7 +132,7 @@ def merge_metrics(job_metircs: dict, batch_metrics: dict) -> dict:
     """
     merged_metrics = {}
     for key, value in job_metircs.items():
-        if value == None:
+        if value == "":
             merged_metrics.update({
                 key: batch_metrics[key]
             })
