@@ -27,13 +27,15 @@ def main():
     rtn_str_arr = rtn_str.splitlines()[1:]
 
     # Generate all job data dict
-    for i in rtn_str_arr:
-        processed = str_2_json(format, i)
-        print(json.dumps(processed, indent=4))
+    job_dict_all = process_job_dict(format, rtn_str_arr)
+    print(json.dumps(job_dict_all, indent=4))
+    # for i in rtn_str_arr:
+    #     processed = str_2_json(format, i)
+    #     print(json.dumps(processed, indent=4))
     return
 
 
-def str_2_json(format: list, job_str: str) -> dict:
+def str_2_json(format: list, job_str: str, queue: object) -> dict:
     """
     Process the job string, and generate the json format job data corresponding to job id.
     """
@@ -63,7 +65,8 @@ def str_2_json(format: list, job_str: str) -> dict:
         job_data["jobid"]: job_data
     }
 
-    return job_dict
+    queue.put(job_dict)
+    # return job_dict
 
 
 def unfold(metric_str: str) -> dict:
@@ -80,8 +83,25 @@ def unfold(metric_str: str) -> dict:
     return metric_dict
 
 
-def process_job_dict(rtn_str_arr: list, job_dict_all: dict) -> dict:
-    return
+def process_job_dict(format: list, rtn_str_arr: list) -> dict:
+    """
+    Process the job string using multiprocesses.
+    """
+    job_dict_all = {}
+    queue = Queue()
+    procs = []
+    for rtn_str in rtn_str_arr:
+        p = Process(target=str_2_json, args=(format, rtn_str, queue))
+        procs.append(p)
+        p.start()
+    
+    for _ in procs:
+        job_dict = queue.get()
+        job_dict_all.update(job_dict)
+
+    for p in procs:
+        p.join()
+    return job_dict_all
 
 if __name__ == '__main__':
     main()
