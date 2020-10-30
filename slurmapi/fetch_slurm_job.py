@@ -19,7 +19,7 @@ def main():
     rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
     
     # Split strings by line
-    rtn_str_arr = rtn_str_arr.splitlines()
+    rtn_str_arr = rtn_str.splitlines()
 
     print(rtn_str_arr)
     return
