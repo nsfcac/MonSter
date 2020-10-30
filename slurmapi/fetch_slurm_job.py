@@ -57,19 +57,22 @@ def str_2_json(format: list, job_str: str, queue: object) -> dict:
     # return job_dict
 
 
-def unfold(metric_str: str) -> dict:
+def unfold(metric_str: str, type: str) -> dict:
     """
     Unfold the metrics under the same metric name(such as tresusageintot, tresusageouttot)
     """
     metric_dict = {}
     for item in metric_str.split(","):
         item_pair = item.split("=")
-        metric_dict.update({
-            item_pair[0]: item_pair[1]
-        })
 
-        if item_pair[0] == "fs/disk":
-            print(item_pair[1])
+        if item_pair[0] == "fs/disk" or item_pair[0] == "energy":
+            key_name = item_pair[0] + type
+        else:
+            key_name = item_pair[0]
+
+        metric_dict.update({
+            key_name: item_pair[1]
+        })
 
     return metric_dict
 
@@ -128,13 +131,13 @@ def aggregate_job_dict(job_dict_all: dict) -> dict:
             # Unfold metrics in treusageintot and tresusageoutot
             folded_metrics = job_data.get("tresusageintot", None)
             if folded_metrics:
-                unfolded_metrics = unfold(folded_metrics)
+                unfolded_metrics = unfold(folded_metrics, "in")
                 job_data.update(unfolded_metrics)
                 job_data.pop("tresusageintot")
             
             folded_metrics = job_data.get("tresusageouttot", None)
             if folded_metrics:
-                unfolded_metrics = unfold(folded_metrics)
+                unfolded_metrics = unfold(folded_metrics, "out")
                 job_data.update(unfolded_metrics)
                 job_data.pop("tresusageouttot")
             
