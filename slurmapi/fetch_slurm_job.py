@@ -46,18 +46,18 @@ def str_2_json(format: list, job_str: str) -> dict:
             format[i]: job_str_arr[i]
         })
     
-    # Unfold metrics in treusageintot and tresusageoutot
-    folded_metrics = job_data.get("tresusageintot", None)
-    if folded_metrics:
-        unfolded_metrics = unfold(folded_metrics)
-        job_data.update(unfolded_metrics)
-        job_data.pop("tresusageintot")
+    # # Unfold metrics in treusageintot and tresusageoutot
+    # folded_metrics = job_data.get("tresusageintot", None)
+    # if folded_metrics:
+    #     unfolded_metrics = unfold(folded_metrics)
+    #     job_data.update(unfolded_metrics)
+    #     job_data.pop("tresusageintot")
     
-    folded_metrics = job_data.get("tresusageouttot", None)
-    if folded_metrics:
-        unfolded_metrics = unfold(folded_metrics)
-        job_data.update(unfolded_metrics)
-        job_data.pop("tresusageouttot")
+    # folded_metrics = job_data.get("tresusageouttot", None)
+    # if folded_metrics:
+    #     unfolded_metrics = unfold(folded_metrics)
+    #     job_data.update(unfolded_metrics)
+    #     job_data.pop("tresusageouttot")
     
     job_dict = {
         job_data["jobid"]: job_data
