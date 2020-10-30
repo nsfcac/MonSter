@@ -18,8 +18,10 @@ def main():
     # Get strings from command line
     rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
     
-    # Split strings by line
-    rtn_str_arr = rtn_str.splitlines()
+    # Split strings by line, and discard the first line that indicates the metrics name
+    rtn_str_arr = rtn_str.splitlines()[1:]
+
+    # Parallel process the accouting information
 
     print(rtn_str_arr)
     return
