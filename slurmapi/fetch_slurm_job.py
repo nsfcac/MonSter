@@ -3,6 +3,8 @@
 This module calls sacct in Slurm to obtain detailed accouting information about
 individual jobs or job steps. This module can only be used in Python 3.5 or above.
 
+sacct --format=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem -p
+
 Jie Li (jie.li@ttu.edu)
 """
 import json
@@ -18,7 +20,7 @@ def main():
               "timelimitraw","reqmem"]
     
     # The command used in command line
-    command = ["sacct --format=" + ",".join(format) + " -p"]
+    command = ["sacct  --allusers --format=" + ",".join(format) + " -p"]
 
     # Get strings from command line
     rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
