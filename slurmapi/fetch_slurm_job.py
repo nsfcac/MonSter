@@ -113,11 +113,11 @@ def unfold(metric_str: str, in_out: str) -> dict:
 
 def merge_metrics(job_metircs: dict, batch_step_metrics: dict) -> dict:
     """
-    Merge metrics under JobID with metrics under batch and jobstep.
+    Merge metrics under JobID with metrics under batch and jobstep, update the job name
     """
     merged_metrics = {}
     for key, value in batch_step_metrics.items():
-        if value == "":
+        if value == "" or key == "JobName":
             merged_metrics.update({
                 key: job_metircs[key]
             })
