@@ -63,7 +63,7 @@ def str_2_json(format: list, job_str: str, queue: object) -> dict:
         })
     
     job_dict = {
-        job_data["jobid"]: job_data
+        job_data["JobID"]: job_data
     }
 
     queue.put(job_dict)
