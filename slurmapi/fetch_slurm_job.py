@@ -3,37 +3,48 @@
 This module calls sacct in Slurm to obtain detailed accouting information about
 individual jobs or job steps. This module can only be used in Python 3.5 or above.
 
-sacct --allusers --format=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem -p
+Job State:
+https://slurm.schedmd.com/sacct.html#SECTION_JOB-STATE-CODES
+
+Get all jobs that have been terminated.
+sacct --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --format=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem -p > sacct_raw_parse.txt
+sacct --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --format=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem,State
 
 Jie Li (jie.li@ttu.edu)
 """
+import sys
 import json
 import subprocess
 from multiprocessing import Process, Queue
 
+sys.path.append('../')
+
+from sharings.utils import parse_config
 
 def main():
+    # Read configuration file
+    config_path = './slurmapi/config.yml'
+    config = parse_config(config_path)
+
     # Job data format, should be configurable
-    format = ["partition", "nodelist", "group", "user", "jobname", "jobid", \
-              "submit","start","end","exitcode","cputimeraw","tresusageintot", \
-              "tresusageouttot","maxvmsize","alloccpus","ntasks","cluster",\
-              "timelimitraw","reqmem"]
+    format = config["slurm"]["accounting_fields"]
     
-    # The command used in command line
-    command = ["sacct  --allusers --format=" + ",".join(format) + " -p"]
+    print(format)
+    # # The command used in command line
+    # command = ["sacct  --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --format=" + ",".join(format) + " -p"]
 
-    # Get strings from command line
-    rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
+    # # Get strings from command line
+    # rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
     
-    # Split strings by line, and discard the first line that indicates the metrics name
-    rtn_str_arr = rtn_str.splitlines()[1:]
+    # # Split strings by line, and discard the first line that indicates the metrics name
+    # rtn_str_arr = rtn_str.splitlines()[1:]
 
-    # Get all job data dict
-    job_dict_all = process_job_dict(format, rtn_str_arr)
+    # # Get all job data dict
+    # job_dict_all = process_job_dict(format, rtn_str_arr)
 
-    # Aggregate job data
-    aggregated_job_dict = aggregate_job_dict(job_dict_all)
-    print(json.dumps(aggregated_job_dict, indent=4))
+    # # Aggregate job data
+    # aggregated_job_dict = aggregate_job_dict(job_dict_all)
+    # print(json.dumps(aggregated_job_dict, indent=4))
     
     return
 
