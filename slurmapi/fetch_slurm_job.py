@@ -27,9 +27,9 @@ def main():
     config = parse_config(config_path)
 
     # Job data format, should be configurable
-    format = config["slurm"]["accounting_fields"]
+    # format = config["slurm"]["accounting_fields"]
     
-    print(format)
+    print(config)
     # # The command used in command line
     # command = ["sacct  --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --format=" + ",".join(format) + " -p"]
 
