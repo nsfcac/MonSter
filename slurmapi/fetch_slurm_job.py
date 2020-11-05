@@ -91,7 +91,7 @@ def process_job_dict(fields: list, rtn_str_arr: list) -> dict:
     return job_dict_all
 
 
-def unfold(metric_str: str, type: str) -> dict:
+def unfold(metric_str: str, in_out: str) -> dict:
     """
     Unfold the metrics under the same metric name(such as tresusageintot, tresusageouttot)
     """
@@ -100,7 +100,7 @@ def unfold(metric_str: str, type: str) -> dict:
         item_pair = item.split("=")
 
         if item_pair[0] == "fs/disk" or item_pair[0] == "energy":
-            key_name = item_pair[0] + "_" + type
+            key_name = item_pair[0] + "_" + in_out
         else:
             key_name = item_pair[0]
 
@@ -143,17 +143,17 @@ def aggregate_job_dict(job_dict_all: dict) -> dict:
             merged_data = merge_metrics(job_dict_all[job_id], job_dict_all[job_id_raw])
             
             # Unfold metrics in treusageintot and tresusageoutot
-            folded_metrics = merged_data.get("tresusageintot", None)
+            folded_metrics = merged_data.get("TresUsageInTot", None)
             if folded_metrics:
                 unfolded_metrics = unfold(folded_metrics, "in")
                 merged_data.update(unfolded_metrics)
-                merged_data.pop("tresusageintot")
+                merged_data.pop("TresUsageInTot")
             
-            folded_metrics = merged_data.get("tresusageouttot", None)
+            folded_metrics = merged_data.get("TresUsageOutTot", None)
             if folded_metrics:
                 unfolded_metrics = unfold(folded_metrics, "out")
                 merged_data.update(unfolded_metrics)
-                merged_data.pop("tresusageouttot")
+                merged_data.pop("TresUsageOutTot")
             
             aggregated_job_dict.update({
                 job_id: merged_data
