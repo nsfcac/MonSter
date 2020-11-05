@@ -23,24 +23,24 @@ from sharings.utils import parse_config
 
 def main():
     # Read configuration file
-    config_path = './slurmapi/config.yml'
+    config_path = './config.yml'
     config = parse_config(config_path)
 
     # Job data format, should be configurable
-    # format = config["slurm"]["accounting_fields"]
+    accounting_fields = config["slurm"]["accounting_fields"]
     
-    print(config)
-    # # The command used in command line
-    # command = ["sacct  --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --format=" + ",".join(format) + " -p"]
+    # The command used in command line
+    command = ["sacct  --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --format=" + ",".join(accounting_fields) + " -p"]
 
-    # # Get strings from command line
-    # rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
+    # Get strings from command line
+    rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
     
-    # # Split strings by line, and discard the first line that indicates the metrics name
-    # rtn_str_arr = rtn_str.splitlines()[1:]
+    # Split strings by line, and discard the first line that indicates the metrics name
+    rtn_str_arr = rtn_str.splitlines()[1:]
 
     # # Get all job data dict
-    # job_dict_all = process_job_dict(format, rtn_str_arr)
+    job_dict_all = process_job_dict(format, rtn_str_arr)
+    print(json.dumps(job_dict_all, indent=4))
 
     # # Aggregate job data
     # aggregated_job_dict = aggregate_job_dict(job_dict_all)
