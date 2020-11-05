@@ -39,7 +39,7 @@ def main():
     rtn_str_arr = rtn_str.splitlines()[1:]
 
     # # Get all job data dict
-    job_dict_all = process_job_dict(format, rtn_str_arr)
+    job_dict_all = process_job_dict(accounting_fields, rtn_str_arr)
     print(json.dumps(job_dict_all, indent=4))
 
     # # Aggregate job data
