@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-This module calls sacct in Slurm to obtain detailed accouting information about
+This module calls sacct in Slurm to obtain detailed accouting infieldsion about
 individual jobs or job steps. This module can only be used in Python 3.5 or above.
 
 Job State:
 https://slurm.schedmd.com/sacct.html#SECTION_JOB-STATE-CODES
 
 Get all jobs that have been terminated.
-sacct --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --format=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem -p > sacct_raw_parse.txt
-sacct --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --format=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem,State
+sacct --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --fields=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem -p > sacct_raw_parse.txt
+sacct --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --fields=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem,State
 
 Jie Li (jie.li@ttu.edu)
 """
@@ -26,11 +26,11 @@ def main():
     config_path = './config.yml'
     config = parse_config(config_path)
 
-    # Job data format, should be configurable
+    # Job data fields, should be configurable
     accounting_fields = config["slurm"]["accounting_fields"]
     
     # The command used in command line
-    command = ["sacct  --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --format=" + ",".join(accounting_fields) + " -p"]
+    command = ["sacct  --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --fields=" + ",".join(accounting_fields) + " -p"]
 
     # Get strings from command line
     rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
@@ -40,26 +40,25 @@ def main():
 
     # # Get all job data dict
     job_dict_all = process_job_dict(accounting_fields, rtn_str_arr)
-    print(json.dumps(job_dict_all, indent=4))
 
-    # # Aggregate job data
-    # aggregated_job_dict = aggregate_job_dict(job_dict_all)
-    # print(json.dumps(aggregated_job_dict, indent=4))
+    # Aggregate job data
+    aggregated_job_dict = aggregate_job_dict(job_dict_all)
+    print(json.dumps(aggregated_job_dict, indent=4))
     
     return
 
 
-def str_2_json(format: list, job_str: str, queue: object) -> dict:
+def str_2_json(fields: list, job_str: str, queue: object) -> dict:
     """
-    Process the job string, and generate the json format job data corresponding to job id.
+    Process the job string, and generate job data corresponding to job id in json format.
     """
     job_dict = {}
     job_data = {}
     job_str_arr = job_str.split("|")
     
-    for i in range(len(format)):
+    for i in range(len(fields)):
         job_data.update({
-            format[i]: job_str_arr[i]
+            fields[i]: job_str_arr[i]
         })
     
     job_dict = {
@@ -68,6 +67,28 @@ def str_2_json(format: list, job_str: str, queue: object) -> dict:
 
     queue.put(job_dict)
     # return job_dict
+
+
+def process_job_dict(fields: list, rtn_str_arr: list) -> dict:
+    """
+    Process the job string using multiprocesses.
+    """
+    job_dict_all = {}
+    queue = Queue()
+    procs = []
+    for rtn_str in rtn_str_arr:
+        p = Process(target=str_2_json, args=(fields, rtn_str, queue))
+        procs.append(p)
+        p.start()
+    
+    for _ in procs:
+        job_dict = queue.get()
+        job_dict_all.update(job_dict)
+
+    for p in procs:
+        p.join()
+
+    return job_dict_all
 
 
 def unfold(metric_str: str, type: str) -> dict:
@@ -90,40 +111,18 @@ def unfold(metric_str: str, type: str) -> dict:
     return metric_dict
 
 
-def process_job_dict(format: list, rtn_str_arr: list) -> dict:
+def merge_metrics(job_metircs: dict, batch_step_metrics: dict) -> dict:
     """
-    Process the job string using multiprocesses.
-    """
-    job_dict_all = {}
-    queue = Queue()
-    procs = []
-    for rtn_str in rtn_str_arr:
-        p = Process(target=str_2_json, args=(format, rtn_str, queue))
-        procs.append(p)
-        p.start()
-    
-    for _ in procs:
-        job_dict = queue.get()
-        job_dict_all.update(job_dict)
-
-    for p in procs:
-        p.join()
-
-    return job_dict_all
-
-
-def merge_metrics(job_metircs: dict, batch_metrics: dict) -> dict:
-    """
-    Merge metrics in jobid.batch to metrics in jobid.
+    Merge metrics under JobID with metrics under batch and jobstep.
     """
     merged_metrics = {}
-    for key, value in job_metircs.items():
+    for key, value in batch_step_metrics.items():
         if value == "":
             merged_metrics.update({
-                key: batch_metrics[key]
+                key: job_metircs[key]
             })
         else:
-            merged_metrics.update({
+            merge_metrics.update({
                 key: value
             })
     return merged_metrics
@@ -131,32 +130,33 @@ def merge_metrics(job_metircs: dict, batch_metrics: dict) -> dict:
 
 def aggregate_job_dict(job_dict_all: dict) -> dict:
     """
-    Aggregate jobid.batch with jobid, and unfold several metrics under the same 
+    Aggregate jobid with jobid.batch and jobid.step# , and unfold several metrics under the same 
     attribute, such as "tresusageintot", "tresusageouttot".
     """
     aggregated_job_dict = {}
     job_id_list = job_dict_all.keys()
-    for job_id in job_id_list:
-        if ".batch" not in job_id:
-            job_id_batch = job_id + ".batch"
-            if job_dict_all.get(job_id_batch, None):
-                job_data = merge_metrics(job_dict_all[job_id], job_dict_all[job_id_batch])
+    for job_id_raw in job_id_list:
+        # only keep resource statistics under batch and jobstep
+        if ".batch" in job_id_raw or "." in job_id_raw and ".extern" not in job_id_raw:
+            # merge metrics
+            job_id = job_id_raw.split('.')[0]
+            merged_data = merge_metrics(job_dict_all[job_id], job_dict_all[job_id_raw])
             
             # Unfold metrics in treusageintot and tresusageoutot
-            folded_metrics = job_data.get("tresusageintot", None)
+            folded_metrics = merged_data.get("tresusageintot", None)
             if folded_metrics:
                 unfolded_metrics = unfold(folded_metrics, "in")
-                job_data.update(unfolded_metrics)
-                job_data.pop("tresusageintot")
+                merged_data.update(unfolded_metrics)
+                merged_data.pop("tresusageintot")
             
-            folded_metrics = job_data.get("tresusageouttot", None)
+            folded_metrics = merged_data.get("tresusageouttot", None)
             if folded_metrics:
                 unfolded_metrics = unfold(folded_metrics, "out")
-                job_data.update(unfolded_metrics)
-                job_data.pop("tresusageouttot")
+                merged_data.update(unfolded_metrics)
+                merged_data.pop("tresusageouttot")
             
             aggregated_job_dict.update({
-                job_id: job_data
+                job_id: merged_data
             })
     return aggregated_job_dict
 
