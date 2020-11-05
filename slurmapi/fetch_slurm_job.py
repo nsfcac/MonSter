@@ -128,44 +128,65 @@ def merge_metrics(job_metircs: dict, batch_step_metrics: dict) -> dict:
     return merged_metrics
 
 
-def aggregate_job_dict(job_dict_all: dict) -> dict:
+def merge_job_dict(job_dict_all: dict, job_id_raw: str, queue: object) -> dict:
     """
     Aggregate jobid with jobid.batch and jobid.step# , and unfold several metrics under the same 
     attribute, such as "tresusageintot", "tresusageouttot".
     """
-    aggregated_job_dict = {}
-    job_id_list = job_dict_all.keys()
-    for job_id_raw in job_id_list:
-        # only keep resource statistics under batch and jobstep
-        if ".batch" in job_id_raw or "." in job_id_raw and ".extern" not in job_id_raw:
-            # merge metrics
-            job_id = job_id_raw.split('.')[0]
-            merged_data = merge_metrics(job_dict_all[job_id], job_dict_all[job_id_raw])
-            
-            # Unfold metrics in treusageintot and tresusageoutot
-            folded_metrics = merged_data.get("TresUsageInTot", None)
-            if folded_metrics:
-                unfolded_metrics = unfold(folded_metrics, "in")
-                merged_data.update(unfolded_metrics)
-                merged_data.pop("TresUsageInTot")
-            
-            folded_metrics = merged_data.get("TresUsageOutTot", None)
-            if folded_metrics:
-                unfolded_metrics = unfold(folded_metrics, "out")
-                merged_data.update(unfolded_metrics)
-                merged_data.pop("TresUsageOutTot")
+    merged_job_dict = {}
+    # only keep resource statistics under batch and jobstep
+    if ".batch" in job_id_raw or "." in job_id_raw and ".extern" not in job_id_raw:
+        # merge metrics
+        job_id = job_id_raw.split('.')[0]
+        merged_data = merge_metrics(job_dict_all[job_id], job_dict_all[job_id_raw])
+        
+        # Unfold metrics in treusageintot and tresusageoutot
+        folded_metrics = merged_data.get("TresUsageInTot", None)
+        if folded_metrics:
+            unfolded_metrics = unfold(folded_metrics, "in")
+            merged_data.update(unfolded_metrics)
+            merged_data.pop("TresUsageInTot")
+        
+        folded_metrics = merged_data.get("TresUsageOutTot", None)
+        if folded_metrics:
+            unfolded_metrics = unfold(folded_metrics, "out")
+            merged_data.update(unfolded_metrics)
+            merged_data.pop("TresUsageOutTot")
 
-            if ".batch" in job_id_raw:
-                # Update the job id if it contains batch
-                merged_data.update({
-                    "JobID": job_id
-                })
-            
-            aggregated_job_dict.update({
-                job_id: merged_data
+        if ".batch" in job_id_raw:
+            # Update the job id if it contains batch
+            merged_data.update({
+                "JobID": job_id
             })
-    return aggregated_job_dict
+        
+        merged_job_dict.update({
+            job_id: merged_data
+        })
+        
+        queue.put(merged_job_dict)
 
+
+def aggregate_job_dict(job_dict_all: dict) -> dict:
+    """
+    Aggregate job dict using multiprocesses.
+    """
+    aggregated_job_dict = {}
+    job_id_raw_list = job_dict_all.keys()
+    queue = Queue()
+    procs = []
+    for job_id_raw in job_id_raw_list:
+        p = Process(target=str_2_json, args=(job_dict_all, job_id_raw, queue))
+        procs.append(p)
+        p.start()
+    
+    for _ in procs:
+        job_dict = queue.get()
+        aggregated_job_dict.update(job_dict)
+
+    for p in procs:
+        p.join()
+
+    return aggregated_job_dict
 
 if __name__ == '__main__':
     main()
