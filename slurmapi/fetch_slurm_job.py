@@ -163,7 +163,7 @@ def merge_job_dict(job_dict_all: dict, job_id_raw: str, queue: object) -> dict:
             job_id: merged_data
         })
 
-        queue.put(merged_job_dict)
+    queue.put(merged_job_dict)
 
 
 def aggregate_job_dict(job_dict_all: dict) -> dict:
