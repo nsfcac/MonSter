@@ -122,7 +122,7 @@ def merge_metrics(job_metircs: dict, batch_step_metrics: dict) -> dict:
                 key: job_metircs[key]
             })
         else:
-            merge_metrics.update({
+            merged_metrics.update({
                 key: value
             })
     return merged_metrics
