@@ -1,0 +1,99 @@
+slurm:
+  accounting_fields: 
+    # For detailed description of these fields, please refer to: https://slurm.schedmd.com/sacct.html
+    # - ALL
+    - AllocCPUs
+    # - AllocGRES
+    # - AllocNodes
+    # - AllocTres
+    # - Account
+    # - AssocID
+    # - AveCPU
+    # - AveCPUFreq
+    # - AveDiskRead
+    # - AveDiskWrite
+    # - AvePages
+    # - AveRSS
+    # - AveVMSize
+    - Cluster
+    # - Comment
+    # - ConsumedEnergy
+    # - CPUTime
+    - CPUTimeRAW
+    # - DerivedExitCode
+    # - Elapsed
+    # - Eligible
+    - End
+    - ExitCode
+    # - GID
+    - Group
+    - JobID
+    # - JobIDRaw
+    - JobName
+    # - Layout
+    # - MaxDiskRead
+    # - MaxDiskReadNode
+    # - MaxDiskReadTask
+    # - MaxDiskWrite
+    # - MaxDiskWriteNode
+    # - MaxDiskWriteTask
+    # - MaxPages
+    # - MaxPagesNode
+    # - MaxPagesTask
+    # - MaxRSS
+    # - MaxRSSNode
+    # - MaxRSSTask
+    - MaxVMSize
+    # - MaxVMSizeNode
+    # - MaxVMSizeTask
+    # - MinCPU
+    # - MinCPUNode
+    # - MinCPUTask
+    # - NCPUS
+    - NodeList
+    # - NNodes
+    - NTasks
+    # - Priority
+    - Partition
+    # - QOS
+    # - QOSRAW
+    # - ReqCPUFreq
+    # - ReqCPUFreqGov
+    # - ReqCPUFreqMax
+    # - ReqCPUFreqMin
+    # - ReqCPUS
+    # - ReqGRES
+    - ReqMem
+    # - ReqNodes
+    # - ReqTres
+    # - Reservation
+    # - ReservationId
+    # - Reserved
+    # - ResvCPU
+    # - ResvCPURAW
+    - Start
+    - State
+    - Submit
+    # - Suspended
+    # - SystemCPU
+    # - Timelimit
+    - TimelimitRaw
+    # - TotalCPU
+    # - TresUsageInAve
+    # - TresUsageInMax
+    # - TresUsageInMaxNode
+    # - TresUsageInMaxTask
+    # - TresUsageInMin
+    # - TresUsageInMinNode
+    # - TresUsageInMinTask
+    - TresUsageInTot
+    # - TresUsageOutAve
+    # - TresUsageOutMax
+    # - TresUsageOutMaxNode
+    # - TresUsageOutMaxTask
+    - TresUsageOutTot
+    # - UID
+    - User
+    # - UserCPU
+    # - WCKey
+    # - WCKeyID
