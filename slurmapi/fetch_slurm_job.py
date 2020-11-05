@@ -154,6 +154,12 @@ def aggregate_job_dict(job_dict_all: dict) -> dict:
                 unfolded_metrics = unfold(folded_metrics, "out")
                 merged_data.update(unfolded_metrics)
                 merged_data.pop("TresUsageOutTot")
+
+            if ".batch" in job_id_raw:
+                # Update the job id if it contains batch
+                merged_data.update({
+                    "JobID": job_id
+                })
             
             aggregated_job_dict.update({
                 job_id: merged_data
