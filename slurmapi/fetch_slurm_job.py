@@ -42,8 +42,8 @@ def main():
     job_dict_all = process_job_dict(accounting_fields, rtn_str_arr)
 
     # Aggregate job data
-    aggregated_job_dict = aggregate_job_dict(job_dict_all)
-    print(json.dumps(aggregated_job_dict, indent=4))
+    # aggregated_job_dict = aggregate_job_dict(job_dict_all)
+    print(json.dumps(job_dict_all, indent=4))
     
     return
 
@@ -162,7 +162,7 @@ def merge_job_dict(job_dict_all: dict, job_id_raw: str, queue: object) -> dict:
         merged_job_dict.update({
             job_id: merged_data
         })
-        
+
         queue.put(merged_job_dict)
 
 
