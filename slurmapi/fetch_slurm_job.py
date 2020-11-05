@@ -26,11 +26,14 @@ def main():
     config_path = './config.yml'
     config = parse_config(config_path)
 
-    # Job data fields, should be configurable
+    # Setting command parameters
     accounting_fields = config["slurm"]["accounting_fields"]
+    job_states = config["slurm"]["job_states"]
+    start_time = config["slurm"]["start_time"]
+    end_time = config["slurm"]["end_time"]
     
     # The command used in command line
-    command = ["sacct  --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --fields=" + ",".join(accounting_fields) + " -p"]
+    command = ["sacct  --allusers --starttime " + start_time + " --endtime " + end_time + " --state " + ",".join(job_states) + " --fields=" + ",".join(accounting_fields) + " -p"]
 
     # Get strings from command line
     rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
@@ -38,8 +41,8 @@ def main():
     # Split strings by line, and discard the first line that indicates the metrics name
     rtn_str_arr = rtn_str.splitlines()[1:]
 
-    # # Get all job data dict
-    job_dict_all = process_job_dict(accounting_fields, rtn_str_arr)
+    # Get all job data dict
+    job_dict_all = generate_job_dict(accounting_fields, rtn_str_arr)
 
     # Aggregate job data
     aggregated_job_dict = aggregate_job_dict(job_dict_all)
@@ -48,9 +51,9 @@ def main():
     return
 
 
-def str_2_json(fields: list, job_str: str, queue: object) -> dict:
+def convert_str_json(fields: list, job_str: str, queue: object) -> dict:
     """
-    Process the job string, and generate job data corresponding to job id in json format.
+    Convert the job data in string to job data in json.
     """
     job_dict = {}
     job_data = {}
@@ -66,18 +69,17 @@ def str_2_json(fields: list, job_str: str, queue: object) -> dict:
     }
 
     queue.put(job_dict)
-    # return job_dict
 
 
-def process_job_dict(fields: list, rtn_str_arr: list) -> dict:
+def generate_job_dict(fields: list, rtn_str_arr: list) -> dict:
     """
-    Process the job string using multiprocesses.
+    Generate the job dict from string using multiprocesses.
     """
     job_dict_all = {}
     queue = Queue()
     procs = []
     for rtn_str in rtn_str_arr:
-        p = Process(target=str_2_json, args=(fields, rtn_str, queue))
+        p = Process(target=convert_str_json, args=(fields, rtn_str, queue))
         procs.append(p)
         p.start()
     
@@ -91,7 +93,7 @@ def process_job_dict(fields: list, rtn_str_arr: list) -> dict:
     return job_dict_all
 
 
-def unfold(metric_str: str, in_out: str) -> dict:
+def unfold_metrics(metric_str: str, in_out: str) -> dict:
     """
     Unfold the metrics under the same metric name(such as tresusageintot, tresusageouttot)
     """
@@ -143,13 +145,13 @@ def merge_job_dict(job_dict_all: dict, job_id_raw: str, queue: object) -> dict:
         # Unfold metrics in treusageintot and tresusageoutot
         folded_metrics = merged_data.get("TresUsageInTot", None)
         if folded_metrics:
-            unfolded_metrics = unfold(folded_metrics, "in")
+            unfolded_metrics = unfold_metrics(folded_metrics, "in")
             merged_data.update(unfolded_metrics)
             merged_data.pop("TresUsageInTot")
         
         folded_metrics = merged_data.get("TresUsageOutTot", None)
         if folded_metrics:
-            unfolded_metrics = unfold(folded_metrics, "out")
+            unfolded_metrics = unfold_metrics(folded_metrics, "out")
             merged_data.update(unfolded_metrics)
             merged_data.pop("TresUsageOutTot")
 
@@ -187,6 +189,7 @@ def aggregate_job_dict(job_dict_all: dict) -> dict:
         p.join()
 
     return aggregated_job_dict
+
 
 if __name__ == '__main__':
     main()
