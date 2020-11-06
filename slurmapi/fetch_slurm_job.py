@@ -38,17 +38,16 @@ def fetch_slurm_job() -> list:
     # Get strings from command line
     rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
     
-    print(rtn_str)
-    # # Split strings by line, and discard the first line that indicates the metrics name
-    # rtn_str_arr = rtn_str.splitlines()[1:]
+    # Split strings by line, and discard the first line that indicates the metrics name
+    rtn_str_arr = rtn_str.splitlines()[1:]
 
-    # # Get all job data dict
-    # job_dict_all = generate_job_dict(accounting_fields, rtn_str_arr)
+    # Get all job data dict
+    job_dict_all = generate_job_dict(accounting_fields, rtn_str_arr)
 
-    # # Aggregate job data
-    # aggregated_job_data = aggregate_job_data(job_dict_all)
+    # Aggregate job data
+    aggregated_job_data = aggregate_job_data(job_dict_all)
     
-    # return aggregated_job_data
+    return aggregated_job_data
 
 
 def convert_str_json(fields: list, job_str: str, queue: object) -> dict:
@@ -191,4 +190,4 @@ def aggregate_job_data(job_dict_all: dict) -> dict:
 
 if __name__ == '__main__':
     records = fetch_slurm_job()
-    # print(json.dumps(records, indent=4))
+    print(json.dumps(records, indent=4))
