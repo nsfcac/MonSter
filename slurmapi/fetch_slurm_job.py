@@ -48,7 +48,7 @@ def fetch_slurm_job():
     aggregated_job_dict = aggregate_job_dict(job_dict_all)
 
     # Only return the values of each job dict as records (documents in MongoDB)
-    job_data = aggregated_job_dict.values()
+    job_data = list(aggregated_job_dict.values())
     
     return job_data
 
