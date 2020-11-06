@@ -21,7 +21,7 @@ sys.path.append('../')
 
 from sharings.utils import parse_config
 
-def fetch_slurm_job():
+def fetch_slurm_job() -> list:
     # Read configuration file
     config_path = './config.yml'
     config = parse_config(config_path)
@@ -33,21 +33,22 @@ def fetch_slurm_job():
     end_time = config["slurm"]["end_time"]
     
     # The command used in command line
-    command = ["sacct  --allusers --starttime " + start_time + " --endtime " + end_time + " --state " + ",".join(job_states) + " --fields=" + ",".join(accounting_fields) + " -p"]
+    command = ["ssh monster@login.hpcc.ttu.edu " + "'sacct  --allusers --starttime " + start_time + " --endtime " + end_time + " --state " + ",".join(job_states) + " --fields=" + ",".join(accounting_fields) + " -p'"]
 
     # Get strings from command line
     rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
     
-    # Split strings by line, and discard the first line that indicates the metrics name
-    rtn_str_arr = rtn_str.splitlines()[1:]
+    print(rtn_str)
+    # # Split strings by line, and discard the first line that indicates the metrics name
+    # rtn_str_arr = rtn_str.splitlines()[1:]
 
-    # Get all job data dict
-    job_dict_all = generate_job_dict(accounting_fields, rtn_str_arr)
+    # # Get all job data dict
+    # job_dict_all = generate_job_dict(accounting_fields, rtn_str_arr)
 
-    # Aggregate job data
-    aggregated_job_data = aggregate_job_data(job_dict_all)
+    # # Aggregate job data
+    # aggregated_job_data = aggregate_job_data(job_dict_all)
     
-    return aggregated_job_data
+    # return aggregated_job_data
 
 
 def convert_str_json(fields: list, job_str: str, queue: object) -> dict:
@@ -190,4 +191,4 @@ def aggregate_job_data(job_dict_all: dict) -> dict:
 
 if __name__ == '__main__':
     records = fetch_slurm_job()
-    print(json.dumps(records, indent=4))
+    # print(json.dumps(records, indent=4))
