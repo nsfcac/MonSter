@@ -37,7 +37,7 @@ def store_job_mongodb():
 
     # Insert data records
     if job_data:
-        x = collection.insert_many(job_data)
+        x = mongodb_col.insert_many(job_data)
         print(x.inserted_ids)
     else:
         print("Fail to get job data!")
