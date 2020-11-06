@@ -179,7 +179,8 @@ def aggregate_job_data(job_dict_all: dict) -> dict:
     
     for _ in procs:
         job_data = queue.get()
-        aggregated_job_data.append(job_data)
+        if job_data:
+            aggregated_job_data.append(job_data)
 
     for p in procs:
         p.join()
