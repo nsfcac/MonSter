@@ -1,3 +1,7 @@
+mongodb:
+  client: mongodb://localhost:27017
+  database: slurm_job_data
+  collection: job_reports
 slurm:
   accounting_fields: 
     ## For detailed description of these fields, please refer to: https://slurm.schedmd.com/sacct.html
@@ -98,7 +102,7 @@ slurm:
     # - WCKey
     # - WCKeyID
   job_states:
-    ## For detailed description of these states, please refer to: https://slurm.schedmd.com/sacct.html
+    ## For detailed description of these states, please refer to: https://slurm.schedmd.com/sacct.html#SECTION_JOB-STATE-CODES
     - BOOT_FAIL
     - CANCELLED
     - COMPLETED
