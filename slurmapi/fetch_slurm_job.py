@@ -45,12 +45,9 @@ def fetch_slurm_job():
     job_dict_all = generate_job_dict(accounting_fields, rtn_str_arr)
 
     # Aggregate job data
-    aggregated_job_dict = aggregate_job_dict(job_dict_all)
-
-    # Only return the values of each job dict as records (documents in MongoDB)
-    job_data = list(aggregated_job_dict.values())
+    aggregated_job_data = aggregate_job_data(job_dict_all)
     
-    return job_data
+    return aggregated_job_data
 
 
 def convert_str_json(fields: list, job_str: str, queue: object) -> dict:
@@ -137,7 +134,7 @@ def merge_job_dict(job_dict_all: dict, job_id_raw: str, queue: object) -> dict:
     Aggregate jobid with jobid.batch and jobid.step# , and unfold several metrics under the same 
     attribute, such as "tresusageintot", "tresusageouttot".
     """
-    merged_job_dict = {}
+    merged_data = {}
     # only keep resource statistics under batch and jobstep
     if ".batch" in job_id_raw or "." in job_id_raw and ".extern" not in job_id_raw:
         # merge metrics
@@ -160,21 +157,18 @@ def merge_job_dict(job_dict_all: dict, job_id_raw: str, queue: object) -> dict:
         if ".batch" in job_id_raw:
             # Update the job id if it contains batch
             merged_data.update({
+                "_id": job_id,
                 "JobID": job_id
             })
-        
-        merged_job_dict.update({
-            job_id: merged_data
-        })
 
-    queue.put(merged_job_dict)
+    queue.put(merged_data)
 
 
-def aggregate_job_dict(job_dict_all: dict) -> dict:
+def aggregate_job_data(job_dict_all: dict) -> dict:
     """
     Aggregate job dict using multiprocesses.
     """
-    aggregated_job_dict = {}
+    aggregated_job_data = []
     job_id_raw_list = job_dict_all.keys()
     queue = Queue()
     procs = []
@@ -184,13 +178,13 @@ def aggregate_job_dict(job_dict_all: dict) -> dict:
         p.start()
     
     for _ in procs:
-        job_dict = queue.get()
-        aggregated_job_dict.update(job_dict)
+        job_data = queue.get()
+        aggregated_job_data.append(job_data)
 
     for p in procs:
         p.join()
 
-    return aggregated_job_dict
+    return aggregated_job_data
 
 
 if __name__ == '__main__':
