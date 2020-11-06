@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 This module calls the fetch_slurm_job function to fetch the job data from slurm
-and saved the data records into mongodb.
+and saves the data records into mongodb.
 
 Jie Li (jie.li@ttu.edu)
 """
