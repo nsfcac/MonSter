@@ -35,14 +35,13 @@ def store_job_mongodb():
 
     job_data = fetch_slurm_job()
 
-    print(job_data)
-    # # Insert data records
-    # if job_data:
-    #     x = collection.insert_many(job_data)
-    #     print(x.inserted_ids)
-    # else:
-    #     print("Fail to get job data!")
-    # return
+    # Insert data records
+    if job_data:
+        x = collection.insert_many(job_data)
+        print(x.inserted_ids)
+    else:
+        print("Fail to get job data!")
+    return
 
 if __name__ == '__main__':
     store_job_mongodb()
