@@ -7,8 +7,8 @@ Job State:
 https://slurm.schedmd.com/sacct.html#SECTION_JOB-STATE-CODES
 
 Get all jobs that have been terminated.
-sacct --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --fields=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem -p > sacct_raw_parse.txt
-sacct --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --fields=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem,State
+sacct --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --fields=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem,State -p > sacct_raw_parse.txt
+sacct --allusers --starttime midnight --endtime now --state BOOT_FAIL,CANCELLED,COMPLETED,DEADLINE,FAILED,NODE_FAIL,OUT_OF_MEMORY,PREEMPTED,TIMEOUT --fields=partition,nodelist,group,user,jobname,jobid,submit,start,end,exitcode,cputimeraw,tresusageintot,tresusageouttot,maxvmsize,alloccpus,ntasks,cluster,timelimitraw,reqmem,State > sacct_raw.txt
 
 Jie Li (jie.li@ttu.edu)
 """
@@ -21,7 +21,7 @@ sys.path.append('../')
 
 from sharings.utils import parse_config
 
-def main():
+def fetch_slurm_job():
     # Read configuration file
     config_path = './config.yml'
     config = parse_config(config_path)
@@ -46,9 +46,11 @@ def main():
 
     # Aggregate job data
     aggregated_job_dict = aggregate_job_dict(job_dict_all)
-    print(json.dumps(aggregated_job_dict, indent=4))
+
+    # Only return the values of each job dict as records (documents in MongoDB)
+    job_data = aggregated_job_dict.values()
     
-    return
+    return job_data
 
 
 def convert_str_json(fields: list, job_str: str, queue: object) -> dict:
@@ -192,4 +194,5 @@ def aggregate_job_dict(job_dict_all: dict) -> dict:
 
 
 if __name__ == '__main__':
-    main()
+    records = fetch_slurm_job()
+    print(json.dumps(records, indent=4))
