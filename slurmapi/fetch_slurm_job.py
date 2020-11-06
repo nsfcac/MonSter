@@ -32,7 +32,7 @@ def fetch_slurm_job() -> list:
     start_time = config["slurm"]["start_time"]
     end_time = config["slurm"]["end_time"]
     
-    # The command used in command line
+    # The command used in cli
     command = ["ssh monster@login.hpcc.ttu.edu " + "'sacct  --allusers --starttime " + start_time + " --endtime " + end_time + " --state " + ",".join(job_states) + " --fields=" + ",".join(accounting_fields) + " -p'"]
 
     # Get strings from command line
