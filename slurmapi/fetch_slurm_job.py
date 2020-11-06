@@ -135,7 +135,7 @@ def merge_job_dict(job_dict_all: dict, job_id_raw: str, queue: object) -> dict:
     attribute, such as "tresusageintot", "tresusageouttot".
     """
     merged_data = {}
-    # only keep resource statistics under batch and jobstep
+    # only keep resource statistics under batch and jobstep, discard extern
     if ".batch" in job_id_raw or "." in job_id_raw and ".extern" not in job_id_raw:
         # merge metrics
         job_id = job_id_raw.split('.')[0]
@@ -157,9 +157,13 @@ def merge_job_dict(job_dict_all: dict, job_id_raw: str, queue: object) -> dict:
         if ".batch" in job_id_raw:
             # Update the job id if it contains batch
             merged_data.update({
-                "_id": job_id,
                 "JobID": job_id
             })
+        
+        # Add unique ids, which is used as unique ids for the record
+        merged_data.update({
+            "_id": merged_data["JobID"]
+        })
 
     queue.put(merged_data)
 
