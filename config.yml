@@ -1,15 +1,15 @@
 influxdb:
   host: '10.10.1.3'
   port: '8086'
-  user: 'lijie'
-  password: 'li29729'
+  user: 'user'
+  password: 'password'
   database: 'hpcc_metrics_phase2'
 
 frequency: 60 # in seconds
 
 bmc:
-  user: 'root'
-  password: 'nivipnut'
+  user: 'user'
+  password: 'password'
   timeout: 
     connect: 15
     read: 45
