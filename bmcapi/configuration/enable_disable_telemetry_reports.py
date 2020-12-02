@@ -12,10 +12,11 @@ import logging
 import argparse
 import requests
 
+sys.path.append('../../')
+
 from requests.adapters import HTTPAdapter
 from sharings.utils import parse_config, parse_nodelist
 
-sys.path.append('../../')
 logging_path = './TelemetryReports.log'
 
 logging.basicConfig(
