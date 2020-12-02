@@ -9,11 +9,13 @@ Jie Li (jie.li@ttu.edu)
 import sys
 import json
 import logging
+import getpass
 import argparse
 import requests
 
 sys.path.append('../../')
 
+from getpass import getpass
 from requests.adapters import HTTPAdapter
 from sharings.utils import parse_config, parse_nodelist
 
@@ -33,10 +35,10 @@ def main():
     
     # Ask username and password
     user = input ("iDRAC username: ")
-    password = input ("iDRAC password: ")
+    password = getpass.getpass(prompt='iDRAC password')
     
     # Get attributes
-    attributes = get_attributes(nodes[0])
+    attributes = get_attributes(config, nodes[0], user, password)
 
     print(json.dump(attributes, indent=4))
 
