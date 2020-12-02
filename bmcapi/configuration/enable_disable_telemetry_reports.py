@@ -6,6 +6,7 @@
 
 Jie Li (jie.li@ttu.edu)
 """
+import sys
 import json
 import logging
 import argparse
@@ -14,6 +15,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from sharings.utils import parse_config, parse_nodelist
 
+sys.path.append('../../')
 logging_path = './TelemetryReports.log'
 
 logging.basicConfig(
@@ -34,7 +36,7 @@ def main():
     
     # Get attributes
     attributes = get_attributes(nodes[0])
-    
+
     print(json.dump(attributes, indent=4))
 
 
