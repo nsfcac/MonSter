@@ -24,7 +24,7 @@ from sharings.utils import parse_config, parse_nodelist
 from urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
-logging_path = './TelemetryReports.log'
+logging_path = './TelemetryReportSetting.log'
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -38,20 +38,7 @@ def main():
     config = parse_config('../../config.yml')
     nodes = parse_nodelist(config['bmc']['nodelist'])
     
-    # Ask setting, username and password
-    setting = input("Enable/Disable telemetry reports: ")
-    setting = setting.lower()
-    if setting not in ['enable', 'disable', 'e', 'd']:
-        print("Invalid setting. Please select Enable or Disable")
-        return
-    else:
-        if setting in ['enable', 'e']:
-            setting = 'Enabled'
-        else:
-            setting = 'Disabled'
-
-    user = input("iDRAC username: ")
-    password = getpass(prompt='iDRAC password: ')
+    setting, user, password = get_user_input()
     
     # Get attributes
     attributes = get_attributes(config, nodes[0], user, password)
@@ -59,12 +46,34 @@ def main():
 
     # Enable or disable telemetry reports asynchronously
     loop = asyncio.get_event_loop()
-    status_code = loop.run_until_complete(set_telemetry_reports(config, nodes, 
+    status = loop.run_until_complete(set_telemetry_reports(config, nodes, 
                                                   user, password, 
                                                   attributes, setting))
     loop.close()
 
-    print(status_code)
+    # Report status
+    status_report(status, nodes, setting)
+
+
+def get_user_input() -> tuple:
+    """
+    Ask setting, username and password
+    """
+    setting = input("--> Enable/Disable telemetry reports: ")
+    setting = setting.lower()
+    if setting not in ['enable', 'disable', 'e', 'd']:
+        print("--> Invalid setting. Please select Enable or Disable")
+        return
+    else:
+        if setting in ['enable', 'e']:
+            setting = 'Enabled'
+        else:
+            setting = 'Disabled'
+
+    user = input("--> iDRAC username: ")
+    password = getpass(prompt='--> iDRAC password: ')
+
+    return(setting, user, password)
 
 
 def get_attributes(config: dict, ip: str, user: str, password: str) -> dict:
@@ -130,36 +139,26 @@ async def enable_disable_reports(ip: str, attributes: dict, setting: str,
     except Exception as err:
         logging.error(f"Fail to update telemetry attributes on {ip}: {err}")
 
-# def set_telemetry_reports(config: dict, ip: str, 
-#                           user: str, password: str, 
-#                           attributes: dict, setting: str) -> bool:
-#     """
-#     Enable or disable telemetry reports
-#     """
-#     url = f'https://{ip}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes'
-#     headers = {'content-type': 'application/json'}
-#     updated_attributes = {k: setting for k in attributes.keys()}
-#     patch_data = {"Attributes": updated_attributes}
 
-#     adapter = HTTPAdapter(max_retries=config['bmc']['max_retries'])
-#     with requests.Session() as session:
-#         session.mount(url, adapter)
-#         try:
-#             response = session.patch(
-#                 url,
-#                 auth = (user, password),
-#                 verify = config['bmc']['ssl_verify'], 
-#                 headers = headers,
-#                 data = json.dumps(patch_data)
-#             )
-#             if response.status_code != 200:
-#                 logging.error(f"Fail to update telemetry attributes on {ip}: \
-#                                {str(response.reason)}")
-#                 return False
-#         except Exception as err:
-#             logging.error(f"Fail to update telemetry attributes on {ip}: {err}")
+def status_report(status: list, nodes: list, setting: str) -> None:
+    """
+    Generate status report for the setting
+    """
+    total_cnt = len(nodes)
+    success_cnt = status.count(200)
+    fail_nodes = []
 
-#     return True
+    print(f"--> {success_cnt} out of {total_cnt} have been {setting} \
+           the telemetry reports successfully!")
+
+    selection = input("--> Press l to display the failed nodes, \
+                      press other key to quit: ")
+    
+    if selection in ['L', 'l']:
+        fail_nodes = [nodes[i] for i, j in enumerate(status) if j !=200 ]
+        print(fail_nodes)
+    else:
+        return
 
 
 if __name__ == '__main__':
