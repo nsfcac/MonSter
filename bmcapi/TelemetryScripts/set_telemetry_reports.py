@@ -39,7 +39,7 @@ def main():
     nodes = parse_nodelist(config['bmc']['nodelist'])
     
     setting, user, password = get_user_input()
-    
+
     # Get attributes
     attributes = get_attributes(config, nodes[0], user, password)
     # print(json.dumps(attributes, indent=4))
@@ -148,8 +148,7 @@ def status_report(status: list, nodes: list, setting: str) -> None:
     success_cnt = status.count(200)
     fail_nodes = []
 
-    print(f"--> {success_cnt} out of {total_cnt} have been {setting} \
-           the telemetry reports successfully!")
+    print(f"--> {success_cnt} out of {total_cnt} have been {setting.upper()} the telemetry reports successfully!")
 
     selection = input("--> Press l to display the failed nodes, \
                       press other key to quit: ")
