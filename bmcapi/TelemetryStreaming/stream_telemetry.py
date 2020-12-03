@@ -67,14 +67,14 @@ def stream_data(config: dict, ip: str, user: str, password: str) -> dict:
                 decoded_line = line.decode('utf-8')
                 if '{' in decoded_line:
                     metrics = json.loads(decoded_line)
-                    sequence = metrics['ReportSequence']
-                    counts = metrics['MetricValues@odata.count']
-                    values = metrics['MetricValues']
+                    # sequence = metrics['ReportSequence']
+                    # counts = metrics['MetricValues@odata.count']
+                    # values = metrics['MetricValues']
 
-                    # Process metric values
-                    process_value(values)
-                    print(f"Report sequence: {sequence} | Total counts: {counts}")
-                    print(json.dumps(values))
+                    # # Process metric values
+                    # process_value(values)
+                    # print(f"Report sequence: {sequence} | Total counts: {counts}")
+                    print(json.dumps(metrics))
     except Exception as err:
         logging.error(f"Fail to stream telemetry data: {err}")
 
