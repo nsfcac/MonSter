@@ -55,7 +55,7 @@ def stream_data(config: dict, ip: str, user: str, password: str) -> dict:
             verify = config['bmc']['ssl_verify']
         )
         
-        for line in response.iter_line():
+        for line in response.iter_lines():
             if line:
                 decoded_line = line.decode('utf-8')
                 metrics = json.loads(decoded_line)
