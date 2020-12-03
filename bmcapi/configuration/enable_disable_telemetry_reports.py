@@ -111,7 +111,7 @@ def enable_disable_telemetry_reports(config: dict, ip: str,
             )
             if response.status_code != 200:
                 logging.error(f"Fail to update telemetry attributes on {ip}: \
-                               {response.status_code}")
+                               {str(response)}")
                 return False
         except Exception as err:
             logging.error(f"Fail to update telemetry attributes on {ip}: {err}")
