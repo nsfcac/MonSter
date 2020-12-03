@@ -13,6 +13,7 @@ import requests
 
 sys.path.append('../../')
 
+from getpass import getpass
 from sharings.utils import parse_config, parse_nodelist
 from urllib3.exceptions import InsecureRequestWarning
 
