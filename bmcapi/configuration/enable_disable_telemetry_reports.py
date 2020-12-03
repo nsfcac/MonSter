@@ -20,6 +20,7 @@ from requests.adapters import HTTPAdapter
 from sharings.utils import parse_config, parse_nodelist
 from urllib3.exceptions import InsecureRequestWarning
 
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 logging_path = './TelemetryReports.log'
 
 logging.basicConfig(
