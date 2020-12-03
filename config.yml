@@ -8,6 +8,9 @@ influxdb:
 frequency: 60 # in seconds
 
 bmc:
+  timeout: 
+    connect: 15
+    read: 45
   ssl_verify: False   # Secure Sockets Layer Verify
   max_retries: 3
   nodelist:
