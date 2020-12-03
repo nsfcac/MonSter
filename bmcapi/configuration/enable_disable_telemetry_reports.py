@@ -125,10 +125,9 @@ async def enable_disable_reports(ip: str, attributes: dict, setting: str,
     headers = {'content-type': 'application/json'}
     updated_attributes = {k: setting for k in attributes.keys()}
     patch_data = {"Attributes": updated_attributes}
-    print(patch_data)
     try:
         resp = await session.request(method='PATCH', url=url, 
-                                     headers=headers, data=patch_data)
+                                     headers=headers, data=json.dumps(patch_data))
         resp.raise_for_status()
         status = await resp.status_code
         if status != 200:
