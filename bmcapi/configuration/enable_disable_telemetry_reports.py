@@ -58,7 +58,7 @@ def get_attributes(config: dict, ip: str, user: str, password: str) -> dict:
                 auth = (user, password),
                 verify = config['bmc']['ssl_verify'], 
             )
-            attributes = response.json()
+            attributes = {k: v for k, v in response.json().items() if k.startwith('Telemetry')}
         except Exception as err:
             logging.error(f"Fail to get telemetry attributes: {err}")
     return attributes
