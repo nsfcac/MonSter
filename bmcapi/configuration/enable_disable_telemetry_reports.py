@@ -109,6 +109,7 @@ def enable_disable_telemetry_reports(config: dict, ip: str,
                 headers = headers,
                 data = json.dumps(patch_data)
             )
+            print(response.json())
             if response.status_code != 200:
                 logging.error(f"Fail to update telemetry attributes on {ip}: \
                                {str(response.reason)}")
