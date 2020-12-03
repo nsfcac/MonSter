@@ -73,41 +73,35 @@ def stream_data(config: dict, ip: str, user: str, password: str) -> dict:
                     values = metrics['MetricValues']
 
                     # Process metric values
-                    process_value(values)
+                    processed_metrics = process_metrics(values)
+                    print(json.dumps(processed_metrics, indent=4))
                     print(f"Report sequence: {sequence} | Total counts: {counts}")
-                    print(json.dumps(values, indent=4))
     except Exception as err:
         logging.error(f"Fail to stream telemetry data: {err}")
 
 
-def process_value(values: dict) -> None:
+def process_metrics(values: dict) -> None:
     """
     Process data in the MetricValues, generate a list of key:values
     """
-    processed_value = []
+    processed_metrics = []
     try:
         for value in values:
-                del value['Oem']
+            timestamp = value['Timestamp']
+            metric_label = value['Oem']['Dell']['Label'].replace(' ', '_')
+            metric_value = value['MetircValue']
+            metric = {
+                'Timestamp': timestamp,
+                'MetircLabel': metric_label,
+                'MetircValue': metric_value
+            }
+            processed_metrics.append(metric)
     except Exception as err:
             logging.error(f"Fail to process metric values: {err}")
+    
+    return processed_metrics
 
 
 if __name__ == '__main__':
     main()
-
-# r = requests.get('https://10.101.23.1/redfish/v1/SSE?$filter=EventFormatType eq MetricReport',
-#                  verify=False, stream=True, auth=('password', 'monster'))
-
-# for line in r.iter_lines():
-#     if line:
-#         decoded_line = line.decode('utf-8')
-#         if '{' in decoded_line:
-#             decoded_line = decoded_line.strip('data: ')
-#             metrics = json.loads(decoded_line)
-#             seqNum      = metrics['ReportSequence']
-#             readings    = metrics['MetricValues']
-
-#             print("Report sequence number: %s ##########################################" % seqNum)
-
-#             print(json.dumps(metrics, indent=4))
 
