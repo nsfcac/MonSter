@@ -18,6 +18,7 @@ sys.path.append('../../')
 from getpass import getpass
 from requests.adapters import HTTPAdapter
 from sharings.utils import parse_config, parse_nodelist
+from urllib3.exceptions import InsecureRequestWarning
 
 logging_path = './TelemetryReports.log'
 
@@ -59,7 +60,9 @@ def get_attributes(config: dict, ip: str, user: str, password: str) -> dict:
                 verify = config['bmc']['ssl_verify'], 
             )
             all_attributes = response.json().get('Attributes', {})
-            attributes = {k: v for k, v in all_attributes.items() if ((k.startswith('Telemetry')) and (k.endswith("EnableTelemetry")))}
+            attributes = {k: v for k, v in all_attributes.items() if (
+                (k.startswith('Telemetry')) and (k.endswith("EnableTelemetry"))
+                )}
         except Exception as err:
             logging.error(f"Fail to get telemetry attributes: {err}")
     return attributes
