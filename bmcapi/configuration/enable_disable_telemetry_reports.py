@@ -129,7 +129,7 @@ async def enable_disable_reports(ip: str, attributes: dict, setting: str,
         resp = await session.request(method='PATCH', url=url, 
                                      headers=headers, data=json.dumps(patch_data))
         resp.raise_for_status()
-        status = await resp.status_code
+        status = await resp.status
         if status != 200:
             logging.error(f"Fail to update telemetry attributes on {ip}: \
                             {str(resp.reason)}")
