@@ -50,11 +50,11 @@ def main():
     # print(json.dumps(attributes, indent=4))
 
     # Enable or disable telemetry arrtibutes
-    result = enable_disable_telemetry_reports(config, nodes[0], user, 
+    result = set_telemetry_reports(config, nodes[0], user, 
                                        password, attributes, setting)
     
-    attributes = get_attributes(config, nodes[0], user, password)
-    print(json.dumps(attributes, indent=4))
+    # attributes = get_attributes(config, nodes[0], user, password)
+    # print(json.dumps(attributes, indent=4))
 
 
 def get_attributes(config: dict, ip: str, user: str, password: str) -> dict:
@@ -81,9 +81,9 @@ def get_attributes(config: dict, ip: str, user: str, password: str) -> dict:
     return attributes
 
 
-def enable_disable_telemetry_reports(config: dict, ip: str, 
-                                     user: str, password: str, 
-                                     attributes: dict, setting: str) -> bool:
+def set_telemetry_reports(config: dict, ip: str, 
+                          user: str, password: str, 
+                          attributes: dict, setting: str) -> bool:
     """
     Enable or disable telemetry reports
     """
@@ -98,6 +98,8 @@ def enable_disable_telemetry_reports(config: dict, ip: str,
     updated_attributes = {k: setting_value for k in attributes.keys()}
     patch_data = {"Attributes": updated_attributes}
 
+    print(patch_data)
+
     adapter = HTTPAdapter(max_retries=config['bmc']['max_retries'])
     with requests.Session() as session:
         session.mount(uri, adapter)
@@ -109,7 +111,6 @@ def enable_disable_telemetry_reports(config: dict, ip: str,
                 headers = headers,
                 data = json.dumps(patch_data)
             )
-            print(response.json())
             if response.status_code != 200:
                 logging.error(f"Fail to update telemetry attributes on {ip}: \
                                {str(response.reason)}")
