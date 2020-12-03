@@ -48,7 +48,7 @@ def get_attributes(config: dict, ip: str, user: str, password: str) -> dict:
     Get all telemetry attributes 
     """
     attributes = {}
-    uri = f'https:{ip}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes'
+    uri = f'https://{ip}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes'
     adapter = HTTPAdapter(max_retries=config['bmc']['max_retries'])
     with requests.Session() as session:
         session.mount(uri, adapter)
