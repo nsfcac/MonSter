@@ -20,6 +20,13 @@ from urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 logging_path = './TelemetryStreaming.log'
 
+logging.basicConfig(
+    level=logging.ERROR,
+    filename= logging_path,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S %Z'
+)
+
 
 def main():
     # Read configuratin file
@@ -58,15 +65,16 @@ def stream_data(config: dict, ip: str, user: str, password: str) -> dict:
         for line in response.iter_lines():
             if line:
                 decoded_line = line.decode('utf-8')
-                metrics = json.loads(decoded_line)
-                sequence = metrics['ReportSequence']
-                counts = metrics['MetricValues@odata.count']
-                values = metrics['MetricValues']
+                if '{' in decoded_line:
+                    metrics = json.loads(decoded_line)
+                    sequence = metrics['ReportSequence']
+                    counts = metrics['MetricValues@odata.count']
+                    values = metrics['MetricValues']
 
-                # Process metric values
-                process_value(values)
-                print(f"Report sequence: {sequence} | Total counts: {counts}")
-                print(json.dumps(values))
+                    # Process metric values
+                    process_value(values)
+                    print(f"Report sequence: {sequence} | Total counts: {counts}")
+                    print(json.dumps(values))
     except Exception as err:
         logging.error(f"Fail to stream telemetry data: {err}")
 
