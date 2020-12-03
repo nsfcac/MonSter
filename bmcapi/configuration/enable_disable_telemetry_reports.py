@@ -57,16 +57,9 @@ def main():
     attributes = get_attributes(config, nodes[0], user, password)
     # print(json.dumps(attributes, indent=4))
 
-    # Enable or disable telemetry arrtibutes
-    # result = set_telemetry_reports(config, nodes[0], user, 
-    #                                    password, attributes, setting)
-    
-    # attributes = get_attributes(config, nodes[0], user, password)
-    # print(json.dumps(attributes, indent=4))
-
     # Enable or disable telemetry reports asynchronously
     loop = asyncio.get_event_loop()
-    status_code = loop.run_until_complete(set_telemetry_reports(config, nodes[:5], 
+    status_code = loop.run_until_complete(set_telemetry_reports(config, nodes, 
                                                   user, password, 
                                                   attributes, setting))
     loop.close()
