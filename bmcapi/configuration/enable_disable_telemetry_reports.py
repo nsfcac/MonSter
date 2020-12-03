@@ -35,7 +35,7 @@ def main():
     
     # Ask username and password
     user = input ("iDRAC username: ")
-    password = getpass.getpass(prompt='iDRAC password')
+    password = getpass(prompt='iDRAC password')
     
     # Get attributes
     attributes = get_attributes(config, nodes[0], user, password)
