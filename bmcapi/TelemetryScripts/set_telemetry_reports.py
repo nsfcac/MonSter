@@ -148,10 +148,11 @@ def status_report(status: list, nodes: list, setting: str) -> None:
     success_cnt = status.count(200)
     fail_nodes = []
 
-    print(f"--> {success_cnt} out of {total_cnt} have been {setting.upper()} the telemetry reports successfully!")
+    print(f"--> {success_cnt} out of {total_cnt} have been {setting.upper()} \
+        the telemetry reports successfully!")
 
     selection = input("--> Press l to display the failed nodes, \
-                      press other key to quit: ")
+        press other key to quit: ")
     
     if selection in ['L', 'l']:
         fail_nodes = [nodes[i] for i, j in enumerate(status) if j !=200 ]
