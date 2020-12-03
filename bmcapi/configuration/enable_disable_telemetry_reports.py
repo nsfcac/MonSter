@@ -35,12 +35,12 @@ def main():
     
     # Ask username and password
     user = input ("iDRAC username: ")
-    password = getpass(prompt='iDRAC password')
+    password = getpass(prompt='iDRAC password: ')
     
     # Get attributes
     attributes = get_attributes(config, nodes[0], user, password)
 
-    print(json.dump(attributes, indent=4))
+    print(json.dumps(attributes, indent=4))
 
 
 def get_attributes(config: dict, ip: str, user: str, password: str) -> dict:
