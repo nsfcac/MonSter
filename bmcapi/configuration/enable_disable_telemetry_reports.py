@@ -79,13 +79,13 @@ def get_attributes(config: dict, ip: str, user: str, password: str) -> dict:
     Get all telemetry attributes 
     """
     attributes = {}
-    uri = f'https://{ip}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes'
+    url = f'https://{ip}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes'
     adapter = HTTPAdapter(max_retries=config['bmc']['max_retries'])
     with requests.Session() as session:
-        session.mount(uri, adapter)
+        session.mount(url, adapter)
         try:
             response = session.get(
-                uri,
+                url,
                 auth = (user, password),
                 verify = config['bmc']['ssl_verify'], 
             )
@@ -121,12 +121,13 @@ async def enable_disable_reports(ip: str, attributes: dict, setting: str,
     """
     Enable or disable telemetry reports
     """
-    uri = f'https://{ip}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes'
+    url = f'https://{ip}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes'
     headers = {'content-type': 'application/json'}
     updated_attributes = {k: setting for k in attributes.keys()}
     patch_data = {"Attributes": updated_attributes}
     try:
-        resp = await session.patch(uri, headers=headers, data=patch_data)
+        resp = await session.request(method='PATCH', url=url, 
+                                     headers=headers, data=patch_data)
         resp.raise_for_status()
         status = await resp.status_code
         if status != 200:
@@ -142,17 +143,17 @@ async def enable_disable_reports(ip: str, attributes: dict, setting: str,
 #     """
 #     Enable or disable telemetry reports
 #     """
-#     uri = f'https://{ip}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes'
+#     url = f'https://{ip}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes'
 #     headers = {'content-type': 'application/json'}
 #     updated_attributes = {k: setting for k in attributes.keys()}
 #     patch_data = {"Attributes": updated_attributes}
 
 #     adapter = HTTPAdapter(max_retries=config['bmc']['max_retries'])
 #     with requests.Session() as session:
-#         session.mount(uri, adapter)
+#         session.mount(url, adapter)
 #         try:
 #             response = session.patch(
-#                 uri,
+#                 url,
 #                 auth = (user, password),
 #                 verify = config['bmc']['ssl_verify'], 
 #                 headers = headers,
