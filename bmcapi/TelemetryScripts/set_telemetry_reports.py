@@ -154,7 +154,7 @@ def status_report(status: list, nodes: list, setting: str) -> None:
     
     if selection in ['L', 'l']:
         fail_nodes = [nodes[i] for i in status if status[i]!=200 ]
-        print(fail_nodes)
+        print(f"--> {fail_nodes}")
     else:
         return
 
