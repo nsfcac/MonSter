@@ -75,7 +75,7 @@ def stream_data(config: dict, ip: str, user: str, password: str) -> dict:
                     # Process metric values
                     process_value(values)
                     print(f"Report sequence: {sequence} | Total counts: {counts}")
-                    print(json.dumps(metrics))
+                    print(json.dumps(values, indent=4))
     except Exception as err:
         logging.error(f"Fail to stream telemetry data: {err}")
 
