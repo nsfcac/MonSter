@@ -54,7 +54,9 @@ def get_attributes(config: dict, ip: str, user: str, password: str) -> dict:
         session.mount(uri, adapter)
         try:
             response = session.get(
-                uri, auth = (user, password)
+                uri,
+                auth = (user, password),
+                verify = config['bmc']['ssl_verify'], 
             )
             attributes = response.json()
         except Exception as err:
