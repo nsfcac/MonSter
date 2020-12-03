@@ -96,7 +96,7 @@ def enable_disable_telemetry_reports(config: dict, ip: str,
         setting_value = 'Disable'
 
     updated_attributes = {k: setting_value for k in attributes.keys()}
-    patch_data = json.dumps({"Attributes": updated_attributes})
+    patch_data = {"Attributes": updated_attributes}
 
     adapter = HTTPAdapter(max_retries=config['bmc']['max_retries'])
     with requests.Session() as session:
@@ -107,12 +107,11 @@ def enable_disable_telemetry_reports(config: dict, ip: str,
                 auth = (user, password),
                 verify = config['bmc']['ssl_verify'], 
                 headers = headers,
-                data = patch_data
+                data = json.dumps(patch_data)
             )
-            print(response.json())
             if response.status_code != 200:
                 logging.error(f"Fail to update telemetry attributes on {ip}: \
-                               {str(response)}")
+                               {str(response.reason)}")
                 return False
         except Exception as err:
             logging.error(f"Fail to update telemetry attributes on {ip}: {err}")
