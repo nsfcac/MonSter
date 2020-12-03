@@ -36,7 +36,7 @@ def main():
     nodes = parse_nodelist(config['bmc']['nodelist'])
     
     # Ask setting, username and password
-    setting = input("Enabled/Disable telemetry reports: ")
+    setting = input("Enable/Disable telemetry reports: ")
     setting = setting.lower()
     if setting not in ['enable', 'disable', 'e', 'd']:
         print("Invalid setting. Please select Enable or Disable")
@@ -53,8 +53,8 @@ def main():
     result = set_telemetry_reports(config, nodes[0], user, 
                                        password, attributes, setting)
     
-    # attributes = get_attributes(config, nodes[0], user, password)
-    # print(json.dumps(attributes, indent=4))
+    attributes = get_attributes(config, nodes[0], user, password)
+    print(json.dumps(attributes, indent=4))
 
 
 def get_attributes(config: dict, ip: str, user: str, password: str) -> dict:
@@ -91,14 +91,12 @@ def set_telemetry_reports(config: dict, ip: str,
     headers = {'content-type': 'application/json'}
 
     if setting in ['enable', 'e']:
-        setting_value = 'Enable'
+        setting_value = 'Enabled'
     else:
-        setting_value = 'Disable'
+        setting_value = 'Disabled'
 
     updated_attributes = {k: setting_value for k in attributes.keys()}
     patch_data = {"Attributes": updated_attributes}
-
-    print(patch_data)
 
     adapter = HTTPAdapter(max_retries=config['bmc']['max_retries'])
     with requests.Session() as session:
