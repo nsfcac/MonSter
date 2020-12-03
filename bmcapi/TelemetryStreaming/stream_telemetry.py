@@ -89,11 +89,11 @@ def process_metrics(values: dict) -> None:
         for value in values:
             timestamp = value['Timestamp']
             metric_label = value['Oem']['Dell']['Label'].replace(' ', '_')
-            metric_value = value['MetircValue']
+            metric_value = value['MetricValue']
             metric = {
                 'Timestamp': timestamp,
-                'MetircLabel': metric_label,
-                'MetircValue': metric_value
+                'MetricLabel': metric_label,
+                'MetricValue': metric_value
             }
             processed_metrics.append(metric)
     except Exception as err:
