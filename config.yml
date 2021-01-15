@@ -13,8 +13,32 @@ bmc:
     read: 45
   ssl_verify: False   # Secure Sockets Layer Verify
   max_retries: 3
-  nodelist:
-    - '10.101.23.[1-60]'
-    - '10.101.24.[1-60]'
-    - '10.101.25.[1-60]'
-    - '10.101.26.[1-60]'
+  iDRAC9_nodelist:
+    - 10.101.23.[1-60]
+    - 10.101.24.[1-60]
+    - 10.101.25.[1-60]
+    - 10.101.26.[1-60]
+  telemetry_report:   # Comment out to disable
+     - PSUMetrics
+    #  - PowerStatistics
+     - PowerMetrics
+     - CUPS
+     - CPUMemMetrics
+     - AggregationMetrics
+     - ThermalSensor
+     - ThermalMetrics
+     - StorageSensor
+     - StorageDiskSMARTData
+     - Sensor
+     - FCSensor
+     - NICStatistics
+     - NICSensor
+     - MemorySensor
+     - SerialLog
+     - CPUSensor
+     - CPURegisters
+     - FanSensor
+    #  - GPUStatistics
+     - NVMeSMARTData
+    #  - GPUMetrics
+    #  - FPGASensor
