@@ -8,3 +8,6 @@ pathlib
 paramiko
 schedule
 pymongo
+psycopg2
+pgcopy
+pandas
