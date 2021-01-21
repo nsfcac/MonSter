@@ -1,5 +1,18 @@
 import yaml
 import json
+from getpass import getpass
+
+
+def get_user_input() -> tuple:
+    """
+    Ask username and password
+    """
+    try:
+        user = input("--> iDRAC username: ")
+        password = getpass(prompt='--> iDRAC password: ')
+        return(user, password)
+    except Exception as err:
+        print(err)
 
 
 def parse_config(path: str) -> object:
