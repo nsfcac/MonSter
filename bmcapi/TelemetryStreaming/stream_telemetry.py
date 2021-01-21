@@ -18,7 +18,7 @@ sys.path.append('../../')
 from getpass import getpass
 from datetime import datetime, timedelta
 from functools import reduce
-from sharings.utils import parse_config, parse_nodelist
+from sharings.utils import get_user_input, parse_config, parse_nodelist
 from urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
@@ -41,20 +41,10 @@ def main():
 
     # Stream data and write json data into a file
     timelimit = 1
-    metrics_list = stream_data(config, nodes[0], user, password, timelimit)
+    metrics_list = stream_data(config, nodes[1], user, password, timelimit)
     # df = generate_df(metrics_list)
     # print(json.dumps(metrics_list, indent=4))
     # df.to_csv(f'./MetricsReport_{timelimit}min.csv', index=False)
-
-
-def get_user_input() -> tuple:
-    """
-    Ask username and password
-    """
-    user = input("--> iDRAC username: ")
-    password = getpass(prompt='--> iDRAC password: ')
-
-    return(user, password)
 
 
 def stream_data(config: dict, ip: str, user: str, 
