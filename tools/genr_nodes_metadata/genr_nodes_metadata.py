@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-    This module uses Redfish API to auto generate nodes metadata.
+    This module uses Redfish API to generate nodes metadata.
 
 Jie Li (jie.li@ttu.edu)
 """
@@ -37,13 +37,25 @@ def main():
     user, password = get_user_input()
     # print(user, password)
     
+    ####################################
     print("--> Fetch System metrics...")
     system_info = fetch_system_info(user, password, bmc_config, idrac8_nodes)
 
     # Convert JSON to CSV
-    print("--> Aggregate metrics and write to CSV file...")
+    print("--> Aggregate system metrics and write to CSV file...")
     df = pd.DataFrame(system_info)
     df.to_csv('./nodes_metadata.csv')
+
+    print("--> Done!")
+
+    ####################################
+    print("--> Fetch Bios metrics...")
+    bios_info = fetch_bios_info(user, password, bmc_config, idrac8_nodes)
+
+    # Convert JSON to CSV
+    print("--> Aggregate bios metrics and write to CSV file...")
+    df = pd.DataFrame(bios_info)
+    df.to_csv('./bios_info.csv')
 
     print("--> Done!")
     # print(json.dumps(system_info, indent=4))
@@ -58,9 +70,11 @@ def fetch_system_info(user: str, password: str, bmc_config: dict, nodes: list) -
     system_info = {}
     try:
         # Generate urls
+        base_url = "/redfish/v1/"
         bmc_base_url = "/redfish/v1/Managers/iDRAC.Embedded.1"
         system_base_url = "/redfish/v1/Systems/System.Embedded.1"
 
+        base_urls = ["https://" + node + base_url for node in nodes]
         system_urls = ["https://" + node + system_base_url for node in nodes]
         ethernet1_urls = ["https://" + node + system_base_url + "/EthernetInterfaces/NIC.Embedded.1-1-1" for node in nodes]
         ethernet2_urls = ["https://" + node + system_base_url + "/EthernetInterfaces/NIC.Embedded.2-1-1" for node in nodes]
@@ -68,6 +82,10 @@ def fetch_system_info(user: str, password: str, bmc_config: dict, nodes: list) -
         # print(system_urls)
 
         cores= multiprocessing.cpu_count()
+
+        # Parallel fetch service tags
+        basic_metrics = parallel_fetch(user, password, bmc_config, 
+                                       base_urls, nodes, cores)
 
         # Parallel fetch system metrics
         system_metrics = parallel_fetch(user, password, bmc_config, 
@@ -84,11 +102,39 @@ def fetch_system_info(user: str, password: str, bmc_config: dict, nodes: list) -
                                      bmc_urls, nodes, cores)
         
         # Parallel process system metrics
-        system_info = parallel_process(system_metrics, ethernet1_metrics, ethernet2_metrics, bmc_metrics)
+        system_info = parallel_process(basic_metrics, system_metrics, 
+                                       ethernet1_metrics, ethernet2_metrics, 
+                                       bmc_metrics)
 
         return system_info
     except Exception as err:
         logging.error(f"Fetch system info error: {err}")
+
+
+def fetch_bios_info(user: str, password: str, bmc_config: dict, nodes: list) -> list:
+    """
+    Fetch bios info from Redfish API.
+    Examplse of using Redfish API:
+    curl -s -k -u user:password -X GET GET https://10.101.1.1/redfish/v1/Systems/System.Embedded.1/Bios | jq '.'
+    """
+    bios_info = {}
+    try:
+        # Generate urls
+        bios_url = "/redfish/v1/Systems/System.Embedded.1/Bios"
+        bios_urls = ["https://" + node + bios_url for node in nodes]
+
+        cores= multiprocessing.cpu_count()
+
+        # Parallel fetch service tags
+        bios_metrics = parallel_fetch(user, password, bmc_config, 
+                                      bios_urls, nodes, cores)
+        
+        # Parallel process system metrics
+        bios_info = parallel_process_bios(bios_metrics)
+
+        return bios_info
+    except Exception as err:
+        logging.error(f"Fetch bios info error: {err}")
 
 
 def partition(arr:list, cores: int) -> list:
@@ -157,7 +203,8 @@ def fetch(user: str, password:str, bmc_config: dict, urls: list, nodes: list) ->
     return bmc_metrics
 
 
-def parallel_process(system_metrics: list, 
+def parallel_process(basic_metrics: list,
+                     system_metrics: list, 
                      ethernet1_metrics: list, 
                      ethernet2_metrics: list,
                      bmc_metrics: list) -> list:
@@ -167,7 +214,11 @@ def parallel_process(system_metrics: list,
     """
     flat_datapoints = []
     try:
-        process_args = zip(system_metrics, ethernet1_metrics, ethernet2_metrics, bmc_metrics)
+        process_args = zip(basic_metrics,
+                           system_metrics, 
+                           ethernet1_metrics, 
+                           ethernet2_metrics, 
+                           bmc_metrics)
         with multiprocessing.Pool() as pool:
             datapoints = pool.starmap(process, process_args)
     except Exception as err:
@@ -175,22 +226,37 @@ def parallel_process(system_metrics: list,
     return datapoints
 
 
-def process(system_metrics: dict, ethernet1_metrics: dict, ethernet2_metrics: dict, bmc_metrics: dict) -> dict:
+def process(basic_metrics: dict, 
+            system_metrics: dict, 
+            ethernet1_metrics: dict, 
+            ethernet2_metrics: dict, 
+            bmc_metrics: dict) -> dict:
     """
     Extract system info from returned metrics
     """
     bmc_ip_addr = system_metrics["node"]
+    basic_metrics = basic_metrics["metrics"]
     system_metrics = system_metrics["metrics"]
     ethernet1_metrics = ethernet1_metrics["metrics"]
     ethernet2_metrics = ethernet2_metrics["metrics"]
     bmc_metrics = bmc_metrics["metrics"]
     
+    basic = ["ServiceTag"]
     general = ["UUID", "SerialNumber", "HostName", "Model", "Manufacturer"]
     processor = ["ProcessorModel", "ProcessorCount", "LogicalProcessorCount"]
     memory = ["TotalSystemMemoryGiB"]
     bmc = ["BmcModel", "BmcFirmwareVersion"]
     metrics = {}
     try:
+        # Update service tag
+        if basic_metrics:
+            service_tag = basic_metrics.get("Oem", {}).get("Dell", {}).get("ServiceTag", "N/A")
+        else:
+            service_tag = "N/A"
+        metrics.update({
+            "ServiceTag": service_tag
+        })
+
         # Update System metrics
         if system_metrics:
             for metric in general:
@@ -249,7 +315,11 @@ def process(system_metrics: dict, ethernet1_metrics: dict, ethernet2_metrics: di
                 })
         
         # Update Status
-        if  not system_metrics and not ethernet1_metrics and not ethernet2_metrics and not bmc_metrics:
+        if  (not basic_metrics and 
+             not system_metrics and 
+             not ethernet1_metrics and 
+             not ethernet2_metrics and 
+             not bmc_metrics):
             metrics.update({
                 "Status": "BMC Unreachable"
             })
@@ -263,14 +333,53 @@ def process(system_metrics: dict, ethernet1_metrics: dict, ethernet2_metrics: di
         logging.error(f"fetch_system_info : parallel_process : process error : {err}")
 
 
+def parallel_process_bios(bios_metrics: list) -> list:
+    """
+    Parallel process bios metrics, 
+    system_metrics refer to a list of {'node': node_id, 'metrics': metric}
+    """
+    flat_datapoints = []
+    try:
+        process_args = zip(bios_metrics)
+        with multiprocessing.Pool() as pool:
+            datapoints = pool.starmap(process_bios, process_args)
+    except Exception as err:
+        logging.error(f"fetch_bios_info : parallel_process_bios error : {err}")
+    return datapoints
+
+
+def process_bios(bios_metrics: dict) -> dict:
+    """
+    Extract system info from returned metrics
+    """
+    bmc_ip_addr = bios_metrics["node"]
+    bios_metrics = bios_metrics["metrics"]
+    
+    metrics = {}
+    try:
+        # Update bios attributes
+        if bios_metrics:
+            metrics = bios_metrics["Attributes"]
+        
+        metrics.update({
+            "Bmc_Ip_Addr": bmc_ip_addr
+        })
+            
+        return metrics
+    except Exception as err:
+        logging.error(f"fetch_bios_info : parallel_process_bios : process_bios error : {err}")
+
+
+
 def print_logo():
-    print("""+--------> Generate Nodes Metadata via BMC <---------+""")
+    print("""+--------| Generate Nodes Metadata via BMC |---------+""")
     print("""|     _   _           _             __  __ ____      |""")
     print("""|    | \ | | ___   __| | ___  ___  |  \/  |  _ \     |""")
     print("""|    |  \| |/ _ \ / _` |/ _ \/ __| | |\/| | | | |    |""")
     print("""|    | |\  | (_) | (_| |  __/\__ \_| |  | | |_| |    |""")
     print("""|    |_| \_|\___/ \__,_|\___||___(_)_|  |_|____/     |""")
-    print("""+----> Please input iDRAC username and password <----+""")
+    print("""|                                                    |""")
+    print("""+---> Please input iDRAC username and password: <----+""")
                                                  
 if __name__ == '__main__':
     main()
