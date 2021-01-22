@@ -1,5 +1,7 @@
+import sys
 import yaml
 import json
+import time 
 from getpass import getpass
 
 
@@ -62,6 +64,17 @@ def parse_nodelist(nodelist_cfg: list) -> list:
                 nodelist.append(ip_addr)
     
     return nodelist
+
+
+def animated_loading():
+    """
+    Printing loading animation
+    """
+    chars = "/—\|" 
+    for char in chars:
+        sys.stdout.write('\r'+'loading...'+char)
+        time.sleep(.1)
+        sys.stdout.flush() 
     
 
 def ansys_node(nodelist: list) -> dict:

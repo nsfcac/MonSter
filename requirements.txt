@@ -11,3 +11,4 @@ pymongo
 psycopg2
 pgcopy
 pandas
+tqdm

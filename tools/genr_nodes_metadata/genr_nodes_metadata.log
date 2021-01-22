@@ -1,0 +1,93 @@
+2021-01-21 19:59:10 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.23/redfish/v1/Systems/System.Embedded.1 : Cannot connect to host 10.101.5.23:443 ssl:default [Connect call failed ('10.101.5.23', 443)]
+2021-01-21 19:59:12 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.9/redfish/v1/Systems/System.Embedded.1 : Cannot connect to host 10.101.7.9:443 ssl:default [Connect call failed ('10.101.7.9', 443)]
+2021-01-21 19:59:24 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.4/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 19:59:24 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.57/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 19:59:24 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.60/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 19:59:24 CST - password - ERROR - Error : Cannot fetch data from https://10.101.4.1/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 19:59:25 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.46/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 19:59:25 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.23/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : Cannot connect to host 10.101.5.23:443 ssl:default [Connect call failed ('10.101.5.23', 443)]
+2021-01-21 19:59:29 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.9/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : Cannot connect to host 10.101.7.9:443 ssl:default [Connect call failed ('10.101.7.9', 443)]
+2021-01-21 19:59:41 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.48/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 19:59:41 CST - password - ERROR - Error : Cannot fetch data from https://10.101.3.20/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 19:59:41 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.57/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 19:59:41 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.32/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 19:59:41 CST - password - ERROR - Error : Cannot fetch data from https://10.101.4.1/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 19:59:41 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.60/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 19:59:41 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.23/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : Cannot connect to host 10.101.5.23:443 ssl:default [Connect call failed ('10.101.5.23', 443)]
+2021-01-21 19:59:45 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.9/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : Cannot connect to host 10.101.7.9:443 ssl:default [Connect call failed ('10.101.7.9', 443)]
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.20/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.3.20/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.7/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.9.57/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.60/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.6.16/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.3.12/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.57/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.8.49/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.8.1/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.8.53/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.7/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 19:59:57 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.23/redfish/v1/Managers/iDRAC.Embedded.1 : Cannot connect to host 10.101.5.23:443 ssl:default [Connect call failed ('10.101.5.23', 443)]
+2021-01-21 20:00:01 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.9/redfish/v1/Managers/iDRAC.Embedded.1 : Cannot connect to host 10.101.7.9:443 ssl:default [Connect call failed ('10.101.7.9', 443)]
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.57/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.32/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.46/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.3.19/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.3.20/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.60/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.13/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.20/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.7/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.21/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 20:00:13 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.7/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 21:05:39 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.23/redfish/v1/Systems/System.Embedded.1 : Cannot connect to host 10.101.5.23:443 ssl:default [Connect call failed ('10.101.5.23', 443)]
+2021-01-21 21:05:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.9/redfish/v1/Systems/System.Embedded.1 : Cannot connect to host 10.101.7.9:443 ssl:default [Connect call failed ('10.101.7.9', 443)]
+2021-01-21 21:05:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.9.13/redfish/v1/Systems/System.Embedded.1 : Cannot connect to host 10.101.9.13:443 ssl:default [Connect call failed ('10.101.9.13', 443)]
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.6/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.3.19/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.8.1/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.9.20/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.21/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.18/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.13/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.7/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.24/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.51/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.57/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.11/redfish/v1/Systems/System.Embedded.1 : 
+2021-01-21 21:05:54 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.23/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : Cannot connect to host 10.101.5.23:443 ssl:default [Connect call failed ('10.101.5.23', 443)]
+2021-01-21 21:05:58 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.9/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : Cannot connect to host 10.101.7.9:443 ssl:default [Connect call failed ('10.101.7.9', 443)]
+2021-01-21 21:05:58 CST - password - ERROR - Error : Cannot fetch data from https://10.101.9.13/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : Cannot connect to host 10.101.9.13:443 ssl:default [Connect call failed ('10.101.9.13', 443)]
+2021-01-21 21:06:10 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.32/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 21:06:10 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.48/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 21:06:10 CST - password - ERROR - Error : Cannot fetch data from https://10.101.3.20/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 21:06:10 CST - password - ERROR - Error : Cannot fetch data from https://10.101.3.19/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 21:06:10 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.7/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 21:06:10 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.57/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 21:06:10 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.60/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 21:06:10 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.6/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.1-1-1 : 
+2021-01-21 21:06:10 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.23/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : Cannot connect to host 10.101.5.23:443 ssl:default [Connect call failed ('10.101.5.23', 443)]
+2021-01-21 21:06:14 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.9/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : Cannot connect to host 10.101.7.9:443 ssl:default [Connect call failed ('10.101.7.9', 443)]
+2021-01-21 21:06:14 CST - password - ERROR - Error : Cannot fetch data from https://10.101.9.13/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : Cannot connect to host 10.101.9.13:443 ssl:default [Connect call failed ('10.101.9.13', 443)]
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.3.20/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.57/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.6/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.18/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.7/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.13/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.11/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.60/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.9.16/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.51/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Embedded.2-1-1 : 
+2021-01-21 21:06:26 CST - password - ERROR - Error : Cannot fetch data from https://10.101.5.23/redfish/v1/Managers/iDRAC.Embedded.1 : Cannot connect to host 10.101.5.23:443 ssl:default [Connect call failed ('10.101.5.23', 443)]
+2021-01-21 21:06:30 CST - password - ERROR - Error : Cannot fetch data from https://10.101.9.13/redfish/v1/Managers/iDRAC.Embedded.1 : Cannot connect to host 10.101.9.13:443 ssl:default [Connect call failed ('10.101.9.13', 443)]
+2021-01-21 21:06:30 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.9/redfish/v1/Managers/iDRAC.Embedded.1 : Cannot connect to host 10.101.7.9:443 ssl:default [Connect call failed ('10.101.7.9', 443)]
+2021-01-21 21:06:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.48/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 21:06:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.13/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 21:06:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.6/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 21:06:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.8.49/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 21:06:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.60/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 21:06:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.25/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 21:06:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.2.51/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 21:06:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.7.16/redfish/v1/Managers/iDRAC.Embedded.1 : 
+2021-01-21 21:06:42 CST - password - ERROR - Error : Cannot fetch data from https://10.101.1.57/redfish/v1/Managers/iDRAC.Embedded.1 : 

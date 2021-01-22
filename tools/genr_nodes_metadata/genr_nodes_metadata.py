@@ -17,7 +17,7 @@ sys.path.append('../../')
 from sharings.utils import get_user_input, parse_config, parse_nodelist
 from sharings.AsyncioRequests import AsyncioRequests
 
-logging_path = './autogenr_nodes_metadata.log'
+logging_path = './genr_nodes_metadata.log'
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -29,18 +29,23 @@ logging.basicConfig(
 
 def main():
     # Read configuratin file
+    print_logo()
     config = parse_config('../../config.yml')
     bmc_config = config['bmc']
     idrac8_nodes = parse_nodelist(bmc_config['iDRAC8_nodelist'])
 
     user, password = get_user_input()
     # print(user, password)
-
+    
+    print("--> Fetch System metrics...")
     system_info = fetch_system_info(user, password, bmc_config, idrac8_nodes)
 
     # Convert JSON to CSV
+    print("--> Aggregate metrics and write to CSV file...")
     df = pd.DataFrame(system_info)
     df.to_csv('./nodes_metadata.csv')
+
+    print("--> Done!")
     # print(json.dumps(system_info, indent=4))
     
 
@@ -67,7 +72,7 @@ def fetch_system_info(user: str, password: str, bmc_config: dict, nodes: list) -
         # Parallel fetch system metrics
         system_metrics = parallel_fetch(user, password, bmc_config, 
                                         system_urls, nodes, cores)
-        
+
         # Parallel fetch ethernet metrics
         ethernet1_metrics = parallel_fetch(user, password, bmc_config, 
                                    ethernet1_urls, nodes, cores)
@@ -127,6 +132,7 @@ def parallel_fetch(user: str, password:str, bmc_config: dict,
 
         with multiprocessing.Pool() as pool:
             metrics = pool.starmap(fetch, fetch_args)
+            # metrics = list(tqdm(pool.istarmap(fetch, fetch_args), total=len(nodes)))
 
         flatten_metrics = [item for sublist in metrics for item in sublist]
     except Exception as err:
@@ -256,7 +262,16 @@ def process(system_metrics: dict, ethernet1_metrics: dict, ethernet2_metrics: di
     except Exception as err:
         logging.error(f"fetch_system_info : parallel_process : process error : {err}")
 
-    
+
+def print_logo():
+    print("""+--------> Generate Nodes Metadata via BMC <---------+""")
+    print("""|     _   _           _             __  __ ____      |""")
+    print("""|    | \ | | ___   __| | ___  ___  |  \/  |  _ \     |""")
+    print("""|    |  \| |/ _ \ / _` |/ _ \/ __| | |\/| | | | |    |""")
+    print("""|    | |\  | (_) | (_| |  __/\__ \_| |  | | |_| |    |""")
+    print("""|    |_| \_|\___/ \__,_|\___||___(_)_|  |_|____/     |""")
+    print("""+----> Please input iDRAC username and password <----+""")
+                                                 
 if __name__ == '__main__':
     main()
 
