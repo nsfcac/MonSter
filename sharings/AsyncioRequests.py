@@ -42,8 +42,8 @@ class AsyncioRequests:
                 logging.error(f"Timeout Error : cannot fetch data from {node} : {url}")
                 return {"node": node, "metrics": {}, "timestamp": self.timestamp}
             return await self.__fetch_json(url, node, session)
-        except:
-            logging.error(f"Error : Cannot fetch data from {node} : {url}")
+        except Exception as err:
+            logging.error(f"Error : Cannot fetch data from {url} : {err}")
             return {"node": node, "metrics": {}, "timestamp": self.timestamp}
 
 
