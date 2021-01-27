@@ -32,32 +32,41 @@ def main():
     print_logo()
     config = parse_config('../../config.yml')
     bmc_config = config['bmc']
+
+    # Get node list
     idrac8_nodes = parse_nodelist(bmc_config['iDRAC8_nodelist'])
+    idrac9_nodes = parse_nodelist(bmc_config['iDRAC9_nodelist'])
+    gpu_nodes = parse_nodelist(bmc_config['GPU_nodelist'])
+    
+    all_nodes = idrac8_nodes + gpu_nodes + idrac9_nodes
 
     user, password = get_user_input()
     # print(user, password)
     
     ####################################
     print("--> Fetch System metrics...")
-    system_info = fetch_system_info(user, password, bmc_config, idrac8_nodes)
+    # system_info = fetch_system_info(user, password, bmc_config, idrac8_nodes)
+    # system_info = fetch_system_info(user, password, bmc_config, idrac9_nodes)
+    system_info = fetch_system_info(user, password, bmc_config, all_nodes)
 
     # Convert JSON to CSV
     print("--> Aggregate system metrics and write to CSV file...")
     df = pd.DataFrame(system_info)
-    df.to_csv('./nodes_metadata.csv')
-
-    print("--> Done!")
+    # df.to_csv('./idrac8_nodes_metadata.csv')
+    # df.to_csv('./idrac9_nodes_metadata.csv')
+    df.to_csv('./all_nodes_metadata.csv')
 
     ####################################
     print("--> Fetch Bios metrics...")
-    bios_info = fetch_bios_info(user, password, bmc_config, idrac8_nodes)
+    bios_info = fetch_bios_info(user, password, bmc_config, all_nodes)
 
     # Convert JSON to CSV
     print("--> Aggregate bios metrics and write to CSV file...")
     df = pd.DataFrame(bios_info)
-    df.to_csv('./bios_info.csv')
+    df.to_csv('./all_bios_info.csv')
 
     print("--> Done!")
+
     # print(json.dumps(system_info, indent=4))
     
 
@@ -76,8 +85,12 @@ def fetch_system_info(user: str, password: str, bmc_config: dict, nodes: list) -
 
         base_urls = ["https://" + node + base_url for node in nodes]
         system_urls = ["https://" + node + system_base_url for node in nodes]
-        ethernet1_urls = ["https://" + node + system_base_url + "/EthernetInterfaces/NIC.Embedded.1-1-1" for node in nodes]
-        ethernet2_urls = ["https://" + node + system_base_url + "/EthernetInterfaces/NIC.Embedded.2-1-1" for node in nodes]
+
+        # # Ethernet info is currently disabled because the ethernet url
+        # # structures are different in iDRAC8 and iDRAC9; Will add parser later
+        # ethernet1_urls = ["https://" + node + system_base_url + "/EthernetInterfaces/NIC.Embedded.1-1-1" for node in nodes]
+        # ethernet2_urls = ["https://" + node + system_base_url + "/EthernetInterfaces/NIC.Embedded.2-1-1" for node in nodes]
+
         bmc_urls = ["https://" + node + bmc_base_url for node in nodes]
         # print(system_urls)
 
@@ -91,19 +104,19 @@ def fetch_system_info(user: str, password: str, bmc_config: dict, nodes: list) -
         system_metrics = parallel_fetch(user, password, bmc_config, 
                                         system_urls, nodes, cores)
 
-        # Parallel fetch ethernet metrics
-        ethernet1_metrics = parallel_fetch(user, password, bmc_config, 
-                                   ethernet1_urls, nodes, cores)
-        ethernet2_metrics = parallel_fetch(user, password, bmc_config, 
-                                   ethernet2_urls, nodes, cores)
+        # # Parallel fetch ethernet metrics
+        # ethernet1_metrics = parallel_fetch(user, password, bmc_config, 
+        #                            ethernet1_urls, nodes, cores)
+        # ethernet2_metrics = parallel_fetch(user, password, bmc_config, 
+        #                            ethernet2_urls, nodes, cores)
         
         # Parallel fetch BMC metrics
         bmc_metrics = parallel_fetch(user, password, bmc_config, 
                                      bmc_urls, nodes, cores)
         
         # Parallel process system metrics
-        system_info = parallel_process(basic_metrics, system_metrics, 
-                                       ethernet1_metrics, ethernet2_metrics, 
+        system_info = parallel_process(basic_metrics, 
+                                       system_metrics, 
                                        bmc_metrics)
 
         return system_info
@@ -178,7 +191,6 @@ def parallel_fetch(user: str, password:str, bmc_config: dict,
 
         with multiprocessing.Pool() as pool:
             metrics = pool.starmap(fetch, fetch_args)
-            # metrics = list(tqdm(pool.istarmap(fetch, fetch_args), total=len(nodes)))
 
         flatten_metrics = [item for sublist in metrics for item in sublist]
     except Exception as err:
@@ -205,8 +217,6 @@ def fetch(user: str, password:str, bmc_config: dict, urls: list, nodes: list) ->
 
 def parallel_process(basic_metrics: list,
                      system_metrics: list, 
-                     ethernet1_metrics: list, 
-                     ethernet2_metrics: list,
                      bmc_metrics: list) -> list:
     """
     Parallel process metrics, 
@@ -216,8 +226,6 @@ def parallel_process(basic_metrics: list,
     try:
         process_args = zip(basic_metrics,
                            system_metrics, 
-                           ethernet1_metrics, 
-                           ethernet2_metrics, 
                            bmc_metrics)
         with multiprocessing.Pool() as pool:
             datapoints = pool.starmap(process, process_args)
@@ -228,8 +236,6 @@ def parallel_process(basic_metrics: list,
 
 def process(basic_metrics: dict, 
             system_metrics: dict, 
-            ethernet1_metrics: dict, 
-            ethernet2_metrics: dict, 
             bmc_metrics: dict) -> dict:
     """
     Extract system info from returned metrics
@@ -237,8 +243,8 @@ def process(basic_metrics: dict,
     bmc_ip_addr = system_metrics["node"]
     basic_metrics = basic_metrics["metrics"]
     system_metrics = system_metrics["metrics"]
-    ethernet1_metrics = ethernet1_metrics["metrics"]
-    ethernet2_metrics = ethernet2_metrics["metrics"]
+    # ethernet1_metrics = ethernet1_metrics["metrics"]
+    # ethernet2_metrics = ethernet2_metrics["metrics"]
     bmc_metrics = bmc_metrics["metrics"]
     
     basic = ["ServiceTag"]
@@ -282,21 +288,23 @@ def process(basic_metrics: dict,
                     metric: "N/A"
                 })
         
-        # Update MAC address
-        if ethernet1_metrics:
-            nic_1_mac = ethernet1_metrics.get("PermanentMACAddress", "N/A")
-        else:
-            nic_1_mac = "N/A"
+        # # Ethernet info is currently disabled because the ethernet url
+        # # structures are different in iDRAC8 and iDRAC9; Will add parser later
+        # # Update MAC address
+        # if ethernet1_metrics:
+        #     nic_1_mac = ethernet1_metrics.get("PermanentMACAddress", "N/A")
+        # else:
+        #     nic_1_mac = "N/A"
         
-        if ethernet2_metrics:
-            nic_2_mac = ethernet2_metrics.get("PermanentMACAddress", "N/A")
-        else:
-            nic_2_mac = "N/A"
+        # if ethernet2_metrics:
+        #     nic_2_mac = ethernet2_metrics.get("PermanentMACAddress", "N/A")
+        # else:
+        #     nic_2_mac = "N/A"
     
-        metrics.update({
-            "NIC_1_PermanentMACAddress": nic_1_mac,
-            "NIC_2_PermanentMACAddress": nic_2_mac
-        })
+        # metrics.update({
+        #     "NIC_1_PermanentMACAddress": nic_1_mac,
+        #     "NIC_2_PermanentMACAddress": nic_2_mac
+        # })
 
         metrics.update({
             "Bmc_Ip_Addr": bmc_ip_addr
@@ -317,11 +325,11 @@ def process(basic_metrics: dict,
         # Update Status
         if  (not basic_metrics and 
              not system_metrics and 
-             not ethernet1_metrics and 
-             not ethernet2_metrics and 
+            #  not ethernet1_metrics and 
+            #  not ethernet2_metrics and 
              not bmc_metrics):
             metrics.update({
-                "Status": "BMC Unreachable"
+                "Status": "BMC unreachable in this query"
             })
         else:
             metrics.update({
@@ -357,14 +365,18 @@ def process_bios(bios_metrics: dict) -> dict:
     
     metrics = {}
     try:
-        # Update bios attributes
-        if bios_metrics:
-            metrics = bios_metrics["Attributes"]
-        
         metrics.update({
             "Bmc_Ip_Addr": bmc_ip_addr
         })
-            
+
+        # Update bios attributes
+        if bios_metrics:
+            for k, v in bios_metrics["Attributes"].items():
+                if v != "":
+                    metrics.update({
+                        k: v
+                    })        
+        
         return metrics
     except Exception as err:
         logging.error(f"fetch_bios_info : parallel_process_bios : process_bios error : {err}")

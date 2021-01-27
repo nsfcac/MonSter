@@ -6,3 +6,4 @@
 env/
 __pycache__/
 test/slurm/
+tools/genr_nodes_metadata/data
