@@ -1,5 +1,6 @@
 # Ignore files
 .DS_Store
+tools/genr_nodes_metadata/genr_nodes_metadata.log
 
 # Ignore folders
 .vscode/
