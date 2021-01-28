@@ -35,9 +35,9 @@ bmc:
     - 10.101.26.[1-60]
   telemetry_report:   # Comment out to disable
      - PSUMetrics
-    #  - PowerStatistics
+     - PowerStatistics
      - PowerMetrics
-     - CUPS
+     - SystemUsage
      - CPUMemMetrics
      - AggregationMetrics
      - ThermalSensor
@@ -45,6 +45,7 @@ bmc:
      - StorageSensor
      - StorageDiskSMARTData
      - Sensor
+     - FCPortStatistics
      - FCSensor
      - NICStatistics
      - NICSensor
@@ -53,7 +54,7 @@ bmc:
      - CPUSensor
      - CPURegisters
      - FanSensor
-    #  - GPUStatistics
+     - GPUStatistics
      - NVMeSMARTData
-    #  - GPUMetrics
-    #  - FPGASensor
+     - GPUMetrics
+     - FPGASensor
