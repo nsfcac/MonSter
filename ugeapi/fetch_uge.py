@@ -5,6 +5,7 @@ import requests
 import multiprocessing
 
 from itertools import repeat
+from dateutil.parser import parse
 
 from requests.adapters import HTTPAdapter
 from ugeapi.ProcessUge import ProcessUge
