@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module calls sacct in Slurm to obtain detailed accouting infieldsion about
+This module calls sacct in Slurm to obtain detailed accouting information about
 individual jobs or job steps. This module can only be used in Python 3.5 or above.
 
 Job State:
@@ -42,12 +42,13 @@ def fetch_slurm_job() -> list:
     rtn_str_arr = rtn_str.splitlines()[1:]
 
     # Get all job data dict
-    job_dict_all = generate_job_dict(accounting_fields, rtn_str_arr)
+    # job_dict_all = generate_job_dict(accounting_fields, rtn_str_arr)
 
     # Aggregate job data
-    aggregated_job_data = aggregate_job_data(job_dict_all)
+    # aggregated_job_data = aggregate_job_data(job_dict_all)
     
-    return aggregated_job_data
+    # return aggregated_job_data
+    return rtn_str_arr
 
 
 def convert_str_json(fields: list, job_str: str, queue: object) -> dict:
