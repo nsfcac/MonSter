@@ -13,7 +13,7 @@ import pandas as pd
 
 from itertools import repeat
 
-sys.path.append('../../')
+sys.path.append('../')
 from sharings.utils import get_user_input, parse_config, parse_nodelist
 from sharings.AsyncioRequests import AsyncioRequests
 
@@ -30,7 +30,7 @@ logging.basicConfig(
 def main():
     # Read configuratin file
     print_logo()
-    config = parse_config('../../config.yml')
+    config = parse_config('../config.yml')
     bmc_config = config['bmc']
 
     # Get node list
@@ -56,14 +56,14 @@ def main():
     # df.to_csv('./idrac9_nodes_metadata.csv')
     df.to_csv('./all_nodes_metadata.csv')
 
-    ####################################
-    print("--> Fetch Bios metrics...")
-    bios_info = fetch_bios_info(user, password, bmc_config, all_nodes)
+    # ####################################
+    # print("--> Fetch Bios metrics...")
+    # bios_info = fetch_bios_info(user, password, bmc_config, all_nodes)
 
-    # Convert JSON to CSV
-    print("--> Aggregate bios metrics and write to CSV file...")
-    df = pd.DataFrame(bios_info)
-    df.to_csv('./all_bios_info.csv')
+    # # Convert JSON to CSV
+    # print("--> Aggregate bios metrics and write to CSV file...")
+    # df = pd.DataFrame(bios_info)
+    # df.to_csv('./all_bios_info.csv')
 
     print("--> Done!")
 
@@ -254,11 +254,18 @@ def process(basic_metrics: dict,
     bmc = ["BmcModel", "BmcFirmwareVersion"]
     metrics = {}
     try:
+        # # Update service tag
+        # if basic_metrics:
+        #     service_tag = basic_metrics.get("Oem", {}).get("Dell", {}).get("ServiceTag", "N/A")
+        # else:
+        #     service_tag = "N/A"
+
         # Update service tag
-        if basic_metrics:
-            service_tag = basic_metrics.get("Oem", {}).get("Dell", {}).get("ServiceTag", "N/A")
+        if system_metrics:
+            service_tag = system_metrics.get("SKU", "N/A")
         else:
             service_tag = "N/A"
+
         metrics.update({
             "ServiceTag": service_tag
         })

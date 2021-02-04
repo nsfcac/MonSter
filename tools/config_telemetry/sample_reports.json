@@ -1,0 +1,1555 @@
+{
+  "@odata.type": "#MetricReport.v1_3_0.MetricReport",
+  "@odata.context": "/redfish/v1/$metadata#MetricReport.MetricReport",
+  "@odata.id": "/redfish/v1/TelemetryService/MetricReports/PowerMetrics",
+  "Id": "PowerMetrics",
+  "Name": "PowerMetrics Metric Report",
+  "ReportSequence": "10057",
+  "Timestamp": "2021-02-03T23:42:22.000Z",
+  "MetricReportDefinition": {
+    "@odata.id": "/redfish/v1/TelemetryService/MetricReportDefinitions/PowerMetrics"
+  },
+  "MetricValues": [
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:42:21.815Z",
+      "MetricValue": "123",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:42:21.815Z",
+      "MetricValue": "473",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:42:21.815Z",
+      "MetricValue": "473",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:42:21.815Z",
+      "MetricValue": "566",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:42:21.815Z",
+      "MetricValue": "752",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:42:21.815Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:42:21.815Z",
+      "MetricValue": "136",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:42:21.815Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:42:21.815Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:42:21.815Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:42:15.818Z",
+      "MetricValue": "160",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:42:15.818Z",
+      "MetricValue": "459",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:42:15.818Z",
+      "MetricValue": "459",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:42:15.818Z",
+      "MetricValue": "529",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:42:15.818Z",
+      "MetricValue": "708",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:42:15.818Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:42:15.818Z",
+      "MetricValue": "134",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:42:15.818Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:42:15.818Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:42:15.818Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:42:09.823Z",
+      "MetricValue": "155",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:42:09.823Z",
+      "MetricValue": "454",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:42:09.823Z",
+      "MetricValue": "454",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:42:09.823Z",
+      "MetricValue": "534",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:42:09.823Z",
+      "MetricValue": "698",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:42:09.823Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:42:09.823Z",
+      "MetricValue": "142",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:42:09.823Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:42:09.823Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:42:09.823Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:42:04.820Z",
+      "MetricValue": "131",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:42:04.820Z",
+      "MetricValue": "465",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:42:04.820Z",
+      "MetricValue": "465",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:42:04.820Z",
+      "MetricValue": "558",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:42:04.820Z",
+      "MetricValue": "710",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:42:04.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:42:04.820Z",
+      "MetricValue": "144",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:42:04.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:42:04.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:42:04.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:41:58.821Z",
+      "MetricValue": "142",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:41:58.821Z",
+      "MetricValue": "465",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:41:58.821Z",
+      "MetricValue": "465",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:41:58.821Z",
+      "MetricValue": "547",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:41:58.821Z",
+      "MetricValue": "706",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:41:58.821Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:41:58.821Z",
+      "MetricValue": "152",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:41:58.821Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:41:58.821Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:41:58.821Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:41:52.821Z",
+      "MetricValue": "175",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:41:52.821Z",
+      "MetricValue": "452",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:41:52.821Z",
+      "MetricValue": "452",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:41:52.821Z",
+      "MetricValue": "514",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:41:52.821Z",
+      "MetricValue": "704",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:41:52.821Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:41:52.821Z",
+      "MetricValue": "148",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:41:52.821Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:41:52.821Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:41:52.821Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:41:47.820Z",
+      "MetricValue": "108",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:41:47.820Z",
+      "MetricValue": "494",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:41:47.820Z",
+      "MetricValue": "494",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:41:47.820Z",
+      "MetricValue": "581",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:41:47.820Z",
+      "MetricValue": "786",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:41:47.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:41:47.820Z",
+      "MetricValue": "144",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:41:47.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:41:47.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:41:47.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:41:42.820Z",
+      "MetricValue": "124",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:41:42.820Z",
+      "MetricValue": "480",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:41:42.820Z",
+      "MetricValue": "480",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:41:42.820Z",
+      "MetricValue": "565",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:41:42.820Z",
+      "MetricValue": "730",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:41:42.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:41:42.820Z",
+      "MetricValue": "154",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:41:42.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:41:42.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:41:42.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:41:37.815Z",
+      "MetricValue": "202",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:41:37.815Z",
+      "MetricValue": "403",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:41:37.815Z",
+      "MetricValue": "403",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:41:37.815Z",
+      "MetricValue": "487",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:41:37.815Z",
+      "MetricValue": "584",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:41:37.815Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:41:37.815Z",
+      "MetricValue": "150",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:41:37.815Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:41:37.815Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:41:37.815Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:41:31.820Z",
+      "MetricValue": "160",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:41:31.820Z",
+      "MetricValue": "433",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:41:31.820Z",
+      "MetricValue": "433",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:41:31.820Z",
+      "MetricValue": "529",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:41:31.820Z",
+      "MetricValue": "666",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:41:31.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:41:31.820Z",
+      "MetricValue": "144",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:41:31.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:41:31.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:41:31.820Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemHeadRoomInstantaneous",
+      "Timestamp": "2021-02-03T23:41:25.826Z",
+      "MetricValue": "188",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemHeadRoomInstantaneous",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemInputPower",
+      "Timestamp": "2021-02-03T23:41:25.826Z",
+      "MetricValue": "418",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemInputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemOutputPower",
+      "Timestamp": "2021-02-03T23:41:25.826Z",
+      "MetricValue": "418",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemOutputPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "SystemPowerConsumption",
+      "Timestamp": "2021-02-03T23:41:25.826Z",
+      "MetricValue": "501",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics SystemPowerConsumption",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalCPUPower",
+      "Timestamp": "2021-02-03T23:41:25.826Z",
+      "MetricValue": "640",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalCPUPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFanPower",
+      "Timestamp": "2021-02-03T23:41:25.826Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFanPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalMemoryPower",
+      "Timestamp": "2021-02-03T23:41:25.826Z",
+      "MetricValue": "142",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalMemoryPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalPciePower",
+      "Timestamp": "2021-02-03T23:41:25.826Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalPciePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalStoragePower",
+      "Timestamp": "2021-02-03T23:41:25.826Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalStoragePower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    },
+    {
+      "MetricId": "TotalFPGAPower",
+      "Timestamp": "2021-02-03T23:41:25.826Z",
+      "MetricValue": "0",
+      "Oem": {
+        "Dell": {
+          "@odata.type": "#DellMetricReport.v1_0_0.DellMetricReport",
+          "ContextID": "PowerMetrics",
+          "Label": "PowerMetrics TotalFPGAPower",
+          "Source": "powermetrics",
+          "FQDD": "PowerMetrics"
+        }
+      }
+    }
+  ],
+  "MetricValues@odata.count": 110
+}
