@@ -21,7 +21,7 @@ import requests
 import aiohttp
 import asyncio
 
-sys.path.append('../../')
+sys.path.append('../')
 
 from getpass import getpass
 from tqdm import tqdm
@@ -55,7 +55,7 @@ def main():
             enable_only = True
 
     # Read configuratin file
-    config = parse_config('../../config.yml')
+    config = parse_config('../config.yml')
 
     # Print logo and user interface
     print_logo()
@@ -70,14 +70,17 @@ def main():
         if attributes:
             break
         else:
-            print(f"{bcolors.WARNING}Cannot get metric report configurations, please try again later!{bcolors.ENDC}")
+            print(f"{bcolors.WARNING}--> Cannot get metric report configurations, please try again later!{bcolors.ENDC}")
             return
+
+    # print(json.dumps(attributes, indent=4))
+    # return
     
     # Enable all metirc reports
     enabled_attributes = enable_all_attributes(attributes)
     # print(json.dumps(enabled_attributes, indent=4))
 
-    print("--> Enable all telemetry reports:")
+    print("--> Enable all telemetry reports...")
     # Enable all telemetry reports asynchronously
     loop = asyncio.get_event_loop()
     status = loop.run_until_complete(set_telemetry_reports(config, nodelist, 
@@ -85,7 +88,15 @@ def main():
                                                            enabled_attributes))
 
     if enable_only:
-        status_report(status, nodelist, enabled_attributes)
+        fail_nodes = status_report(status, nodelist, enabled_attributes)
+        if fail_nodes:
+            print("--> Retry on failed nodes...")
+            status = loop.run_until_complete(set_telemetry_reports(config, fail_nodes, 
+                                                            user, password, 
+                                                            enabled_attributes))
+
+            fail_nodes_last = status_report(status, fail_nodes, enabled_attributes)
+        loop.close()
         return
 
     # We still test the telemetry report with 3 nodes, and if we encounter 3 
@@ -97,8 +108,7 @@ def main():
             break
     
     # print(json.dumps(members_urls, indent=4))
-
-    print("--> Analyze telemetry reports:")
+    print(f"--> Get {bcolors.BOLD}{len(members_urls)}{bcolors.ENDC} telemetry reports and analyze...")
     if members_urls:
         for url in tqdm(members_urls):
             for node in nodes:
@@ -106,18 +116,30 @@ def main():
                     valid_reports.append(url.split('/')[-1])
                     break
     
+    # print(valid_reports)
+
     attributes_settings = update_attributes(attributes, valid_reports)
+
     # print(json.dumps(attributes_settings, indent=4))
 
-    print("--> Set valid telemetry reports:")
+    print("--> Set valid telemetry reports...")
     # Update all telemetry reports asynchronously
     status = loop.run_until_complete(set_telemetry_reports(config, nodelist, 
                                                            user, password, 
                                                            attributes_settings))
-    loop.close()
+    # loop.close()
 
     # Report status
-    status_report(status, nodelist, attributes_settings)
+    fail_nodes = status_report(status, nodelist, attributes_settings)
+    if fail_nodes:
+        print("--> Retry on failed nodes...")
+        # Update all telemetry reports asynchronously
+        status = loop.run_until_complete(set_telemetry_reports(config, fail_nodes, 
+                                                            user, password, 
+                                                            attributes_settings))
+        # Report status
+        fail_nodes_last = status_report(status, fail_nodes, attributes_settings)
+    loop.close()
 
 
 def get_attributes(config: dict, node: str, user: str, password: str) -> dict:
@@ -217,10 +239,11 @@ def update_attributes(attributes: dict, valid_reports: list) -> dict:
         else:
             copy_reports_setting = list(valid_reports)
             for k in attributes.keys():
+                report_name = k.split('.')[0][9:]
                 setting = 'Disabled'
 
                 for report in copy_reports_setting:
-                    if report in k:
+                    if report == report_name:
                         setting='Enabled'
                         copy_reports_setting.remove(report)
                         break
@@ -238,7 +261,7 @@ def update_attributes(attributes: dict, valid_reports: list) -> dict:
         logging.error(f"Fail to update attributes : {err}")
 
 
-def status_report(status: list, nodes: list, attributes_settings: dict) -> None:
+def status_report(status: list, nodes: list, attributes_settings: dict) -> list:
     """
     Generate status report for the setting
     """
@@ -262,7 +285,7 @@ def status_report(status: list, nodes: list, attributes_settings: dict) -> None:
     print(f"--> {bcolors.BOLD}{success_cnt}{bcolors.ENDC} out of {bcolors.BOLD}{total_cnt}{bcolors.ENDC} nodes have been configured the telemetry reports successfully!")
     print(f"--> {bcolors.FAIL}FAILED{bcolors.ENDC} nodes are: {bcolors.FAIL}{fail_nodes}{bcolors.ENDC}")
 
-    return
+    return fail_nodes
 
 
 def get_metric_report_member_urls(config: dict, node: str, user: str, password: str) -> dict:
@@ -302,8 +325,14 @@ def check_metric_value(config: dict, member_url: str, node: str,
                 auth = (user, password),
                 verify = config['bmc']['ssl_verify'], 
             )
-            values = response.json().get('MetricValues', [])                
-            return values != []
+            values = response.json().get('MetricValues@odata.count', 0)
+
+            # print(f"{member_url} : {values != 0}")
+            if values == 0 or values == 1:
+                return False
+            else:
+                return True
+                
         except Exception as err:
             logging.error(f'check_metric_value: {err}')
             return False
@@ -320,7 +349,7 @@ def print_logo():
     print(f"       \_____\___/|_| |_|_| |_|\__, |_|  |_|  \_\      ".center(columns))
     print(f"                                __/ |                  ".center(columns))
     print(f"                                   |___/                   {bcolors.ENDC}".center(columns))
-    print(f"+======| Automatic Configure Telemetry Reports |======+".center(columns))
+    print(f"+=========| Auto-configure Telemetry Reports |========+".center(columns))
     print(f"+=====================================================+".center(columns))
 
 

@@ -78,7 +78,7 @@ def stream_data(config: dict, ip: str, user: str,
                     # Process metric values
                     processed_metrics = process_metrics(values)
                     metrics_list.extend(processed_metrics)
-                    # print(json.dumps(processed_metrics, indent=4))
+                    print(json.dumps(processed_metrics, indent=4))
                     print(f"Report sequence: {sequence} | Total counts: {counts}")
 
 
@@ -110,8 +110,8 @@ def process_metrics(values: dict) -> None:
             }
             processed_metrics.append(metric)
 
-        print(fields)
-        print(len(fields))
+        # print(fields)
+        # print(len(fields))
     except Exception as err:
             logging.error(f"Fail to process metric values: {err}")
     
