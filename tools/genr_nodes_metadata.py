@@ -8,6 +8,7 @@ Jie Li (jie.li@ttu.edu)
 import sys
 import json
 import logging
+import psycopg2
 import multiprocessing
 import pandas as pd
 
@@ -33,6 +34,14 @@ def main():
     config = parse_config('../config.yml')
     bmc_config = config['bmc']
 
+    # Generate TimeScaleDB connection
+    db_host = config['timescaledb']['host']
+    db_port = config['timescaledb']['port']
+    db_user = config['timescaledb']['user']
+    db_pswd = config['timescaledb']['password']
+    db_dbnm = config['timescaledb']['database']
+    connection = f"postgres://{db_user}:{db_pswd}@{db_host}:{db_port}/{db_dbnm}"
+
     # Get node list
     idrac8_nodes = parse_nodelist(bmc_config['iDRAC8_nodelist'])
     idrac9_nodes = parse_nodelist(bmc_config['iDRAC9_nodelist'])
@@ -50,11 +59,10 @@ def main():
     system_info = fetch_system_info(user, password, bmc_config, all_nodes)
 
     # Convert JSON to CSV
-    print("--> Aggregate system metrics and write to CSV file...")
+    # print("--> Aggregate system metrics and write to CSV file...")
     df = pd.DataFrame(system_info)
-    # df.to_csv('./idrac8_nodes_metadata.csv')
-    # df.to_csv('./idrac9_nodes_metadata.csv')
-    df.to_csv('./all_nodes_metadata.csv')
+    create_db_table(df, connection)
+    # df.to_csv('./all_nodes_metadata.csv')
 
     # ####################################
     # print("--> Fetch Bios metrics...")
@@ -96,9 +104,6 @@ def fetch_system_info(user: str, password: str, bmc_config: dict, nodes: list) -
 
         cores= multiprocessing.cpu_count()
 
-        # Parallel fetch service tags
-        basic_metrics = parallel_fetch(user, password, bmc_config, 
-                                       base_urls, nodes, cores)
 
         # Parallel fetch system metrics
         system_metrics = parallel_fetch(user, password, bmc_config, 
@@ -115,8 +120,7 @@ def fetch_system_info(user: str, password: str, bmc_config: dict, nodes: list) -
                                      bmc_urls, nodes, cores)
         
         # Parallel process system metrics
-        system_info = parallel_process(basic_metrics, 
-                                       system_metrics, 
+        system_info = parallel_process(system_metrics, 
                                        bmc_metrics)
 
         return system_info
@@ -215,8 +219,7 @@ def fetch(user: str, password:str, bmc_config: dict, urls: list, nodes: list) ->
     return bmc_metrics
 
 
-def parallel_process(basic_metrics: list,
-                     system_metrics: list, 
+def parallel_process(system_metrics: list, 
                      bmc_metrics: list) -> list:
     """
     Parallel process metrics, 
@@ -224,8 +227,7 @@ def parallel_process(basic_metrics: list,
     """
     flat_datapoints = []
     try:
-        process_args = zip(basic_metrics,
-                           system_metrics, 
+        process_args = zip(system_metrics, 
                            bmc_metrics)
         with multiprocessing.Pool() as pool:
             datapoints = pool.starmap(process, process_args)
@@ -234,14 +236,12 @@ def parallel_process(basic_metrics: list,
     return datapoints
 
 
-def process(basic_metrics: dict, 
-            system_metrics: dict, 
+def process(system_metrics: dict, 
             bmc_metrics: dict) -> dict:
     """
     Extract system info from returned metrics
     """
     bmc_ip_addr = system_metrics["node"]
-    basic_metrics = basic_metrics["metrics"]
     system_metrics = system_metrics["metrics"]
     # ethernet1_metrics = ethernet1_metrics["metrics"]
     # ethernet2_metrics = ethernet2_metrics["metrics"]
@@ -254,12 +254,6 @@ def process(basic_metrics: dict,
     bmc = ["BmcModel", "BmcFirmwareVersion"]
     metrics = {}
     try:
-        # # Update service tag
-        # if basic_metrics:
-        #     service_tag = basic_metrics.get("Oem", {}).get("Dell", {}).get("ServiceTag", "N/A")
-        # else:
-        #     service_tag = "N/A"
-
         # Update service tag
         if system_metrics:
             service_tag = system_metrics.get("SKU", "N/A")
@@ -330,8 +324,7 @@ def process(basic_metrics: dict,
                 })
         
         # Update Status
-        if  (not basic_metrics and 
-             not system_metrics and 
+        if  (not system_metrics and 
             #  not ethernet1_metrics and 
             #  not ethernet2_metrics and 
              not bmc_metrics):
@@ -388,6 +381,38 @@ def process_bios(bios_metrics: dict) -> dict:
     except Exception as err:
         logging.error(f"fetch_bios_info : parallel_process_bios : process_bios error : {err}")
 
+
+def create_db_table(df: object, connection: object) -> None:
+    """
+    Create table for storing node metadata in Postgres
+    """
+    table_name = "nodes"
+    column_names = list(df.columns)
+    column_types = []
+    column_str = ""
+    for column in column_names:
+        if column == "ProcessorCount" or column == "LogicalProcessorCount":
+            column_type = "SMALLINT"
+        elif column == "TotalSystemMemoryGiB":
+            column_type = "REAL"
+        else:
+            column_type = "VARCHAR(64)"
+        column_types.append(column_type)
+
+    for i, column in enumerate(column_names):
+        if column == "Bmc_Ip_Addr":
+            column_str += column + " " + column_types[i] + " PRIMARY KEY, "
+        else:
+            column_str += column + " " + column_types[i] + ", "
+    column_str = column_str[:-2]
+    sql_statements = f" CREATE TABLE IF NOT EXISTS {table_name} ( id SMALLSERIAL, {column_str});"
+
+    # Write to Postgres
+    with psycopg2.connect(connection) as conn: 
+        cur = conn.cursor()
+        cur.execute(sql_statements)
+        conn.commit()
+        cur.close()
 
 
 def print_logo():
