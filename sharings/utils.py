@@ -77,6 +77,17 @@ def parse_nodelist(nodelist_cfg: list) -> list:
     return nodelist
 
 
+def init_tsdb_connection(config: dict) -> str:
+    # Generate TimeScaleDB connection
+    db_host = config['timescaledb']['host']
+    db_port = config['timescaledb']['port']
+    db_user = config['timescaledb']['user']
+    db_pswd = config['timescaledb']['password']
+    db_dbnm = config['timescaledb']['database']
+    connection = f"postgres://{db_user}:{db_pswd}@{db_host}:{db_port}/{db_dbnm}"
+    return connection
+
+
 def animated_loading():
     """
     Printing loading animation

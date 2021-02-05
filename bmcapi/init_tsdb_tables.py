@@ -1,15 +1,14 @@
 """
-    This module uses Redfish API to pull iDRAC9 sensor data.
+    This module uses Redfish API to pull iDRAC9 sensor data and initialize
+    tables for telemetry reports.
+    Before running this module, make sure that the database has been created and
+    extended the database with TimescaleDB as supersuer:
+    psql -U postgres
+    CREATE EXTENSION IF NOT EXISTS timescaledb;
     Postgres role: monster, password: redraider
 
 Jie Li (jie.li@ttu.edu)
 """
-
-#user monster
-#pwd redraider
-#host localhost
-#port 5432
-#db test_tsdb
 
 import sys
 import json
@@ -20,17 +19,15 @@ import getpass
 import secrets
 import argparse
 import requests
-import aiohttp
-import asyncio
 import psycopg2
 
 sys.path.append('../')
 
 from getpass import getpass
 from tqdm import tqdm
+from pgcopy import CopyManager
 from requests.adapters import HTTPAdapter
-from aiohttp import ClientSession
-from sharings.utils import bcolors, get_user_input, parse_config, parse_nodelist
+from sharings.utils import bcolors, get_user_input, parse_config, parse_nodelist, init_tsdb_connection
 from tools.config_telemetry_reports import get_metric_report_member_urls
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -44,17 +41,16 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
 
-CONNECTION="postgres://monster:redraider@localhost:5432/test_tsdb"
-
 
 def main():
     # Read configuratin file
     config = parse_config('../config.yml')
 
+    # Create TimeScaleDB connection
+    connection = init_tsdb_connection(config)
+
     # Print logo and user interface
-    # user, password = get_user_input()
-    user = 'password'
-    password = 'monster'
+    user, password = get_user_input()
 
     # We randomly select 3 nodes to get the metric reports
     nodelist = parse_nodelist(config['bmc']['iDRAC9_nodelist'])
@@ -81,20 +77,37 @@ def main():
                 break
         all_sample_metrics.append(sample_metrics)
 
-    all_sql_statements = []
-    print("--> Parse telemetry report samples and generate SQL statement...")
-    for i, sample_metrics in enumerate(tqdm(all_sample_metrics)):
-        metrics_features = parse_sample_metrics(member_urls[i], sample_metrics)
-        sql_statements = gen_sql_statements(metrics_features)
-        all_sql_statements.append(sql_statements)
-    
-    with open("./sql.json", "w") as outfile:
-        json.dump(all_sql_statements, outfile, indent=4)
-        
-    with psycopg2.connect(CONNECTION) as conn:
+    # Write to Postgres
+    with psycopg2.connect(connection) as conn: 
         cur = conn.cursor()
-        for sql_statements in all_sql_statements:
+        all_sql_statements = []
+
+        # Create a table recording the relationship between source and labels
+        source_labels_sql = "CREATE TABLE IF NOT EXISTS source_labels ( Source TEXT NOT NULL, Labels TEXT[] );"
+        cur.execute(source_labels_sql)
+
+        source_labels_records = []
+        cols = ('source', 'labels')
+
+        # Get features and generate other tables
+        for i, sample_metrics in enumerate(all_sample_metrics):
+            metrics_feature = parse_sample_metrics(member_urls[i], sample_metrics)
+            sql_statements = gen_sql_statements(metrics_feature)
+            # Create table
+            print(f"--> Create table {metrics_feature['Source']}...")
             cur.execute(sql_statements)
+
+            # Generate hypertable
+            print(f"--> Create the corresponding hypertable {metrics_feature['Source']}...")
+            gene_hypertable_sql = "SELECT create_hypertable(" + "'" + metrics_feature['Source'] + "', 'time');"
+            cur.execute(gene_hypertable_sql)
+
+            # Insert relationship data into source_labels table in TimeScaleDB
+            source_labels_records.append((metrics_feature['Source'], metrics_feature['Labels']))
+        
+        mgr = CopyManager(conn, 'source_labels', cols)
+        mgr.copy(source_labels_records)
+
         conn.commit()
         cur.close()
 
@@ -159,19 +172,11 @@ def gen_sql_statements(metrics_feature: dict) -> str:
         for i, column in enumerate(column_names):
             column_str += column + " " + column_types[i] + ", "
         column_str = column_str[:-2]
-        whole_str = f"CREATE TABLE IF NOT EXISTS {table_name} ( Timestamp TIMESTAMPTZ NOT NULL, Node_Id SMALLINT, {column_str});"
+        time_stamp = 'time'
+        whole_str = f"CREATE TABLE IF NOT EXISTS {table_name} ({time_stamp} TIMESTAMPTZ NOT NULL, Bmc_Ip_Addr VARCHAR(20) NOT NULL, {column_str});"
         return whole_str
     except Exception as err:
         logging.error(f'gen_sql_statements: {err}')
-
-
-def is_integer(n):
-    try:
-        float(n)
-    except ValueError:
-        return False
-    else:
-        return float(n).is_integer()
 
 
 def check_value_type(source: str, value: str) -> str:
