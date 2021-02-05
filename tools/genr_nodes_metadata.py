@@ -34,19 +34,10 @@ def main():
     config = parse_config('../config.yml')
     bmc_config = config['bmc']
 
-    # Generate TimeScaleDB connection
-    db_host = config['timescaledb']['host']
-    db_port = config['timescaledb']['port']
-    db_user = config['timescaledb']['user']
-    db_pswd = config['timescaledb']['password']
-    db_dbnm = config['timescaledb']['database']
-    connection = f"postgres://{db_user}:{db_pswd}@{db_host}:{db_port}/{db_dbnm}"
-
     # Get node list
     idrac8_nodes = parse_nodelist(bmc_config['iDRAC8_nodelist'])
     idrac9_nodes = parse_nodelist(bmc_config['iDRAC9_nodelist'])
     gpu_nodes = parse_nodelist(bmc_config['GPU_nodelist'])
-    
     all_nodes = idrac8_nodes + gpu_nodes + idrac9_nodes
 
     user, password = get_user_input()
@@ -61,8 +52,7 @@ def main():
     # Convert JSON to CSV
     # print("--> Aggregate system metrics and write to CSV file...")
     df = pd.DataFrame(system_info)
-    create_db_table(df, connection)
-    # df.to_csv('./all_nodes_metadata.csv')
+    df.to_csv('./all_nodes_metadata.csv')
 
     # ####################################
     # print("--> Fetch Bios metrics...")
@@ -256,9 +246,9 @@ def process(system_metrics: dict,
     try:
         # Update service tag
         if system_metrics:
-            service_tag = system_metrics.get("SKU", "N/A")
+            service_tag = system_metrics.get("SKU", None)
         else:
-            service_tag = "N/A"
+            service_tag = None
 
         metrics.update({
             "ServiceTag": service_tag
@@ -268,39 +258,39 @@ def process(system_metrics: dict,
         if system_metrics:
             for metric in general:
                 metrics.update({
-                    metric: system_metrics.get(metric, "N/A")
+                    metric: system_metrics.get(metric, None)
                 })
             for metric in processor:
                 if metric.startswith("Processor"):
                     metrics.update({
-                        metric: system_metrics.get("ProcessorSummary", {}).get(metric[9:], "N/A")
+                        metric: system_metrics.get("ProcessorSummary", {}).get(metric[9:], None)
                     })
                 else:
                     metrics.update({
-                        metric: system_metrics.get("ProcessorSummary", {}).get(metric, "N/A")
+                        metric: system_metrics.get("ProcessorSummary", {}).get(metric, None)
                     })
             for metric in memory:
                 metrics.update({
-                    metric: system_metrics.get("MemorySummary", {}).get("TotalSystemMemoryGiB", "N/A")
+                    metric: system_metrics.get("MemorySummary", {}).get("TotalSystemMemoryGiB", None)
                 })
         else:
             for metric in general + processor + memory:
                 metrics.update({
-                    metric: "N/A"
+                    metric: None
                 })
         
         # # Ethernet info is currently disabled because the ethernet url
         # # structures are different in iDRAC8 and iDRAC9; Will add parser later
         # # Update MAC address
         # if ethernet1_metrics:
-        #     nic_1_mac = ethernet1_metrics.get("PermanentMACAddress", "N/A")
+        #     nic_1_mac = ethernet1_metrics.get("PermanentMACAddress", "")
         # else:
-        #     nic_1_mac = "N/A"
+        #     nic_1_mac = ""
         
         # if ethernet2_metrics:
-        #     nic_2_mac = ethernet2_metrics.get("PermanentMACAddress", "N/A")
+        #     nic_2_mac = ethernet2_metrics.get("PermanentMACAddress", "")
         # else:
-        #     nic_2_mac = "N/A"
+        #     nic_2_mac = ""
     
         # metrics.update({
         #     "NIC_1_PermanentMACAddress": nic_1_mac,
@@ -315,12 +305,12 @@ def process(system_metrics: dict,
         if bmc_metrics:
             for metric in bmc:
                 metrics.update({
-                    metric: bmc_metrics.get(metric[3:], "N/A")
+                    metric: bmc_metrics.get(metric[3:], None)
                 })
         else:
             for metric in bmc:
                 metrics.update({
-                    metric: "N/A"
+                    metric: None
                 })
         
         # Update Status
@@ -333,7 +323,7 @@ def process(system_metrics: dict,
             })
         else:
             metrics.update({
-                "Status": system_metrics.get("Status", {}).get("Health", "N/A")
+                "Status": system_metrics.get("Status", {}).get("Health", None)
             })
             
         return metrics
@@ -372,7 +362,7 @@ def process_bios(bios_metrics: dict) -> dict:
         # Update bios attributes
         if bios_metrics:
             for k, v in bios_metrics["Attributes"].items():
-                if v != "":
+                if v != None:
                     metrics.update({
                         k: v
                     })        
@@ -380,39 +370,6 @@ def process_bios(bios_metrics: dict) -> dict:
         return metrics
     except Exception as err:
         logging.error(f"fetch_bios_info : parallel_process_bios : process_bios error : {err}")
-
-
-def create_db_table(df: object, connection: object) -> None:
-    """
-    Create table for storing node metadata in Postgres
-    """
-    table_name = "nodes"
-    column_names = list(df.columns)
-    column_types = []
-    column_str = ""
-    for column in column_names:
-        if column == "ProcessorCount" or column == "LogicalProcessorCount":
-            column_type = "SMALLINT"
-        elif column == "TotalSystemMemoryGiB":
-            column_type = "REAL"
-        else:
-            column_type = "VARCHAR(64)"
-        column_types.append(column_type)
-
-    for i, column in enumerate(column_names):
-        if column == "Bmc_Ip_Addr":
-            column_str += column + " " + column_types[i] + " PRIMARY KEY, "
-        else:
-            column_str += column + " " + column_types[i] + ", "
-    column_str = column_str[:-2]
-    sql_statements = f" CREATE TABLE IF NOT EXISTS {table_name} ( id SMALLSERIAL, {column_str});"
-
-    # Write to Postgres
-    with psycopg2.connect(connection) as conn: 
-        cur = conn.cursor()
-        cur.execute(sql_statements)
-        conn.commit()
-        cur.close()
 
 
 def print_logo():
