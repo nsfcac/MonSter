@@ -100,7 +100,7 @@ def stream_data(config: dict, ip: str,
                     records_tuple = process_metrics(values, label_source_mapping)
 
                     # Dump metrics
-                    dump_metrics(records_tuple, conn)
+                    dump_metrics(ip, records_tuple, conn)
                     # print(json.dumps(records_raw, indent=4))
 
     except Exception as err:
@@ -137,20 +137,21 @@ def process_metrics(values: dict, label_source_mapping: dict) -> None:
     return (table_name, records_raw)
 
 
-def dump_metrics(records_tuple: tuple, conn: object) -> None:
+def dump_metrics(ip: str, records_tuple: tuple, conn: object) -> None:
     """
     Dump metrics into TimescaleDB
     """
     try:
-        table_name = records_tuple[0]
+        table_name = records_tuple[0].lower()
         records_raw = records_tuple[1]
         print(table_name)
         for t, m in records_raw.items():
             t = parse_time(t)
-            cols = tuple(["time"] + m["columns"])
-            print(cols)
-            records = tuple([t] + m["records"])
-            print(records)
+            cols_low = [col.lower() for col in m["columns"]]
+
+            cols = tuple(["time", "bmc_ip_addr"] + cols_low)
+            records = [tuple([t, ip] + m["records"])]
+            
             mgr = CopyManager(conn, table_name, cols)
             mgr.copy(records)
             conn.commit()
