@@ -7,6 +7,10 @@
     CREATE EXTENSION IF NOT EXISTS timescaledb;
     Postgres role: monster, password: redraider
 
+    select table_schema, table_name from information_schema.tables
+    where table_schema not in ('information_schema', 'pg_catalog', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', '_timescaledb_cache') and
+    table_type = 'BASE TABLE';
+
 Jie Li (jie.li@ttu.edu)
 """
 
@@ -89,18 +93,22 @@ def main():
         source_labels_records = []
         cols = ('source', 'labels')
 
-        # Get features and generate other tables
+        # Get features and generate tables
         for i, sample_metrics in enumerate(all_sample_metrics):
             metrics_feature = parse_sample_metrics(member_urls[i], sample_metrics)
             sql_statements = gen_sql_statements(metrics_feature)
-            # Create table
-            print(f"--> Create table {metrics_feature['Source']}...")
-            cur.execute(sql_statements)
-
-            # Generate hypertable
-            print(f"--> Create the corresponding hypertable {metrics_feature['Source']}...")
-            gene_hypertable_sql = "SELECT create_hypertable(" + "'" + metrics_feature['Source'] + "', 'time');"
-            cur.execute(gene_hypertable_sql)
+            
+            # Create schema
+            print(f"--> Create schema {metrics_feature['Source']} ...")
+            cur.execute(sql_statements['schema_sql'])
+            
+            # Create tables in schema
+            for i, sql in enumerate(sql_statements['tables_sql']):
+                print(f" |--> Create table {metrics_feature['Labels'][i]} ...")
+                cur.execute(sql)
+                # Generate hypertable
+                gene_hypertable_sql = "SELECT create_hypertable(" + "'" + metrics_feature['Source'] + "." + metrics_feature['Labels'][i] + "', 'time', if_not_exists => TRUE);"
+                cur.execute(gene_hypertable_sql)
 
             # Insert relationship data into source_labels table in TimeScaleDB
             source_labels_records.append((metrics_feature['Source'], metrics_feature['Labels']))
@@ -160,21 +168,25 @@ def parse_sample_metrics(member_url: str, metrics: list) -> dict:
     return metrics_feature
 
 
-def gen_sql_statements(metrics_feature: dict) -> str:
+def gen_sql_statements(metrics_feature: dict) -> dict:
     """
     Generate SQL statements which will be used to create table
     """
-    table_name = metrics_feature["Source"]
-    column_names = metrics_feature["Labels"]
+    schema_name = metrics_feature["Source"]
+    table_names = metrics_feature["Labels"]
     column_types = metrics_feature["Types"]
+    sql_collection = {}
     try:
-        column_str = ""
-        for i, column in enumerate(column_names):
-            column_str += column + " " + column_types[i] + ", "
-        column_str = column_str[:-2]
-        time_stamp = 'time'
-        whole_str = f"CREATE TABLE IF NOT EXISTS {table_name} ({time_stamp} TIMESTAMPTZ NOT NULL, Bmc_Ip_Addr VARCHAR(20) NOT NULL, {column_str});"
-        return whole_str
+        schema_sql = f"CREATE SCHEMA IF NOT EXISTS {schema_name};"
+        tables_sql = []
+        for i, table in enumerate(table_names):
+            table_sql = f"CREATE TABLE IF NOT EXISTS {schema_name}.{table} (time TIMESTAMPTZ NOT NULL, node_id INT NOT NULL, value {column_types[i]}, FOREIGN KEY (node_id) REFERENCES nodes (node_id));"
+            tables_sql.append(table_sql)
+        sql_collection.update({
+            "schema_sql": schema_sql,
+            "tables_sql": tables_sql
+        })
+        return sql_collection
     except Exception as err:
         logging.error(f'gen_sql_statements: {err}')
 
@@ -182,12 +194,12 @@ def gen_sql_statements(metrics_feature: dict) -> str:
 def check_value_type(source: str, value: str) -> str:
     if ":" in value:
     # Which indicates the value is a time string
-        return "CHAR(30)"
+        return "VARCHAR(30)"
     if source == "NICStatistics":
     # Some metrics value from NICStatistics a large integer
         int_type = "BIGINT"
     else:
-        int_type = "SMALLINT"
+        int_type = "INT"
     if "." in value:
     # Which indicates the value is a float number
         return "REAL"
@@ -198,7 +210,7 @@ def check_value_type(source: str, value: str) -> str:
             return int_type
         except ValueError:
             # otherwise, it is a string
-            return "VARCHAR(20)"
+            return "VARCHAR(30)"
 
 
 if __name__ == '__main__':
