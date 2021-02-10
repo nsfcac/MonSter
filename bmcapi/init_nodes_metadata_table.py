@@ -51,7 +51,7 @@ def create_db_table(system_info: list, conn: object, table_name: str) -> None:
     column_str = ""
     for column in column_names:
         if column == "ProcessorCount" or column == "LogicalProcessorCount":
-            column_type = "SMALLINT"
+            column_type = "INT"
         elif column == "TotalSystemMemoryGiB":
             column_type = "REAL"
         else:
@@ -59,12 +59,9 @@ def create_db_table(system_info: list, conn: object, table_name: str) -> None:
         column_types.append(column_type)
 
     for i, column in enumerate(column_names):
-        if column == "Bmc_Ip_Addr":
-            column_str += column + " " + column_types[i] + " PRIMARY KEY, "
-        else:
-            column_str += column + " " + column_types[i] + ", "
+        column_str += column + " " + column_types[i] + ", "
     column_str = column_str[:-2]
-    sql_statements = f" CREATE TABLE IF NOT EXISTS {table_name} ( id SMALLSERIAL, {column_str});"
+    sql_statements = f" CREATE TABLE IF NOT EXISTS {table_name} ( node_id SERIAL PRIMARY KEY, {column_str}, UNIQUE (node_id));"
 
     # Write to Postgres
     cur = conn.cursor()

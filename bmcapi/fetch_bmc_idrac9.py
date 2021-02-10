@@ -47,13 +47,14 @@ def main():
     user, password = get_user_input()
 
     with psycopg2.connect(connection) as conn:
-        label_source_mapping = gene_mapping(conn)
-        # print(json.dumps(label_source_mapping, indent=4))
+        label_source_mapping = gene_source_label_mapping(conn)
+        ip_id_mapping = gene_ip_id_mapping(conn)
         # Stream data and write json data into a file
-        stream_data(config, nodes[1], user, password, label_source_mapping, conn)
+        stream_data(config, nodes[1], user, password, 
+                    label_source_mapping, ip_id_mapping, conn)
 
 
-def gene_mapping(conn: object) -> dict:
+def gene_source_label_mapping(conn: object) -> dict:
     """
     Generate sources-labels mapping dict
     """
@@ -69,9 +70,27 @@ def gene_mapping(conn: object) -> dict:
     cur.close()
     return mapping
 
+
+def gene_ip_id_mapping(conn: object) -> dict:
+    """
+    Generate IP-ID mapping dict
+    """
+    mapping = {}
+    cur = conn.cursor()
+    query = "SELECT node_id, bmc_ip_addr FROM nodes"
+    cur.execute(query)
+    for (node_id, bmc_ip_addr) in cur.fetchall():
+        mapping.update({
+            bmc_ip_addr: node_id
+        })
+    cur.close()
+    return mapping
+
+
 def stream_data(config: dict, ip: str, 
                 user: str, password: str, 
                 label_source_mapping: dict,
+                ip_id_mapping: dict,
                 conn: object) -> list:
     """
     Stream telemetry data
@@ -97,17 +116,16 @@ def stream_data(config: dict, ip: str,
                     values = metrics['MetricValues']
 
                     # Process metric values
-                    records_tuple = process_metrics(values, label_source_mapping)
+                    records_raw = process_metrics(values)
 
                     # Dump metrics
-                    dump_metrics(ip, records_tuple, conn)
-                    # print(json.dumps(records_raw, indent=4))
+                    dump_metrics(ip, records_raw, label_source_mapping, ip_id_mapping, conn)
 
     except Exception as err:
         logging.error(f"Fail to stream telemetry data: {err}")
 
 
-def process_metrics(values: dict, label_source_mapping: dict) -> None:
+def process_metrics(values: dict) -> None:
     """
     Process data in the MetricValues, generate raw records
     """
@@ -115,46 +133,52 @@ def process_metrics(values: dict, label_source_mapping: dict) -> None:
     try:
         for value in values:
             record = []
-            timestamp = value['Timestamp']
-            column_name = value['Oem']['Dell']['Label'].replace(' ', '_').replace('.', '_').replace('-', '_')
-            column_value = process_value(value['MetricValue'])
-            table_name = label_source_mapping[column_name]
-            
-            if timestamp not in records_raw:
+            time = value['Timestamp']
+            table_name = value['Oem']['Dell']['Label'].replace(' ', '_').replace('.', '_').replace('-', '_')
+            value = process_value(value['MetricValue'])
+
+            if table_name not in records_raw:
                 records_raw.update({
-                    timestamp:{
-                        "columns":[column_name],
-                        "records":[column_value]
+                    table_name: {
+                        "time": [time],
+                        "value": [value]
                     }
                 })
             else:
-                records_raw[timestamp]["columns"].append(column_name)
-                records_raw[timestamp]["records"].append(column_value)
+                records_raw[table_name]['time'].append(time)
+                records_raw[table_name]['value'].append(value)
     
     except Exception as err:
             logging.error(f"Fail to process metric values: {err}")
     
-    return (table_name, records_raw)
+    return records_raw
 
 
-def dump_metrics(ip: str, records_tuple: tuple, conn: object) -> None:
+def dump_metrics(ip: str, 
+                 records_raw: dict,
+                 label_source_mapping: dict, 
+                 ip_id_mapping: dict,
+                 conn: object, ) -> None:
     """
     Dump metrics into TimescaleDB
     """
     try:
-        table_name = records_tuple[0].lower()
-        records_raw = records_tuple[1]
-        print(table_name)
-        for t, m in records_raw.items():
-            t = parse_time(t)
-            cols_low = [col.lower() for col in m["columns"]]
-
-            cols = tuple(["time", "bmc_ip_addr"] + cols_low)
-            records = [tuple([t, ip] + m["records"])]
-            
+        node_id = ip_id_mapping[ip]
+        for k, v in records_raw.items():
+            records = []
+            schema = label_source_mapping[k]
+            table = k
+            target_table = f"{schema}.{table}"
+            cols = ('time', 'node_id', 'value')
+            for i, t in enumerate(v['time']):
+                t = parse_time(t)
+                value = v['value'][i]
+                record = (t, node_id, value)
+                records.append(record)
+            # print(json.dumps(records, indent=4))
             mgr = CopyManager(conn, table_name, cols)
             mgr.copy(records)
-            conn.commit()
+        conn.commit()
     except Exception as err:
             logging.error(f"Fail to dump metrics: {err}")
 
