@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-    This module uses Redfish API to pull iDRAC9 sensor data.
+    This module uses Redfish API to get iDRAC9 sensor data.
 
 Jie Li (jie.li@ttu.edu)
 """
@@ -48,49 +48,22 @@ def main():
 
     with psycopg2.connect(connection) as conn:
         label_source_mapping = gene_source_label_mapping(conn)
+        label_type_mapping = gene_label_type_mapping(conn)
         ip_id_mapping = gene_ip_id_mapping(conn)
         # Stream data and write json data into a file
-        stream_data(config, nodes[1], user, password, 
-                    label_source_mapping, ip_id_mapping, conn)
-
-
-def gene_source_label_mapping(conn: object) -> dict:
-    """
-    Generate sources-labels mapping dict
-    """
-    mapping = {}
-    cur = conn.cursor()
-    query = "SELECT * FROM source_labels"
-    cur.execute(query)
-    for (source, labels) in cur.fetchall():
-        for label in labels:
-            mapping.update({
-                label: source
-            })
-    cur.close()
-    return mapping
-
-
-def gene_ip_id_mapping(conn: object) -> dict:
-    """
-    Generate IP-ID mapping dict
-    """
-    mapping = {}
-    cur = conn.cursor()
-    query = "SELECT node_id, bmc_ip_addr FROM nodes"
-    cur.execute(query)
-    for (node_id, bmc_ip_addr) in cur.fetchall():
-        mapping.update({
-            bmc_ip_addr: node_id
-        })
-    cur.close()
-    return mapping
+        stream_data(config, nodes[0], 
+                    user, password, 
+                    label_source_mapping, 
+                    ip_id_mapping,
+                    label_type_mapping,
+                    conn)
 
 
 def stream_data(config: dict, ip: str, 
                 user: str, password: str, 
                 label_source_mapping: dict,
                 ip_id_mapping: dict,
+                label_type_mapping: dict,
                 conn: object) -> list:
     """
     Stream telemetry data
@@ -119,7 +92,11 @@ def stream_data(config: dict, ip: str,
                     records_raw = process_metrics(values)
 
                     # Dump metrics
-                    dump_metrics(ip, records_raw, label_source_mapping, ip_id_mapping, conn)
+                    dump_metrics(ip, records_raw, 
+                                 label_source_mapping, 
+                                 ip_id_mapping, 
+                                 label_type_mapping, 
+                                 conn)
 
     except Exception as err:
         logging.error(f"Fail to stream telemetry data: {err}")
@@ -135,7 +112,7 @@ def process_metrics(values: dict) -> None:
             record = []
             time = value['Timestamp']
             table_name = value['Oem']['Dell']['Label'].replace(' ', '_').replace('.', '_').replace('-', '_')
-            value = process_value(value['MetricValue'])
+            value = value['MetricValue']
 
             if table_name not in records_raw:
                 records_raw.update({
@@ -158,6 +135,7 @@ def dump_metrics(ip: str,
                  records_raw: dict,
                  label_source_mapping: dict, 
                  ip_id_mapping: dict,
+                 label_type_mapping: dict,
                  conn: object, ) -> None:
     """
     Dump metrics into TimescaleDB
@@ -166,36 +144,84 @@ def dump_metrics(ip: str,
         node_id = ip_id_mapping[ip]
         for k, v in records_raw.items():
             records = []
-            schema = label_source_mapping[k]
-            table = k
+            schema = label_source_mapping[k].lower()
+            table = k.lower()
+            dtype = label_type_mapping[k]
             target_table = f"{schema}.{table}"
+            # print(target_table)
+
             cols = ('time', 'node_id', 'value')
             for i, t in enumerate(v['time']):
                 t = parse_time(t)
-                value = v['value'][i]
+                value = cast_value_type(v['value'][i], dtype)
                 record = (t, node_id, value)
                 records.append(record)
-            # print(json.dumps(records, indent=4))
-            mgr = CopyManager(conn, table_name, cols)
+
+            mgr = CopyManager(conn, target_table, cols)
             mgr.copy(records)
         conn.commit()
     except Exception as err:
-            logging.error(f"Fail to dump metrics: {err}")
+        logging.error(f"Fail to dump metrics: {target_table} : {err}")
 
 
-def process_value(metric_value: str):
-    if ":" in metric_value:
-        return metric_value
-    if "." in metric_value:
-        try:
-            return float(metric_value)
-        except ValueError:
-            return metric_value 
-    else:
-        try:
-            return int(metric_value)             
-        except ValueError:
-            return metric_value
+def gene_source_label_mapping(conn: object) -> dict:
+    """
+    Generate sources-labels mapping dict
+    """
+    mapping = {}
+    cur = conn.cursor()
+    query = "SELECT source, label FROM source_label"
+    cur.execute(query)
+    for (source, label) in cur.fetchall():
+        mapping.update({
+            label: source
+        })
+    cur.close()
+    return mapping
+
+
+def gene_label_type_mapping(conn: object) -> dict:
+    """
+    Generate label_type mapping dict
+    """
+    mapping = {}
+    cur = conn.cursor()
+    query = "SELECT label, type FROM source_label"
+    cur.execute(query)
+    for (label, dtype) in cur.fetchall():
+        mapping.update({
+            label: dtype
+        })
+    cur.close()
+    return mapping
+
+
+def gene_ip_id_mapping(conn: object) -> dict:
+    """
+    Generate IP-ID mapping dict
+    """
+    mapping = {}
+    cur = conn.cursor()
+    query = "SELECT node_id, bmc_ip_addr FROM nodes"
+    cur.execute(query)
+    for (node_id, bmc_ip_addr) in cur.fetchall():
+        mapping.update({
+            bmc_ip_addr: node_id
+        })
+    cur.close()
+    return mapping
+
+
+def cast_value_type(value, dtype):
+    try:
+        if dtype == "INT" or dtype =="BIGINT":
+            return int(value)
+        elif dtype == "REAL":
+            return float(value)
+        else:
+            return value
+    except ValueError:
+        return value
 
 
 if __name__ == '__main__':

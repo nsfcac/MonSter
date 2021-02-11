@@ -1,0 +1,1588 @@
+[
+    {
+        "PowerMetrics_SystemHeadRoomInstantaneous": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PowerMetrics_SystemInputPower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PowerMetrics_SystemOutputPower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PowerMetrics_SystemPowerConsumption": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PowerMetrics_TotalCPUPower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PowerMetrics_TotalFanPower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PowerMetrics_TotalMemoryPower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PowerMetrics_TotalPciePower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PowerMetrics_TotalStoragePower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PowerMetrics_TotalFPGAPower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "CPU_Socket_1_CPUC0ResidencyHigh": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_2_CPUC0ResidencyHigh": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_1_CPUC0ResidencyLow": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_2_CPUC0ResidencyLow": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_1_CUPSIIOBandwidthDMI": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_2_CUPSIIOBandwidthDMI": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_1_CUPSIIOBandwidthPort0": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_2_CUPSIIOBandwidthPort0": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_1_CUPSIIOBandwidthPort1": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_2_CUPSIIOBandwidthPort1": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_1_CUPSIIOBandwidthPort2": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_2_CUPSIIOBandwidthPort2": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_1_CUPSIIOBandwidthPort3": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_2_CUPSIIOBandwidthPort3": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_1_NonC0ResidencyHigh": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_2_NonC0ResidencyHigh": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_1_NonC0ResidencyLow": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU_Socket_2_NonC0ResidencyLow": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "AggregationMetrics_SystemAvgInletTempHour": [
+            "INT"
+        ],
+        "AggregationMetrics_SystemMaxInletTempHour": [
+            "INT"
+        ],
+        "AggregationMetrics_SystemMaxPowerConsumption": [
+            "INT"
+        ]
+    },
+    {
+        "CPU1_Temp_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU2_Temp_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "Fan_1A_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Fan_1B_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Fan_2A_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Fan_2B_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Fan_3A_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Fan_4A_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Fan_4B_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Fan_3B_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "NIC_Embedded_1_1_1_DiscardedPkts": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_DiscardedPkts": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_DiscardedPkts": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_LinkStatus": [
+            "VARCHAR(30)"
+        ],
+        "NIC_Integrated_1_1_1_LinkStatus": [
+            "VARCHAR(30)"
+        ],
+        "NIC_Integrated_1_2_1_LinkStatus": [
+            "VARCHAR(30)"
+        ],
+        "NIC_Embedded_1_1_1_OSDriverState": [
+            "VARCHAR(30)"
+        ],
+        "NIC_Integrated_1_1_1_OSDriverState": [
+            "VARCHAR(30)"
+        ],
+        "NIC_Integrated_1_2_1_OSDriverState": [
+            "VARCHAR(30)"
+        ],
+        "NIC_Integrated_1_1_1_RDMARxTotalBytes": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RDMARxTotalBytes": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RDMARxTotalPackets": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RDMARxTotalPackets": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RDMATxTotalBytes": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RDMATxTotalBytes": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RDMATxTotalPackets": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RDMATxTotalPackets": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_RxBroadcast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxBroadcast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxBroadcast": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_RxBytes": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxBytes": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxBytes": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_RxErrorPktAlignmentErrors": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxErrorPktAlignmentErrors": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxErrorPktAlignmentErrors": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_RxErrorPktFCSErrors": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxErrorPktFCSErrors": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxErrorPktFCSErrors": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxFalseCarrierDetection": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxFalseCarrierDetection": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_RxJabberPkt": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxJabberPkt": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxJabberPkt": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_RxMutlicast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxMutlicast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxMutlicast": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_RxPauseXOFFFrames": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxPauseXOFFFrames": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxPauseXOFFFrames": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_RxPauseXONFrames": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxPauseXONFrames": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxPauseXONFrames": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_RxRuntPkt": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxRuntPkt": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxRuntPkt": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_RxUnicast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_RxUnicast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_RxUnicast": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_TxBroadcast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_TxBroadcast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_TxBroadcast": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_TxBytes": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_TxBytes": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_TxBytes": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_TxErrorPktExcessiveCollision": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_TxErrorPktExcessiveCollision": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_TxErrorPktExcessiveCollision": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_TxErrorPktLateCollision": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_TxErrorPktLateCollision": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_TxErrorPktLateCollision": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_TxErrorPktMultipleCollision": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_TxErrorPktMultipleCollision": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_TxErrorPktMultipleCollision": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_TxErrorPktSingleCollision": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_TxErrorPktSingleCollision": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_TxErrorPktSingleCollision": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_TxMutlicast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_TxMutlicast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_TxMutlicast": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_TxPauseXOFFFrames": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_TxPauseXOFFFrames": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_TxPauseXOFFFrames": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_TxPauseXONFrames": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_TxPauseXONFrames": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_TxPauseXONFrames": [
+            "BIGINT"
+        ],
+        "NIC_Embedded_1_1_1_TxUnicast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_1_1_TxUnicast": [
+            "BIGINT"
+        ],
+        "NIC_Integrated_1_2_1_TxUnicast": [
+            "BIGINT"
+        ]
+    },
+    {
+        "Inlet_Temp_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "DIMM_Socket_A1_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_A2_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_B1_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_B2_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_B3_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_B4_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_B5_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_B6_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_A3_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_A4_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_A5_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_A6_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_A7_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_A8_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_B7_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "DIMM_Socket_B8_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "Thermal_ComputePower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Thermal_ITUE": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Thermal_PSUEfficiency": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Thermal_PowerToCoolRatio": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Thermal_SysAirFlowEfficiency": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Thermal_SysAirflowPerFanPower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Thermal_SysAirflowPerSysInputPower": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Thermal_SysAirflowUtilization": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Thermal_SysNetAirflow": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Thermal_SysRackTempDelta": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Thermal_TotalPSUHeatDissipation": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "Integrated_NIC_1_Port_1_Partition_1_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Embedded_NIC_1_Port_1_Partition_1_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "SystemUsage_CPUUsage": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "SystemUsage_IOUsage": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "SystemUsage_MemoryUsage": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "SystemUsage_AggregateUsage": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "PowerStatistics_LastDayAvgPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastDayMaxPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastDayMaxPowerTime": [
+            "VARCHAR(30)"
+        ],
+        "PowerStatistics_LastDayMinPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastDayMinPowerTime": [
+            "VARCHAR(30)"
+        ],
+        "PowerStatistics_LastHourAvgPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastHourMaxPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastHourMaxPowerTime": [
+            "VARCHAR(30)"
+        ],
+        "PowerStatistics_LastHourMinPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastHourMinPowerTime": [
+            "VARCHAR(30)"
+        ],
+        "PowerStatistics_LastMinuteAvgPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastMinuteMaxPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastMinuteMaxPowerTime": [
+            "VARCHAR(30)"
+        ],
+        "PowerStatistics_LastMinuteMinPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastMinuteMinPowerTime": [
+            "VARCHAR(30)"
+        ],
+        "PowerStatistics_LastWeekAvgPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastWeekMaxPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastWeekMaxPowerTime": [
+            "VARCHAR(30)"
+        ],
+        "PowerStatistics_LastWeekMinPower": [
+            "INT"
+        ],
+        "PowerStatistics_LastWeekMinPowerTime": [
+            "VARCHAR(30)"
+        ]
+    },
+    {
+        "PS1_Current_1_AmpsReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL"
+        ],
+        "PS2_Current_2_AmpsReading": [
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL"
+        ],
+        "System_Board_CPU_Usage_CPUUsagePctReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "FAN2A_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "FAN3A_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "FAN3B_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PS2_Voltage_2_VoltageReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU1_VCORE_VR_VoltageReading": [
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL"
+        ],
+        "CPU1_MEM_VR_VoltageReading": [
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL"
+        ],
+        "CPU2_MEM_VR_VoltageReading": [
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL"
+        ],
+        "System_Board_Pwr_Consumption_WattsReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "FAN1B_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "FAN4A_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "FAN4B_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "PS1_Voltage_1_VoltageReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU2_VCORE_VR_VoltageReading": [
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL",
+            "REAL"
+        ],
+        "FAN1A_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "FAN2B_RPMReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "Inlet_Temp_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU1_Temp_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ],
+        "CPU2_Temp_TemperatureReading": [
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    }
+]

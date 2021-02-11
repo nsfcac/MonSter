@@ -4,6 +4,7 @@
     Before running this module, make sure that the database has been created and
     extended the database with TimescaleDB as supersuer:
     psql -U postgres
+    CREATE DATABASE demo WITH OWNER monster
     CREATE EXTENSION IF NOT EXISTS timescaledb;
     Postgres role: monster, password: redraider
 
@@ -27,8 +28,9 @@ import psycopg2
 
 sys.path.append('../')
 
-from getpass import getpass
 from tqdm import tqdm
+from getpass import getpass
+from itertools import groupby
 from pgcopy import CopyManager
 from requests.adapters import HTTPAdapter
 from sharings.utils import bcolors, get_user_input, parse_config, parse_nodelist, init_tsdb_connection
@@ -87,11 +89,11 @@ def main():
         all_sql_statements = []
 
         # Create a table recording the relationship between source and labels
-        source_labels_sql = "CREATE TABLE IF NOT EXISTS source_labels ( Source TEXT NOT NULL, Labels TEXT[] );"
+        source_labels_sql = "CREATE TABLE IF NOT EXISTS source_label ( Source TEXT NOT NULL, Label TEXT, Type TEXT);"
         cur.execute(source_labels_sql)
 
-        source_labels_records = []
-        cols = ('source', 'labels')
+        all_source_labels_records = []
+        cols = ('source', 'label', 'type')
 
         # Get features and generate tables
         for i, sample_metrics in enumerate(all_sample_metrics):
@@ -111,14 +113,15 @@ def main():
                 cur.execute(gene_hypertable_sql)
 
             # Insert relationship data into source_labels table in TimeScaleDB
-            source_labels_records.append((metrics_feature['Source'], metrics_feature['Labels']))
+            source_labels_records = gen_source_labels_records(metrics_feature)
+            all_source_labels_records.extend(source_labels_records)
         
-        mgr = CopyManager(conn, 'source_labels', cols)
-        mgr.copy(source_labels_records)
+        mgr = CopyManager(conn, 'source_label', cols)
+        mgr.copy(all_source_labels_records)
 
         conn.commit()
         cur.close()
-
+        
 
 def get_sample_metrics(config: dict, member_url: str, node: str, user: str, password: str) -> list:
     """
@@ -145,27 +148,49 @@ def parse_sample_metrics(member_url: str, metrics: list) -> dict:
     """
     Parse sample metrics and generate column names and data type of each column
     """
-    metrics_feature = {}
     source = member_url.split('/')[-1]
-    labels = []
-    data_types = []
+    metrics_feature = {
+        "Source": source,
+        "Labels": [],
+        "Types": []
+    }
+    label_type = {}
     try:
         for metric in metrics:
             label = metric['Oem']['Dell']['Label'].replace(' ', '_').replace('.', '_').replace('-', '_')
             value = metric['MetricValue']
+            data_type = check_value_type(source, value)
 
-            if label not in labels:
-                labels.append(label)
-                data_type = check_value_type(source, value)
-                data_types.append(data_type)
-        metrics_feature.update({
-            "Source": source,
-            "Labels": labels,
-            "Types": data_types
-        })
+            if label not in label_type:
+                label_type.update({
+                    label:[data_type]
+                })
+            else:
+                label_type[label].append(data_type)
+        
+        for k, v in label_type.items():
+            if all_equal(v):
+                data_type = v[0]
+            else:
+                if "REAL" in v:
+                    data_type = "REAL"
+                else:
+                    data_type = "VARCHAR(30)"
+            metrics_feature['Labels'].append(k)
+            metrics_feature['Types'].append(data_type)
+
     except Exception as err:
         logging.error(f'parse_sample_metrics: {err}')
     return metrics_feature
+
+
+def gen_source_labels_records(metrics_feature: dict) -> list:
+    # (metrics_feature['Source'], metrics_feature['Labels'])
+    records = []
+    for i, label in enumerate(metrics_feature['Labels']):
+        records.append((metrics_feature['Source'], label, metrics_feature['Types'][i]))
+    return records
+
 
 
 def gen_sql_statements(metrics_feature: dict) -> dict:
@@ -189,6 +214,14 @@ def gen_sql_statements(metrics_feature: dict) -> dict:
         return sql_collection
     except Exception as err:
         logging.error(f'gen_sql_statements: {err}')
+
+
+def all_equal(iterable):
+    """
+    Ref: https://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
+    """
+    g = groupby(iterable)
+    return next(g, True) and not next(g, False)
 
 
 def check_value_type(source: str, value: str) -> str:
