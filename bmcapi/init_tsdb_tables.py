@@ -108,28 +108,30 @@ def main():
         cols = ('source', 'label', 'type')
 
         # Get features and generate tables
+        all_table_schemas = {}
         for i, sample_metrics in enumerate(all_sample_metrics):
-            metrics_feature = parse_sample_metrics(member_urls[i], sample_metrics)
-            sql_statements = gen_sql_statements(metrics_feature)
-            
-            # Create schema
-            print(f"--> Create schema {metrics_feature['Source']} ...")
-            cur.execute(sql_statements['schema_sql'])
-            
-            # Create tables in schema
-            for i, sql in enumerate(sql_statements['tables_sql']):
-                print(f" |--> Create table {metrics_feature['Labels'][i]} ...")
-                cur.execute(sql)
-                # Generate hypertable
-                gene_hypertable_sql = "SELECT create_hypertable(" + "'" + metrics_feature['Source'] + "." + metrics_feature['Labels'][i] + "', 'time', if_not_exists => TRUE);"
-                cur.execute(gene_hypertable_sql)
-
-            # Insert relationship data into source_labels table in TimeScaleDB
-            source_labels_records = gen_source_labels_records(metrics_feature)
-            all_source_labels_records.extend(source_labels_records)
+            table_schemas = parse_sample_metrics(member_urls[i], sample_metrics)
+            for k, v in table_schemas.items():
+                if k not in all_table_schemas:
+                    all_table_schemas.update({
+                        k: v
+                    })
         
-        mgr = CopyManager(conn, 'source_label', cols)
-        mgr.copy(all_source_labels_records)
+        # Create schema
+        schema_name = 'iDRAC9'
+        print(f"--> Create schema {schema_name}...")
+        sql_statements = gen_sql_statements(all_table_schemas, schema_name)
+        cur.execute(sql_statements['schema_sql'])
+
+        # Create tables in schema
+        for sql in sql_statements['tables_sql']:
+            table_name = sql.split(' ')[5]
+            print(f" |--> Create table {table_name}...")
+            cur.execute(sql)
+
+            # Generate hypertable
+            gene_hypertable_sql = "SELECT create_hypertable(" + "'" + table_name + "', 'timestamp', if_not_exists => TRUE);"
+            cur.execute(gene_hypertable_sql)
 
         conn.commit()
         cur.close()
@@ -158,87 +160,85 @@ def get_sample_metrics(config: dict, member_url: str, node: str, user: str, pass
 
 def parse_sample_metrics(member_url: str, metrics: list) -> dict:
     """
-    Parse sample metrics and generate column names and data type of each column
+    Parse sample metrics and generate table names and data type for the value
+    FQDD( Fully Qualified Device Descriptor )
     """
     source = member_url.split('/')[-1]
-    metrics_feature = {
-        "Source": source,
-        "Labels": [],
-        "Types": []
-    }
-    label_type = {}
+    table_schemas = {}
     try:
-        for metric in metrics:
-            label = metric['Oem']['Dell']['Label'].replace(' ', '_').replace('.', '_').replace('-', '_')
-            value = metric['MetricValue']
-            data_type = check_value_type(source, value)
-
-            if label not in label_type:
-                label_type.update({
-                    label:[data_type]
+        if source == 'PowerStatistics':
+            table_names = ['LastMinutePowerStatistics', 'LastHourPowerStatistics', 'LastDayPowerStatistics', 'LastWeekPowerStatistics']
+            column_names = ['Timestamp', 'NodeID', 'Source', 'FQDD', 'AvgPower', 'MinPower', 'MinPowerTime', 'MaxPower', 'MaxPowerTime']
+            column_types = ['TIMESTAMPTZ NOT NULL', 'INT NOT NULL', 'TEXT', 'TEXT', 'INT', 'INT', 'TIMESTAMPTZ', 'INT', 'TIMESTAMPTZ']
+            for table_name in table_names:
+                table_schemas.update({
+                    table_name: {
+                        'column_names': column_names,
+                        'column_types': column_types
+                    }
                 })
-            else:
-                label_type[label].append(data_type)
-        
-        for k, v in label_type.items():
-            if all_equal(v):
-                data_type = v[0]
-            else:
-                if "REAL" in v:
-                    data_type = "REAL"
+        else:
+            for metric in metrics:
+                value_type = check_value_type(source, metric['MetricValue'])
+                table_name = metric['MetricId']
+
+                column_names = ['Timestamp', 'NodeID', 'Source', 'FQDD', 'Value']
+                column_types = ['TIMESTAMPTZ NOT NULL', 'INT NOT NULL', 'TEXT', 'TEXT', value_type]
+
+                if table_name not in table_schemas:
+                    table_schemas.update({
+                        table_name: {
+                            'column_names': column_names,
+                            'column_types': column_types
+                        }
+                    })
                 else:
-                    data_type = "VARCHAR(30)"
-            metrics_feature['Labels'].append(k)
-            metrics_feature['Types'].append(data_type)
+                    # Double check its data type
+                    if table_schemas[table_name]['column_types'] == "INT" and value_type == "REAL":
+                        table_schemas[table_name]['column_types'] = "REAL"
 
     except Exception as err:
         logging.error(f'parse_sample_metrics: {err}')
-    return metrics_feature
+    return table_schemas
 
 
-def gen_source_labels_records(metrics_feature: dict) -> list:
-    # (metrics_feature['Source'], metrics_feature['Labels'])
-    records = []
-    for i, label in enumerate(metrics_feature['Labels']):
-        records.append((metrics_feature['Source'], label, metrics_feature['Types'][i]))
-    return records
-
-
-def gen_sql_statements(metrics_feature: dict) -> dict:
+def gen_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
     """
     Generate SQL statements which will be used to create table
     """
-    schema_name = metrics_feature["Source"]
-    table_names = metrics_feature["Labels"]
-    column_types = metrics_feature["Types"]
-    sql_collection = {}
+    sql_statements = {}
     try:
         schema_sql = f"CREATE SCHEMA IF NOT EXISTS {schema_name};"
-        tables_sql = []
-        for i, table in enumerate(table_names):
-            table_sql = f"CREATE TABLE IF NOT EXISTS {schema_name}.{table} (time TIMESTAMPTZ NOT NULL, node_id INT NOT NULL, value {column_types[i]}, FOREIGN KEY (node_id) REFERENCES nodes (node_id));"
-            tables_sql.append(table_sql)
-        sql_collection.update({
-            "schema_sql": schema_sql,
-            "tables_sql": tables_sql
+        sql_statements.update({
+            'schema_sql': schema_sql
         })
-        return sql_collection
+
+        tables_sql = []
+        for table, column in all_table_schemas.items():
+            column_names = column['column_names']
+            column_types = column['column_types']
+            
+            column_str = ''
+            for i, column in enumerate(column_names):
+                column_str += f'{column} {column_types[i]}, '
+
+            table_sql = f"CREATE TABLE IF NOT EXISTS {schema_name}.{table} ({column_str}FOREIGN KEY (NodeID) REFERENCES nodes (NodeID));"
+            tables_sql.append(table_sql)
+
+        sql_statements.update({
+            'tables_sql': tables_sql
+        })
+
+        return sql_statements
+
     except Exception as err:
         logging.error(f'gen_sql_statements: {err}')
-
-
-def all_equal(iterable):
-    """
-    Ref: https://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
-    """
-    g = groupby(iterable)
-    return next(g, True) and not next(g, False)
 
 
 def check_value_type(source: str, value: str) -> str:
     if ":" in value:
     # Which indicates the value is a time string
-        return "VARCHAR(30)"
+        return "TEXT"
     if source == "NICStatistics":
     # Some metrics value from NICStatistics a large integer
         int_type = "BIGINT"
@@ -254,7 +254,7 @@ def check_value_type(source: str, value: str) -> str:
             return int_type
         except ValueError:
             # otherwise, it is a string
-            return "VARCHAR(30)"
+            return "TEXT"
 
 
 if __name__ == '__main__':

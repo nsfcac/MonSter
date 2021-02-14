@@ -1,0 +1,1234 @@
+{
+    "SystemHeadRoomInstantaneous": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SystemInputPower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SystemOutputPower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SystemPowerConsumption": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "TotalCPUPower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "TotalFanPower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "TotalMemoryPower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "TotalPciePower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "TotalStoragePower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "TotalFPGAPower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "CPUC0ResidencyHigh": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "CPUC0ResidencyLow": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "CUPSIIOBandwidthDMI": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "CUPSIIOBandwidthPort0": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "CUPSIIOBandwidthPort1": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "CUPSIIOBandwidthPort2": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "CUPSIIOBandwidthPort3": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "NonC0ResidencyHigh": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "NonC0ResidencyLow": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SystemAvgInletTempHour": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SystemMaxInletTempHour": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SystemMaxPowerConsumption": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "CPUUsage": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "IOUsage": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "MemoryUsage": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "AggregateUsage": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "RPMReading": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "TemperatureReading": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "DiscardedPkts": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "LinkStatus": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "TEXT"
+        ]
+    },
+    "OSDriverState": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "TEXT"
+        ]
+    },
+    "RDMARxTotalBytes": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RDMARxTotalPackets": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RDMATxTotalBytes": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RDMATxTotalPackets": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxBroadcast": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxBytes": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxErrorPktAlignmentErrors": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxErrorPktFCSErrors": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxFalseCarrierDetection": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxJabberPkt": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxMutlicast": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxPauseXOFFFrames": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxPauseXONFrames": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxRuntPkt": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "RxUnicast": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "TxBroadcast": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "TxBytes": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "TxErrorPktExcessiveCollision": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "TxErrorPktLateCollision": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "TxErrorPktMultipleCollision": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "TxErrorPktSingleCollision": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "TxMutlicast": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "TxPauseXOFFFrames": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "TxPauseXONFrames": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "TxUnicast": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "BIGINT"
+        ]
+    },
+    "ComputePower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "ITUE": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "PSUEfficiency": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "PowerToCoolRatio": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SysAirFlowEfficiency": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SysAirflowPerFanPower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SysAirflowPerSysInputPower": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SysAirflowUtilization": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SysNetAirflow": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "SysRackTempDelta": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "TotalPSUHeatDissipation": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "LastMinutePowerStatistics": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "AvgPower",
+            "MinPower",
+            "MinPowerTime",
+            "MaxPower",
+            "MaxPowerTime"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT",
+            "INT",
+            "TIMESTAMPTZ",
+            "INT",
+            "TIMESTAMPTZ"
+        ]
+    },
+    "LastHourPowerStatistics": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "AvgPower",
+            "MinPower",
+            "MinPowerTime",
+            "MaxPower",
+            "MaxPowerTime"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT",
+            "INT",
+            "TIMESTAMPTZ",
+            "INT",
+            "TIMESTAMPTZ"
+        ]
+    },
+    "LastDayPowerStatistics": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "AvgPower",
+            "MinPower",
+            "MinPowerTime",
+            "MaxPower",
+            "MaxPowerTime"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT",
+            "INT",
+            "TIMESTAMPTZ",
+            "INT",
+            "TIMESTAMPTZ"
+        ]
+    },
+    "LastWeekPowerStatistics": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "AvgPower",
+            "MinPower",
+            "MinPowerTime",
+            "MaxPower",
+            "MaxPowerTime"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT",
+            "INT",
+            "TIMESTAMPTZ",
+            "INT",
+            "TIMESTAMPTZ"
+        ]
+    },
+    "AmpsReading": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "REAL"
+        ]
+    },
+    "CPUUsagePctReading": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "VoltageReading": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    },
+    "WattsReading": {
+        "column_names": [
+            "Timestamp",
+            "NodeID",
+            "Source",
+            "FQDD",
+            "Value"
+        ],
+        "column_types": [
+            "TIMESTAMPTZ NOT NULL",
+            "INT NOT NULL",
+            "TEXT",
+            "TEXT",
+            "INT"
+        ]
+    }
+}
