@@ -8,10 +8,22 @@
     CREATE EXTENSION IF NOT EXISTS timescaledb;
     Postgres role: monster, password: redraider
 
+    # show all schemas and tables
     select table_schema, table_name from information_schema.tables
     where table_schema not in ('information_schema', 'pg_catalog', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', '_timescaledb_cache') and
     table_type = 'BASE TABLE';
 
+    # show all schemas
+    select s.nspname as table_schema,
+       s.oid as schema_id,  
+       u.usename as owner
+    from pg_catalog.pg_namespace s
+    join pg_catalog.pg_user u on u.usesysid = s.nspowner
+    order by table_schema;
+
+    # Drop all tables
+    DROP SCHEMA sensor cascade;
+    DROP SCHEMA aggregationmetrics, cpumemmetrics, cpusensor, fansensor, memorysensor, nicsensor, nicstatistics, powermetrics, powerstatistics, systemusage, thermalmetrics, thermalsensor CASCADE;
 Jie Li (jie.li@ttu.edu)
 """
 
@@ -190,7 +202,6 @@ def gen_source_labels_records(metrics_feature: dict) -> list:
     for i, label in enumerate(metrics_feature['Labels']):
         records.append((metrics_feature['Source'], label, metrics_feature['Types'][i]))
     return records
-
 
 
 def gen_sql_statements(metrics_feature: dict) -> dict:
