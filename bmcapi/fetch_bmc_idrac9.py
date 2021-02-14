@@ -2,16 +2,22 @@
 
 """
     This module uses Redfish API to get iDRAC9 sensor data.
+    To use postman:
+    ssh -D 5001 monster@hugo.hpcc.ttu.edu
+    hpts -s 127.0.0.1:5001 -p 1090
 
+    curl -s -k -u password -X GET https://10.101.23.1/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport
 Jie Li (jie.li@ttu.edu)
 """
 import sys
 import csv
 import json
+from pprint import pprint
 import logging
 import getpass
 import requests
 import psycopg2
+import sseclient
 
 sys.path.append('../')
 
@@ -69,7 +75,22 @@ def stream_data(config: dict, ip: str,
     Stream telemetry data
     """
     url = f"https://{ip}/redfish/v1/SSE?$filter=EventFormatType eq MetricReport"
+    # url = f"https://{ip}/redfish/v1/SSE?$filter=MetricReportDefinition eq '/redfish/v1/TelemetryService/MetricReportDefinitions/AggregationMetrics'"
     try:
+        # messages = sseclient.SSEClient(
+        #     url,
+        #     # stream = True,
+        #     auth=(user, password),
+        #     verify = config['bmc']['ssl_verify']
+        # )
+        # aggregated_data = ''
+        # output = ''
+        # with open('./sse.txt','a') as f:
+        #     for msg in messages:
+        #         data = msg.data
+        #         f.write(data)
+        #         f.write('\n')
+
         response = requests.get(
             url,
             stream = True,
@@ -80,23 +101,26 @@ def stream_data(config: dict, ip: str,
         for line in response.iter_lines():
             if line:
                 decoded_line = line.decode('utf-8')
-                if '{' in decoded_line:
-                    decoded_line = decoded_line.strip('data: ')
-                    metrics = json.loads(decoded_line)
+                if "AggregationMetrics" in decoded_line:
+                    print("In...")
+                # if '{' in decoded_line:
+                #     decoded_line = decoded_line.strip('data: ')
+                #     metrics = json.loads(decoded_line)
+                #     # print(json.dumps(metrics, indent=4))
 
-                    sequence = metrics['ReportSequence']
-                    counts = metrics['MetricValues@odata.count']
-                    values = metrics['MetricValues']
+                #     sequence = metrics['ReportSequence']
+                #     counts = metrics['MetricValues@odata.count']
+                #     values = metrics['MetricValues']
 
-                    # Process metric values
-                    records_raw = process_metrics(values)
+                #     # Process metric values
+                #     records_raw = process_metrics(values)
 
-                    # Dump metrics
-                    dump_metrics(ip, records_raw, 
-                                 label_source_mapping, 
-                                 ip_id_mapping, 
-                                 label_type_mapping, 
-                                 conn)
+                #     # Dump metrics
+                #     dump_metrics(ip, records_raw, 
+                #                  label_source_mapping, 
+                #                  ip_id_mapping, 
+                #                  label_type_mapping, 
+                #                  conn)
 
     except Exception as err:
         logging.error(f"Fail to stream telemetry data: {err}")
@@ -113,6 +137,9 @@ def process_metrics(values: dict) -> None:
             time = value['Timestamp']
             table_name = value['Oem']['Dell']['Label'].replace(' ', '_').replace('.', '_').replace('-', '_')
             value = value['MetricValue']
+
+            # if table_name == "AggregationMetrics_SystemMaxPowerConsumption":
+            #     print("We Got It!!!")
 
             if table_name not in records_raw:
                 records_raw.update({
@@ -148,7 +175,7 @@ def dump_metrics(ip: str,
             table = k.lower()
             dtype = label_type_mapping[k]
             target_table = f"{schema}.{table}"
-            # print(target_table)
+            print(target_table)
 
             cols = ('time', 'node_id', 'value')
             for i, t in enumerate(v['time']):
