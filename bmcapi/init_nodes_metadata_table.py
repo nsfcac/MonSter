@@ -55,13 +55,13 @@ def create_db_table(system_info: list, conn: object, table_name: str) -> None:
         elif column == "TotalSystemMemoryGiB":
             column_type = "REAL"
         else:
-            column_type = "VARCHAR(64)"
+            column_type = "TEXT"
         column_types.append(column_type)
 
     for i, column in enumerate(column_names):
         column_str += column + " " + column_types[i] + ", "
     column_str = column_str[:-2]
-    sql_statements = f" CREATE TABLE IF NOT EXISTS {table_name} ( node_id SERIAL PRIMARY KEY, {column_str}, UNIQUE (node_id));"
+    sql_statements = f" CREATE TABLE IF NOT EXISTS {table_name} ( NodeID SERIAL PRIMARY KEY, {column_str}, UNIQUE (NodeID));"
 
     # Write to Postgres
     cur = conn.cursor()
