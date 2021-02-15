@@ -5,6 +5,9 @@
     To use postman:
     ssh -D 5001 monster@hugo.hpcc.ttu.edu
     hpts -s 127.0.0.1:5001 -p 1090
+    
+    To set ssh tunnelling
+    ssh -ND 1080 monster@hugo.hpcc.ttu.edu
 
     curl -s -k -u password -X GET https://10.101.23.1/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport
 Jie Li (jie.li@ttu.edu)

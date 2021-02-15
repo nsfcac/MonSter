@@ -3,27 +3,14 @@
     tables for telemetry reports.
     Before running this module, make sure that the database has been created and
     extended the database with TimescaleDB as supersuer:
+    
     psql -U postgres
     CREATE DATABASE demo WITH OWNER monster
     CREATE EXTENSION IF NOT EXISTS timescaledb;
     Postgres role: monster, password: redraider
 
-    # show all schemas and tables
-    select table_schema, table_name from information_schema.tables
-    where table_schema not in ('information_schema', 'pg_catalog', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', '_timescaledb_cache') and
-    table_type = 'BASE TABLE';
-
-    # show all schemas
-    select s.nspname as table_schema,
-       s.oid as schema_id,  
-       u.usename as owner
-    from pg_catalog.pg_namespace s
-    join pg_catalog.pg_user u on u.usesysid = s.nspowner
-    order by table_schema;
-
     # Drop all tables
-    DROP SCHEMA sensor cascade;
-    DROP SCHEMA aggregationmetrics, cpumemmetrics, cpusensor, fansensor, memorysensor, nicsensor, nicstatistics, powermetrics, powerstatistics, systemusage, thermalmetrics, thermalsensor CASCADE;
+    DROP SCHEMA idrac9 cascade;
 Jie Li (jie.li@ttu.edu)
 """
 
@@ -100,14 +87,7 @@ def main():
         cur = conn.cursor()
         all_sql_statements = []
 
-        # Create a table recording the relationship between source and labels
-        source_labels_sql = "CREATE TABLE IF NOT EXISTS source_label ( Source TEXT NOT NULL, Label TEXT, Type TEXT);"
-        cur.execute(source_labels_sql)
-
-        all_source_labels_records = []
-        cols = ('source', 'label', 'type')
-
-        # Get features and generate tables
+        # Get metrics features
         all_table_schemas = {}
         for i, sample_metrics in enumerate(all_sample_metrics):
             table_schemas = parse_sample_metrics(member_urls[i], sample_metrics)
@@ -123,7 +103,7 @@ def main():
         sql_statements = gen_sql_statements(all_table_schemas, schema_name)
         cur.execute(sql_statements['schema_sql'])
 
-        # Create tables in schema
+        # Create tables
         for sql in sql_statements['tables_sql']:
             table_name = sql.split(' ')[5]
             print(f" |--> Create table {table_name}...")
@@ -132,6 +112,16 @@ def main():
             # Generate hypertable
             gene_hypertable_sql = "SELECT create_hypertable(" + "'" + table_name + "', 'timestamp', if_not_exists => TRUE);"
             cur.execute(gene_hypertable_sql)
+        
+        # Create a table recording the relationship between table and data type
+        tables_dtype_sql = f"CREATE TABLE IF NOT EXISTS tables_dtype (table_name TEXT NOT NULL, data_type TEXT);"
+        cur.execute(tables_dtype_sql)
+
+        cols = ('table_name', 'data_type')
+        all_tables_dtype = [(k, v) for k, v in sql_statements['tables_type'].items()]
+
+        mgr = CopyManager(conn, 'tables_dtype', cols)
+        mgr.copy(all_tables_dtype)
 
         conn.commit()
         cur.close()
@@ -194,8 +184,8 @@ def parse_sample_metrics(member_url: str, metrics: list) -> dict:
                     })
                 else:
                     # Double check its data type
-                    if table_schemas[table_name]['column_types'] == "INT" and value_type == "REAL":
-                        table_schemas[table_name]['column_types'] = "REAL"
+                    if table_schemas[table_name]['column_types'][-1] == "INT" and value_type == "REAL":
+                        table_schemas[table_name]['column_types'][-1] = "REAL"
 
     except Exception as err:
         logging.error(f'parse_sample_metrics: {err}')
@@ -214,6 +204,7 @@ def gen_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
         })
 
         tables_sql = []
+        tables_type = {}
         for table, column in all_table_schemas.items():
             column_names = column['column_names']
             column_types = column['column_types']
@@ -225,8 +216,15 @@ def gen_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
             table_sql = f"CREATE TABLE IF NOT EXISTS {schema_name}.{table} ({column_str}FOREIGN KEY (NodeID) REFERENCES nodes (NodeID));"
             tables_sql.append(table_sql)
 
+            # Table data type, not include PowerStatistics
+            if 'PowerStatistics' not in table:
+                tables_type.update({
+                    table: column_types[-1]
+                })
+
         sql_statements.update({
-            'tables_sql': tables_sql
+            'tables_sql': tables_sql,
+            'tables_type': tables_type
         })
 
         return sql_statements
