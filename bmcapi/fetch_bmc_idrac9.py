@@ -5,7 +5,7 @@
     To use postman:
     ssh -D 5001 monster@hugo.hpcc.ttu.edu
     hpts -s 127.0.0.1:5001 -p 1090
-    
+
     To set ssh tunnelling
     ssh -ND 1080 monster@hugo.hpcc.ttu.edu
 
@@ -56,44 +56,28 @@ def main():
     user, password = get_user_input()
 
     with psycopg2.connect(connection) as conn:
-        label_source_mapping = gene_source_label_mapping(conn)
-        label_type_mapping = gene_label_type_mapping(conn)
+        table_dtype_mapping = gene_table_dtype_mapping(conn)
         ip_id_mapping = gene_ip_id_mapping(conn)
+
         # Stream data and write json data into a file
         stream_data(config, nodes[0], 
                     user, password, 
-                    label_source_mapping, 
+                    table_dtype_mapping, 
                     ip_id_mapping,
-                    label_type_mapping,
                     conn)
 
 
 def stream_data(config: dict, ip: str, 
                 user: str, password: str, 
-                label_source_mapping: dict,
+                table_dtype_mapping: dict,
                 ip_id_mapping: dict,
-                label_type_mapping: dict,
                 conn: object) -> list:
     """
     Stream telemetry data
+    https://{ip}/redfish/v1/SSE?$filter=MetricReportDefinition eq '/redfish/v1/TelemetryService/MetricReportDefinitions/AggregationMetrics'
     """
     url = f"https://{ip}/redfish/v1/SSE?$filter=EventFormatType eq MetricReport"
-    # url = f"https://{ip}/redfish/v1/SSE?$filter=MetricReportDefinition eq '/redfish/v1/TelemetryService/MetricReportDefinitions/AggregationMetrics'"
     try:
-        # messages = sseclient.SSEClient(
-        #     url,
-        #     # stream = True,
-        #     auth=(user, password),
-        #     verify = config['bmc']['ssl_verify']
-        # )
-        # aggregated_data = ''
-        # output = ''
-        # with open('./sse.txt','a') as f:
-        #     for msg in messages:
-        #         data = msg.data
-        #         f.write(data)
-        #         f.write('\n')
-
         response = requests.get(
             url,
             stream = True,
@@ -104,123 +88,116 @@ def stream_data(config: dict, ip: str,
         for line in response.iter_lines():
             if line:
                 decoded_line = line.decode('utf-8')
-                if "AggregationMetrics" in decoded_line:
-                    print("In...")
-                # if '{' in decoded_line:
-                #     decoded_line = decoded_line.strip('data: ')
-                #     metrics = json.loads(decoded_line)
-                #     # print(json.dumps(metrics, indent=4))
+                if '{' in decoded_line:
+                    decoded_line = decoded_line.strip('data: ')
+                    metrics = json.loads(decoded_line)
+                    # print(json.dumps(metrics, indent=4))
 
-                #     sequence = metrics['ReportSequence']
-                #     counts = metrics['MetricValues@odata.count']
-                #     values = metrics['MetricValues']
+                    report = metrics['Id']
+                    metrics = metrics['MetricValues']
+                    # sequence = metrics['ReportSequence']
 
-                #     # Process metric values
-                #     records_raw = process_metrics(values)
+                    # Process metric values
+                    processed_metrics = process_metrics(report, metrics)
 
-                #     # Dump metrics
-                #     dump_metrics(ip, records_raw, 
-                #                  label_source_mapping, 
-                #                  ip_id_mapping, 
-                #                  label_type_mapping, 
-                #                  conn)
+                    # Dump metrics
+                    dump_metrics(ip, processed_metrics, 
+                                 table_dtype_mapping, 
+                                 ip_id_mapping, 
+                                 conn)
 
     except Exception as err:
         logging.error(f"Fail to stream telemetry data: {err}")
 
 
-def process_metrics(values: dict) -> None:
+def process_metrics(report: str, metrics: list) -> None:
     """
     Process data in the MetricValues, generate raw records
     """
-    records_raw = {}
+    processed_metrics = {}
     try:
-        for value in values:
-            record = []
-            time = value['Timestamp']
-            table_name = value['Oem']['Dell']['Label'].replace(' ', '_').replace('.', '_').replace('-', '_')
-            value = value['MetricValue']
+        if report == "PowerStatistics":
+            # PowerStatistics is better to be pulled
+            pass
+        else:
+            for metric in metrics:
+                table_name = metric['MetricId']
+                time = metric['Timestamp']
+                source = metric['Oem']['Dell']['Source']
+                fqdd = metric['Oem']['Dell']['FQDD']
+                value = metric['MetricValue']
 
-            # if table_name == "AggregationMetrics_SystemMaxPowerConsumption":
-            #     print("We Got It!!!")
+                record = {
+                    'Timestamp': time,
+                    'Source': source,
+                    'FQDD': fqdd,
+                    'Value': value
+                }
 
-            if table_name not in records_raw:
-                records_raw.update({
-                    table_name: {
-                        "time": [time],
-                        "value": [value]
-                    }
-                })
-            else:
-                records_raw[table_name]['time'].append(time)
-                records_raw[table_name]['value'].append(value)
+                if table_name not in processed_metrics:
+                    processed_metrics.update({
+                        table_name: [record]
+                    })
+                else:
+                    processed_metrics[table_name].append(record)
     
     except Exception as err:
             logging.error(f"Fail to process metric values: {err}")
     
-    return records_raw
+    return processed_metrics
 
 
 def dump_metrics(ip: str, 
-                 records_raw: dict,
-                 label_source_mapping: dict, 
+                 processed_metrics: dict,
+                 table_dtype_mapping: dict, 
                  ip_id_mapping: dict,
-                 label_type_mapping: dict,
                  conn: object, ) -> None:
     """
     Dump metrics into TimescaleDB
     """
     try:
-        node_id = ip_id_mapping[ip]
-        for k, v in records_raw.items():
-            records = []
-            schema = label_source_mapping[k].lower()
-            table = k.lower()
-            dtype = label_type_mapping[k]
-            target_table = f"{schema}.{table}"
+        schema_name = 'idrac9'
+        nodeid = ip_id_mapping[ip]
+
+        # print(json.dumps(processed_metrics, indent=4))
+
+        for table_name, table_metrics in processed_metrics.items():
+            all_records = []
+            dtype = table_dtype_mapping[table_name]
+
+            table_name = table_name.lower()
+            target_table = f"{schema_name}.{table_name}"
+
             print(target_table)
 
-            cols = ('time', 'node_id', 'value')
-            for i, t in enumerate(v['time']):
-                t = parse_time(t)
-                value = cast_value_type(v['value'][i], dtype)
-                record = (t, node_id, value)
-                records.append(record)
+            cols = ('timestamp', 'nodeid', 'source', 'fqdd', 'value')
+            for metric in table_metrics:
+                timestamp = parse_time(metric['Timestamp'])
+                source = metric['Source']
+                fqdd = metric['FQDD']
+                value = cast_value_type(metric['Value'], dtype)
+
+                all_records.append((timestamp, nodeid, source, fqdd, value))
 
             mgr = CopyManager(conn, target_table, cols)
-            mgr.copy(records)
+            mgr.copy(all_records)
         conn.commit()
+
     except Exception as err:
-        logging.error(f"Fail to dump metrics: {target_table} : {err}")
+        logging.error(f"Fail to dump metrics : {err}")
 
 
-def gene_source_label_mapping(conn: object) -> dict:
+def gene_table_dtype_mapping(conn: object) -> dict:
     """
-    Generate sources-labels mapping dict
-    """
-    mapping = {}
-    cur = conn.cursor()
-    query = "SELECT source, label FROM source_label"
-    cur.execute(query)
-    for (source, label) in cur.fetchall():
-        mapping.update({
-            label: source
-        })
-    cur.close()
-    return mapping
-
-
-def gene_label_type_mapping(conn: object) -> dict:
-    """
-    Generate label_type mapping dict
+    Generate table_dtype mapping dict
     """
     mapping = {}
     cur = conn.cursor()
-    query = "SELECT label, type FROM source_label"
+    query = "SELECT table_name, data_type FROM tables_dtype;"
     cur.execute(query)
-    for (label, dtype) in cur.fetchall():
+    for (table_name, data_type) in cur.fetchall():
         mapping.update({
-            label: dtype
+            table_name: data_type
         })
     cur.close()
     return mapping
@@ -232,11 +209,11 @@ def gene_ip_id_mapping(conn: object) -> dict:
     """
     mapping = {}
     cur = conn.cursor()
-    query = "SELECT node_id, bmc_ip_addr FROM nodes"
+    query = "SELECT nodeid, bmc_ip_addr FROM nodes"
     cur.execute(query)
-    for (node_id, bmc_ip_addr) in cur.fetchall():
+    for (nodeid, bmc_ip_addr) in cur.fetchall():
         mapping.update({
-            bmc_ip_addr: node_id
+            bmc_ip_addr: nodeid
         })
     cur.close()
     return mapping
