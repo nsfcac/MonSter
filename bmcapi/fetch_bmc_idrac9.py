@@ -6,7 +6,7 @@
     ssh -D 5001 monster@hugo.hpcc.ttu.edu
     hpts -s 127.0.0.1:5001 -p 1090
 
-    To set ssh tunnelling
+    To set ssh tunnelling for reading iDRAC metrics via local browser:
     ssh -ND 1080 monster@hugo.hpcc.ttu.edu
 
     curl -s -k -u password -X GET https://10.101.23.1/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport
@@ -18,9 +18,10 @@ import json
 from pprint import pprint
 import logging
 import getpass
+import asyncio
+import aiohttp
 import requests
 import psycopg2
-import sseclient
 
 sys.path.append('../')
 
@@ -53,18 +54,59 @@ def main():
     nodes = parse_nodelist(config['bmc']['iDRAC9_nodelist'])
     
     # Print logo and user interface
-    user, password = get_user_input()
+    # user, password = get_user_input()
+    user = 'password'
+    password = 'monster'
 
+    loop = asyncio.get_event_loop()
+    asyncio.ensure_future(collect_data(config, nodes, user, password, connection))
+    loop.run_forever()
+
+
+async def collect_data(config: dict, nodes: list, 
+                       user: str, password: str, connection: str) -> None:
+    tasks = []
     with psycopg2.connect(connection) as conn:
         table_dtype_mapping = gene_table_dtype_mapping(conn)
         ip_id_mapping = gene_ip_id_mapping(conn)
 
-        # Stream data and write json data into a file
-        stream_data(config, nodes[0], 
-                    user, password, 
-                    table_dtype_mapping, 
-                    ip_id_mapping,
-                    conn)
+        for node in nodes:
+            tasks.append(asyncio_stream_data(config, node, user, password, table_dtype_mapping, ip_id_mapping, conn))
+        
+        await asyncio.gather(*tasks)
+
+
+async def asyncio_stream_data(config: dict, ip: str, 
+                user: str, password: str, 
+                table_dtype_mapping: dict,
+                ip_id_mapping: dict,
+                conn: object) -> list:
+    url = f"https://{ip}/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport"
+    try:
+        async with aiohttp.ClientSession(connector = aiohttp.TCPConnector(verify_ssl=False), auth=aiohttp.BasicAuth(user, password)) as session:
+            async with session.get(url) as resp:
+                async for line in resp.content:
+                    if line:
+                        decoded_line = line.decode('utf-8')
+                        if '{' in decoded_line:
+                            decoded_line = decoded_line.strip('data: ')
+                            metrics = json.loads(decoded_line)
+
+                            report = metrics['Id']
+                            metrics = metrics['MetricValues']
+
+                            # Process metric values
+                            processed_metrics = process_metrics(report, metrics)
+                            
+                            # print(ip)
+                            # Dump metrics
+                            dump_metrics(ip, processed_metrics, 
+                                        table_dtype_mapping, 
+                                        ip_id_mapping, 
+                                        conn)
+
+    except Exception as err:
+        logging.error(f"Fail to asyncio stream telemetry data: {err}")
 
 
 def stream_data(config: dict, ip: str, 
@@ -84,7 +126,6 @@ def stream_data(config: dict, ip: str,
             auth=(user, password),
             verify = config['bmc']['ssl_verify']
         )
-        
         for line in response.iter_lines():
             if line:
                 decoded_line = line.decode('utf-8')
@@ -100,11 +141,12 @@ def stream_data(config: dict, ip: str,
                     # Process metric values
                     processed_metrics = process_metrics(report, metrics)
 
-                    # Dump metrics
-                    dump_metrics(ip, processed_metrics, 
-                                 table_dtype_mapping, 
-                                 ip_id_mapping, 
-                                 conn)
+                    print(json.dumps(processed_metrics, indent=4))
+                    # # Dump metrics
+                    # dump_metrics(ip, processed_metrics, 
+                    #             table_dtype_mapping, 
+                    #             ip_id_mapping, 
+                    #             conn)
 
     except Exception as err:
         logging.error(f"Fail to stream telemetry data: {err}")
@@ -168,7 +210,7 @@ def dump_metrics(ip: str,
             table_name = table_name.lower()
             target_table = f"{schema_name}.{table_name}"
 
-            print(target_table)
+            # print(target_table)
 
             cols = ('timestamp', 'nodeid', 'source', 'fqdd', 'value')
             for metric in table_metrics:
