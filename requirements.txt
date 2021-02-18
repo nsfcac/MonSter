@@ -13,4 +13,4 @@ pgcopy
 pandas
 tqdm
 http_parser
-sseclient
+async_retrying

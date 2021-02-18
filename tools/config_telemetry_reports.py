@@ -11,6 +11,7 @@ Jie Li (jie.li@ttu.edu)
 """
 import sys
 import json
+import time
 import getopt
 import shutil
 import logging
@@ -45,14 +46,22 @@ def main():
     argv = sys.argv[1:]
 
     enable_only = False
+    disable_only = False
     try:
-        opts, args = getopt.getopt(argv, "e")
+        opts, args = getopt.getopt(argv, "de", ["disable", "enable"])
     except:
+        print("Error")
         return
     
     for opt, arg in opts:
-        if opt in ['-e', '--enable']:
+        if opt in ['-d', '--disable']:
+            disable_only = True
+            break
+        elif opt in ['-e', '--enable']:
             enable_only = True
+            break
+        else:
+            break
 
     # Read configuratin file
     config = parse_config('../config.yml')
@@ -61,6 +70,7 @@ def main():
     print_logo()
     user, password = get_user_input()
 
+    loop = asyncio.get_event_loop()
     # We randomly select 3 nodes to get the metric report configurations
     nodelist = parse_nodelist(config['bmc']['iDRAC9_nodelist'])
     nodes = secrets.SystemRandom().sample(nodelist, 3)
@@ -76,28 +86,26 @@ def main():
     # print(json.dumps(attributes, indent=4))
     # return
     
-    # Enable all metirc reports
-    enabled_attributes = enable_all_attributes(attributes)
-    # print(json.dumps(enabled_attributes, indent=4))
-
-    print("--> Enable all telemetry reports...")
-    # Enable all telemetry reports asynchronously
-    loop = asyncio.get_event_loop()
-    status = loop.run_until_complete(set_telemetry_reports(config, nodelist, 
-                                                           user, password, 
-                                                           enabled_attributes))
-
-    if enable_only:
-        fail_nodes = status_report(status, nodelist, enabled_attributes)
-        if fail_nodes:
-            print("--> Retry on failed nodes...")
-            status = loop.run_until_complete(set_telemetry_reports(config, fail_nodes, 
-                                                            user, password, 
-                                                            enabled_attributes))
-
-            fail_nodes_last = status_report(status, fail_nodes, enabled_attributes)
+    if disable_only or enable_only:
+        if disable_only:
+            setting = "Disabled"
+        if enable_only:
+            setting = "Enabled"
+        print(f"--> {setting} all telemetry reports...")
+        attributes_settings = set_all_attributes(attributes, setting)
+        # print(json.dumps(attributes_settings, indent=4))
+        set_all_telemetry_reports(config, nodelist, user, password, attributes_settings, loop)
+        
         loop.close()
         return
+
+    # Enable all telemetry reports
+    attributes_settings = set_all_attributes(attributes, "Enabled")
+    print(f"--> Enabled all telemetry reports...")
+    set_all_telemetry_reports(config, nodelist, user, password, attributes_settings, loop)
+
+    print(f"--> Wait for 5 seconds for the telemetry reports to be effective...")
+    time.sleep(5)
 
     # We still test the telemetry report with 3 nodes, and if we encounter 3 
     # consecutive empty reports, we consider the telemetry report invalid
@@ -116,31 +124,12 @@ def main():
                     valid_reports.append(url.split('/')[-1])
                     break
     
-    # print(valid_reports)
-
     attributes_settings = update_attributes(attributes, valid_reports)
 
     # print(json.dumps(attributes_settings, indent=4))
-
     print("--> Set valid telemetry reports...")
-    # Update all telemetry reports asynchronously
-    status = loop.run_until_complete(set_telemetry_reports(config, nodelist, 
-                                                           user, password, 
-                                                           attributes_settings))
-    # loop.close()
-
-    # Report status
-    fail_nodes = status_report(status, nodelist, attributes_settings)
-    if fail_nodes:
-        print("--> Retry on failed nodes...")
-        # Update all telemetry reports asynchronously
-        status = loop.run_until_complete(set_telemetry_reports(config, fail_nodes, 
-                                                            user, password, 
-                                                            attributes_settings))
-        # Report status
-        fail_nodes_last = status_report(status, fail_nodes, attributes_settings)
+    set_all_telemetry_reports(config, nodelist, user, password, attributes_settings, loop)
     loop.close()
-
 
 def get_attributes(config: dict, node: str, user: str, password: str) -> dict:
     """
@@ -166,7 +155,26 @@ def get_attributes(config: dict, node: str, user: str, password: str) -> dict:
     return attributes
 
 
-async def set_telemetry_reports(config: dict, nodes: list, 
+def set_all_telemetry_reports(config: dict, nodelist: list, 
+                              user: str, password: str,
+                              attributes_settings: dict, loop) -> None:
+
+    status = loop.run_until_complete(set_telemetry_reports(config, nodelist, 
+                                                           user, password, 
+                                                           attributes_settings))
+    fail_nodes = status_report(status, nodelist, attributes_settings)
+    max_retry = 0
+    while fail_nodes and max_retry<3:
+        print("--> Retry on failed nodes...")
+        status = loop.run_until_complete(set_telemetry_reports(config, fail_nodes, 
+                                                        user, password, 
+                                                        attributes_settings))
+
+        fail_nodes = status_report(status, fail_nodes, attributes_settings)
+        max_retry += 1
+
+
+async def set_telemetry_reports(config: dict, nodelist: list, 
                                 user: str, password: str,
                                 attributes_settings: dict) -> None:
     """
@@ -179,14 +187,14 @@ async def set_telemetry_reports(config: dict, nodes: list,
     async with ClientSession(connector=connector, 
                              auth=auth, timeout=timeout) as session:
         tasks = []
-        for node in nodes:
-            tasks.append(enable_reports(node, attributes_settings, session))
+        for node in nodelist:
+            tasks.append(set_reports(node, attributes_settings, session))
         response = [await f for f in tqdm(asyncio.as_completed(tasks), total=len(tasks))]
         # return await asyncio.gather(*tasks)
         return response
 
 
-async def enable_reports(node: str, attributes_settings: dict,
+async def set_reports(node: str, attributes_settings: dict,
                                  session: ClientSession) -> int:
     """
     Enable or disable telemetry reports
@@ -207,7 +215,7 @@ async def enable_reports(node: str, attributes_settings: dict,
         logging.error(f"Fail to update telemetry attributes on {node}: {err}")
 
 
-def enable_all_attributes(attributes: dict) -> dict:
+def set_all_attributes(attributes: dict, setting: str) -> dict:
     """
     Enable all attributes, return a configuration dict
     """
@@ -215,13 +223,13 @@ def enable_all_attributes(attributes: dict) -> dict:
     try:
         for k in attributes.keys():
             updated_attributes.update({
-                k: 'Enabled'
+                k: setting
             })
             updated_attributes.update({
-                "Telemetry.1.EnableTelemetry": "Enabled"
+                "Telemetry.1.EnableTelemetry": setting
             })
     except Exception as err:
-        logging.error(f"Fail to enable all attributes : {err}")
+        logging.error(f"Fail to {setting} all attributes : {err}")
     return updated_attributes
 
 
@@ -283,8 +291,10 @@ def status_report(status: list, nodes: list, attributes_settings: dict) -> list:
     print(f"--> {bcolors.BOLD}{len(disabled_list)}{bcolors.ENDC} reports are {bcolors.BOLD}DISABLED{bcolors.ENDC}: {bcolors.WARNING}{disabled_list}{bcolors.ENDC}")
 
     print(f"--> {bcolors.BOLD}{success_cnt}{bcolors.ENDC} out of {bcolors.BOLD}{total_cnt}{bcolors.ENDC} nodes have been configured the telemetry reports successfully!")
-    print(f"--> {bcolors.FAIL}FAILED{bcolors.ENDC} nodes are: {bcolors.FAIL}{fail_nodes}{bcolors.ENDC}")
-
+    if fail_nodes:
+        print(f"--> {bcolors.FAIL}FAILED{bcolors.ENDC} nodes are: {bcolors.FAIL}{fail_nodes}{bcolors.ENDC}")
+    else:
+        print(f"--> {bcolors.OKGREEN}All nodes{bcolors.ENDC} have been configured the telemetry reports successfully!")
     return fail_nodes
 
 
@@ -325,14 +335,20 @@ def check_metric_value(config: dict, member_url: str, node: str,
                 auth = (user, password),
                 verify = config['bmc']['ssl_verify'], 
             )
-            values = response.json().get('MetricValues@odata.count', 0)
+            metric_value = response.json().get('MetricValues', [])
 
-            # print(f"{member_url} : {values != 0}")
-            if values == 0 or values == 1:
+            if not metric_value:
                 return False
             else:
-                return True
-                
+                if len(metric_value) == 1:
+                    metric_value = metric_value[0].get('MetricValue', "")
+                    if metric_value:
+                        return True
+                    else:
+                        return False
+                else:
+                    return True
+
         except Exception as err:
             logging.error(f'check_metric_value: {err}')
             return False
