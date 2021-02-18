@@ -1,0 +1,972 @@
+{
+    "TotalPciePower": {
+        "MetricDataType": "Decimal",
+        "Description": "Overall PCIe power consumption",
+        "Units": "W"
+    },
+    "FCRxSequences": {
+        "MetricDataType": "Integer",
+        "Description": "This property represents the FC sequences received",
+        "Units": null
+    },
+    "BoardPowerSupplyStatus": {
+        "MetricDataType": "Enumeration",
+        "Description": "GPU board power supply status",
+        "Units": null
+    },
+    "VoltageReading": {
+        "MetricDataType": "Decimal",
+        "Description": "The reading of the Sensor",
+        "Units": "V"
+    },
+    "ComputePower": {
+        "MetricDataType": "Integer",
+        "Description": "Computer power that is not wasted",
+        "Units": "W"
+    },
+    "DataUnitsReadLower": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the lower part of the count of 512 byte data units the host has read from the controller. This value is reported in thousands and is rounded up",
+        "Units": "Blocks"
+    },
+    "TxPauseXONFrames": {
+        "MetricDataType": "Integer",
+        "Description": "Number of XON frames transmitted to the network",
+        "Units": "Pkt"
+    },
+    "SystemUsagePctReading": {
+        "MetricDataType": "Decimal",
+        "Description": "The reading of the Sensor",
+        "Units": "%"
+    },
+    "CUPSIIOBandwidthPort3": {
+        "MetricDataType": "Decimal",
+        "Description": "Utilization counter of the integrated IO Port on a per x16 port granularity",
+        "Units": "CUPS"
+    },
+    "TxErrorPktExcessiveCollision": {
+        "MetricDataType": "Integer",
+        "Description": "Number of times that 16 or more collisions occurred on a single transmit packet",
+        "Units": null
+    },
+    "TotalFanPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Overall Fan power consumption",
+        "Units": "W"
+    },
+    "AmpsReading": {
+        "MetricDataType": "Decimal",
+        "Description": "The reading of the Sensor",
+        "Units": "A"
+    },
+    "SystemOutputPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Current System Output Power",
+        "Units": "W"
+    },
+    "SystemPowerConsumption": {
+        "MetricDataType": "Decimal",
+        "Description": "Present reading in watts",
+        "Units": "W"
+    },
+    "TxErrorPktSingleCollision": {
+        "MetricDataType": "Integer",
+        "Description": "Number of times that a successfully transmitted packet encountered a single collision",
+        "Units": null
+    },
+    "DataUnitsWrittenLower": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the lower part of the count of 512 byte data units the host has written to the controller. This value is reported in thousands and is rounded up",
+        "Units": "Blocks"
+    },
+    "FCRxKBCount": {
+        "MetricDataType": "Integer",
+        "Description": "This property represents the total KBs received",
+        "Units": "KB"
+    },
+    "TemperatureReading": {
+        "MetricDataType": "Decimal",
+        "Description": "Temperature sensor reading in Celsius",
+        "Units": "Cel"
+    },
+    "SBECounterGRL1Cache": {
+        "MetricDataType": "Integer",
+        "Description": "Single-bit errors from  L1 cache in Graphic Device (GR) memory",
+        "Units": null
+    },
+    "ControllerBusyTimeLower": {
+        "MetricDataType": "Integer",
+        "Description": "Contains the lower part of the amount of time in minutes the controller is busy with I/O command",
+        "Units": "min"
+    },
+    "FCInvalidCRCs": {
+        "MetricDataType": "Integer",
+        "Description": "This property represents the count of invalid CRCs",
+        "Units": null
+    },
+    "FCOEPktRxCount": {
+        "MetricDataType": "Integer",
+        "Description": "Number of good (FCS valid) packets received with the partition active FCoE(Fiber Channel over Ethernet) MAC address",
+        "Units": "Pkt"
+    },
+    "DBECounterGRL1Cache": {
+        "MetricDataType": "Integer",
+        "Description": "Double-bit errors from  L1 cache in Graphic Device (GR) memory",
+        "Units": null
+    },
+    "FCTxSequences": {
+        "MetricDataType": "Integer",
+        "Description": "This property represents the FC sequences transmitted",
+        "Units": null
+    },
+    "TotalCPUPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Overall CPU power consumption",
+        "Units": "W"
+    },
+    "TxMutlicast": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of good multicast packets transmitted",
+        "Units": "Pkt"
+    },
+    "AggregateUsage": {
+        "MetricDataType": "Decimal",
+        "Description": "Aggregate Usage Percent",
+        "Units": "%"
+    },
+    "TxBytes": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of bytes transmitted, including host and remote management pass through traffic",
+        "Units": "By"
+    },
+    "UncorrectableLBACount": {
+        "MetricDataType": "Integer",
+        "Description": "Uncorrectable LBA(Logical block addressing) count",
+        "Units": null
+    },
+    "CurrentPendingSectorCount": {
+        "MetricDataType": "Integer",
+        "Description": "Current pending sector count",
+        "Units": null
+    },
+    "TxBroadcast": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of good broadcast packets transmitted",
+        "Units": "Pkt"
+    },
+    "UncorrectableErrorCount": {
+        "MetricDataType": "Integer",
+        "Description": "Uncorrectable error count",
+        "Units": null
+    },
+    "FCOEPktTxCount": {
+        "MetricDataType": "Integer",
+        "Description": "Number of good (FCS valid) packets transmitted that passed L2 filtering by a specific MAC address",
+        "Units": "Pkt"
+    },
+    "PartitionLinkStatus": {
+        "MetricDataType": "Enumeration",
+        "Description": "Indicates whether the partition link is up or down",
+        "Units": null
+    },
+    "FCCRCErrorCount": {
+        "MetricDataType": "Integer",
+        "Description": "Number of FC frames with CRC errors",
+        "Units": null
+    },
+    "FCTxTotalFrames": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the total FC frames transmitted",
+        "Units": "Pkt"
+    },
+    "TxPauseXOFFFrames": {
+        "MetricDataType": "Integer",
+        "Description": "Number of XOFF frames transmitted to the network",
+        "Units": "Pkt"
+    },
+    "DBECounterGRRF": {
+        "MetricDataType": "Integer",
+        "Description": "Double-bit errors from  SM register file (RF) in Graphic Device (GR) memory",
+        "Units": null
+    },
+    "UnsafeShutdownsLower": {
+        "MetricDataType": "Integer",
+        "Description": "Contains the upper part of the number of unsafe shutdowns.  This count is incremented when a shutdown notification (CC.SHN) is not received prior to loss of power",
+        "Units": null
+    },
+    "PartitionOSDriverState": {
+        "MetricDataType": "Enumeration",
+        "Description": "Indicates partitions operating system driver states",
+        "Units": null
+    },
+    "TotalStoragePower": {
+        "MetricDataType": "Decimal",
+        "Description": "Overall Storage power consumption",
+        "Units": "W"
+    },
+    "FCOELinkFailures": {
+        "MetricDataType": "Integer",
+        "Description": "Number of FCoE/FIP Login failures",
+        "Units": null
+    },
+    "AvailableSpare": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the remaining spare capacity available as a normalized percentage (0 to 100%)",
+        "Units": null
+    },
+    "TxErrorPktLateCollision": {
+        "MetricDataType": "Integer",
+        "Description": "Number of collisions that occurred after one slot time",
+        "Units": null
+    },
+    "SBECounterFBL2Cache": {
+        "MetricDataType": "Integer",
+        "Description": "No of Single-bit errors from L2 cache in Frame Buffer memory",
+        "Units": null
+    },
+    "DBECounterFBL2Cache": {
+        "MetricDataType": "Integer",
+        "Description": "Double-bit errors from  L2 cache  in Frame Buffer memory",
+        "Units": null
+    },
+    "SystemMaxPowerConsumption": {
+        "MetricDataType": "Decimal",
+        "Description": "Peak system power consumption",
+        "Units": "W"
+    },
+    "TxUnicast": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of good multicast packets transmitted",
+        "Units": "Pkt"
+    },
+    "GPUHealth": {
+        "MetricDataType": "Enumeration",
+        "Description": "GPU health status",
+        "Units": null
+    },
+    "WattsReading": {
+        "MetricDataType": "Decimal",
+        "Description": "The reading of the Sensor",
+        "Units": "W"
+    },
+    "PercentageUsed": {
+        "MetricDataType": "Decimal",
+        "Description": "Specifies a vendor specific estimate of the percentage of NVM(Non Volatile Memory) subsystem life used based on the actual usage and the manufacturer prediction of NVM life",
+        "Units": "%"
+    },
+    "DBERetiredPages": {
+        "MetricDataType": "Integer",
+        "Description": "Number of pages dynamically retired because of double-bit errors in Frame Buffer memory",
+        "Units": null
+    },
+    "ThermalAlertState": {
+        "MetricDataType": "Enumeration",
+        "Description": "Thermal alert state",
+        "Units": null
+    },
+    "DataUnitsReadUpper": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the upper part of the count of 512 byte data units the host has read from the controller. This value is reported in thousands and is rounded up",
+        "Units": "Blocks"
+    },
+    "GPUStatus": {
+        "MetricDataType": "Enumeration",
+        "Description": "GPU Availability Status",
+        "Units": null
+    },
+    "DriveTemperature": {
+        "MetricDataType": "Decimal",
+        "Description": "Drive temperature in celsius",
+        "Units": "Cel"
+    },
+    "EraseFailCount": {
+        "MetricDataType": "Integer",
+        "Description": "Erase fail count",
+        "Units": null
+    },
+    "PercentDriveLifeRemaining": {
+        "MetricDataType": "Decimal",
+        "Description": "Drive Life Remaining (DLR) in percentage ",
+        "Units": "%"
+    },
+    "ECCERate": {
+        "MetricDataType": "Decimal",
+        "Description": "Uncorrected read errors reported ",
+        "Units": null
+    },
+    "UnsafeShutdownsUpper": {
+        "MetricDataType": "Integer",
+        "Description": "Contains the lower part of the number of unsafe shutdowns.  This count is incremented when a shutdown notification (CC.SHN) is not received prior to loss of power",
+        "Units": null
+    },
+    "DBECounterFB": {
+        "MetricDataType": "Integer",
+        "Description": "Double-bit errors from  Frame Buffer in Frame Buffer memory",
+        "Units": null
+    },
+    "DataUnitsWrittenUpper": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the upper part of the count of 512 byte data units the host has written to the controller. This value is reported in thousands and is rounded up",
+        "Units": "Blocks"
+    },
+    "ExceptionModeStatus": {
+        "MetricDataType": "Integer",
+        "Description": "Exception mode status",
+        "Units": null
+    },
+    "TxErrorPktMultipleCollision": {
+        "MetricDataType": "Integer",
+        "Description": "Number of times that a transmitted packet encountered more than one collision but fewer than 16",
+        "Units": null
+    },
+    "BoardTemperature": {
+        "MetricDataType": "Decimal",
+        "Description": "Temperature (degrees C) on GPU board, if supported",
+        "Units": "Cel"
+    },
+    "FCLinkFailures": {
+        "MetricDataType": "Integer",
+        "Description": "This property represents the number of link failures",
+        "Units": null
+    },
+    "TotalPSUHeatDissipation": {
+        "MetricDataType": "Integer",
+        "Description": "Heat dissipated from the PSU as a result of its inefficiency",
+        "Units": "BTU"
+    },
+    "TotalMemoryPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Overall memory power consumption",
+        "Units": "W"
+    },
+    "TotalFPGAPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Overall FPGA power consumption",
+        "Units": "W"
+    },
+    "FCOERxPktDroppedCount": {
+        "MetricDataType": "Integer",
+        "Description": "Number of received packets with FCS errors",
+        "Units": null
+    },
+    "ControllerBusyTimeUpper": {
+        "MetricDataType": "Integer",
+        "Description": "Contains the upper part of the amount of time in minutes the controller is busy with I/O commands",
+        "Units": "min"
+    },
+    "PortSpeed": {
+        "MetricDataType": "Enumeration",
+        "Description": "Specifies the port speed",
+        "Units": null
+    },
+    "DBECounterGRTex": {
+        "MetricDataType": "Integer",
+        "Description": "Double-bit errors from  texure units (TEX) in Graphic Device (GR) memory",
+        "Units": null
+    },
+    "FCLossOfSignals": {
+        "MetricDataType": "Integer",
+        "Description": "This property represents the lost signals count",
+        "Units": null
+    },
+    "DiscardedPkts": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of discarded packets",
+        "Units": "Pkt"
+    },
+    "PortStatus": {
+        "MetricDataType": "Enumeration",
+        "Description": "FC port status",
+        "Units": null
+    },
+    "AvailableSpareThreshold": {
+        "MetricDataType": "Integer",
+        "Description": "The available spare value below which an asynchronous event completion may occur.  The value is indicated as a normalized percentage (0 to 100%)",
+        "Units": null
+    },
+    "HostReadCommandsLower": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the lower part of the number of read commands completed by the controller",
+        "Units": null
+    },
+    "PowerConsumption": {
+        "MetricDataType": "Decimal",
+        "Description": "Total GPU board power consumption in mWatts (100mW resolution)",
+        "Units": "mW"
+    },
+    "IOUsage": {
+        "MetricDataType": "Decimal",
+        "Description": "IO Usage Percent",
+        "Units": "%"
+    },
+    "HostReadCommandsUpper": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the lower part of the number of read commands completed by the controller",
+        "Units": null
+    },
+    "HostWriteCommandsLower": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the lower part of the number of write commands completed by the controller",
+        "Units": null
+    },
+    "PowerBrakeState": {
+        "MetricDataType": "Enumeration",
+        "Description": "Power brake state",
+        "Units": null
+    },
+    "HostWriteCommandsUpper": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the upper part of the number of write commands completed by the controller",
+        "Units": null
+    },
+    "PowerCycleCount": {
+        "MetricDataType": "Integer",
+        "Description": "This attribute indicates the count of full hard disk power on/off cycles. ",
+        "Units": null
+    },
+    "IOUsagePctReading": {
+        "MetricDataType": "Decimal",
+        "Description": "The reading of the Sensor",
+        "Units": "%"
+    },
+    "ITUE": {
+        "MetricDataType": "Decimal",
+        "Description": "Indicates the power utilization efficiency. It is expressed as the ratio of total system power to compute power",
+        "Units": null
+    },
+    "PowerCyclesLower": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the lower part of the number of power cycles",
+        "Units": null
+    },
+    "PowerCyclesUpper": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the upper part of the number of power cycles",
+        "Units": null
+    },
+    "LanFCSRxErrors": {
+        "MetricDataType": "Integer",
+        "Description": "Number of Rx packets with Checksum errors",
+        "Units": null
+    },
+    "LastDayAvgPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Day Average Power",
+        "Units": "W"
+    },
+    "PowerSupplyStatus": {
+        "MetricDataType": "Enumeration",
+        "Description": "Specifies Power supply status",
+        "Units": null
+    },
+    "PowerOnHoursLower": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the lower part of the number of hours powered on.  Hours may not include time that the controller was powered and in a non-operational power state",
+        "Units": "h"
+    },
+    "PowerOnHoursUpper": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the upper part of the number of hours powered on.  Hours may not include time that the controller was powered and in a non-operational power state",
+        "Units": "h"
+    },
+    "LanUnicastPktTxCount": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of Unicast LAN Packets Transmitted",
+        "Units": "Pkt"
+    },
+    "PowerOnHours": {
+        "MetricDataType": "Integer",
+        "Description": "The raw value of this attribute shows total count of hours (or minutes, or seconds, depending on manufacturer) in power-on state",
+        "Units": null
+    },
+    "LastDayMaxPowerTime": {
+        "MetricDataType": "DateTime",
+        "Description": "Last Day Max Power Time",
+        "Units": null
+    },
+    "LanUnicastPktRxCount": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of LAN Unicast Packets Received",
+        "Units": "Pkt"
+    },
+    "PrimaryTemperature": {
+        "MetricDataType": "Decimal",
+        "Description": "Temperature (degrees C)  on primary GPU",
+        "Units": "Cel"
+    },
+    "PowerToCoolRatio": {
+        "MetricDataType": "Decimal",
+        "Description": "Fan Power over system power ratio (PCTR)",
+        "Units": null
+    },
+    "LastHourAvgPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Hour Average Power",
+        "Units": "W"
+    },
+    "LastDayMaxPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Day Max Power",
+        "Units": "W"
+    },
+    "LastDayMinPowerTime": {
+        "MetricDataType": "DateTime",
+        "Description": "Last Day Min Power Time",
+        "Units": null
+    },
+    "LastDayMinPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Day Min Power",
+        "Units": "W"
+    },
+    "ProgramFailCount": {
+        "MetricDataType": "Integer",
+        "Description": "Program fail count since drive was deployed",
+        "Units": null
+    },
+    "PSURPMReading": {
+        "MetricDataType": "Decimal",
+        "Description": "PSU Fan reading in RPMs",
+        "Units": "RPM"
+    },
+    "LastHourMaxPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Hour Max Power",
+        "Units": "W"
+    },
+    "PSUEfficiency": {
+        "MetricDataType": "Decimal",
+        "Description": "PSU efficiency in percentage",
+        "Units": "%"
+    },
+    "LastHourMaxPowerTime": {
+        "MetricDataType": "DateTime",
+        "Description": "Last Hour Max Power Time",
+        "Units": null
+    },
+    "RDMARxTotalPackets": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of RDMA packets received",
+        "Units": "Pkt"
+    },
+    "RDMATotalProtectionErrors": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of RDMA Protection errors",
+        "Units": null
+    },
+    "LastMinuteMaxPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Minute Max Power",
+        "Units": "W"
+    },
+    "LastHourMinPowerTime": {
+        "MetricDataType": "DateTime",
+        "Description": "Last Hour Min Power Time",
+        "Units": null
+    },
+    "RDMATxTotalBytes": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of RDMA bytes transmitted",
+        "Units": "By"
+    },
+    "PSUTemperatureReading": {
+        "MetricDataType": "Decimal",
+        "Description": "PSU Temperature sensor reading in Celsius",
+        "Units": "Cel"
+    },
+    "LastHourMinPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Hour Min Power",
+        "Units": "W"
+    },
+    "LastMinuteAvgPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Minute Average Power",
+        "Units": "W"
+    },
+    "RDMATotalProtocolErrors": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of RDMA Protocol errors",
+        "Units": null
+    },
+    "LastMinuteMinPowerTime": {
+        "MetricDataType": "DateTime",
+        "Description": "Last Minute Min Power Time",
+        "Units": null
+    },
+    "RDMARxTotalBytes": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of RDMA bytes received",
+        "Units": "By"
+    },
+    "RDMATxTotalWritePkts": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of RDMA write packets transmitted",
+        "Units": "Pkt"
+    },
+    "LastMinuteMaxPowerTime": {
+        "MetricDataType": "DateTime",
+        "Description": "Last Minute Max Power Time",
+        "Units": null
+    },
+    "RDMATxTotalSendPkts": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of RDMA Send packets transmitted",
+        "Units": "Pkt"
+    },
+    "RDMATxTotalPackets": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of RDMA packets transmitted",
+        "Units": "Pkt"
+    },
+    "RDMATxTotalReadReqPkts": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of RDMA Read Request packets transmitted",
+        "Units": "Pkt"
+    },
+    "LastMinuteMinPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Minute Min Power",
+        "Units": "W"
+    },
+    "LastWeekMinPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Week Min Power",
+        "Units": "W"
+    },
+    "LastWeekMaxPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Week Max Power",
+        "Units": "W"
+    },
+    "LastWeekAvgPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Last Week Average Power",
+        "Units": "W"
+    },
+    "LastWeekMaxPowerTime": {
+        "MetricDataType": "DateTime",
+        "Description": "Last Week Max Power Time",
+        "Units": null
+    },
+    "LastWeekMinPowerTime": {
+        "MetricDataType": "DateTime",
+        "Description": "Last Week Min Power Time",
+        "Units": null
+    },
+    "MediaDataIntegrityErrorsLower": {
+        "MetricDataType": "Integer",
+        "Description": "Contains the lower part of the count of detected unrecovered data integrity errors. Includes errors such as uncorrectable ECC, CRC checksum failure, or LBA tag mismatch",
+        "Units": null
+    },
+    "RxBroadcast": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of good broadcast packets received",
+        "Units": "Pkt"
+    },
+    "ReadErrorRate": {
+        "MetricDataType": "Decimal",
+        "Description": "Read error rate",
+        "Units": null
+    },
+    "ReallocatedBlockCount": {
+        "MetricDataType": "Integer",
+        "Description": "Reallocated block count",
+        "Units": null
+    },
+    "RxBytes": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of bytes received, including host and remote management pass through traffic (remote management pass through traffic is applicable to LOMs only)",
+        "Units": "By"
+    },
+    "RPMReading": {
+        "MetricDataType": "Decimal",
+        "Description": "Current reading specific to the sensor",
+        "Units": "RPM"
+    },
+    "RxErrorPktFCSErrors": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of packets received with FCS(Frame Check Sequence) errors",
+        "Units": "Pkt"
+    },
+    "LinkStatus": {
+        "MetricDataType": "Enumeration",
+        "Description": "Indicates whether the link is up or down",
+        "Units": null
+    },
+    "RxErrorPktAlignmentErrors": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of packets received with alignment errors",
+        "Units": "Pkt"
+    },
+    "MemoryUsage": {
+        "MetricDataType": "Decimal",
+        "Description": "Memory Usage Percent",
+        "Units": "%"
+    },
+    "MediaWriteCount": {
+        "MetricDataType": "Integer",
+        "Description": "Media (SSD) write count",
+        "Units": null
+    },
+    "RxFalseCarrierDetection": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of false carrier errors received from PHY",
+        "Units": "Pkt"
+    },
+    "MemoryTemperature": {
+        "MetricDataType": "Decimal",
+        "Description": "Temperature (degrees C)  on GPU memory , if supported",
+        "Units": "Cel"
+    },
+    "RxJabberPkt": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of frames that are too long",
+        "Units": "Pkt"
+    },
+    "MediaDataIntegrityErrorsUpper": {
+        "MetricDataType": "Integer",
+        "Description": "Contains the upper part of the count of detected unrecovered data integrity errors. Includes errors such as uncorrectable ECC, CRC checksum failure, or LBA tag mismatch",
+        "Units": null
+    },
+    "NumOfErrorInfoLogEntriesLower": {
+        "MetricDataType": "Integer",
+        "Description": "Contains the lower part of the count of error information log entries over the life of the controller",
+        "Units": null
+    },
+    "MemoryUsagePctReading": {
+        "MetricDataType": "Decimal",
+        "Description": "The reading of the Sensor",
+        "Units": "%"
+    },
+    "RxPauseXONFrames": {
+        "MetricDataType": "Integer",
+        "Description": "Flow control frames from the network to resume transmission",
+        "Units": "Pkt"
+    },
+    "NonC0ResidencyHigh": {
+        "MetricDataType": "Integer",
+        "Description": "32 MSBs of the 64-bit counter containing number of Package C2 and C6 cycles",
+        "Units": null
+    },
+    "RxMutlicast": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of good multicast packets transmitted",
+        "Units": "Pkt"
+    },
+    "NonC0ResidencyLow": {
+        "MetricDataType": "Integer",
+        "Description": "32 LSBs of the 64-bit counter containing number of Package C2 and C6 cycles",
+        "Units": null
+    },
+    "RxUnicast": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of good unicast packets received",
+        "Units": "Pkt"
+    },
+    "NumOfErrorInfoLogEntriesUpper": {
+        "MetricDataType": "Integer",
+        "Description": "Contains the upper part of the count of error information log entries over the life of the controller",
+        "Units": null
+    },
+    "RxPauseXOFFFrames": {
+        "MetricDataType": "Integer",
+        "Description": "Flow control frames from the network to pause transmission",
+        "Units": "Pkt"
+    },
+    "SBECounterFB": {
+        "MetricDataType": "Integer",
+        "Description": "Single-bit errors from Frame Buffer in Frame Buffer memory",
+        "Units": null
+    },
+    "RxRuntPkt": {
+        "MetricDataType": "Integer",
+        "Description": "Total number of frames that are too short (< 64 bytes)",
+        "Units": "Pkt"
+    },
+    "OSDriverState": {
+        "MetricDataType": "Enumeration",
+        "Description": "Indicates operating system driver states (Unknown, Operational, Non-operational)",
+        "Units": null
+    },
+    "FCStatOSDriverState": {
+        "MetricDataType": "Enumeration",
+        "Description": "This property indicates the OS driver state",
+        "Units": null
+    },
+    "CommandTimeout": {
+        "MetricDataType": "Integer",
+        "Description": "The number of aborted operations due to disk timeout",
+        "Units": null
+    },
+    "UnusedReservedBlockCount": {
+        "MetricDataType": "Integer",
+        "Description": "Unused reserved block count",
+        "Units": null
+    },
+    "CUPSIIOBandwidthPort1": {
+        "MetricDataType": "Decimal",
+        "Description": "Utilization counter of the integrated IO Port on a per x16 port granularity",
+        "Units": "CUPS"
+    },
+    "CumulativeSBECounterFB": {
+        "MetricDataType": "Integer",
+        "Description": "Cumulative single-bit error counter for Frame Buffer (FB)",
+        "Units": null
+    },
+    "SystemInputPower": {
+        "MetricDataType": "Decimal",
+        "Description": "Current System Input Power",
+        "Units": "W"
+    },
+    "UsedReservedBlockCount": {
+        "MetricDataType": "Integer",
+        "Description": "Used reserved block count",
+        "Units": null
+    },
+    "SysRackTempDelta": {
+        "MetricDataType": "Integer",
+        "Description": "Temperature difference between exhaust air and inlet air temperature of the server",
+        "Units": "Cel"
+    },
+    "CumulativeSBECounterGR": {
+        "MetricDataType": "Integer",
+        "Description": "Cumulative single-bit error counter for Graphic Device (GR)",
+        "Units": null
+    },
+    "CompositeTemperature": {
+        "MetricDataType": "Integer",
+        "Description": "Indicatest the current composite temperature (in Kelvin) of the controller and namespace(s) associated with that controller",
+        "Units": "K"
+    },
+    "SystemHeadRoomInstantaneous": {
+        "MetricDataType": "Decimal",
+        "Description": "Instantaneous Headroom",
+        "Units": "W"
+    },
+    "SystemAvgInletTempHour": {
+        "MetricDataType": "Decimal",
+        "Description": "Average Inlet temperature for the last hour",
+        "Units": "Cel"
+    },
+    "SystemMaxInletTempHour": {
+        "MetricDataType": "Decimal",
+        "Description": "Peak Inlet temperature for the last hour",
+        "Units": "Cel"
+    },
+    "FCRxTotalFrames": {
+        "MetricDataType": "Integer",
+        "Description": "Specifies the total FC frames received",
+        "Units": "Pkt"
+    },
+    "FCTxKBCount": {
+        "MetricDataType": "Integer",
+        "Description": "This property represents the total KBs transmitted",
+        "Units": "KB"
+    },
+    "CUPSIIOBandwidthPort2": {
+        "MetricDataType": "Decimal",
+        "Description": "Utilization counter of the integrated IO Port on a per x16 port granularity",
+        "Units": "CUPS"
+    },
+    "CUPSIIOBandwidthDMI": {
+        "MetricDataType": "Decimal",
+        "Description": "Utilization counter of the DMI Port",
+        "Units": "CUPS"
+    },
+    "CumulativeDBECounterGR": {
+        "MetricDataType": "Integer",
+        "Description": "Cumulative double-bit error counter for Graphic Device (GR)",
+        "Units": null
+    },
+    "SysNetAirflow": {
+        "MetricDataType": "Integer",
+        "Description": "System net airflow",
+        "Units": "CFM"
+    },
+    "CUPSIIOBandwidthPort0": {
+        "MetricDataType": "Decimal",
+        "Description": "Utilization counter of the integrated IO Port on a per x16 port granularity",
+        "Units": "CUPS"
+    },
+    "VolatileMemoryBackupSourceFailures": {
+        "MetricDataType": "Integer",
+        "Description": "Volatile memory backup source failures",
+        "Units": null
+    },
+    "CriticalWarning": {
+        "MetricDataType": "Integer",
+        "Description": "Indicates critical warnings about the controller state",
+        "Units": null
+    },
+    "CPUC0ResidencyHigh": {
+        "MetricDataType": "Integer",
+        "Description": "32 MSBs of the 64-bit counter containing the aggregate C0 residency count from all the cores",
+        "Units": null
+    },
+    "CPUC0ResidencyLow": {
+        "MetricDataType": "Integer",
+        "Description": "32 LSBs of the 64-bit counter containing the aggregate C0 residency count from all the cores",
+        "Units": null
+    },
+    "CPUUsage": {
+        "MetricDataType": "Decimal",
+        "Description": "CPU Usage Percent",
+        "Units": "%"
+    },
+    "CRCErrorCount": {
+        "MetricDataType": "Integer",
+        "Description": "CRC error count",
+        "Units": null
+    },
+    "SBERetiredPages": {
+        "MetricDataType": "Integer",
+        "Description": "Number of pages dynamically retired because of single-bit errors in Frame Buffer memory",
+        "Units": null
+    },
+    "SysAirflowUtilization": {
+        "MetricDataType": "Decimal",
+        "Description": "Specifies the system airflow utilization (CFM / Max CFM). CFM (cubic feet per min)",
+        "Units": "CFM"
+    },
+    "SecondaryTemperature": {
+        "MetricDataType": "Decimal",
+        "Description": "Temperature (degrees C)  on secondary GPU in dual GPU boards",
+        "Units": "Cel"
+    },
+    "SBECounterGRTex": {
+        "MetricDataType": "Integer",
+        "Description": "Single-bit errors from  texure units (TEX) in Graphic Device (GR) memory",
+        "Units": null
+    },
+    "SBECounterGRRF": {
+        "MetricDataType": "Integer",
+        "Description": "Single-bit errors from SM register file (RF) in Graphic Device (GR) memory",
+        "Units": null
+    },
+    "SysAirflowPerFanPower": {
+        "MetricDataType": "Decimal",
+        "Description": "System airflow per unit of system fan power consumption ",
+        "Units": "CFM"
+    },
+    "CumulativeDBECounterFB": {
+        "MetricDataType": "Integer",
+        "Description": "Cumulative double-bit error counter for Frame Buffer (FB)",
+        "Units": null
+    },
+    "SysAirFlowEfficiency": {
+        "MetricDataType": "Decimal",
+        "Description": "System airflow efficiency metric (SAFE)",
+        "Units": "%"
+    },
+    "SysAirflowPerSysInputPower": {
+        "MetricDataType": "Decimal",
+        "Description": "System airflow per unit of system input [DC] power consumption ",
+        "Units": "CFM"
+    },
+    "CPUUsagePctReading": {
+        "MetricDataType": "Decimal",
+        "Description": "The reading of the Sensor",
+        "Units": "%"
+    }
+}
