@@ -15,6 +15,7 @@ Jie Li (jie.li@ttu.edu)
 import sys
 import csv
 import json
+import time
 import logging
 import getpass
 import asyncio
@@ -95,22 +96,25 @@ async def write_data(ip: str,
         async with session.get(url) as resp:
             async for line in resp.content:
                 if line:
-                    decoded_line = line.decode('utf-8')
-                    if '{' in decoded_line:
-                        decoded_line = decoded_line.strip('data: ')
-                        metrics = json.loads(decoded_line)
+                    try:
+                        decoded_line = line.decode('utf-8', 'ignore')
+                        if '{' in decoded_line:
+                            decoded_line = decoded_line.strip('data: ')
+                            metrics = json.loads(decoded_line)
 
-                        report = metrics['Id']
-                        metrics = metrics['MetricValues']
+                            report = metrics['Id']
+                            metrics = metrics['MetricValues']
 
-                        # Process metric values
-                        processed_metrics = process_metrics(ip, report, metrics)
-                        
-                        # Dump metrics
-                        dump_metrics(ip, processed_metrics, 
-                                    table_dtype_mapping, 
-                                    ip_id_mapping, 
-                                    conn)
+                            # Process metric values
+                            processed_metrics = process_metrics(ip, report, metrics)
+                            
+                            # Dump metrics
+                            dump_metrics(ip, processed_metrics, 
+                                        table_dtype_mapping, 
+                                        ip_id_mapping, 
+                                        conn)
+                    except Exception as err:
+                        logging.error(f"Fail to decode: {ip} : {err}")
 
     except aiohttp.client_exceptions.ClientConnectorError as err:
         logging.error(f"Fail to write_data: {err}")
@@ -184,7 +188,7 @@ def dump_metrics(ip: str,
             table_name = table_name.lower()
             target_table = f"{schema_name}.{table_name}"
 
-            print(f"{ip} : {target_table}")
+            # print(f"{ip} : {target_table}")
 
             cols = ('timestamp', 'nodeid', 'source', 'fqdd', 'value')
             for metric in table_metrics:
@@ -209,11 +213,11 @@ def gene_table_dtype_mapping(conn: object) -> dict:
     """
     mapping = {}
     cur = conn.cursor()
-    query = "SELECT table_name, data_type FROM tables_dtype;"
+    query = "SELECT metric, data_type FROM metrics_definition;"
     cur.execute(query)
-    for (table_name, data_type) in cur.fetchall():
+    for (metric, data_type) in cur.fetchall():
         mapping.update({
-            table_name: data_type
+            metric: data_type
         })
     cur.close()
     return mapping
