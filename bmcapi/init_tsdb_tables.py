@@ -74,15 +74,20 @@ def main():
     # For some unknown reasons, Sensor telemetry reports have extra metrics from the following nodes
     # nodes = ['10.101.23.10', '10.101.24.60', '10.101.25.21', '10.101.25.22', '10.101.26.10']
 
+    all_table_schemas = {}
+
     loop = asyncio.get_event_loop()
 
     metrics_definition = get_metrics_definition(config, nodes, user, password, loop)
     sample_metrics = get_sample_metrics(config, nodes, user, password, loop)
-    sample_metrics.extend(['VoltageReading', 'AmpsReading'])
-    
+    print(len(sample_metrics))
+    sample_metrics.extend(['VoltageReading', 'AmpsReading', 'CPUUsagePctReading', 'RDMATotalProtectionErrors','RDMARxTotalBytes', 'RDMARxTotalPackets'])
+    sample_metrics = list(set(sample_metrics))
+    print(len(sample_metrics))
     reduced_metrics_definition = reduce_metrics_definition(metrics_definition, sample_metrics)
 
     all_table_schemas = parse_sample_metrics(reduced_metrics_definition, data_type_mapping)
+
     loop.close()
 
     # Write to Postgres
@@ -93,7 +98,7 @@ def main():
         # Create schema
         schema_name = 'iDRAC9'
         print(f"--> Create schema {schema_name}...")
-        sql_statements = gen_sql_statements(all_table_schemas, schema_name)
+        sql_statements = genr_sql_statements(all_table_schemas, schema_name)
         cur.execute(sql_statements['schema_sql'])
 
         # Create tables
@@ -110,11 +115,14 @@ def main():
         tables_dtype_sql = f"CREATE TABLE IF NOT EXISTS metrics_definition (id SERIAL PRIMARY KEY, metric TEXT NOT NULL, data_type TEXT, description TEXT, units TEXT, UNIQUE (id));"
         cur.execute(tables_dtype_sql)
 
-        cols = ('metric', 'data_type', 'description', 'units')
-        metrics_definition_table = [(k, data_type_mapping[v['MetricDataType']], v['Description'], v['Units']) for k, v in reduced_metrics_definition.items()]
-
-        mgr = CopyManager(conn, 'metrics_definition', cols)
-        mgr.copy(metrics_definition_table)
+        if not check_table_exist(conn, 'metrics_definition'):
+            cols = ('metric', 'data_type', 'description', 'units')
+            metrics_definition_table = [(k, all_table_schemas[k]['column_types'][-1], v['Description'], v['Units']) for k, v in reduced_metrics_definition.items()]
+            # Sort
+            metrics_definition_table = sort_tuple(metrics_definition_table)
+            
+            mgr = CopyManager(conn, 'metrics_definition', cols)
+            mgr.copy(metrics_definition_table)
 
         conn.commit()
         cur.close()
@@ -140,7 +148,7 @@ def get_metrics_definition(config: dict, nodes:list,
             #     json.dump(metrics_definition, f, indent=4)
             break
         else:
-            print(f"{bcolors.WARNING}--> Cannot get metrics definition, please try again later!{bcolors.ENDC}")
+            print(f"{bcolors.WARNING}--> Cannot get metrics definition, please try on another node!{bcolors.ENDC}")
     return metrics_definition
 
 
@@ -262,21 +270,13 @@ def parse_sample_metrics(reduced_metrics_definition: dict, data_type_mapping: di
     """
     table_schemas = {}
     try:
-        # if source == 'PowerStatistics':
-        #     table_names = ['LastMinutePowerStatistics', 'LastHourPowerStatistics', 'LastDayPowerStatistics', 'LastWeekPowerStatistics']
-        #     column_names = ['Timestamp', 'NodeID', 'Source', 'FQDD', 'AvgPower', 'MinPower', 'MinPowerTime', 'MaxPower', 'MaxPowerTime']
-        #     column_types = ['TIMESTAMPTZ NOT NULL', 'INT NOT NULL', 'TEXT', 'TEXT', 'INT', 'INT', 'TIMESTAMPTZ', 'INT', 'TIMESTAMPTZ']
-        #     for table_name in table_names:
-        #         table_schemas.update({
-        #             table_name: {
-        #                 'column_names': column_names,
-        #                 'column_types': column_types
-        #             }
-        #         })
-        # else:
         for key, value in reduced_metrics_definition.items():
             table_name = key
-            value_type = data_type_mapping.get(value['MetricDataType'], 'TEXT')
+            units = value.get('Units', None)
+            if units == 'By' or units == 'Pkt':
+                value_type = "BIGINT"
+            else:
+                value_type = data_type_mapping.get(value['MetricDataType'], 'TEXT')
 
             column_names = ['Timestamp', 'NodeID', 'Source', 'FQDD', 'Value']
             column_types = ['TIMESTAMPTZ NOT NULL', 'INT NOT NULL', 'TEXT', 'TEXT', value_type]
@@ -288,15 +288,15 @@ def parse_sample_metrics(reduced_metrics_definition: dict, data_type_mapping: di
                 }
             })
         
-        with open('./data/table_schemas.json', 'w') as f:
-            json.dump(table_schemas, f, indent=4)
+        # with open('./data/all_table_schemas.json', 'w') as f:
+        #     json.dump(table_schemas, f, indent=4)
 
     except Exception as err:
         logging.error(f'parse_sample_metrics: {err}')
     return table_schemas
 
 
-def gen_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
+def genr_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
     """
     Generate SQL statements which will be used to create table
     """
@@ -324,10 +324,38 @@ def gen_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
         })
 
     except Exception as err:
-        logging.error(f'gen_sql_statements: {err}')
+        logging.error(f'genr_sql_statements: {err}')
     
     return sql_statements
 
+
+def check_table_exist (conn: object, table_name: str) -> None:
+    """
+    Check if table exists
+    """
+    cur = conn.cursor()
+    table_exists = False
+    sql = "SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = '" + table_name + "');"
+    cur.execute(sql)
+    (table_exists, ) = cur.fetchall()[0]
+
+    if table_exists:
+        data_exists = False
+        sql = "SELECT EXISTS (SELECT * from " + table_name + ");"
+        cur.execute(sql)
+        (data_exists, ) = cur.fetchall()[0]
+        return data_exists
+    return False
+
+def sort_tuple(tup):  
+    """
+    Ref: https://www.geeksforgeeks.org/python-program-to-sort-a-list-of-tuples-by-second-item/
+    """
+    # reverse = None (Sorts in Ascending order)  
+    # key is set to sort using second element of  
+    # sublist lambda has been used  
+    tup.sort(key = lambda x: x[0])  
+    return tup 
 
 if __name__ == '__main__':
     main()
