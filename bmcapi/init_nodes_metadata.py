@@ -93,7 +93,7 @@ def update_nodes_metatada(system_info: list, conn: object, table_name: str) -> N
         col_sql = ""
         bmc_ip_addr = record['Bmc_Ip_Addr']
         for col, value in record.items():
-            if col != 'Bmc_Ip_Addr':
+            if col != 'Bmc_Ip_Addr' and col != 'HostName':
                 col_value = col.lower() + " = '" + str(value) + "', "
                 col_sql += col_value
         col_sql = col_sql[:-2]

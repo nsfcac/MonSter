@@ -13,14 +13,13 @@ import json
 import time
 import logging
 import requests
+import psycopg2
 import subprocess
-
-from requests.adapters import HTTPAdapter
-from multiprocessing import Process, Queue
 
 sys.path.append('../')
 
-from sharings.utils import parse_config
+from requests.adapters import HTTPAdapter
+from sharings.utils import parse_config, parse_hostnames, init_tsdb_connection
 
 logging_path = './fetch_slurm.log'
 
@@ -30,6 +29,60 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
+
+def main():
+    # Read configuration file
+    config = parse_config('../config.yml')
+    config_slurm = config['slurm_rest_api']
+
+    # Connect to TimescaleDB
+    connection = init_tsdb_connection(config)
+
+    # Get nodename-nodeid mapping dict
+    node_id_mapping = gene_node_id_mapping(connection)
+
+    # print(hostnames)
+    # print([node_id_mapping[item] for item in hostnames])
+
+    # Read token file, if it is out of date, get a new token
+    token = read_token(config_slurm)
+
+    # Get jobs metrics
+    jobs_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['slurm_jobs']}"
+    jobs_metrics = fetch_slurm(config_slurm, token, jobs_url)
+
+    node_jobs = get_node_jobs(jobs_metrics, node_id_mapping)
+
+    # with open('./data/node_jobs.json', 'w') as f:
+    #     json.dump(node_jobs, f, indent=4)
+
+    # nodes_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['slurm_nodes']}"
+    # # openapi_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['openapi']}"
+    # # queue_status = aggregate_queue_status(jobs_metrics)
+
+    # # for status, job_list in queue_status.items():
+    # #     print(f"{status} : {len(job_list)}")
+    # # with open('./data/job_status.json', 'w') as f:
+    # #     json.dump(job_status, f, indent=4)
+
+
+def read_token(config_slurm: dict) -> str:
+    """
+    Read token file, if it is out of date, get a new token
+    """
+    token = ""
+    try:
+        with open('./token.json', 'r') as f:
+            token_record = json.load(f)
+            time_interval = int(time.time()) - token_record['time']
+            if time_interval >= 3600:
+                token = get_slurm_token(config_slurm)
+            else:
+                token = token_record['token']
+    except:
+        token = get_slurm_token(config_slurm)
+    return token
+
 
 def get_slurm_token(config_slurm: dict) -> list:
     """
@@ -69,7 +122,7 @@ def fetch_slurm(config_slurm: dict, token: str, url: str) -> dict:
     """
     Fetch slurm info via Slurm REST API
     """
-    metrics = []
+    metrics = {}
     headers = {"X-SLURM-USER-NAME": config_slurm['user'], "X-SLURM-USER-TOKEN": token}
     adapter = HTTPAdapter(max_retries=3)
     with requests.Session() as session:
@@ -80,148 +133,6 @@ def fetch_slurm(config_slurm: dict, token: str, url: str) -> dict:
         except Exception as err:
             logging.error(f"Fetch slurm metrics error: {err}")
     return metrics
-
-
-def convert_str_json(fields: list, job_str: str, queue: object) -> dict:
-    """
-    Convert the job data in string to job data in json.
-    """
-    job_dict = {}
-    job_data = {}
-    job_str_arr = job_str.split("|")
-    
-    for i in range(len(fields)):
-        job_data.update({
-            fields[i]: job_str_arr[i]
-        })
-    
-    job_dict = {
-        job_data["JobID"]: job_data
-    }
-
-    queue.put(job_dict)
-
-
-def generate_job_dict(fields: list, rtn_str_arr: list) -> dict:
-    """
-    Generate the job dict from string using multiprocesses.
-    """
-    job_dict_all = {}
-    queue = Queue()
-    procs = []
-    for rtn_str in rtn_str_arr:
-        p = Process(target=convert_str_json, args=(fields, rtn_str, queue))
-        procs.append(p)
-        p.start()
-    
-    for _ in procs:
-        job_dict = queue.get()
-        job_dict_all.update(job_dict)
-
-    for p in procs:
-        p.join()
-
-    return job_dict_all
-
-
-def unfold_metrics(metric_str: str, in_out: str) -> dict:
-    """
-    Unfold the metrics under the same metric name(such as tresusageintot, tresusageouttot)
-    """
-    metric_dict = {}
-    for item in metric_str.split(","):
-        item_pair = item.split("=")
-
-        if item_pair[0] == "fs/disk" or item_pair[0] == "energy":
-            key_name = item_pair[0] + "_" + in_out
-        else:
-            key_name = item_pair[0]
-
-        metric_dict.update({
-            key_name: item_pair[1]
-        })
-
-    return metric_dict
-
-
-def merge_metrics(job_metircs: dict, batch_step_metrics: dict) -> dict:
-    """
-    Merge metrics under JobID with metrics under batch and jobstep, update the job name
-    """
-    merged_metrics = {}
-    for key, value in batch_step_metrics.items():
-        if value == "" or key == "JobName":
-            merged_metrics.update({
-                key: job_metircs[key]
-            })
-        else:
-            merged_metrics.update({
-                key: value
-            })
-    return merged_metrics
-
-
-def merge_job_dict(job_dict_all: dict, job_id_raw: str, queue: object) -> dict:
-    """
-    Aggregate jobid with jobid.batch and jobid.step# , and unfold several metrics under the same 
-    attribute, such as "tresusageintot", "tresusageouttot".
-    """
-    merged_data = {}
-    # only keep resource statistics under batch and jobstep, discard extern
-    if ".batch" in job_id_raw or "." in job_id_raw and ".extern" not in job_id_raw:
-        # merge metrics
-        job_id = job_id_raw.split('.')[0]
-        merged_data = merge_metrics(job_dict_all[job_id], job_dict_all[job_id_raw])
-        
-        # Unfold metrics in treusageintot and tresusageoutot
-        folded_metrics = merged_data.get("TresUsageInTot", None)
-        if folded_metrics:
-            unfolded_metrics = unfold_metrics(folded_metrics, "in")
-            merged_data.update(unfolded_metrics)
-            merged_data.pop("TresUsageInTot")
-        
-        folded_metrics = merged_data.get("TresUsageOutTot", None)
-        if folded_metrics:
-            unfolded_metrics = unfold_metrics(folded_metrics, "out")
-            merged_data.update(unfolded_metrics)
-            merged_data.pop("TresUsageOutTot")
-
-        if ".batch" in job_id_raw:
-            # Update the job id if it contains batch
-            merged_data.update({
-                "JobID": job_id
-            })
-        
-        # Add unique ids, which is used as unique ids for the record
-        merged_data.update({
-            "_id": merged_data["JobID"]
-        })
-
-    queue.put(merged_data)
-
-
-def aggregate_job_data(job_dict_all: dict) -> dict:
-    """
-    Aggregate job dict using multiprocesses.
-    """
-    aggregated_job_data = []
-    job_id_raw_list = job_dict_all.keys()
-    queue = Queue()
-    procs = []
-    for job_id_raw in job_id_raw_list:
-        p = Process(target=merge_job_dict, args=(job_dict_all, job_id_raw, queue))
-        procs.append(p)
-        p.start()
-    
-    for _ in procs:
-        job_data = queue.get()
-        if job_data:
-            aggregated_job_data.append(job_data)
-
-    for p in procs:
-        p.join()
-
-    return aggregated_job_data
 
 
 def get_response_properties() -> None:
@@ -237,32 +148,68 @@ def get_response_properties() -> None:
         json.dump(node_properties, f, indent = 4)
 
 
-if __name__ == '__main__':
-    # Read configuration file
-    config_path = '../config.yml'
-    config_slurm = parse_config(config_path)['slurm_rest_api']
-
-    # Read token file, if it is out of date, get a new token
-    try:
-        with open('./token.json', 'r') as f:
-            token_record = json.load(f)
-            time_interval = int(time.time()) - token_record['time']
-            if time_interval >= 3600:
-                token = get_slurm_token(config_slurm)
+def get_node_jobs(jobs_metrics: dict, node_id_mapping:dict) -> list:
+    """
+    Only process running jobs, and get nodes-job correlation
+    """
+    node_jobs = {}
+    all_jobs = jobs_metrics['jobs']
+    # Get job-nodes correlation
+    job_nodes = {}
+    for job in all_jobs:
+        if job['job_state'] == "RUNNING":
+            job_id = job['job_id']
+            nodes = job['nodes']
+            # Get node ids
+            hostnames = parse_hostnames(nodes)
+            node_ids = [node_id_mapping[i] for i in hostnames]
+            node_ids.sort()
+            # Get cpu counts for each node
+            allocated_nodes = job['job_resources']['allocated_nodes']
+            cpu_counts = [resource['cpus'] for node, resource in allocated_nodes.items()]
+            job_nodes.update({
+                job_id: {
+                    'nodes': node_ids,
+                    'cpus': cpu_counts
+                }
+            })
+    # Get nodes-job correlation
+    for job, nodes_cpus in job_nodes.items():
+        for i, node in enumerate(nodes_cpus['nodes']):
+            if node not in node_jobs:
+                node_jobs.update({
+                    node: {
+                        'jobs':[job],
+                        'cpus':[nodes_cpus['cpus'][i]]
+                    }
+                })
             else:
-                token = token_record['token']
-    except:
-        token = get_slurm_token(config_slurm)
+                node_jobs[node]['jobs'].append(job)
+                node_jobs[node]['cpus'].append(nodes_cpus['cpus'][i])
+    # node_jobs = sorted(node_jobs.items(), key=lambda item: item[0])
+    # print(len(list(node_jobs.keys())))
+    return node_jobs
 
-    jobs_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['slurm_jobs']}"
-    nodes_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['slurm_nodes']}"
-    # openapi_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['openapi']}"
 
-    jobs_metrics = fetch_slurm(config_slurm, token, jobs_url)
+def gene_node_id_mapping(connection: str) -> dict:
+    """
+    Generate nodename-nodeid mapping dict
+    """
+    mapping = {}
+    try:
+        with psycopg2.connect(connection) as conn:
+            cur = conn.cursor()
+            query = "SELECT nodeid, hostname FROM nodes"
+            cur.execute(query)
+            for (nodeid, hostname) in cur.fetchall():
+                mapping.update({
+                    hostname: nodeid
+                })
+            cur.close()
+            return mapping
+    except Exception as err:
+        loggin.error(f"Faile to generate node-id mapping : {err}")
 
-    # queue_status = aggregate_queue_status(jobs_metrics)
 
-    # for status, job_list in queue_status.items():
-    #     print(f"{status} : {len(job_list)}")
-    # with open('./data/job_status.json', 'w') as f:
-    #     json.dump(job_status, f, indent=4)
+if __name__ == '__main__':
+    main()
