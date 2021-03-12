@@ -57,21 +57,24 @@ def aggregate_queue_status() -> dict:
     REQUEUE_FED,REQUEUE_HOLD, REQUEUED, RESIZING, REVOKED, SIGNALING, 
     SPECIAL_EXIT, STAGE_OUT,STOPPED, SUSPENDED, TIMEOUT
     """
-    time.sleep(10)
+    time.sleep(15)
     # Get jobs metrics
     jobs_metrics = get_jobs_metrics()
     # Aggregate queue status
     all_jobs = jobs_metrics['jobs']
+    quanah_allocated_cpus = 0
+    nocona_allocated_cpus = 0
+    matador_allocated_cpus = 0
     status = {}
     status_list = {
         'RUNNING': [],
         'PENDING': [],
         'COMPLETED': [],
-        'TIMEOUT': [],
+        # 'TIMEOUT': [],
         'CANCELLED': [],
         'FAILED': [],
-        'STOPPED': [],
-        'REQUEUED':[]
+        # 'STOPPED': [],
+        # 'REQUEUED':[]
     }
 
     for job in all_jobs:
@@ -79,11 +82,24 @@ def aggregate_queue_status() -> dict:
         job_state = job['job_state']
         if job_state in status_list:
             status_list[job_state].append(job_id)
+        if job_state == "RUNNING":
+            cpus = job['job_resources']['allocated_cpus']
+            if job['partition'] == 'quanah':
+                quanah_allocated_cpus += cpus
+            if job['partition'] == 'nocona':
+                nocona_allocated_cpus += cpus
+            if job['partition'] == 'matador':
+                matador_allocated_cpus += cpus
     
     for status_name, job_list in status_list.items():
         status.update({
             status_name: len(job_list)
         })
+    status.update({
+        'QUANAH_ALLOCATED_CORES': quanah_allocated_cpus,
+        'NOCONA_ALLOCATED_CORES': nocona_allocated_cpus,
+        'MATADOR_ALLOCATED_CORES': matador_allocated_cpus
+    })
         # print(status)
     return status
 

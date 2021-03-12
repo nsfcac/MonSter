@@ -1,6 +1,7 @@
 # Ignore files
 .DS_Store
 *.log
+*.json
 
 # Ignore folders
 .vscode/
@@ -8,3 +9,6 @@ env/
 __pycache__/
 test/slurm/
 tools/genr_nodes_metadata/data
+bmcapi/data
+slurmapi/data
+slurmapi/cmd_slurm/data

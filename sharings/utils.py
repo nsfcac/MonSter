@@ -1,7 +1,8 @@
+import re
 import sys
 import yaml
 import json
-import time 
+import time
 from getpass import getpass
 
 class bcolors:
@@ -75,6 +76,36 @@ def parse_nodelist(nodelist_cfg: list) -> list:
                 nodelist.append(ip_addr)
     
     return nodelist
+
+
+def parse_hostnames(nodes: str) -> list:
+    """
+    Parse hostname from the nodes string in job metrics fetched from slurm
+    For example, nodes = "cpu-1-[24,46],cpu-2-33,cpu-4-[35,41],cpu-7-[37-39,46,53],cpu-10-40"
+    """
+    hostnames = []
+    hn_raw_single = re.findall('[a-z]+-{1}\d+-{1}\d+', nodes)
+    hn_raw_range = re.findall('[a-z]+-{1}\d+-{1}\[{1}\d+[0-9,\,,\-]*\]{1}', nodes)
+
+    for item in hn_raw_single:
+        hostnames.append(item)
+    for item in hn_raw_range:
+        rack = item.split("[")[0]
+        node_range = item.split("[")[1]
+
+        sections = node_range[:-1].split(",")
+        for section in sections:
+            if "-" in section:
+                st = int(section.split("-")[0])
+                ed = int(section.split("-")[1])
+                for i in range(st, ed+1):
+                    hostname = rack + str(i)
+                    hostnames.append(hostname)
+            else:
+                hostname = rack + str(int(section))
+                hostnames.append(hostname)
+
+    return hostnames
 
 
 def init_tsdb_connection(config: dict) -> str:
