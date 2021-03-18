@@ -192,7 +192,11 @@ def dump_metrics(ip: str,
 
             cols = ('timestamp', 'nodeid', 'source', 'fqdd', 'value')
             for metric in table_metrics:
-                timestamp = parse_time(metric['Timestamp'])
+                # We have to offset timestamp by -6 hours. For some unknow
+                # reasons, the timestamp reported in iDRAC9 is not configured
+                # correctly.
+                offset = timedelta(hours=6)
+                timestamp = parse_time(metric['Timestamp']) - offset
                 source = metric['Source']
                 fqdd = metric['FQDD']
                 value = cast_value_type(metric['Value'], dtype)
