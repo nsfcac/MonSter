@@ -11,13 +11,17 @@ Jie Li (jie.li@ttu.edu)
 import sys
 import json
 import time
+import pytz
 import logging
 import requests
 import psycopg2
+import schedule
 import subprocess
 
 sys.path.append('../')
 
+from pgcopy import CopyManager
+from datetime import datetime, timezone
 from requests.adapters import HTTPAdapter
 from sharings.utils import parse_config, parse_hostnames, init_tsdb_connection
 
@@ -41,17 +45,18 @@ def main():
     # Get nodename-nodeid mapping dict
     node_id_mapping = gene_node_id_mapping(connection)
 
-    # print(hostnames)
-    # print([node_id_mapping[item] for item in hostnames])
+    # Schedule fetch slurm
 
-    # Read token file, if it is out of date, get a new token
-    token = read_token(config_slurm)
+    schedule.every().minutes.at(":00").do(fetch_slurm, config_slurm, connection, node_id_mapping)
+    # #fetch_slurm(config_slurm, connection, node_id_mapping)
 
-    # Get jobs metrics
-    jobs_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['slurm_jobs']}"
-    jobs_metrics = fetch_slurm(config_slurm, token, jobs_url)
-
-    node_jobs = get_node_jobs(jobs_metrics, node_id_mapping)
+    while True:
+        try:
+            schedule.run_pending()
+            time.sleep(1)
+        except KeyboardInterrupt:
+            schedule.clear()
+            break   
 
     # with open('./data/node_jobs.json', 'w') as f:
     #     json.dump(node_jobs, f, indent=4)
@@ -60,10 +65,21 @@ def main():
     # # openapi_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['openapi']}"
     # # queue_status = aggregate_queue_status(jobs_metrics)
 
-    # # for status, job_list in queue_status.items():
-    # #     print(f"{status} : {len(job_list)}")
-    # # with open('./data/job_status.json', 'w') as f:
-    # #     json.dump(job_status, f, indent=4)
+
+
+def fetch_slurm(config_slurm: dict, connection: str, node_id_mapping: dict) -> None:
+    # Read token file, if it is out of date, get a new token
+    token = read_token(config_slurm)
+    # Get jobs metrics
+    timestamp = datetime.now(pytz.utc).replace(microsecond=0)
+    jobs_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['slurm_jobs']}"
+    jobs_metrics = call_slurm_api(config_slurm, token, jobs_url)
+
+    node_jobs = get_node_jobs(jobs_metrics, node_id_mapping)
+
+    # Dump metrics into TimescaleDB
+    with psycopg2.connect(connection) as conn:
+        dump_node_jobs_metrics(timestamp, node_jobs, conn)
 
 
 def read_token(config_slurm: dict) -> str:
@@ -118,7 +134,7 @@ def get_slurm_token(config_slurm: dict) -> list:
         print("Get Slurm token error!")
 
 
-def fetch_slurm(config_slurm: dict, token: str, url: str) -> dict:
+def call_slurm_api(config_slurm: dict, token: str, url: str) -> dict:
     """
     Fetch slurm info via Slurm REST API
     """
@@ -209,6 +225,22 @@ def gene_node_id_mapping(connection: str) -> dict:
             return mapping
     except Exception as err:
         loggin.error(f"Faile to generate node-id mapping : {err}")
+
+
+def dump_node_jobs_metrics(timestamp: object, 
+                           node_jobs_metrics: dict, 
+                           conn: object) -> None:
+    """
+    Dump slurm metrics into TimescaleDB
+    """
+    all_records = []
+    target_table = 'node_jobs'
+    cols = ('timestamp', 'nodeid', 'jobs', 'cpus')
+    for node, job_info in node_jobs_metrics.items():
+        all_records.append((timestamp, int(node), job_info['jobs'], job_info['cpus']))
+    mgr = CopyManager(conn, target_table, cols)
+    mgr.copy(all_records)
+    conn.commit()
 
 
 if __name__ == '__main__':

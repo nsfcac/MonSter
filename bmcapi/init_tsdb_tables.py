@@ -5,8 +5,12 @@
     extended the database with TimescaleDB as supersuer:
     
     psql -U postgres
-    CREATE DATABASE demo WITH OWNER monster
+    CREATE DATABASE 'dbname' WITH OWNER monster;
+    \c 'dbname'
     CREATE EXTENSION IF NOT EXISTS timescaledb;
+
+    AND the nodes metadata table has been created
+
     Postgres role: monster, password: redraider
 
     # Drop all tables
@@ -80,10 +84,10 @@ def main():
 
     metrics_definition = get_metrics_definition(config, nodes, user, password, loop)
     sample_metrics = get_sample_metrics(config, nodes, user, password, loop)
-    print(len(sample_metrics))
+    # print(len(sample_metrics))
     sample_metrics.extend(['VoltageReading', 'AmpsReading', 'CPUUsagePctReading', 'RDMATotalProtectionErrors','RDMARxTotalBytes', 'RDMARxTotalPackets'])
     sample_metrics = list(set(sample_metrics))
-    print(len(sample_metrics))
+    # print(len(sample_metrics))
     reduced_metrics_definition = reduce_metrics_definition(metrics_definition, sample_metrics)
 
     all_table_schemas = parse_sample_metrics(reduced_metrics_definition, data_type_mapping)
@@ -110,7 +114,7 @@ def main():
             # Generate hypertable
             gene_hypertable_sql = "SELECT create_hypertable(" + "'" + table_name + "', 'timestamp', if_not_exists => TRUE);"
             cur.execute(gene_hypertable_sql)
-        
+
         # Create a table recording the relationship between table and data type
         tables_dtype_sql = f"CREATE TABLE IF NOT EXISTS metrics_definition (id SERIAL PRIMARY KEY, metric TEXT NOT NULL, data_type TEXT, description TEXT, units TEXT, UNIQUE (id));"
         cur.execute(tables_dtype_sql)
@@ -308,6 +312,8 @@ def genr_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
         })
 
         tables_sql = []
+
+        # tables for idrac9
         for table, column in all_table_schemas.items():
             column_names = column['column_names']
             column_types = column['column_types']
@@ -318,6 +324,10 @@ def genr_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
 
             table_sql = f"CREATE TABLE IF NOT EXISTS {schema_name}.{table} ({column_str}FOREIGN KEY (NodeID) REFERENCES nodes (NodeID));"
             tables_sql.append(table_sql)
+
+        # tables for node_jobs
+        table_sql = "CREATE TABLE IF NOT EXISTS node_jobs (Timestamp TIMESTAMPTZ NOT NULL, NodeID INT NOT NULL, Jobs integer[], CPUs integer[], FOREIGN KEY (NodeID) REFERENCES nodes (NodeID));"
+        tables_sql.append(table_sql)
 
         sql_statements.update({
             'tables_sql': tables_sql,

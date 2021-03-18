@@ -43,7 +43,7 @@ UGE_SLURM = {
     'ru_ismrss' : 'NotAvail',
     'ru_idrss': 'NotAvail',
     'ru_isrss': 'NotAvail',
-    'ru_minflt': 'NotAvail', #Average number of page faults of all tasks in job.
+    'ru_minflt': 'NotAvail', 
     'ru_majflt': 'MaxPages', #Maximum number of page faults of all tasks in job.
     'ru_nswap': 'NotAvail',
     'ru_inblock': 'NotAvail',
