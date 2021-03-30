@@ -10,6 +10,10 @@
     ssh -ND 1080 monster@hugo.hpcc.ttu.edu
 
     curl -s -k -u password -X GET https://10.101.23.1/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport
+
+    Setting Power Cap
+    https://10.101.23.1/redfish/v1/Chassis/System.Embedded.1/Power
+    https://10.101.24.1/redfish/v1/Managers/iDRAC.Embedded.1/Oem/Dell/DellAttributes/System.Embedded.1
 Jie Li (jie.li@ttu.edu)
 """
 import sys
@@ -116,7 +120,8 @@ async def write_data(ip: str,
                     except Exception as err:
                         logging.error(f"Fail to decode: {ip} : {err}")
 
-    except aiohttp.client_exceptions.ClientConnectorError as err:
+    # except aiohttp.client_exceptions.ClientConnectorError as err:
+    except Exception as err:
         logging.error(f"Fail to write_data: {err}")
 
 

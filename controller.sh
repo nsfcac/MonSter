@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-readonly sourceFile="$PWD/MonSter/env/bin/activate"
+readonly sourceFile="$PWD/env/bin/activate"
 
 source ${sourceFile}
 
-python $PWD/MonSter/monster.py
+# python $PWD/MonSter/monster.py
 
 # Submit cron job by:
 # crontab -e
