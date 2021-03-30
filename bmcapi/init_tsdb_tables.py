@@ -78,7 +78,7 @@ def main():
     # For some unknown reasons, Sensor telemetry reports have extra metrics from the following nodes
     # nodes = ['10.101.23.10', '10.101.24.60', '10.101.25.21', '10.101.25.22', '10.101.26.10']
 
-    all_table_schemas = {}
+    idrac9_table_schemas = {}
 
     loop = asyncio.get_event_loop()
 
@@ -90,7 +90,8 @@ def main():
     # print(len(sample_metrics))
     reduced_metrics_definition = reduce_metrics_definition(metrics_definition, sample_metrics)
 
-    all_table_schemas = parse_sample_metrics(reduced_metrics_definition, data_type_mapping)
+    idrac9_table_schemas = parse_sample_metrics(reduced_metrics_definition, data_type_mapping)
+    slurm_table_schemas = gen_slurm_table_schemas()
 
     loop.close()
 
@@ -99,14 +100,19 @@ def main():
         cur = conn.cursor()
         all_sql_statements = []
         
-        # Create schema
+        # Create schema and tables for iDRAC9
         schema_name = 'iDRAC9'
-        print(f"--> Create schema {schema_name}...")
-        sql_statements = genr_sql_statements(all_table_schemas, schema_name)
-        cur.execute(sql_statements['schema_sql'])
+        sql_idrac9 = genr_sql(idrac9_table_schemas, schema_name)
+        cur.execute(sql_idrac9['schema_sql'])
 
+        # Create schema and tables for slurm
+        schema_name = 'slurm'
+        sql_slurm = genr_sql(slurm_table_schemas, schema_name)
+        cur.execute(sql_slurm['schema_sql'])
+
+        tables_sql = sql_idrac9['tables_sql'] + sql_slurm['tables_sql']
         # Create tables
-        for sql in sql_statements['tables_sql']:
+        for sql in tables_sql:
             table_name = sql.split(' ')[5]
             print(f" |--> Create table {table_name}...")
             cur.execute(sql)
@@ -121,7 +127,7 @@ def main():
 
         if not check_table_exist(conn, 'metrics_definition'):
             cols = ('metric', 'data_type', 'description', 'units')
-            metrics_definition_table = [(k, all_table_schemas[k]['column_types'][-1], v['Description'], v['Units']) for k, v in reduced_metrics_definition.items()]
+            metrics_definition_table = [(k, idrac9_table_schemas[k]['column_types'][-1], v['Description'], v['Units']) for k, v in reduced_metrics_definition.items()]
             # Sort
             metrics_definition_table = sort_tuple(metrics_definition_table)
             
@@ -292,7 +298,7 @@ def parse_sample_metrics(reduced_metrics_definition: dict, data_type_mapping: di
                 }
             })
         
-        # with open('./data/all_table_schemas.json', 'w') as f:
+        # with open('./data/idrac9_table_schemas.json', 'w') as f:
         #     json.dump(table_schemas, f, indent=4)
 
     except Exception as err:
@@ -300,7 +306,7 @@ def parse_sample_metrics(reduced_metrics_definition: dict, data_type_mapping: di
     return table_schemas
 
 
-def genr_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
+def genr_sql(table_schemas: dict, schema_name: str) -> dict:
     """
     Generate SQL statements which will be used to create table
     """
@@ -314,7 +320,7 @@ def genr_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
         tables_sql = []
 
         # tables for idrac9
-        for table, column in all_table_schemas.items():
+        for table, column in table_schemas.items():
             column_names = column['column_names']
             column_types = column['column_types']
             
@@ -325,18 +331,51 @@ def genr_sql_statements(all_table_schemas: dict, schema_name: str) -> dict:
             table_sql = f"CREATE TABLE IF NOT EXISTS {schema_name}.{table} ({column_str}FOREIGN KEY (NodeID) REFERENCES nodes (NodeID));"
             tables_sql.append(table_sql)
 
-        # tables for node_jobs
-        table_sql = "CREATE TABLE IF NOT EXISTS node_jobs (Timestamp TIMESTAMPTZ NOT NULL, NodeID INT NOT NULL, Jobs integer[], CPUs integer[], FOREIGN KEY (NodeID) REFERENCES nodes (NodeID));"
-        tables_sql.append(table_sql)
-
         sql_statements.update({
             'tables_sql': tables_sql,
         })
 
     except Exception as err:
-        logging.error(f'genr_sql_statements: {err}')
+        logging.error(f'genr_sql: {err}')
     
     return sql_statements
+
+
+def gen_slurm_table_schemas() -> dict:
+    """
+    Generate table names and data type for slurm metrics
+    """
+    table_schemas = {}
+    add_tables = {
+        'memoryusage':{
+            'add_columns': ['Value'],
+            'add_types': ['REAL']
+        },
+        'state':{
+            'add_columns': ['Value'],
+            'add_types': ['INT']
+        },
+        'node_jobs':{
+            'add_columns': ['Jobs', 'CPUs'],
+            'add_types': ['INTEGER[]', 'INTEGER[]']
+        }
+    }
+    try:
+        for table_name, detail in add_tables.items():
+            column_names = ['Timestamp', 'NodeID']
+            column_types = ['TIMESTAMPTZ NOT NULL', 'INT NOT NULL']
+            column_names.extend(detail['add_columns'])
+            column_types.extend(detail['add_types'])
+
+            table_schemas.update({
+                table_name: {
+                    'column_names': column_names,
+                    'column_types': column_types
+                }
+            })
+    except Exception as err:
+        logging.error(f'gen_slurm_table_schemas: {err}')
+    return table_schemas
 
 
 def check_table_exist (conn: object, table_name: str) -> None:

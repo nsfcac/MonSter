@@ -72,7 +72,9 @@ def main():
 
     loop = asyncio.get_event_loop()
     # We randomly select 3 nodes to get the metric report configurations
-    nodelist = parse_nodelist(config['bmc']['iDRAC9_nodelist'])
+    # nodelist = parse_nodelist(config['bmc']['iDRAC9_nodelist'])
+    nodelist = parse_nodelist(config['bmc']['GPU_nodelist'])
+
     nodes = secrets.SystemRandom().sample(nodelist, 3)
 
     for node in nodes:

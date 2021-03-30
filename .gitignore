@@ -3,6 +3,7 @@
 *.log
 *.json
 *.out
+*.csv
 
 # Ignore folders
 .vscode/
