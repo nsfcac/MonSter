@@ -9,6 +9,7 @@ import time
 import json
 import logging
 import flask
+from flask_cors import CORS, cross_origin
 
 sys.path.append('../')
 
@@ -23,9 +24,11 @@ logging.basicConfig(
 
 from sharings.utils import parse_config
 app = flask.Flask(__name__)
-
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/queue_status')
+@cross_origin()
 def get_queue_status():
     queue_status = []
     with open('../slurmapi/data/queue_status.json', 'r') as f:

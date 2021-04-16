@@ -30,7 +30,7 @@ import logging
 import psycopg2
 import schedule
 import subprocess
-# import hostlist
+import hostlist
 
 sys.path.append('../')
 
@@ -42,7 +42,19 @@ from sharings.utils import parse_config, parse_hostnames, init_tsdb_connection
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%Z'
 
 # 'ARRAY_JOB_ID', 'ARRAY_TASK_ID', 
-SELECT_FIELDS = ['JOBID', 'NAME', 'USER', 'STATE', 'PARTITION', 'NODELIST', 'CPUS', 'MIN_MEMORY', 'START_TIME', 'TIME', 'TIME_LEFT']
+SELECT_FIELDS = ['JOBID', 'ARRAY_JOB_ID', 'NAME', 'USER', 'STATE', 'PARTITION', 'NODELIST', 'CPUS', 'MIN_MEMORY', 'SUBMIT_TIME', 'START_TIME', 'TIME', 'TIME_LEFT']
+
+# JOBID: Job ID. 
+# NAME: Job name.
+# USER: User name for a job.
+# STATE: Job state. For array jobs, this field includes all states of array jobs under the same job id. 
+# PARTITION: Partition of the job
+# NODELIST: List of nodes allocated to the job
+# CPUS: the number of CPUs allocated to the job.
+# MIN_MEMORY: Minimum size of memory (in MB) requested by the job. If the job is an array job, this field is 'MIN_MEMORY' X '#of array jobs'
+# START_TIME: Actual or expected start time of the job or job step.
+# TIME: Time used by the job or job step in days-hours:minutes:seconds. 
+# TIME_LEFT: Time left for the job or job step to execute in days-hours:minutes:seconds. This value is calculated by subtracting the job's time used from its time limit. The value may be "NOT_SET" if not yet established or "UNLIMITED" for no limit. 
 
 logging_path = './fetch_slurm_queue.log'
 
@@ -87,7 +99,8 @@ def fetch_slurm_queue() -> list:
 
     if rtn_str:
         # Process queue status
-        timestamp = datetime.now(pytz.utc).replace(microsecond=0).strftime(DATETIME_FORMAT)
+        # timestamp = datetime.now(pytz.utc).replace(microsecond=0).strftime(DATETIME_FORMAT)
+        timestamp = int(datetime.now().timestamp())
         queue_status = convert_str_list(rtn_str)
 
         # Dump status into status file
@@ -97,9 +110,6 @@ def fetch_slurm_queue() -> list:
         }
         with open('./data/queue_status.json', 'w') as f:
             json.dump(time_queue_status, f)
-        # timestamp = datetime.now(pytz.utc).replace(microsecond=0)
-        # with psycopg2.connect(connection) as conn:
-        #     dump_queue_metrics(timestamp, queue_status, conn)
 
     return
 
@@ -119,31 +129,9 @@ def convert_str_list(rtn_str: str) -> dict:
     # for record_raw in tqdm(records_raw):
     for record_raw in records_raw: 
         record = parse_record(field_index, record_raw)
-        job_id = record['JOBID'].split('_')[0]
+        job_id = record['JOBID']
         if job_id not in queue_dict:
             queue_dict[job_id] = record
-            queue_dict[job_id]['JOBID'] = int(job_id)
-        else:
-            queue_dict[job_id]['TOTAL'] += 1
-            if 'NODELIST' in record:
-                    queue_dict[job_id]['NODELIST'] = list(set(queue_dict[job_id]['NODELIST'] + record['NODELIST']))
-            if 'CPUS' in record:
-                queue_dict[job_id]['CPUS'] += record['CPUS']
-            if 'STATE' in record:
-                queue_dict[job_id]['STATE'] = queue_dict[job_id]['STATE'] + record['STATE']
-        
-    # Aggregate MIN_MEMORY and count the number of states
-    for job_id, record in queue_dict.items():
-        if record['TOTAL'] > 1:
-            queue_dict[job_id]['MIN_MEMORY'] = f"{record['MIN_MEMORY']} X {record['TOTAL']}"
-        if len(record['STATE']) > 1:
-            updated_state = []
-            unique_state = list(set(record['STATE']))
-            for state in unique_state:
-                cnt = record['STATE'].count(state)
-                updated_state.append(f"{state} ({cnt})")
-            queue_dict[job_id]['STATE'] = updated_state
-        queue_dict[job_id].pop('TOTAL', None)
 
     return list(queue_dict.values())
 
@@ -152,11 +140,12 @@ def get_index(all_fields: list) -> list:
     field_index = {}
     valid_fields = []
     valid_index = []
-    for field in SELECT_FIELDS:
-        if field in all_fields:
-            valid_fields.append(field)
-            index = all_fields.index(field)
-            valid_index.append(index)
+    # for field in SELECT_FIELDS:
+        # if field in all_fields:
+    for field in all_fields:
+        valid_fields.append(field)
+        index = all_fields.index(field)
+        valid_index.append(index)
     field_index = {
         'valid_fields': valid_fields,
         'valid_index': valid_index
@@ -165,46 +154,53 @@ def get_index(all_fields: list) -> list:
 
 
 def parse_record(field_index: dict, record_raw: str) -> dict:
-    record = {'TOTAL': 1}
+    # record = {'TOTAL': 1}
+    record = {}
     record_list = record_raw.split('|')
     # index = field_index['valid_index']
     for i, index in enumerate(field_index['valid_index']):
         field = field_index['valid_fields'][i]
         if field == 'NODELIST':
             if record_list[index]:
-                ## Do not expand node list
-                # record[field] = hostlist.expand_hostlist(record_list[index])
-                record[field] = [record_list[index]]
+                record[field] = hostlist.expand_hostlist(record_list[index])
+                 ## Do not expand node list
+                # record[field] = [record_list[index]]
             else:
                 record[field] = []
-        elif field == 'STATE':
-            record[field] = [record_list[index]]
+        # elif field == 'STATE':
+        #     record[field] = [record_list[index]]
         elif field == 'CPUS':
             record[field] = int(record_list[index])
+        elif field == 'START_TIME' or field == 'SUBMIT_TIME' or field == 'END_TIME':
+            try:
+                time_object = datetime.strptime(record_list[index], "%Y-%m-%dT%H:%M:%S")
+                record[field] = int(time_object.timestamp())
+            except:
+                record[field] = 'N/A'
         else:
             record[field] = record_list[index]
 
     return record
 
 
-def dump_queue_metrics(timestamp: object, queue_status: list, conn: object) -> None:
-    """
-    Dump queue status into TimescaleDB
-    """
-    all_records = []
-    target_table = 'slurm.queue_status'
-    cols = ('timestamp', 'jobid', 'name', 'user', 'state', 'partition', 
-            'nodelist', 'cpus', 'min_memory', 'start_time', 'time', 'time_left')
-    for job_status in queue_status:
-        all_records.append((timestamp, job_status['JOBID'], job_status['NAME'], 
-                            job_status['USER'], job_status['STATE'], 
-                            job_status['PARTITION'], job_status['NODELIST'], 
-                            job_status['CPUS'], job_status['MIN_MEMORY'], 
-                            job_status['START_TIME'], job_status['TIME'],
-                            job_status['TIME_LEFT']))
-    mgr = CopyManager(conn, target_table, cols)
-    mgr.copy(all_records)
-    conn.commit()
+# def dump_queue_metrics(timestamp: object, queue_status: list, conn: object) -> None:
+#     """
+#     Dump queue status into TimescaleDB
+#     """
+#     all_records = []
+#     target_table = 'slurm.queue_status'
+#     cols = ('timestamp', 'jobid', 'name', 'user', 'state', 'partition', 
+#             'nodelist', 'cpus', 'min_memory', 'start_time', 'time', 'time_left')
+#     for job_status in queue_status:
+#         all_records.append((timestamp, job_status['JOBID'], job_status['NAME'], 
+#                             job_status['USER'], job_status['STATE'], 
+#                             job_status['PARTITION'], job_status['NODELIST'], 
+#                             job_status['CPUS'], job_status['MIN_MEMORY'], 
+#                             job_status['START_TIME'], job_status['TIME'],
+#                             job_status['TIME_LEFT']))
+#     mgr = CopyManager(conn, target_table, cols)
+#     mgr.copy(all_records)
+#     conn.commit()
 
 
 # # Write to json

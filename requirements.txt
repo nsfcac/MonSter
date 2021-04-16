@@ -16,3 +16,4 @@ tqdm
 http_parser
 async_retrying
 python-hostlist
+flask_cors
