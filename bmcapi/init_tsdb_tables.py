@@ -351,6 +351,14 @@ def gen_slurm_table_schemas() -> dict:
             'add_columns': ['Value'],
             'add_types': ['REAL']
         },
+        'memory_used':{
+            'add_columns': ['Value'],
+            'add_types': ['INT']
+        },
+        'cpu_load':{
+            'add_columns': ['Value'],
+            'add_types': ['INT']
+        },
         'state':{
             'add_columns': ['Value'],
             'add_types': ['INT']

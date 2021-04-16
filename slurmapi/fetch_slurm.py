@@ -235,16 +235,25 @@ def parse_node_metrics(nodes_metrics: dict, node_id_mapping: dict) -> dict:
         # Only process those nodes that are in node_id_mapping dict. 
         if hostname in node_id_mapping:
             node_id = node_id_mapping[hostname]
+            # CPU load
+            cpu_load = int(node['cpu_load'])
+            # Some down nodes report cpu_load large than 2147483647, which is 
+            # not INT4, and cannot saved in TSDB
+            if cpu_load > 2147483647:
+                cpu_load = 2147483647
             # Memory usage
             free_memory = node['free_memory']
             real_memory = node['real_memory']
             memory_usage = ((real_memory - free_memory)/real_memory) * 100
+            memory_used = real_memory - free_memory
             f_memory_usage = float("{:.2f}".format(memory_usage))
             # Status
             state = node['state']
             f_state = state_mapping[state]
             node_data = {
+                'cpu_load': cpu_load,
                 'memoryusage': f_memory_usage,
+                'memory_used': memory_used,
                 'state': f_state
             }
             all_node_data.update({
@@ -270,7 +279,7 @@ def gene_node_id_mapping(connection: str) -> dict:
             cur.close()
             return mapping
     except Exception as err:
-        loggin.error(f"Faile to generate node-id mapping : {err}")
+        logging.error(f"Faile to generate node-id mapping : {err}")
 
 
 def dump_node_jobs_metrics(timestamp: object, 
@@ -309,7 +318,7 @@ def dump_node_metrics(timestamp: object,
             mgr.copy(all_records)
             conn.commit()
     except Exception as err:
-        loggin.error(f"Faile to dump_node_metrics : {err}")
+        logging.error(f"Faile to dump_node_metrics : {err}")
 
 
 if __name__ == '__main__':
