@@ -34,6 +34,9 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
 
+PREV_JOBS_RUNNING = []
+PREV_JOBS_COMPLETED = []
+
 def main():
     # Read configuration file
     config = parse_config('../config.yml')
@@ -73,12 +76,15 @@ def fetch_slurm(config_slurm: dict, connection: str, node_id_mapping: dict) -> N
     jobs_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['slurm_jobs']}"
     jobs_data = call_slurm_api(config_slurm, token, jobs_url)
 
-    # Process slurm data
+    ## Process slurm data
+    job_metrics = parse_jobs_metrics(jobs_data, node_id_mapping)
     node_metrics = parse_node_metrics(nodes_data, node_id_mapping)
     node_jobs = get_node_jobs(jobs_data, node_id_mapping)
 
-    # Dump metrics into TimescaleDB
+    # print(json.dumps(job_metrics, indent=4))
+    ## Dump metrics into TimescaleDB
     with psycopg2.connect(connection) as conn:
+        dump_jobs_metrics(job_metrics, conn)
         dump_node_metrics(timestamp, node_metrics, conn)
         dump_node_jobs_metrics(timestamp, node_jobs, conn)
         
@@ -174,14 +180,14 @@ def get_node_jobs(jobs_metrics: dict, node_id_mapping:dict) -> dict:
     # Get job-nodes correlation
     job_nodes = {}
     for job in all_jobs:
-        # Check if hostname is in node_id_mapping. If not, ignore this jon info.
         valid_flag = True
         if job['job_state'] == "RUNNING":
             job_id = job['job_id']
             nodes = job['nodes']
             # Get node ids
             hostnames = parse_hostnames(nodes)
-
+            
+            # Check if hostname is in node_id_mapping. If not, ignore this job info.
             for hostname in hostnames:
                 if hostname not in node_id_mapping:
                     valid_flag = False
@@ -215,6 +221,84 @@ def get_node_jobs(jobs_metrics: dict, node_id_mapping:dict) -> dict:
     # node_jobs = sorted(node_jobs.items(), key=lambda item: item[0])
     # print(len(list(node_jobs.keys())))
     return node_jobs
+
+
+def parse_jobs_metrics(jobs_metrics: dict, node_id_mapping: dict):
+    """
+    Parse jobs metrics
+    """
+    global PREV_JOBS_RUNNING
+    global PREV_JOBS_COMPLETED
+
+    jobs_info = {
+        'running':[],
+        'completed':[]
+    }
+
+    all_jobs = jobs_metrics['jobs']
+    attributes = ['job_id', 'array_job_id', 'array_task_id', 'name','job_state', 
+                  'user_id', 'user_name', 'group_id', 'cluster', 'partition', 
+                  'command', 'current_working_directory', 'batch_flag', 
+                  'batch_host', 'nodes', 'node_count', 'cpus', 'tasks', 
+                  'tasks_per_node', 'cpus_per_task', 'memory_per_node', 
+                  'memory_per_cpu', 'priority', 'time_limit', 'deadline', 
+                  'submit_time', 'preempt_time', 'suspend_time', 
+                  'eligible_time', 'start_time', 'end_time', 'resize_time', 
+                  'restart_cnt', 'exit_code', 'derived_exit_code']
+
+    curr_jobs = []
+    curr_jobs_running = []
+    curr_jobs_completed = []
+    
+    for job in all_jobs:
+        job_id = job['job_id']
+        job_state = job['job_state']
+
+        if job_state == "RUNNING":
+            curr_jobs = PREV_JOBS_RUNNING
+            curr_jobs_running.append(job_id)
+        if job_state == "COMPLETED":
+            curr_jobs = PREV_JOBS_COMPLETED
+            curr_jobs_completed.append(job_id)
+            
+        if job_id not in curr_jobs:
+            valid_flag = True
+            batch_host = job['batch_host']
+            batch_host_id = node_id_mapping.get(batch_host, -1)
+
+            nodes = job['nodes']
+            hostnames = parse_hostnames(nodes)
+
+            # Check if hostname is in node_id_mapping. If not, ignore this job info.
+            for hostname in hostnames:
+                if hostname not in node_id_mapping:
+                    valid_flag = False
+                    break
+
+            if batch_host_id == -1:
+                valid_flag = False
+
+            if valid_flag:
+                node_ids = [node_id_mapping[i] for i in hostnames]
+                metrics = []
+                for attribute in attributes:
+                    if attribute == 'batch_host':
+                        metrics.append(batch_host_id)
+                    elif attribute == 'nodes':
+                        metrics.append(node_ids)
+                    else:
+                        metrics.append(job[attribute])
+                tuple_metrics = tuple(metrics)
+                if job_state == "RUNNING": 
+                    jobs_info['running'].append(tuple_metrics)
+                if job_state == "COMPLETED":
+                    jobs_info['completed'] .append(tuple_metrics)
+
+    PREV_JOBS_RUNNING = curr_jobs_running
+    PREV_JOBS_COMPLETED = curr_jobs_completed
+        # if RUNNING and NOT in PREVISOU JOBS, insert a record
+        # if COMPLETED, update database
+    return jobs_info
 
 
 def parse_node_metrics(nodes_metrics: dict, node_id_mapping: dict) -> dict:
@@ -319,6 +403,58 @@ def dump_node_metrics(timestamp: object,
             conn.commit()
     except Exception as err:
         logging.error(f"Faile to dump_node_metrics : {err}")
+
+
+def dump_jobs_metrics(job_metrics: dict, conn: object) -> None:
+    """
+    Dump jobs info into slurm.jobs
+    """
+    try:
+        target_table = 'slurm.jobs'
+        cols = ('job_id', 'array_job_id', 'array_task_id', 'name','job_state', 
+                'user_id', 'user_name', 'group_id', 'cluster', 'partition', 
+                'command', 'current_working_directory', 'batch_flag', 
+                'batch_host', 'nodes', 'node_count', 'cpus', 'tasks', 
+                'tasks_per_node', 'cpus_per_task', 'memory_per_node', 
+                'memory_per_cpu', 'priority', 'time_limit', 'deadline', 
+                'submit_time', 'preempt_time', 'suspend_time', 'eligible_time', 
+                'start_time', 'end_time', 'resize_time', 'restart_cnt', 
+                'exit_code', 'derived_exit_code')
+
+        # Insert running jobs
+        all_records = []
+        for job in job_metrics['running']:
+            all_records.append(job)
+
+        # For completed jobs, first check if it exists in the db as running jobs,
+        # then update it if exists or insert one if not.
+        cur = conn.cursor()
+        for job in job_metrics['completed']:
+            job_id = job[cols.index('job_id')]
+            check_sql = f"SELECT EXISTS(SELECT 1 FROM slurm.jobs WHERE job_id={job_id})"
+            cur.execute(check_sql)
+            (job_exists, ) = cur.fetchall()[0]
+
+            if job_exists:
+                # Update
+                job_state = job[cols.index('job_state')]
+                end_time = job[cols.index('end_time')]
+                resize_time = job[cols.index('resize_time')]
+                restart_cnt = job[cols.index('restart_cnt')]
+                exit_code = job[cols.index('exit_code')]
+                derived_exit_code = job[cols.index('derived_exit_code')]
+                update_sql = """ UPDATE slurm.jobs 
+                                 SET job_state = %s, end_time = %s, resize_time = %s, restart_cnt = %s, exit_code = %s, derived_exit_code = %s
+                                 WHERE job_id = %s """
+                cur.execute(update_sql, (job_state, end_time, resize_time, restart_cnt, exit_code, derived_exit_code, job_id))
+            else:
+                all_records.append(job)
+
+        mgr = CopyManager(conn, target_table, cols)
+        mgr.copy(all_records)
+        conn.commit()
+    except Exception as err:
+        logging.error(f"Faile to dump_jobs_metrics : {err}")
 
 
 if __name__ == '__main__':

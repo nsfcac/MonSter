@@ -96,6 +96,8 @@ def find_jobs(start: str, end: str, cpuload: int, memory_str: str,
             # print(node_jobs_sql)
             cur.execute(node_jobs_sql)
             rows = cur.fetchall()
+
+            # If TSDB does not have corresponding records
             if not rows:
                 no_record_nodes.append(mapping[node])
 
@@ -127,8 +129,9 @@ def find_jobs(start: str, end: str, cpuload: int, memory_str: str,
 
         nodelist = [mapping[nodeid] for nodeid in nodelist]
 
-        print(f"--> Jobs are: {bcolors.OKGREEN}{all_jobs}{bcolors.ENDC}")
         print(f"--> Nodes are: {bcolors.OKCYAN}{nodelist}{bcolors.ENDC}")
+        print(f"--> Jobs are: {bcolors.OKGREEN}{all_jobs}{bcolors.ENDC}")
+        
         if no_record_nodes:
             print(f"--> These nodes DO NOT have job record: {bcolors.WARNING}{no_record_nodes}{bcolors.ENDC}")
         
@@ -160,8 +163,9 @@ def find_jobs(start: str, end: str, cpuload: int, memory_str: str,
         noncona_nodelist.sort()
         noncona_nodelist = [mapping[nodeid] for nodeid in noncona_nodelist]
 
-        print(f"--> Jobs are: {bcolors.OKGREEN}{all_jobs}{bcolors.ENDC}")
         print(f"--> Nodes are: {bcolors.OKCYAN}{noncona_nodelist}{bcolors.ENDC}")
+        print(f"--> Jobs are: {bcolors.OKGREEN}{all_jobs}{bcolors.ENDC}")
+        
         if no_record_nodes:
             print(f"--> These nodes DO NOT have job record: {bcolors.WARNING}{no_record_nodes}{bcolors.ENDC}")
         cur.close()
@@ -244,7 +248,7 @@ def get_argument():
                         '--memory', 
                         type = str,
                         default = '6G',
-                        help = 'maximum memory used, in MB')
+                        help = 'maximum memory used, in MB or GB')
 
     parser.add_argument('-pn',
                         '--power_nocona', 
