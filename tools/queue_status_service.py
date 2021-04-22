@@ -31,7 +31,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @cross_origin()
 def get_queue_status():
     queue_status = []
-    with open('../slurmapi/data/queue_status.json', 'r') as f:
+    with open('../slurmapi/samples/queue_status.json', 'r') as f:
         queue_status = json.load(f)
     return queue_status
 
