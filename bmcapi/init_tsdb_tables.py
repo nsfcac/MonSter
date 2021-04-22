@@ -111,6 +111,7 @@ def main():
         cur.execute(sql_slurm['schema_sql'])
 
         tables_sql = sql_idrac9['tables_sql'] + sql_slurm['tables_sql']
+
         # Create tables
         for sql in tables_sql:
             table_name = sql.split(' ')[5]
@@ -120,6 +121,14 @@ def main():
             # Generate hypertable
             gene_hypertable_sql = "SELECT create_hypertable(" + "'" + table_name + "', 'timestamp', if_not_exists => TRUE);"
             cur.execute(gene_hypertable_sql)
+
+        # Create table for jobs info
+        sql_slurm_jobs = genr_jobs_sql()
+        cur.execute(sql_slurm_jobs['schema_sql'])
+        for sql in sql_slurm_jobs['tables_sql']:
+            table_name = sql.split(' ')[5]
+            print(f" |--> Create table {table_name}...")
+            cur.execute(sql)
 
         # Create a table recording the relationship between table and data type
         tables_dtype_sql = f"CREATE TABLE IF NOT EXISTS metrics_definition (id SERIAL PRIMARY KEY, metric TEXT NOT NULL, data_type TEXT, description TEXT, units TEXT, UNIQUE (id));"
@@ -304,6 +313,39 @@ def parse_sample_metrics(reduced_metrics_definition: dict, data_type_mapping: di
     except Exception as err:
         logging.error(f'parse_sample_metrics: {err}')
     return table_schemas
+
+
+def genr_jobs_sql() -> dict:
+    """
+    Generate SQL statements to create table for jobs info
+    """
+    sql_statements = {}
+    schema_name = 'slurm'
+    table = 'jobs'
+    try:
+        schema_sql = f"CREATE SCHEMA if NOT EXISTS {schema_name}"
+        sql_statements.update({
+            'schema_sql': schema_sql
+        })
+        tables_sql = []
+        column_names = ['job_id', 'array_job_id', 'array_task_id', 'name', 'job_state', 'user_id', 'user_name', 'group_id', 'cluster', 'partition', 'command', 'current_working_directory', 'batch_flag', 'batch_host', 'nodes', 'node_count', 'cpus', 'tasks', 'tasks_per_node', 'cpus_per_task', 'memory_per_node', 'memory_per_cpu', 'priority', 'time_limit', 'deadline', 'submit_time', 'preempt_time', 'suspend_time', 'eligible_time', 'start_time', 'end_time', 'resize_time', 'restart_cnt', 'exit_code', 'derived_exit_code']
+        column_types = ['INT PRIMARY KEY', 'INT', 'INT', 'TEXT', 'TEXT', 'INT', 'TEXT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'BOOLEAN', 'INT', 'INT[]', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT']
+        # all_column_names = ['account', 'accrue_time', 'username_comment', 'array_job_id', 'array_task_id', 'array_max_tasks', 'array_task_string', 'association_id', 'batch_features', 'batch_flag', 'batch_host', 'flags', 'burst_buffer', 'burst_buffer_state', 'cluster', 'cluster_features', 'command', 'comment', 'contiguous', 'core_spec', 'thread_spec', 'cores_per_socket', 'billable_tres', 'cpus_per_task', 'cpu_frequency_minimum', 'cpu_frequency_maximum', 'cpu_frequency_governor', 'cpus_per_tres', 'deadline', 'delay_boot', 'dependency', 'derived_exit_code', 'eligible_time', 'end_time', 'excluded_nodes', 'exit_code', 'features', 'federation_origin', 'federation_siblings_active', 'federation_siblings_viable', 'gres_detail', 'group_id', 'job_id', 'job_state', 'last_sched_evaluation', 'licenses', 'max_cpus', 'max_nodes', 'mcs_label', 'memory_per_tres', 'name', 'nodes', 'nice', 'tasks_per_core', 'tasks_per_node', 'tasks_per_socket', 'tasks_per_board', 'cpus', 'node_count', 'tasks', 'het_job_id', 'het_job_id_set', 'het_job_offset', 'partition', 'memory_per_node', 'memory_per_cpu', 'minimum_cpus_per_node', 'minimum_tmp_disk_per_node', 'preempt_time', 'pre_sus_time', 'priority', 'profile', 'qos', 'reboot', 'required_nodes', 'requeue', 'resize_time', 'restart_cnt', 'resv_name', 'shared', 'show_flags', 'sockets_per_board', 'sockets_per_node', 'start_time', 'state_description', 'state_reason', 'standard_error', 'standard_input', 'standard_output', 'submit_time', 'suspend_time', 'system_comment', 'time_limit', 'time_minimum', 'threads_per_core', 'tres_bind', 'tres_freq', 'tres_per_job', 'tres_per_node', 'tres_per_socket', 'tres_per_task', 'tres_req_str', 'tres_alloc_str', 'user_id', 'user_name', 'wckey', 'current_working_directory']
+        # column_types = ['TEXT', 'INT', 'TEXT', 'INT', 'INT', 'INT', 'TXT', 'INT', 'TXT', 'BOOLEAN', 'INT', 'TEXT[]', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'BOOLEAN', 'INT', 'INT', 'INT', 'REAL', 'INT', 'REAL', 'REAL', 'REAL', 'TEXT', 'INT', 'INT', 'TEXT', 'INT', 'INT', 'INT', 'INT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'TEXT[]', 'INT', 'INT', 'TEXT', 'INT', 'TEXT', 'INT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'INT[]', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'TEXT', 'INT', 'TEXT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'TEXT', 'TEXT', 'BOOLEAN', 'INT', 'BOOLEAN', 'INT', 'INT', 'TEXT', 'TEXT', 'TEXT[]', 'INT', 'INT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'INT', 'INT', 'TEXT', 'INT', 'INT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT','TEXT', 'TEXT','TEXT', 'TEXT', 'INT', 'TEXT', 'TEXT', 'TEXT']
+        column_str = ''
+        for i, column in enumerate(column_names):
+            column_str += f'{column} {column_types[i]}, '
+
+        table_sql = f"CREATE TABLE IF NOT EXISTS {schema_name}.{table} ({column_str[:-2]});"
+        tables_sql.append(table_sql)
+
+        sql_statements.update({
+            'tables_sql': tables_sql,
+        })
+    except Exception as err:
+        logging.error(f'genr_jobs_sql: {err}')
+    
+    return sql_statements
 
 
 def genr_sql(table_schemas: dict, schema_name: str) -> dict:
