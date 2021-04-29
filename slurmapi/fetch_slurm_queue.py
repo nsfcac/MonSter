@@ -108,7 +108,7 @@ def fetch_slurm_queue() -> list:
             'timestamp': timestamp,
             'queue_status': queue_status
         }
-        with open('./data/queue_status.json', 'w') as f:
+        with open('./samples/queue_status.json', 'w') as f:
             json.dump(time_queue_status, f)
 
     return
@@ -217,7 +217,7 @@ def parse_record(field_index: dict, record_raw: str) -> dict:
 
 # print('--> Done!')
 
-# with open('./data/squeue.json', 'w') as f:
+# with open('./samples/squeue.json', 'w') as f:
 #     json.dump(queue_status, f, indent = 4)
 
 if __name__ == '__main__':

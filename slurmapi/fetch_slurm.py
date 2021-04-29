@@ -34,7 +34,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
 
-PREV_JOBS_RUNNING = []
+PREV_JOBS_OTHERS = []
 PREV_JOBS_COMPLETED = []
 
 def main():
@@ -227,11 +227,11 @@ def parse_jobs_metrics(jobs_metrics: dict, node_id_mapping: dict):
     """
     Parse jobs metrics
     """
-    global PREV_JOBS_RUNNING
+    global PREV_JOBS_OTHERS
     global PREV_JOBS_COMPLETED
 
     jobs_info = {
-        'running':[],
+        'others':[],
         'completed':[]
     }
 
@@ -247,19 +247,19 @@ def parse_jobs_metrics(jobs_metrics: dict, node_id_mapping: dict):
                   'restart_cnt', 'exit_code', 'derived_exit_code']
 
     curr_jobs = []
-    curr_jobs_running = []
+    curr_jobs_others = []
     curr_jobs_completed = []
     
     for job in all_jobs:
         job_id = job['job_id']
         job_state = job['job_state']
-
-        if job_state == "RUNNING":
-            curr_jobs = PREV_JOBS_RUNNING
-            curr_jobs_running.append(job_id)
+            
         if job_state == "COMPLETED":
             curr_jobs = PREV_JOBS_COMPLETED
             curr_jobs_completed.append(job_id)
+        else:
+            curr_jobs = PREV_JOBS_OTHERS
+            curr_jobs_others.append(job_id)
             
         if job_id not in curr_jobs:
             valid_flag = True
@@ -287,14 +287,20 @@ def parse_jobs_metrics(jobs_metrics: dict, node_id_mapping: dict):
                     elif attribute == 'nodes':
                         metrics.append(node_ids)
                     else:
-                        metrics.append(job[attribute])
+                        # Some attributes values are larger than 2147483647, which is 
+                        # not INT4, and cannot saved in TSDB
+                        if type(job[attribute]) is int and job[attribute] > 2147483647:
+                            metrics.append(2147483647)
+                        else:
+                            metrics.append(job[attribute])
                 tuple_metrics = tuple(metrics)
-                if job_state == "RUNNING": 
-                    jobs_info['running'].append(tuple_metrics)
+
                 if job_state == "COMPLETED":
                     jobs_info['completed'] .append(tuple_metrics)
+                else: 
+                    jobs_info['others'].append(tuple_metrics)
 
-    PREV_JOBS_RUNNING = curr_jobs_running
+    PREV_JOBS_OTHERS = curr_jobs_others
     PREV_JOBS_COMPLETED = curr_jobs_completed
         # if RUNNING and NOT in PREVISOU JOBS, insert a record
         # if COMPLETED, update database
@@ -323,7 +329,7 @@ def parse_node_metrics(nodes_metrics: dict, node_id_mapping: dict) -> dict:
             cpu_load = int(node['cpu_load'])
             # Some down nodes report cpu_load large than 2147483647, which is 
             # not INT4, and cannot saved in TSDB
-            if cpu_load > 2147483647:
+            if cpu_load > 2147483647: 
                 cpu_load = 2147483647
             # Memory usage
             free_memory = node['free_memory']
@@ -372,14 +378,20 @@ def dump_node_jobs_metrics(timestamp: object,
     """
     Dump slurm metrics into TimescaleDB
     """
-    all_records = []
-    target_table = 'slurm.node_jobs'
-    cols = ('timestamp', 'nodeid', 'jobs', 'cpus')
-    for node, job_info in node_jobs_metrics.items():
-        all_records.append((timestamp, int(node), job_info['jobs'], job_info['cpus']))
-    mgr = CopyManager(conn, target_table, cols)
-    mgr.copy(all_records)
-    conn.commit()
+    try:
+        all_records = []
+        target_table = 'slurm.node_jobs'
+        cols = ('timestamp', 'nodeid', 'jobs', 'cpus')
+        for node, job_info in node_jobs_metrics.items():
+            all_records.append((timestamp, int(node), job_info['jobs'], job_info['cpus']))
+        mgr = CopyManager(conn, target_table, cols)
+        mgr.copy(all_records)
+        conn.commit()
+    except Exception as err:
+        curs = conn.cursor()
+        curs.execute("ROLLBACK")
+        conn.commit()
+        logging.error(f"Faile to dump_node_jobs_metrics : {err}")
 
 
 def dump_node_metrics(timestamp: object, 
@@ -402,6 +414,9 @@ def dump_node_metrics(timestamp: object,
             mgr.copy(all_records)
             conn.commit()
     except Exception as err:
+        curs = conn.cursor()
+        curs.execute("ROLLBACK")
+        conn.commit()
         logging.error(f"Faile to dump_node_metrics : {err}")
 
 
@@ -421,14 +436,19 @@ def dump_jobs_metrics(job_metrics: dict, conn: object) -> None:
                 'start_time', 'end_time', 'resize_time', 'restart_cnt', 
                 'exit_code', 'derived_exit_code')
 
+        cur = conn.cursor()
         # Insert running jobs
         all_records = []
-        for job in job_metrics['running']:
-            all_records.append(job)
+        for job in job_metrics['others']:
+            job_id = job[cols.index('job_id')]
+            check_sql = f"SELECT EXISTS(SELECT 1 FROM slurm.jobs WHERE job_id={job_id})"
+            cur.execute(check_sql)
+            (job_exists, ) = cur.fetchall()[0]
+            if not job_exists:
+                all_records.append(job)
 
         # For completed jobs, first check if it exists in the db as running jobs,
         # then update it if exists or insert one if not.
-        cur = conn.cursor()
         for job in job_metrics['completed']:
             job_id = job[cols.index('job_id')]
             check_sql = f"SELECT EXISTS(SELECT 1 FROM slurm.jobs WHERE job_id={job_id})"
@@ -438,15 +458,16 @@ def dump_jobs_metrics(job_metrics: dict, conn: object) -> None:
             if job_exists:
                 # Update
                 job_state = job[cols.index('job_state')]
+                start_time = job[cols.index('start_time')]
                 end_time = job[cols.index('end_time')]
                 resize_time = job[cols.index('resize_time')]
                 restart_cnt = job[cols.index('restart_cnt')]
                 exit_code = job[cols.index('exit_code')]
                 derived_exit_code = job[cols.index('derived_exit_code')]
                 update_sql = """ UPDATE slurm.jobs 
-                                 SET job_state = %s, end_time = %s, resize_time = %s, restart_cnt = %s, exit_code = %s, derived_exit_code = %s
+                                 SET job_state = %s, start_time = %s, end_time = %s, resize_time = %s, restart_cnt = %s, exit_code = %s, derived_exit_code = %s
                                  WHERE job_id = %s """
-                cur.execute(update_sql, (job_state, end_time, resize_time, restart_cnt, exit_code, derived_exit_code, job_id))
+                cur.execute(update_sql, (job_state, start_time, end_time, resize_time, restart_cnt, exit_code, derived_exit_code, job_id))
             else:
                 all_records.append(job)
 
@@ -454,6 +475,10 @@ def dump_jobs_metrics(job_metrics: dict, conn: object) -> None:
         mgr.copy(all_records)
         conn.commit()
     except Exception as err:
+        # Ref: https://stackoverflow.com/questions/2979369/databaseerror-current-transaction-is-aborted-commands-ignored-until-end-of-tra
+        curs = conn.cursor()
+        curs.execute("ROLLBACK")
+        conn.commit()
         logging.error(f"Faile to dump_jobs_metrics : {err}")
 
 
