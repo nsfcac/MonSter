@@ -1,34 +1,5 @@
-import re
-import sys
 import yaml
 import json
-import time
-import logging
-import psycopg2
-from getpass import getpass
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
-
-def get_user_input() -> tuple:
-    """
-    Ask username and password
-    """
-    try:
-        user = input(f"--> {bcolors.HEADER}iDRAC username{bcolors.ENDC}: ")
-        password = getpass(prompt=f'--> {bcolors.HEADER}iDRAC password{bcolors.ENDC}: ')
-        return(user, password)
-    except Exception as err:
-        print(err)
 
 
 def parse_config(path: str) -> object:
@@ -62,94 +33,22 @@ def parse_nodelist(nodelist_cfg: list) -> list:
     """
     nodelist = []
     for item in nodelist_cfg:
-        ip_addr_node = item.split("[")[0]
-        ip_addr_subnet = item.split("[")[1]
+        ip_addr_node = item.split("/")[0]
+        ip_addr_subnet = item.split("/")[1]
 
-        sections = ip_addr_subnet[:-1].split(",")
+        sections = ip_addr_subnet.split(",")
         for section in sections:
             if "-" in section:
                 st = int(section.split("-")[0])
                 ed = int(section.split("-")[1])
                 for i in range(st, ed+1):
-                    ip_addr = ip_addr_node + str(i)
+                    ip_addr = ip_addr_node + "." + str(i)
                     nodelist.append(ip_addr)
             else:
-                ip_addr = ip_addr_node + str(int(section))
+                ip_addr = ip_addr_node + "." + str(int(section))
                 nodelist.append(ip_addr)
     
     return nodelist
-
-
-def parse_hostnames(nodes: str) -> list:
-    """
-    Parse hostname from the nodes string in job metrics fetched from slurm
-    For example, nodes = "cpu-1-[24,46],cpu-2-33,cpu-4-[35,41],cpu-7-[37-39,46,53],cpu-10-40"
-    """
-    hostnames = []
-    hn_raw_single = re.findall('[a-z]+-{1}\d+-{1}\d+', nodes)
-    hn_raw_range = re.findall('[a-z]+-{1}\d+-{1}\[{1}\d+[0-9,\,,\-]*\]{1}', nodes)
-
-    for item in hn_raw_single:
-        hostnames.append(item)
-    for item in hn_raw_range:
-        rack = item.split("[")[0]
-        node_range = item.split("[")[1]
-
-        sections = node_range[:-1].split(",")
-        for section in sections:
-            if "-" in section:
-                st = int(section.split("-")[0])
-                ed = int(section.split("-")[1])
-                for i in range(st, ed+1):
-                    hostname = rack + str(i)
-                    hostnames.append(hostname)
-            else:
-                hostname = rack + str(int(section))
-                hostnames.append(hostname)
-
-    return hostnames
-
-
-def init_tsdb_connection(config: dict) -> str:
-    # Generate TimeScaleDB connection
-    db_host = config['timescaledb']['host']
-    db_port = config['timescaledb']['port']
-    db_user = config['timescaledb']['user']
-    db_pswd = config['timescaledb']['password']
-    db_dbnm = config['timescaledb']['database']
-    connection = f"postgres://{db_user}:{db_pswd}@{db_host}:{db_port}/{db_dbnm}"
-    return connection
-
-
-def gene_node_id_mapping(connection: str) -> dict:
-    """
-    Generate nodename-nodeid mapping dict
-    """
-    mapping = {}
-    try:
-        with psycopg2.connect(connection) as conn:
-            cur = conn.cursor()
-            query = "SELECT nodeid, hostname FROM nodes"
-            cur.execute(query)
-            for (nodeid, hostname) in cur.fetchall():
-                mapping.update({
-                    hostname: nodeid
-                })
-            cur.close()
-            return mapping
-    except Exception as err:
-        logging.error(f"Faile to generate node-id mapping : {err}")
-
-
-def animated_loading():
-    """
-    Printing loading animation
-    """
-    chars = "/—\|" 
-    for char in chars:
-        sys.stdout.write('\r'+'loading...'+char)
-        time.sleep(.1)
-        sys.stdout.flush() 
     
 
 def ansys_node(nodelist: list) -> dict:
