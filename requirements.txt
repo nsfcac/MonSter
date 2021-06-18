@@ -1,4 +1,5 @@
 # pyslurm==17.11.0.11
+flask
 aiohttp
 influxdb
 PyYAML
@@ -8,3 +9,11 @@ pathlib
 paramiko
 schedule
 pymongo
+psycopg2
+pgcopy
+pandas
+tqdm
+http_parser
+async_retrying
+python-hostlist
+flask_cors
