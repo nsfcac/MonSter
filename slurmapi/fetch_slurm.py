@@ -79,14 +79,14 @@ def fetch_slurm(config_slurm: dict, connection: str, node_id_mapping: dict) -> N
 
     ## Process slurm data
     if jobs_data and nodes_data:
-        job_metrics = parse_jobs_metrics(jobs_data, node_id_mapping)
+        # job_metrics = parse_jobs_metrics(jobs_data, node_id_mapping)
         node_jobs = get_node_jobs(jobs_data, node_id_mapping)
         node_metrics = parse_node_metrics(nodes_data, node_id_mapping)
 
         # print(json.dumps(job_metrics, indent=4))
         ## Dump metrics into TimescaleDB
         with psycopg2.connect(connection) as conn:
-            dump_jobs_metrics(job_metrics, conn)
+            # dump_jobs_metrics(job_metrics, conn)
             dump_node_metrics(timestamp, node_metrics, conn)
             dump_node_jobs_metrics(timestamp, node_jobs, conn)
         
