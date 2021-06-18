@@ -76,7 +76,7 @@ async def fetch_write_data(config: dict, nodes: list,
         table_dtype_mapping = gene_table_dtype_mapping(conn)
         ip_id_mapping = gene_ip_id_mapping(conn)
         async with ClientSession(
-            connector = aiohttp.TCPConnector(verify_ssl=False, force_close=False, limit=None), 
+            connector = aiohttp.TCPConnector(ssl=False, force_close=False, limit=None), 
             auth=aiohttp.BasicAuth(user, password),
             timeout = aiohttp.ClientTimeout(total=0)
         ) as session:
