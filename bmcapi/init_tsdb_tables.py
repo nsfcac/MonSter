@@ -68,9 +68,9 @@ def main():
     connection = init_tsdb_connection(config)
 
     # Print logo and user interface
-    # user, password = get_user_input()
-    user = 'password'
-    password = 'monster'
+    user, password = get_user_input()
+    # user = 'password'
+    # password = 'monster'
 
     # We randomly select 3 nodes to get the metric reports
     nodelist = parse_nodelist(config['bmc']['iDRAC9_nodelist'])

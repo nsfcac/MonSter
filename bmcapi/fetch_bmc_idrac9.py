@@ -34,6 +34,7 @@ from async_retrying import retry
 from getpass import getpass
 from pgcopy import CopyManager
 from datetime import datetime, timedelta
+from dateutil import tz
 from dateutil.parser import parse as parse_time
 from functools import reduce
 from sharings.utils import get_user_input, parse_config, parse_nodelist, init_tsdb_connection
@@ -67,7 +68,6 @@ def main():
     loop = asyncio.get_event_loop()
     loop.create_task(fetch_write_data(config, nodes, user, password, connection))
     loop.run_forever()
-    # loop.run_until_complete(fetch_write_data(config, nodes, user, password, connection))
 
 
 async def fetch_write_data(config: dict, nodes: list, 
@@ -134,7 +134,25 @@ def process_metrics(ip: str, report: str, metrics: list) -> None:
     10.101.25.22
     10.101.26.10
     """
+    import time
     processed_metrics = {}
+    valid_metrics = ['temperaturereading', 'rpmreading', 'voltagereading', 
+                     'ampsreading', 'wattsreading', 'cpuusagepctreading', 
+                     'cpuusage', 'systemheadroominstantaneous', 
+                     'systeminputpower', 'systemoutputpower', 
+                     'systempowerconsumption', 'totalcpupower', 
+                     'totalmemorypower', 'memoryusage',
+                     'linkstatus', 'rxbroadcast', 'rxbytes', 
+                     'rxerrorpktalignmenterrors', 'rxerrorpktfcserrors', 
+                     'rxjabberpkt', 'rxmutlicast', 'rxpausexoffframes',
+                     'rxpausexonframes', 'rxruntpkt', 'rxunicast',
+                     'txbroadcast',	'txbytes', 'txmutlicast', 
+                     'txpausexoffframes', 'txpausexonframes', 'txunicast',
+                     'rxfalsecarrierdetection', 'rdmarxtotalbytes',
+                     'rdmarxtotalpackets', 'rdmatxtotalbytes','rdmatxtotalpackets']
+                      #   'osdriverstate'
+
+    curr_ts = int(time.time())
     try:
         if report == "PowerStatistics":
             # PowerStatistics is better to be pulled
@@ -154,17 +172,20 @@ def process_metrics(ip: str, report: str, metrics: list) -> None:
                     'Value': value
                 }
 
-                # if table_name.lower() == 'ampsreading' or table_name.lower() == 'voltagereading':
-                #     print(f"{ip} : {report}")
-                # if table_name.lower() == 'cpuusagepctreading' or table_name.lower() == 'rdmarxtotalbytes':
-                #     print(f"{ip} : {report}")
+                # Some metrics only have values of 0, we do not save these metrics
+                if table_name.lower() in valid_metrics:
+                    if table_name not in processed_metrics:
+                        processed_metrics.update({
+                            table_name: [record]
+                        })
+                    else:
+                        processed_metrics[table_name].append(record)
 
-                if table_name not in processed_metrics:
-                    processed_metrics.update({
-                        table_name: [record]
-                    })
-                else:
-                    processed_metrics[table_name].append(record)
+                    # # # Collect data in json format
+                    # if curr_ts >= 1621969200 and curr_ts <= 1622055600:
+                    #     with open('./samples/raw_metrics.txt', 'a') as f:
+                    #         record_str = json.dumps(record)
+                    #         f.write(f"{record_str}, ")
     
     except Exception as err:
             logging.error(f"Fail to process metric values: {err}")
@@ -197,11 +218,14 @@ def dump_metrics(ip: str,
 
             cols = ('timestamp', 'nodeid', 'source', 'fqdd', 'value')
             for metric in table_metrics:
-                # We have to offset timestamp by -6 hours. For some unknow
+                # We have to offset timestamp by -6/-5 hours. For some unknow
                 # reasons, the timestamp reported in iDRAC9 is not configured
                 # correctly.
-                offset = timedelta(hours=6)
-                timestamp = parse_time(metric['Timestamp']) - offset
+                timestamp = parse_time(metric['Timestamp'])
+                timestamp = timestamp.astimezone(tz.tzlocal())
+                timestamp = timestamp.replace(tzinfo=tz.tzutc())
+                timestamp = timestamp.astimezone(tz.tzlocal())
+
                 source = metric['Source']
                 fqdd = metric['FQDD']
                 value = cast_value_type(metric['Value'], dtype)
@@ -211,6 +235,7 @@ def dump_metrics(ip: str,
             mgr = CopyManager(conn, target_table, cols)
             mgr.copy(all_records)
         conn.commit()
+
 
     except Exception as err:
         logging.error(f"Fail to dump metrics : {err}")

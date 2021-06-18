@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 This module calls Slurm REST API to obtain detailed accouting information about
-individual jobs or job steps and nodes information.
+individual jobs or job steps and nodes metrics.
 
 Job State:
 https://slurm.schedmd.com/sacct.html#SECTION_JOB-STATE-CODES
@@ -23,7 +23,8 @@ sys.path.append('../')
 from pgcopy import CopyManager
 from datetime import datetime, timezone
 from requests.adapters import HTTPAdapter
-from sharings.utils import parse_config, parse_hostnames, init_tsdb_connection
+from sharings.utils import parse_config, parse_hostnames, \
+    init_tsdb_connection, gene_node_id_mapping
 
 logging_path = './fetch_slurm.log'
 
@@ -77,16 +78,17 @@ def fetch_slurm(config_slurm: dict, connection: str, node_id_mapping: dict) -> N
     jobs_data = call_slurm_api(config_slurm, token, jobs_url)
 
     ## Process slurm data
-    job_metrics = parse_jobs_metrics(jobs_data, node_id_mapping)
-    node_metrics = parse_node_metrics(nodes_data, node_id_mapping)
-    node_jobs = get_node_jobs(jobs_data, node_id_mapping)
+    if jobs_data and nodes_data:
+        job_metrics = parse_jobs_metrics(jobs_data, node_id_mapping)
+        node_jobs = get_node_jobs(jobs_data, node_id_mapping)
+        node_metrics = parse_node_metrics(nodes_data, node_id_mapping)
 
-    # print(json.dumps(job_metrics, indent=4))
-    ## Dump metrics into TimescaleDB
-    with psycopg2.connect(connection) as conn:
-        dump_jobs_metrics(job_metrics, conn)
-        dump_node_metrics(timestamp, node_metrics, conn)
-        dump_node_jobs_metrics(timestamp, node_jobs, conn)
+        # print(json.dumps(job_metrics, indent=4))
+        ## Dump metrics into TimescaleDB
+        with psycopg2.connect(connection) as conn:
+            dump_jobs_metrics(job_metrics, conn)
+            dump_node_metrics(timestamp, node_metrics, conn)
+            dump_node_jobs_metrics(timestamp, node_jobs, conn)
         
 
 def read_token(config_slurm: dict) -> str:
@@ -112,33 +114,37 @@ def get_slurm_token(config_slurm: dict) -> list:
     Get JWT token from Slurm. This requires the public key on this node to be 
     added to the target cluster headnode.
     """
-    try:
-        # Setting command parameters
-        slurm_rest_api_ip = config_slurm['ip']
-        slurm_rest_api_port = config_slurm['port']
-        slurm_rest_api_user = config_slurm['user']
-        slurm_headnode = config_slurm['headnode']
-        
-        print("Get a new token...")
-        # The command used in cli
-        command = [f"ssh {slurm_headnode} 'scontrol token lifespan=3600'"]
-        # Get the string from command line
-        rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
-        # Get token
-        token = rtn_str.splitlines()[0].split('=')[1]
-        timestamp = int(time.time())
+    while True:
+        try:
+            # Setting command parameters
+            slurm_rest_api_ip = config_slurm['ip']
+            slurm_rest_api_port = config_slurm['port']
+            slurm_rest_api_user = config_slurm['user']
+            slurm_headnode = config_slurm['headnode']
+            
+            print("Get a new token...")
+            # The command used in cli
+            command = [f"ssh {slurm_headnode} 'scontrol token lifespan=3600'"]
+            # Get the string from command line
+            rtn_str = subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8')
+            # Get token
+            token = rtn_str.splitlines()[0].split('=')[1]
+            timestamp = int(time.time())
 
-        token_record = {
-            'time': timestamp,
-            'token': token
-        }
+            token_record = {
+                'time': timestamp,
+                'token': token
+            }
 
-        with open('./token.json', 'w') as f:
-            json.dump(token_record, f, indent = 4)
-        
-        return token
-    except Exception as err:
-        print("Get Slurm token error!")
+            with open('./token.json', 'w') as f:
+                json.dump(token_record, f, indent = 4)
+            
+            return token
+        except Exception as err:
+            print("Get Slurm token error!")
+            time.sleep(60)
+        else:
+            break
 
 
 def call_slurm_api(config_slurm: dict, token: str, url: str) -> dict:
@@ -246,7 +252,7 @@ def parse_jobs_metrics(jobs_metrics: dict, node_id_mapping: dict):
                   'eligible_time', 'start_time', 'end_time', 'resize_time', 
                   'restart_cnt', 'exit_code', 'derived_exit_code']
 
-    curr_jobs = []
+    prev_jobs = []
     curr_jobs_others = []
     curr_jobs_completed = []
     
@@ -255,13 +261,13 @@ def parse_jobs_metrics(jobs_metrics: dict, node_id_mapping: dict):
         job_state = job['job_state']
             
         if job_state == "COMPLETED":
-            curr_jobs = PREV_JOBS_COMPLETED
+            prev_jobs = PREV_JOBS_COMPLETED
             curr_jobs_completed.append(job_id)
         else:
-            curr_jobs = PREV_JOBS_OTHERS
+            prev_jobs = PREV_JOBS_OTHERS
             curr_jobs_others.append(job_id)
             
-        if job_id not in curr_jobs:
+        if job_id not in prev_jobs:
             valid_flag = True
             batch_host = job['batch_host']
             batch_host_id = node_id_mapping.get(batch_host, -1)
@@ -295,10 +301,17 @@ def parse_jobs_metrics(jobs_metrics: dict, node_id_mapping: dict):
                             metrics.append(job[attribute])
                 tuple_metrics = tuple(metrics)
 
-                if job_state == "COMPLETED":
-                    jobs_info['completed'] .append(tuple_metrics)
+                
+                # Only running jobs do not need to update
+                if job_state == "RUNNING":
+                    jobs_info['others'] .append(tuple_metrics)
                 else: 
-                    jobs_info['others'].append(tuple_metrics)
+                    jobs_info['completed'].append(tuple_metrics)
+
+                # if job_state == "COMPLETED":
+                #     jobs_info['completed'] .append(tuple_metrics)
+                # else: 
+                #     jobs_info['others'].append(tuple_metrics)
 
     PREV_JOBS_OTHERS = curr_jobs_others
     PREV_JOBS_COMPLETED = curr_jobs_completed

@@ -4,6 +4,7 @@
 *.json
 *.out
 *.csv
+*.txt
 
 # Ignore folders
 .vscode/

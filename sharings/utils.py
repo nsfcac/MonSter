@@ -3,6 +3,8 @@ import sys
 import yaml
 import json
 import time
+import logging
+import psycopg2
 from getpass import getpass
 
 class bcolors:
@@ -117,6 +119,26 @@ def init_tsdb_connection(config: dict) -> str:
     db_dbnm = config['timescaledb']['database']
     connection = f"postgres://{db_user}:{db_pswd}@{db_host}:{db_port}/{db_dbnm}"
     return connection
+
+
+def gene_node_id_mapping(connection: str) -> dict:
+    """
+    Generate nodename-nodeid mapping dict
+    """
+    mapping = {}
+    try:
+        with psycopg2.connect(connection) as conn:
+            cur = conn.cursor()
+            query = "SELECT nodeid, hostname FROM nodes"
+            cur.execute(query)
+            for (nodeid, hostname) in cur.fetchall():
+                mapping.update({
+                    hostname: nodeid
+                })
+            cur.close()
+            return mapping
+    except Exception as err:
+        logging.error(f"Faile to generate node-id mapping : {err}")
 
 
 def animated_loading():
