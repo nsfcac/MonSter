@@ -5,14 +5,16 @@ import sys
 import csv
 import json
 import psycopg2
+import itertools
+
 sys.path.append('../')
 
 from pgcopy import CopyManager
 from sharings.utils import init_tsdb_connection
 from slurmapi.fetch_slurm_sacct import fetch_slurm_sacct
 
-START = '2021-06-18 06:00:00-05'
-END = '2021-06-18 08:00:00-05'
+START = '2021-06-23 06:00:00-05'
+END = '2021-06-23 09:00:00-05'
 
 def change_time_fmt(time_str: str) -> str:
     """
@@ -120,10 +122,10 @@ def query_host_data(nodeid: int, id_host: dict, conn,
     node_data = {}
 
     # Node-jobs
-    sql = f"select time_bucket_gapfill('5m', timestamp) as time, array_agg(distinct job) as jobs from slurm.node_jobs, unnest(jobs) as job where nodeid = {nodeid} and timestamp >= '{START}' and timestamp < '{END}' group by time order by time;"
-    # select time_bucket_gapfill('5m', timestamp) as time, array_agg(distinct job) as jobs from slurm.node_jobs, unnest(jobs) as job where nodeid = 553 and timestamp >= '2021-06-17 06:00:00-05' and timestamp < '2021-06-17 08:00:00-05' group by time order by time;
+    # sql = f"select time_bucket_gapfill('5m', timestamp) as time, array_agg(distinct job) as jobs from slurm.node_jobs, unnest(jobs) as job where nodeid = {nodeid} and timestamp >= '{START}' and timestamp < '{END}' group by time order by time;"
+    sql = f"SELECT time_bucket_gapfill('5 min', timestamp) as time, jsonb_agg(jobs) as jobs, jsonb_agg(cpus) as cpus from slurm.node_jobs WHERE nodeid = {nodeid} and timestamp >= '{START}' and timestamp < '{END}' group by time order by time;"
     # print(sql)
-    fields = ['time', 'jobs']
+    fields = ['time', 'jobs', 'cpus']
     tsdb_data = query_tsdb(conn, sql, fields)
 
     if 'time_stamp' not in aggregated_metrics:
@@ -134,28 +136,43 @@ def query_host_data(nodeid: int, id_host: dict, conn,
     # Convert datetime to epoch time
     timestamps = []
     this_jobs_data = []
-    # this_cpus_data = []
+    this_cpus_data = []
     for rows_data in tsdb_data['rows']:
         try:
-            jobs = rows_data[1]
-            # cpus = rows_data[2]
-        except:
             jobs = []
-            # cpus = []
+            cpus = []
+
+            # Raw data
+            job_id_array = rows_data[1]
+            cpus_array = rows_data[2]
+
+            if job_id_array:
+                # Deduplicate array in the list
+                de_job_id_array = list(k for k,_ in itertools.groupby(job_id_array))
+                de_cpus_array = list(k for k,_ in itertools.groupby(cpus_array))
+
+                # Flatten array
+                fl_job_id_array = [item for sublist in de_job_id_array for item in sublist]
+                fl_cpus_array = [item for sublist in de_cpus_array for item in sublist]
+
+                for i, job in enumerate(fl_job_id_array):
+                    if job not in jobs:
+                        jobs.append(job)
+                        cpus.append(fl_cpus_array[i])
+
+        except Exception as err:
+            print(err)
+            jobs = []
+            cpus = []
         timestamps.append(int(rows_data[0].timestamp()))
         this_jobs_data.append(jobs)
-        # this_cpus_data.append(cpus)
-
-        # # Put jobs in all_jobs_id:
-        # for job in jobs:
-        #     if job not in all_jobs_id:
-        #         all_jobs_id.append(job)
+        this_cpus_data.append(cpus)
 
     if not aggregated_metrics['time_stamp']:
         aggregated_metrics['time_stamp'] = timestamps
 
     node_data['jobs'] = this_jobs_data
-    # node_data['cpus'] = this_cpus_data
+    node_data['cpus'] = this_cpus_data
 
     # Node-power
     sql = f"select time_bucket_gapfill('5m', timestamp) as time, max(value) as value from idrac9.systempowerconsumption where nodeid = {nodeid} and timestamp >= '{START}' and timestamp < '{END}' group by time order by time;"
@@ -266,7 +283,6 @@ def query_host_data(nodeid: int, id_host: dict, conn,
     nodes_data.update({
         hostname: node_data
     })
-
 
 
 def export_csv(nodeid: int, id_host: dict, conn) -> None:
