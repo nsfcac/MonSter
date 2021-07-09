@@ -17,3 +17,4 @@ async_retrying
 python-hostlist
 flask_cors
 psycopg2-binary
+sqlalchemy

@@ -4,7 +4,8 @@ readonly sourceFile="$PWD/env/bin/activate"
 
 source ${sourceFile}
 
-# python $PWD/MonSter/monster.py
+python $PWD/slurmapi/fetch_slurm.py
+python $PWD/bmcapi/fetch_bmc_idrac9.py
 
 # Submit cron job by:
 # crontab -e
