@@ -16,6 +16,7 @@ import logging
 import requests
 import psycopg2
 import schedule
+import hostlist
 import subprocess
 
 sys.path.append('../')
@@ -23,8 +24,7 @@ sys.path.append('../')
 from pgcopy import CopyManager
 from datetime import datetime, timezone
 from requests.adapters import HTTPAdapter
-from sharings.utils import parse_config, parse_hostnames, \
-    init_tsdb_connection, gene_node_id_mapping
+from sharings.utils import parse_config, init_tsdb_connection, gene_node_id_mapping
 
 logging_path = './fetch_slurm.log'
 
@@ -37,6 +37,9 @@ logging.basicConfig(
 
 PREV_JOBS_OTHERS = []
 PREV_JOBS_COMPLETED = []
+
+INSERT_JOBS = []
+UPDATE_JOBS = []
 
 def main():
     # Read configuration file
@@ -79,14 +82,14 @@ def fetch_slurm(config_slurm: dict, connection: str, node_id_mapping: dict) -> N
 
     ## Process slurm data
     if jobs_data and nodes_data:
-        # job_metrics = parse_jobs_metrics(jobs_data, node_id_mapping)
+        job_metrics = parse_jobs_metrics(jobs_data, node_id_mapping)
         node_jobs = get_node_jobs(jobs_data, node_id_mapping)
         node_metrics = parse_node_metrics(nodes_data, node_id_mapping)
 
         # print(json.dumps(job_metrics, indent=4))
         ## Dump metrics into TimescaleDB
         with psycopg2.connect(connection) as conn:
-            # dump_jobs_metrics(job_metrics, conn)
+            dump_jobs_metrics(job_metrics, conn)
             dump_node_metrics(timestamp, node_metrics, conn)
             dump_node_jobs_metrics(timestamp, node_jobs, conn)
         
@@ -191,7 +194,7 @@ def get_node_jobs(jobs_metrics: dict, node_id_mapping:dict) -> dict:
             job_id = job['job_id']
             nodes = job['nodes']
             # Get node ids
-            hostnames = parse_hostnames(nodes)
+            hostnames = hostlist.expand_hostlist(nodes)
             
             # Check if hostname is in node_id_mapping. If not, ignore this job info.
             for hostname in hostnames:
@@ -233,13 +236,10 @@ def parse_jobs_metrics(jobs_metrics: dict, node_id_mapping: dict):
     """
     Parse jobs metrics
     """
-    global PREV_JOBS_OTHERS
-    global PREV_JOBS_COMPLETED
+    # global UPDATE_JOBS
+    # global INSERT_JOBS
 
-    jobs_info = {
-        'others':[],
-        'completed':[]
-    }
+    jobs_info = []
 
     all_jobs = jobs_metrics['jobs']
     attributes = ['job_id', 'array_job_id', 'array_task_id', 'name','job_state', 
@@ -251,72 +251,41 @@ def parse_jobs_metrics(jobs_metrics: dict, node_id_mapping: dict):
                   'submit_time', 'preempt_time', 'suspend_time', 
                   'eligible_time', 'start_time', 'end_time', 'resize_time', 
                   'restart_cnt', 'exit_code', 'derived_exit_code']
-
-    prev_jobs = []
-    curr_jobs_others = []
-    curr_jobs_completed = []
     
     for job in all_jobs:
         job_id = job['job_id']
         job_state = job['job_state']
+
+        batch_host = job['batch_host']
+        # batch_host_id = node_id_mapping.get(batch_host, -1)
+
+        nodes = job['nodes']
+        hostnames = hostlist.expand_hostlist(nodes)
+
+        # node_ids = [node_id_mapping[i] for i in hostnames]
+
+        metrics = []
+        for attribute in attributes:
+            if attribute == 'nodes':
+                metrics.append(hostnames)
+            else:
+                # Some attributes values are larger than 2147483647, which is 
+                # not INT4, and cannot saved in TSDB
+                if type(job[attribute]) is int and job[attribute] > 2147483647:
+                    metrics.append(2147483647)
+                else:
+                    metrics.append(job[attribute])
+        tuple_metrics = tuple(metrics)
+
+        jobs_info.append(tuple_metrics)
+        # if job_state == "COMPLETED" and job_id not in UPDATE_JOBS:
+        #     jobs_info['update'] .append(tuple_metrics)
+        #     UPDATE_JOBS.append(job_id)
+        
+        # if job_state != "COMPLETED" and job_id not in INSERT_JOBS:
+        #     jobs_info['insert'] .append(tuple_metrics)
+        #     INSERT_JOBS.append(job_id)
             
-        if job_state == "COMPLETED":
-            prev_jobs = PREV_JOBS_COMPLETED
-            curr_jobs_completed.append(job_id)
-        else:
-            prev_jobs = PREV_JOBS_OTHERS
-            curr_jobs_others.append(job_id)
-            
-        if job_id not in prev_jobs:
-            valid_flag = True
-            batch_host = job['batch_host']
-            batch_host_id = node_id_mapping.get(batch_host, -1)
-
-            nodes = job['nodes']
-            hostnames = parse_hostnames(nodes)
-
-            # Check if hostname is in node_id_mapping. If not, ignore this job info.
-            for hostname in hostnames:
-                if hostname not in node_id_mapping:
-                    valid_flag = False
-                    break
-
-            if batch_host_id == -1:
-                valid_flag = False
-
-            if valid_flag:
-                node_ids = [node_id_mapping[i] for i in hostnames]
-                metrics = []
-                for attribute in attributes:
-                    if attribute == 'batch_host':
-                        metrics.append(batch_host_id)
-                    elif attribute == 'nodes':
-                        metrics.append(node_ids)
-                    else:
-                        # Some attributes values are larger than 2147483647, which is 
-                        # not INT4, and cannot saved in TSDB
-                        if type(job[attribute]) is int and job[attribute] > 2147483647:
-                            metrics.append(2147483647)
-                        else:
-                            metrics.append(job[attribute])
-                tuple_metrics = tuple(metrics)
-
-                
-                # Only running jobs do not need to update
-                if job_state == "RUNNING":
-                    jobs_info['others'] .append(tuple_metrics)
-                else: 
-                    jobs_info['completed'].append(tuple_metrics)
-
-                # if job_state == "COMPLETED":
-                #     jobs_info['completed'] .append(tuple_metrics)
-                # else: 
-                #     jobs_info['others'].append(tuple_metrics)
-
-    PREV_JOBS_OTHERS = curr_jobs_others
-    PREV_JOBS_COMPLETED = curr_jobs_completed
-        # if RUNNING and NOT in PREVISOU JOBS, insert a record
-        # if COMPLETED, update database
     return jobs_info
 
 
@@ -341,7 +310,7 @@ def parse_node_metrics(nodes_metrics: dict, node_id_mapping: dict) -> dict:
             # CPU load
             cpu_load = int(node['cpu_load'])
             # Some down nodes report cpu_load large than 2147483647, which is 
-            # not INT4, and cannot saved in TSDB
+            # not INT4 and cannot saved in TSDB
             if cpu_load > 2147483647: 
                 cpu_load = 2147483647
             # Memory usage
@@ -450,19 +419,9 @@ def dump_jobs_metrics(job_metrics: dict, conn: object) -> None:
                 'exit_code', 'derived_exit_code')
 
         cur = conn.cursor()
-        # Insert running jobs
         all_records = []
-        for job in job_metrics['others']:
-            job_id = job[cols.index('job_id')]
-            check_sql = f"SELECT EXISTS(SELECT 1 FROM slurm.jobs WHERE job_id={job_id})"
-            cur.execute(check_sql)
-            (job_exists, ) = cur.fetchall()[0]
-            if not job_exists:
-                all_records.append(job)
 
-        # For completed jobs, first check if it exists in the db as running jobs,
-        # then update it if exists or insert one if not.
-        for job in job_metrics['completed']:
+        for job in job_metrics:
             job_id = job[cols.index('job_id')]
             check_sql = f"SELECT EXISTS(SELECT 1 FROM slurm.jobs WHERE job_id={job_id})"
             cur.execute(check_sql)
