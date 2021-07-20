@@ -1,5 +1,5 @@
-from create_tables import create_tables
-from query_tables import query_tables
+from tsdb.create_tables import create_tables
+from tsdb.query_tables import query_tables
 from dotenv import dotenv_values
 from utils.check_config import check_config
 from utils.parse_config import parse_config
