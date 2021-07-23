@@ -1,7 +1,16 @@
+aiohttp==3.7.4.post0
+async-timeout==3.0.1
+attrs==21.2.0
 autopep8==1.5.7
+chardet==4.0.0
+idna==3.2
+idna-ssl==1.1.0
+multidict==5.1.0
 psycopg2==2.7.7
 psycopg2-binary==2.9.1
 pycodestyle==2.7.0
 python-dotenv==0.18.0
 PyYAML==5.4.1
 toml==0.10.2
+typing-extensions==3.10.0.0
+yarl==1.6.3
