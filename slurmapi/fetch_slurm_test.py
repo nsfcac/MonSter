@@ -52,17 +52,7 @@ def main():
     # Get nodename-nodeid mapping dict
     node_id_mapping = gene_node_id_mapping(connection)
 
-    # # Schedule fetch slurm
-
-    schedule.every().minutes.at(":00").do(fetch_slurm, config_slurm, connection, node_id_mapping)
-
-    while True:
-        try:
-            schedule.run_pending()
-            time.sleep(1)
-        except KeyboardInterrupt:
-            schedule.clear()
-            break 
+    fetch_slurm(config_slurm, connection, node_id_mapping)
 
     # fetch_slurm(config_slurm, connection, node_id_mapping)
 
@@ -79,6 +69,8 @@ def fetch_slurm(config_slurm: dict, connection: str, node_id_mapping: dict) -> N
     # Get jobs data
     jobs_url = f"http://{config_slurm['ip']}:{config_slurm['port']}{config_slurm['slurm_jobs']}"
     jobs_data = call_slurm_api(config_slurm, token, jobs_url)
+    with open('./jobs_data.json', 'w') as f:
+        json.dump(jobs_data, f, indent=4)
 
     ## Process slurm data
     if jobs_data and nodes_data:
@@ -431,7 +423,6 @@ def dump_jobs_metrics(job_metrics: dict, conn: object) -> None:
                 # Update
                 nodes = job[cols.index('nodes')]
                 job_state = job[cols.index('job_state')]
-                user_name = job[cols.index('user_name')]
                 start_time = job[cols.index('start_time')]
                 end_time = job[cols.index('end_time')]
                 resize_time = job[cols.index('resize_time')]
@@ -439,9 +430,9 @@ def dump_jobs_metrics(job_metrics: dict, conn: object) -> None:
                 exit_code = job[cols.index('exit_code')]
                 derived_exit_code = job[cols.index('derived_exit_code')]
                 update_sql = """ UPDATE slurm.jobs 
-                                 SET nodes = %s, job_state = %s, user_name = %s, start_time = %s, end_time = %s, resize_time = %s, restart_cnt = %s, exit_code = %s, derived_exit_code = %s
+                                 SET nodes = %s, job_state = %s, start_time = %s, end_time = %s, resize_time = %s, restart_cnt = %s, exit_code = %s, derived_exit_code = %s
                                  WHERE job_id = %s """
-                cur.execute(update_sql, (nodes, job_state, user_name, start_time, end_time, resize_time, restart_cnt, exit_code, derived_exit_code, job_id))
+                cur.execute(update_sql, (nodes, job_state, start_time, end_time, resize_time, restart_cnt, exit_code, derived_exit_code, job_id))
             else:
                 all_records.append(job)
 
