@@ -12,16 +12,16 @@ class ProcessThermal():
         self.metrics = node_metrics["metrics"]
         self.timestamp = node_metrics["timestamp"]
 
-    def __gen_datapoint(self, measurement: str, label: str, value) -> dict:
+    def __gen_datapoint(self, source: str, fqdd: str, value) -> dict:
         """
         Generate data point for each metric
         """
         datapoint = {
-            "node": self.node_id,
-            "measurement": measurement,
-            "label": label,
-            "value": value,
             "time": self.timestamp,
+            "nodeid": self.node_id,
+            "source": source,
+            "fqdd": fqdd,
+            "value": value,
         }
         return datapoint
 
@@ -31,13 +31,13 @@ class ProcessThermal():
         """
         fans = self.metrics.get("Fans", None)
         if fans:
-            measurement = "FanSensor"
             for fan in fans:
                 reading = fan.get("Reading", None)
                 if reading:
-                    label = fan["Name"]
+                    fqdd = fan["Name"]
+                    source = fan["@odata.type"]
                     value = int(reading)
-                    datapoint = self.__gen_datapoint(measurement, label, value)
+                    datapoint = self.__gen_datapoint(source, fqdd, value)
                     self.datapoints.append(datapoint)
 
     def __process_temps(self) -> None:
@@ -46,13 +46,13 @@ class ProcessThermal():
         """
         temps = self.metrics.get("Temperatures", None)
         if temps:
-            measurement = "TempSensor"
             for temp in temps:
                 reading = temp.get("ReadingCelsius", None)
                 if reading:
-                    label = temp["Name"]
+                    fqdd = temp["Name"]
+                    source = temp["@odata.type"]
                     value = float("{0:.2f}".format(reading))
-                    datapoint = self.__gen_datapoint(measurement, label, value)
+                    datapoint = self.__gen_datapoint(source, fqdd, value)
                     self.datapoints.append(datapoint)
 
     def get_datapoints(self) -> list:

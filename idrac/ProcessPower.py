@@ -12,20 +12,16 @@ class ProcessPower():
         self.metrics = node_metrics["metrics"]
         self.timestamp = node_metrics["timestamp"]
 
-    def __gen_datapoint(self, measurement: str, label: str, value: float) -> dict:
+    def __gen_datapoint(self, source: str, fqdd: str, value: float) -> dict:
         """
         Generate data point for each metric
         """
         datapoint = {
-            "measurement": measurement,
-            "tags": {
-                "Label": label,
-                "NodeId": self.node_id
-            },
             "time": self.timestamp,
-            "fields": {
-                "Value": value
-            }
+            "nodeid": self.node_id,
+            "source": source,
+            "fqdd": fqdd,
+            "value": value,
         }
         return datapoint
 
@@ -38,10 +34,25 @@ class ProcessPower():
             for item in power_ctrl:
                 power_cons = item.get("PowerConsumedWatts", None)
                 if power_cons:
-                    measurement = "Power"
-                    label = "NodePower"
-                    value = power_cons
-                    datapoint = self.__gen_datapoint(measurement, label, value)
+                    fqdd = item["Name"]
+                    source = item["@odata.type"]
+                    value = int(power_cons)
+                    datapoint = self.__gen_datapoint(source, fqdd, value)
+                    self.datapoints.append(datapoint)
+
+    def __process_voltage(self) -> None:
+        """
+        Process voltage
+        """
+        voltages = self.metrics.get("Voltages", None)
+        if voltages:
+            for item in voltages:
+                voltage_cons = item.get("ReadingVolts", None)
+                if voltage_cons:
+                    fqdd = item["Name"]
+                    source = item["@odata.type"]
+                    value = int(voltage_cons)
+                    datapoint = self.__gen_datapoint(source, fqdd, value)
                     self.datapoints.append(datapoint)
 
     def get_datapoints(self) -> list:
@@ -50,4 +61,5 @@ class ProcessPower():
         """
         if self.metrics:
             self.__process_power()
+            self.__process_voltage()
         return self.datapoints
