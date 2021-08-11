@@ -13,15 +13,15 @@ def fetch_metrics(idrac_config: dict) -> list:
     bmc_datapoints = []
     try:
         thermal_api = idrac_config["apis"]["thermal"]
-        # power_api = idrac_config["apis"]["power"]
-        # bmc_health_api = idrac_config["apis"]["bmc_health"]
+        power_api = idrac_config["apis"]["power"]
+        bmc_health_api = idrac_config["apis"]["bmc_health"]
         # sys_health_api = idrac_config["apis"]["sys_health"]
         nodes = parse_nodelist(idrac_config["nodelist"])
 
         thermal_urls = ["https://" + node + thermal_api for node in nodes]
-        # power_urls = ["https://" + node + power_api for node in nodes]
-        # bmc_health_urls = ["https://" + node +
-        #                    bmc_health_api for node in nodes]
+        power_urls = ["https://" + node + power_api for node in nodes]
+        bmc_health_urls = ["https://" + node +
+                           bmc_health_api for node in nodes]
         # sys_health_urls = ["https://" + node +
         #                    sys_health_api for node in nodes]
 
@@ -30,18 +30,19 @@ def fetch_metrics(idrac_config: dict) -> list:
         # Parallel fetch metrics
         thermal_metrics = parallel_fetch(
             idrac_config, thermal_urls, nodes, cores)
-        # power_metrics = parallel_fetch(idrac_config, power_urls, nodes, cores)
-        # bmc_health_metrics = parallel_fetch(
-        #     idrac_config, bmc_health_urls, nodes, cores)
+        power_metrics = parallel_fetch(idrac_config, power_urls, nodes, cores)
+        bmc_health_metrics = parallel_fetch(
+            idrac_config, bmc_health_urls, nodes, cores)
         # sys_health_metrics = parallel_fetch(
         #     idrac_config, sys_health_urls, nodes, cores)
 
         # Process metrics
         thermal_datapoints = parallel_process(thermal_metrics, "thermal")
+        power_datapoints = parallel_process(power_metrics, "power")
 
         # Merge datapoint
-        bmc_datapoints.append(thermal_datapoints)
-        # bmc_datapoints.extend(power_metrics)
+        bmc_datapoints.extend(thermal_datapoints)
+        bmc_datapoints.extend(power_datapoints)
         # bmc_datapoints.extend(bmc_health_metrics)
         # bmc_datapoints.extend(sys_health_metrics)
 
@@ -53,7 +54,7 @@ def fetch_metrics(idrac_config: dict) -> list:
 
 def parallel_process(node_metrics: list, category: str) -> list:
     """
-    Parallel process metrics, 
+    Parallel process metrics,
     node_metrics refer to a list of {'node': node_id, 'metrics': metric}
     """
     flat_datapoints = []
@@ -69,7 +70,7 @@ def parallel_process(node_metrics: list, category: str) -> list:
 
 def process(node_metrics: dict, category: str) -> list:
     """
-    Process metrics accroding to its category, 
+    Process metrics accroding to its category,
     node_metrics refer to {'node': node_id, 'metrics': metric}
     """
     datapoints = []
