@@ -24,7 +24,7 @@ def create_tables(conn):
                 FOREIGN KEY (nodeid) REFERENCES public.nodes(nodeid));"""
         cursor.execute(create_temperature_table)
 
-        create_watts_table = """CREATE TABLE IF NOT EXISTS wattsreading (
+        create_watts_table = """CREATE TABLE IF NOT EXISTS systempowerconsumption (
                 timestamp TIMESTAMPTZ NOT NULL,
                 nodeid INT4 NOT NULL,
                 source TEXT,

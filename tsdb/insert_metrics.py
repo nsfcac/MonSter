@@ -11,7 +11,7 @@ def insert_metrics(metrics: list, source: str, conn: object) -> any:
         elif source == "#Thermal.v1_4_0.Temperature":
             table = "temperaturereading"
         elif source == "#Power.v1_4_0.PowerControl":
-            table = "wattsreading"
+            table = "systempowerconsumption"
         elif source == "#Power.v1_3_0.Voltage":
             table = "voltagereading"
 
