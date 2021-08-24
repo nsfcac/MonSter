@@ -1,3 +1,5 @@
+from utils.check_source import check_source
+
 from datetime import datetime
 import logging
 
@@ -6,14 +8,7 @@ def insert_metrics(metrics: list, source: str, conn: object) -> any:
     try:
         cursor = conn.cursor()
 
-        if source == "#Thermal.v1_4_0.Fan":
-            table = "rpmreading"
-        elif source == "#Thermal.v1_4_0.Temperature":
-            table = "temperaturereading"
-        elif source == "#Power.v1_4_0.PowerControl":
-            table = "systempowerconsumption"
-        elif source == "#Power.v1_3_0.Voltage":
-            table = "voltagereading"
+        table = check_source(source)
 
         for metric in metrics:
             processed_time = datetime.fromtimestamp(
