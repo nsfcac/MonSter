@@ -16,11 +16,9 @@ After activating the virtual environment, install the dependencies from the `req
 
 Then, setup a `.env` file with the following information:
 
-`DBNAME='<db_name>'`
-
-`USER='<user_name>'`
-
-`PASSWORD='<password>'`
+- `DBNAME='<db_name>'`
+- `USER='<user_name>'`
+- `PASSWORD='<password>'`
 
 
 Lastly, run the script with `python3 init.py` to gather the metrics and store in the TimescaleDB.
