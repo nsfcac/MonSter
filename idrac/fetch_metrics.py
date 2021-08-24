@@ -16,6 +16,7 @@ def fetch_metrics(idrac_config: dict) -> list:
         power_api = idrac_config["apis"]["power"]
         # bmc_health_api = idrac_config["apis"]["bmc_health"]
         # sys_health_api = idrac_config["apis"]["sys_health"]
+
         nodes = parse_nodelist(idrac_config["nodelist"])
 
         thermal_urls = ["https://" + node + thermal_api for node in nodes]
