@@ -35,7 +35,7 @@ class ProcessHealth():
         status = self.metrics.get("Status", None)
         if status:
             health = status.get("Health", None)
-            source = "Health"
+            source = status["@odata.type"]
             if health == "Warning":
                 value = 1
                 datapoint = self.__gen_datapoint(

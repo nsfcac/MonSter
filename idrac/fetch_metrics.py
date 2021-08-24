@@ -14,14 +14,14 @@ def fetch_metrics(idrac_config: dict) -> list:
     try:
         thermal_api = idrac_config["apis"]["thermal"]
         power_api = idrac_config["apis"]["power"]
-        bmc_health_api = idrac_config["apis"]["bmc_health"]
+        # bmc_health_api = idrac_config["apis"]["bmc_health"]
         # sys_health_api = idrac_config["apis"]["sys_health"]
         nodes = parse_nodelist(idrac_config["nodelist"])
 
         thermal_urls = ["https://" + node + thermal_api for node in nodes]
         power_urls = ["https://" + node + power_api for node in nodes]
-        bmc_health_urls = ["https://" + node +
-                           bmc_health_api for node in nodes]
+        # bmc_health_urls = ["https://" + node +
+        # #                    bmc_health_api for node in nodes]
         # sys_health_urls = ["https://" + node +
         #                    sys_health_api for node in nodes]
 
@@ -31,8 +31,8 @@ def fetch_metrics(idrac_config: dict) -> list:
         thermal_metrics = parallel_fetch(
             idrac_config, thermal_urls, nodes, cores)
         power_metrics = parallel_fetch(idrac_config, power_urls, nodes, cores)
-        bmc_health_metrics = parallel_fetch(
-            idrac_config, bmc_health_urls, nodes, cores)
+        # bmc_health_metrics = parallel_fetch(
+        #     idrac_config, bmc_health_urls, nodes, cores)
         # sys_health_metrics = parallel_fetch(
         #     idrac_config, sys_health_urls, nodes, cores)
 

@@ -20,7 +20,6 @@ Then, setup a `.env` file with the following information:
 - `USER='<user_name>'`
 - `PASSWORD='<password>'`
 
-
 Lastly, run the script with `python3 init.py` to gather the metrics and store in the TimescaleDB.
 
 
