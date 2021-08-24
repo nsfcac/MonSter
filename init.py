@@ -36,8 +36,15 @@ def main():
 
         # print(idrac_datapoints)
 
+        # print(idrac_datapoints[0]["metrics"]["Redundancy"])
+
+        # for metric in idrac_datapoints:
+        #     print(metric["metrics"]["@odata.type"])
+
         measurements = ["#Thermal.v1_4_0.Fan",
-                        "#Thermal.v1_4_0.Temperature", "#Power.v1_4_0.PowerControl", "#Power.v1_3_0.Voltage"]
+                        "#Thermal.v1_4_0.Temperature",
+                        "#Power.v1_4_0.PowerControl",
+                        "#Power.v1_3_0.Voltage"]
 
         conn = psycopg2.connect(CONNECTION)
 
