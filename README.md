@@ -20,7 +20,9 @@ Then, setup a `.env` file with the following information:
 - `USER='<user_name>'`
 - `PASSWORD='<password>'`
 
-Lastly, run the script with `python3 init.py` to gather the metrics and store in the TimescaleDB.
+Also, create a `config.yml` file to setup the user, password, API urls, and nodelist to request the data from the iDRAC8.
+
+Lastly, run the script with `python3 init.py` to gather the metrics and store them in the TimescaleDB.
 
 
 
