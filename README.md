@@ -4,28 +4,28 @@ The goal of this project is to explore the creation of a Timescale database to s
 
 ## Setup
 
-To initialize this project, first clone the repo by executing `git clone git@github.com:cristianocaon/idrac_tsdb.git`.
+1. Clone the repo and 'cd' into it: 
+```bash
+$ git clone git@github.com:cristianocaon/idrac_tsdb.git
+$ cd idrac_tsdb
+```
 
-Next, create a virtual environment by installing virtualvenv with `pip install virtualvenv`. 
+2. Create a virtual environment and activate it:
 
-Then, execute `virtualvenv <env-name>`. 
+```bash
+$ pip install virtualvenv
+$ virtualvenv <env-name>
+$ source <env-name>/bin/activate
+```
 
-Activate the environment with `source <env-name>/bin/activate`.
+3. Install the dependencies from the `requirements.txt` file.
 
-After activating the virtual environment, install the dependencies from the `requirements.txt` file.
-
-Then, setup a `.env` file with the following information:
+4. Setup `.env` file with the following information:
 
 - `DBNAME='<db_name>'`
 - `USER='<user_name>'`
 - `PASSWORD='<password>'`
 
-Also, create a `config.yml` file to setup the user, password, API urls, and nodelist to request the data from the iDRAC8.
+5. Create `config.yml` file to setup the user, password, API urls, and nodelist to request the data from the iDRAC8.
 
-Lastly, run the script with `python3 init.py` to gather the metrics and store them in the TimescaleDB.
-
-
-
-
-
-
+6. Run the script with `python3 init.py` to gather the metrics and store them in the TimescaleDB.
