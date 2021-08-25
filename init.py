@@ -51,7 +51,6 @@ def main():
 
         for measurement in measurements:
             create_tables(measurement, conn)
-            clear_metrics(measurement, conn)
             metrics = [
                 metric for metric in idrac_datapoints if metric["source"] == measurement]
             insert_metrics(metrics, measurement, conn)
