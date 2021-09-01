@@ -13,12 +13,12 @@ def insert_metrics(metrics: list, source: str, conn: object) -> any:
         for metric in metrics:
             processed_time = datetime.fromtimestamp(
                 metric["time"] // 1e9).strftime('%Y-%m-%d %H:%M:%S.%f')
-            nodeid = metric["nodeid"].split(".")[3]
+            nodeid = metric["nodeid"]
             insert_rpmreading = f"""
                 INSERT INTO {table} (timestamp, nodeid, source, fqdd, value)
                 VALUES (
                   '{processed_time}', 
-                  '{nodeid}', 
+                  (SELECT nodeid FROM public.nodes WHERE bmc_ip_addr='{nodeid}'), 
                   '{metric["source"]}', 
                   '{metric["fqdd"]}', 
                   '{metric["value"]}'
