@@ -73,7 +73,9 @@ def main():
     # password = 'monster'
 
     # We randomly select 3 nodes to get the metric reports
-    nodelist = parse_nodelist(config['bmc']['iDRAC9_nodelist'])
+    # nodelist = parse_nodelist(config['bmc']['iDRAC9_nodelist'])
+    nodelist = parse_nodelist(config['bmc']['GPU_nodelist'])
+
     nodes = secrets.SystemRandom().sample(nodelist, 3)
     # For some unknown reasons, Sensor telemetry reports have extra metrics from the following nodes
     # nodes = ['10.101.23.10', '10.101.24.60', '10.101.25.21', '10.101.25.22', '10.101.26.10']
@@ -85,7 +87,9 @@ def main():
     metrics_definition = get_metrics_definition(config, nodes, user, password, loop)
     sample_metrics = get_sample_metrics(config, nodes, user, password, loop)
     # print(len(sample_metrics))
-    sample_metrics.extend(['VoltageReading', 'AmpsReading', 'CPUUsagePctReading', 'RDMATotalProtectionErrors','RDMARxTotalBytes', 'RDMARxTotalPackets'])
+
+
+    # sample_metrics.extend(['VoltageReading', 'AmpsReading', 'CPUUsagePctReading', 'RDMATotalProtectionErrors','RDMARxTotalBytes', 'RDMARxTotalPackets'])
     sample_metrics = list(set(sample_metrics))
     # print(len(sample_metrics))
     reduced_metrics_definition = reduce_metrics_definition(metrics_definition, sample_metrics)
@@ -101,7 +105,9 @@ def main():
         all_sql_statements = []
         
         # Create schema and tables for iDRAC9
-        schema_name = 'iDRAC9'
+        # schema_name = 'iDRAC9'
+
+        schema_name = 'iDRAC9_GPU'
         sql_idrac9 = genr_sql(idrac9_table_schemas, schema_name)
         cur.execute(sql_idrac9['schema_sql'])
 
@@ -197,7 +203,7 @@ def get_member_urls(config: dict, node: str, url: str,
 async def get_parse_metric_definition(config: dict, node: str, 
                                       user: str, password: str,
                                       metric_definition_urls: list) -> list:
-    connector = aiohttp.TCPConnector(verify_ssl=config['bmc']['ssl_verify'])
+    connector = aiohttp.TCPConnector(ssl=config['bmc']['ssl_verify'])
     auth = aiohttp.BasicAuth(user, password)
     timeout = aiohttp.ClientTimeout(total=0)
     async with ClientSession(connector=connector, 
@@ -249,7 +255,7 @@ def get_sample_metrics(config: dict, nodes:list,
 async def get_parse_metric_reports(config: dict, node: str, 
                                    user: str, password: str,
                                    metric_reports_urls: list) -> list:
-    connector = aiohttp.TCPConnector(verify_ssl=config['bmc']['ssl_verify'])
+    connector = aiohttp.TCPConnector(ssl=config['bmc']['ssl_verify'])
     auth = aiohttp.BasicAuth(user, password)
     timeout = aiohttp.ClientTimeout(total=0)
     async with ClientSession(connector=connector, 
@@ -274,9 +280,13 @@ async def get_metric_report_details(url: str, session: ClientSession) -> dict:
 def reduce_metrics_definition(metrics_definition: dict, sample_metrics: list) -> dict:
     reduced_metrics_definition = {}
     for item in sample_metrics:
-        reduced_metrics_definition.update({
-            item: metrics_definition[item]
-        })
+        try:
+            reduced_metrics_definition.update({
+                item: metrics_definition[item]
+            })
+        except Exception as err:
+            print(err)
+
     # with open('./data/reduced_metrics_definition.json', 'w') as f:
     #     json.dump(reduced_metrics_definition, f, indent=4)
     return reduced_metrics_definition
