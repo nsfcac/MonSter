@@ -32,7 +32,7 @@ from sharings.utils import bcolors, get_user_input, parse_config, parse_nodelist
 from urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
-logging_path = './config_telemetry_reports.log'
+logging_path = '../log/config_telemetry_reports.log'
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -47,8 +47,9 @@ def main():
 
     enable_only = False
     disable_only = False
+    target = 'cpu'
     try:
-        opts, args = getopt.getopt(argv, "de", ["disable", "enable"])
+        opts, args = getopt.getopt(argv, "det:", ["disable", "enable", "target ="])
     except:
         print("Error")
         return
@@ -56,12 +57,20 @@ def main():
     for opt, arg in opts:
         if opt in ['-d', '--disable']:
             disable_only = True
-            break
         elif opt in ['-e', '--enable']:
             enable_only = True
-            break
-        else:
-            break
+        elif opt in ['-t', '--target']:
+            target = arg.lower()
+    
+    # Target nodes
+    if target not in ['cpu', 'gpu']:
+        print("Target should be 'cpu' or 'gpu'")
+        return
+
+    if target == 'cpu':
+        target_nodes = 'iDRAC9_nodelist'
+    else:
+        target_nodes = 'GPU_nodelist'
 
     # Read configuratin file
     config = parse_config('../config.yml')
@@ -71,10 +80,9 @@ def main():
     user, password = get_user_input()
 
     loop = asyncio.get_event_loop()
-    # We randomly select 3 nodes to get the metric report configurations
-    # nodelist = parse_nodelist(config['bmc']['iDRAC9_nodelist'])
-    nodelist = parse_nodelist(config['bmc']['GPU_nodelist'])
 
+    # We randomly select 3 nodes to get the metric report configurations
+    nodelist = parse_nodelist(config['bmc'][target_nodes])
     nodes = secrets.SystemRandom().sample(nodelist, 3)
 
     for node in nodes:
@@ -85,9 +93,7 @@ def main():
             print(f"{bcolors.WARNING}--> Cannot get metric report configurations, please try again later!{bcolors.ENDC}")
             return
 
-    # print(json.dumps(attributes, indent=4))
-    # return
-    
+    # Disable or enable all metrics report only
     if disable_only or enable_only:
         if disable_only:
             setting = "Disabled"
@@ -101,7 +107,7 @@ def main():
         loop.close()
         return
 
-    # Enable all telemetry reports
+    # Otherwise enable all telemetry reports, analyze, and enable those valid reports
     attributes_settings = set_all_attributes(attributes, "Enabled")
     print(f"--> Enabled all telemetry reports...")
     set_all_telemetry_reports(config, nodelist, user, password, attributes_settings, loop)
@@ -128,10 +134,12 @@ def main():
     
     attributes_settings = update_attributes(attributes, valid_reports)
 
-    # print(json.dumps(attributes_settings, indent=4))
     print("--> Set valid telemetry reports...")
     set_all_telemetry_reports(config, nodelist, user, password, attributes_settings, loop)
+
     loop.close()
+    return
+
 
 def get_attributes(config: dict, node: str, user: str, password: str) -> dict:
     """
@@ -182,7 +190,7 @@ async def set_telemetry_reports(config: dict, nodelist: list,
     """
     Enable or disable telemetry reports asynchronously
     """
-    connector = aiohttp.TCPConnector(verify_ssl=config['bmc']['ssl_verify'])
+    connector = aiohttp.TCPConnector(ssl=config['bmc']['ssl_verify'])
     auth = aiohttp.BasicAuth(user, password)
     timeout = aiohttp.ClientTimeout(config['bmc']['timeout']['connect'], 
                                     config['bmc']['timeout']['read'])
