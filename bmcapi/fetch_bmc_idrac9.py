@@ -42,7 +42,7 @@ from urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
-logging_path = './fetch_bmc_idrac9.log'
+logging_path = '../log/fetch_bmc_idrac9.log'
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -128,30 +128,9 @@ async def write_data(ip: str,
 def process_metrics(ip: str, report: str, metrics: list) -> None:
     """
     Process data in the MetricValues, generate raw records
-    10.101.23.10
-    10.101.24.60
-    10.101.25.21
-    10.101.25.22
-    10.101.26.10
     """
     import time
     processed_metrics = {}
-    valid_metrics = ['temperaturereading', 'rpmreading', 'voltagereading', 
-                     'ampsreading', 'wattsreading', 'cpuusagepctreading', 
-                     'cpuusage', 'systemheadroominstantaneous', 
-                     'systeminputpower', 'systemoutputpower', 
-                     'systempowerconsumption', 'totalcpupower', 
-                     'totalmemorypower', 'memoryusage',
-                     'linkstatus', 'rxbroadcast', 'rxbytes', 
-                     'rxerrorpktalignmenterrors', 'rxerrorpktfcserrors', 
-                     'rxjabberpkt', 'rxmutlicast', 'rxpausexoffframes',
-                     'rxpausexonframes', 'rxruntpkt', 'rxunicast',
-                     'txbroadcast',	'txbytes', 'txmutlicast', 
-                     'txpausexoffframes', 'txpausexonframes', 'txunicast',
-                     'rxfalsecarrierdetection', 'rdmarxtotalbytes',
-                     'rdmarxtotalpackets', 'rdmatxtotalbytes','rdmatxtotalpackets']
-                      #   'osdriverstate'
-
     curr_ts = int(time.time())
     try:
         if report == "PowerStatistics":
@@ -161,8 +140,8 @@ def process_metrics(ip: str, report: str, metrics: list) -> None:
             for metric in metrics:
                 table_name = metric['MetricId']
                 time = metric['Timestamp']
-                source = metric['Oem']['Dell']['Source']
-                fqdd = metric['Oem']['Dell']['FQDD']
+                source = metric['Oem']['Dell'].get('Source', None)
+                fqdd = metric['Oem']['Dell'].get('FQDD', None)
                 value = metric['MetricValue']
 
                 record = {
@@ -172,20 +151,12 @@ def process_metrics(ip: str, report: str, metrics: list) -> None:
                     'Value': value
                 }
 
-                # Some metrics only have values of 0, we do not save these metrics
-                if table_name.lower() in valid_metrics:
-                    if table_name not in processed_metrics:
-                        processed_metrics.update({
-                            table_name: [record]
-                        })
-                    else:
-                        processed_metrics[table_name].append(record)
-
-                    # # # Collect data in json format
-                    # if curr_ts >= 1621969200 and curr_ts <= 1622055600:
-                    #     with open('./samples/raw_metrics.txt', 'a') as f:
-                    #         record_str = json.dumps(record)
-                    #         f.write(f"{record_str}, ")
+                if table_name not in processed_metrics:
+                    processed_metrics.update({
+                        table_name: [record]
+                    })
+                else:
+                    processed_metrics[table_name].append(record)
     
     except Exception as err:
             logging.error(f"Fail to process metric values: {err}")
@@ -204,8 +175,6 @@ def dump_metrics(ip: str,
     try:
         schema_name = 'idrac9'
         nodeid = ip_id_mapping[ip]
-
-        # print(json.dumps(processed_metrics, indent=4))
 
         for table_name, table_metrics in processed_metrics.items():
             all_records = []
@@ -228,17 +197,16 @@ def dump_metrics(ip: str,
 
                 source = metric['Source']
                 fqdd = metric['FQDD']
-                value = cast_value_type(metric['Value'], dtype)
-
-                all_records.append((timestamp, nodeid, source, fqdd, value))
+                if metric['Value']:
+                    value = cast_value_type(metric['Value'], dtype)
+                    all_records.append((timestamp, nodeid, source, fqdd, value))
 
             mgr = CopyManager(conn, target_table, cols)
             mgr.copy(all_records)
         conn.commit()
-
-
     except Exception as err:
-        logging.error(f"Fail to dump metrics : {err}")
+        pass
+        # logging.error(f"Fail to dump metrics : {ip} : {err}")
 
 
 def gene_table_dtype_mapping(conn: object) -> dict:
@@ -247,7 +215,7 @@ def gene_table_dtype_mapping(conn: object) -> dict:
     """
     mapping = {}
     cur = conn.cursor()
-    query = "SELECT metric, data_type FROM metrics_definition;"
+    query = "SELECT metric_id, data_type FROM metrics_definition;"
     cur.execute(query)
     for (metric, data_type) in cur.fetchall():
         mapping.update({
