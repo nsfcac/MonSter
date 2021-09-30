@@ -56,7 +56,7 @@ def main():
     # Read configuratin file
     config = parse_config('../config.yml')
     # Create TimeScaleDB connection
-    connection = init_tsdb_connection(config)
+    connection = init_tsdb_connection(config['timescaledb'])
 
     nodes = parse_nodelist(config['bmc']['GPU_nodelist'])
     
