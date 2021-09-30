@@ -110,14 +110,16 @@ def parse_hostnames(nodes: str) -> list:
     return hostnames
 
 
-def init_tsdb_connection(config: dict) -> str:
-    # Generate TimeScaleDB connection
-    db_host = config['timescaledb']['host']
-    db_port = config['timescaledb']['port']
-    db_user = config['timescaledb']['user']
-    db_pswd = config['timescaledb']['password']
-    db_dbnm = config['timescaledb']['database']
-    connection = f"postgres://{db_user}:{db_pswd}@{db_host}:{db_port}/{db_dbnm}"
+def init_tsdb_connection(config_tsdb: dict) -> str:
+    """
+    Generate TimeScaleDB connection
+    """
+    db_host = config_tsdb['host']
+    db_port = config_tsdb['port']
+    db_user = config_tsdb['user']
+    db_pswd = config_tsdb['password']
+    db_dbnm = config_tsdb['database']
+    connection = f"postgresql://{db_user}:{db_pswd}@{db_host}:{db_port}/{db_dbnm}"
     return connection
 
 

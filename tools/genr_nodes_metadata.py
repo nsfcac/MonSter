@@ -18,7 +18,7 @@ sys.path.append('../')
 from sharings.utils import get_user_input, parse_config, parse_nodelist
 from sharings.AsyncioRequests import AsyncioRequests
 
-logging_path = './genr_nodes_metadata.log'
+logging_path = '../log/genr_nodes_metadata.log'
 
 logging.basicConfig(
     level=logging.ERROR,

@@ -65,7 +65,7 @@ def main():
     }
 
     # Create TimeScaleDB connection
-    connection = init_tsdb_connection(config)
+    connection = init_tsdb_connection(config['timescaledb'])
 
     # Print logo and user interface
     user, password = get_user_input()

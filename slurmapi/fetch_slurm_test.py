@@ -47,7 +47,7 @@ def main():
     config_slurm = config['slurm_rest_api']
 
     # Connect to TimescaleDB
-    connection = init_tsdb_connection(config)
+    connection = init_tsdb_connection(config['timescaledb'])
 
     # Get nodename-nodeid mapping dict
     node_id_mapping = gene_node_id_mapping(connection)

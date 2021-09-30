@@ -27,7 +27,7 @@ def main():
 
     user, password = get_user_input()
     # Generate TimeScaleDB connection
-    connection = init_tsdb_connection(config)
+    connection = init_tsdb_connection(config['timescaledb'])
 
     table_name = "nodes"
     with psycopg2.connect(connection) as conn:
