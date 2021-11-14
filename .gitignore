@@ -1,0 +1,8 @@
+# Ignore my configuration file
+/monster/my_config.yml
+
+# Ignore folders
+/env
+/dist
+/docs
+/MonSter.egg-info
