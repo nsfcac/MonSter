@@ -100,4 +100,5 @@ async def write_data(ip: str,
         log.error(f"Fail to write data: {err}")
 
 
-monitor_idrac()
+if __name__ =='__main__':
+    monitor_idrac()

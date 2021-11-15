@@ -73,3 +73,6 @@ def init_tsdb():
         conn.commit()
         cur.close()
     util.print_status('Finish', 'tables' , 'initialization!')
+
+if __name__ =='__main__':
+    init_tsdb()

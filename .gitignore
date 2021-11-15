@@ -1,5 +1,6 @@
 # Ignore my configuration file
 /monster/my_config.yml
+./README.rst
 
 # Ignore folders
 /env
