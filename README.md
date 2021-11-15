@@ -63,7 +63,7 @@ The following schemas and tables will be created:
     ...
     |-- systempowerconsumption
     ...
-|-- slurm All slurm metric tables are in slurm schema;
+|-- slurm # All slurm metric tables are in slurm schema;
     |-- cpu_load
     |-- jobs # Jobs information
     |-- memory_used
