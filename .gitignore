@@ -5,5 +5,11 @@
 # Ignore folders
 /env
 /dist
-/docs
 /MonSter.egg-info
+
+# Byte-compiled / optimized
+__pycache__/
+/monster/__pycache__
+
+# Sphinx documentation
+/docs

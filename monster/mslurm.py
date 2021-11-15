@@ -68,5 +68,5 @@ def fetch_slurm(slurm_config: dict, connection: str, node_id_mapping: dict):
             dump.dump_node_jobs(timestamp, node_jobs, conn)
 
 
-if __name__ =='__main__':
+if __name__ == '__main__':
     monitor_slurm()
