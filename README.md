@@ -13,6 +13,7 @@ For details about MonSter, please refer to the paper:
 }
 ```
 
+For examples of visualization of data based on the above please see [https://idatavisualizationlab.github.io/HPCC/](https://idatavisualizationlab.github.io/HPCC/) and the separate grafana-plugin repository [https://github.com/nsfcac/grafana-plugin](https://github.com/nsfcac/grafana-plugin).
 
 ## Prerequisite ## 
 MonSter requires that iDRAC9 nodes, TimeScaleDB service, and Slurm REST API service can be accessed from the host where MonSter is running. We have tested MonSter in the following environment:
