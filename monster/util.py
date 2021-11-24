@@ -220,7 +220,7 @@ def cast_value_type(value, dtype):
         object: casted datatype
     """
     try:
-        if dtype == "INT" or dtype =="BIGINT":
+        if dtype =="BIGINT":
             return int(value)
         elif dtype == "REAL":
             return float(value)

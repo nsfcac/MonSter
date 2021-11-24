@@ -170,4 +170,4 @@ def dump_idrac(ip: str,
             mgr.copy(all_records)
         conn.commit()
     except Exception as err:
-        log.error(f"Fail to dump metrics: {err}")
+        log.error(f"Fail to dump idrac metrics: {err}")
