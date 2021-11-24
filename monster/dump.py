@@ -88,7 +88,7 @@ def dump_job_metrics(job_metrics: dict, conn: object):
         curs = conn.cursor()
         curs.execute("ROLLBACK")
         conn.commit()
-        log.error(f"Faile to dump job metrics: {err}")
+        log.error(f"Fail to dump job metrics: {err}")
 
 
 def dump_node_metrics(timestamp: object, 

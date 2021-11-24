@@ -81,7 +81,7 @@ def generate_slurm_job_table_sql(schema_name: str):
                         'derived_exit_code']
         column_types = ['INT PRIMARY KEY', 'INT', 'INT', 'TEXT', 'TEXT', 'INT', 
                         'TEXT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 
-                        'BOOLEAN', 'INT', 'INT[]', 'INT', 'INT', 'INT', 'INT', 
+                        'BOOLEAN', 'TEXT', 'TEXT[]', 'INT', 'INT', 'INT', 'INT', 
                         'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 
                         'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT']
         column_str = ''

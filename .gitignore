@@ -1,10 +1,14 @@
 # Ignore my configuration file
+/monster/config.yml
 /monster/my_config.yml
+
 ./README.rst
+/monster/token.json
 
 # Ignore folders
 /env
 /dist
+/log
 /MonSter.egg-info
 
 # Byte-compiled / optimized

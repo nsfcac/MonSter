@@ -1,22 +1,24 @@
+import json
 import logger
 import hostlist
 
+
 log = logger.get_logger(__name__)
 
-def parse_jobs_metrics(jobs_metrics: dict):
+def parse_jobs_metrics(jobs_data: dict):
     """parse_jobs_metrics Parse Jobs Metrics
 
     Parse jobs metrics get from Slurm API
 
     Args:
-        jobs_metrics (dict): Job metrics get from Slurm APi
+        jobs_data (dict): Job data get from Slurm APi
 
     Returns:
         list: Parsed jobs info
     """
     jobs_metrics = []
 
-    all_jobs = jobs_metrics['jobs']
+    all_jobs = jobs_data['jobs']
     attributes = ['job_id', 'array_job_id', 'array_task_id', 'name','job_state', 
                   'user_id', 'user_name', 'group_id', 'cluster', 'partition', 
                   'command', 'current_working_directory', 'batch_flag', 
@@ -48,13 +50,13 @@ def parse_jobs_metrics(jobs_metrics: dict):
     return jobs_metrics
 
 
-def parse_node_metrics(nodes_metrics: dict, node_id_mapping: dict):
+def parse_node_metrics(nodes_data: dict, node_id_mapping: dict):
     """parse_node_metrics Parse Node Metircs
 
     Parse Nodes metrics get from Slurm API
 
     Args:
-        nodes_metrics (dict): Nodes metrics get from Slurm APi
+        nodes_data (dict): Nodes data get from Slurm APi
         node_id_mapping (dict): Node-Id mapping
 
     Returns:
@@ -66,7 +68,7 @@ def parse_node_metrics(nodes_metrics: dict, node_id_mapping: dict):
         'idle':0,
         'down': -1
     }
-    all_nodes = nodes_metrics['nodes']
+    all_nodes = nodes_data['nodes']
     for node in all_nodes:
         hostname = node['hostname']
         # Only process those nodes that are in node_id_mapping dict. 

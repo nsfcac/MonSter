@@ -7,7 +7,7 @@ log = logger.get_logger(__name__)
 
 data_type_mapping = {
     'Decimal': 'REAL',
-    'Integer': 'INT',
+    'Integer': 'BIGINT',
     'DateTime': 'TIMESTAMPTZ',
     'Enumeration': 'TEXT',
 }
