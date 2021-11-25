@@ -3,6 +3,7 @@ import util
 import dump
 import logger
 import process
+import rparser
 import asyncio
 import aiohttp
 import psycopg2
@@ -77,22 +78,23 @@ async def write_data(ip: str,
                         decoded_line = line.decode('utf-8', 'ignore')
                         if '{' in decoded_line:
                             decoded_line = decoded_line.strip('data: ')
-                            metrics = json.loads(decoded_line)
+                            data = rparser.report_parser(decoded_line)
 
-                            report = metrics['Id']
-                            metrics = metrics['MetricValues']
+                            if data:
+                                report_id = data.get('Id', None)
+                                metric_values = data.get('MetricValues', None)
 
-                            # Process metric values
-                            processed_metrics = process.process_idrac(ip, 
-                                                                      report, 
-                                                                      metrics)
-                            
-                            # Dump metrics
-                            dump.dump_idrac(ip, 
-                                            processed_metrics, 
-                                            metric_dtype_mapping, 
-                                            ip_id_mapping, 
-                                            conn)
+                                if report_id and metric_values:
+                                    processed_metrics = process.process_idrac(ip, 
+                                                                            report_id, 
+                                                                            metric_values)
+                                
+                                    # Dump metrics
+                                    dump.dump_idrac(ip, 
+                                                    processed_metrics, 
+                                                    metric_dtype_mapping, 
+                                                    ip_id_mapping, 
+                                                    conn)
                     except Exception as err:
                         log.error(f"Fail to decode:{ip}: {err}")
 

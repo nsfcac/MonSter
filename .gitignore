@@ -4,6 +4,7 @@
 
 ./README.rst
 /monster/token.json
+/monster/*test.py
 
 # Ignore folders
 /env

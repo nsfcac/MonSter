@@ -120,7 +120,6 @@ def extract(system_info: dict, bmc_info: dict):
     system_metrics = system_info["metrics"]
     bmc_metrics = bmc_info["metrics"]
     
-    basic = ["ServiceTag"]
     general = ["UUID", "SerialNumber", "HostName", "Model", "Manufacturer"]
     processor = ["ProcessorModel", "ProcessorCount", "LogicalProcessorCount"]
     memory = ["TotalSystemMemoryGiB"]
@@ -236,8 +235,6 @@ def process_idrac(ip: str, report: str, metrics: list):
     Returns:
         dict: processed idrac metrics grouped by table name
     """
-    
-    import time
     idrac_metrics = {}
     try:
         if report == "PowerStatistics":
@@ -245,25 +242,35 @@ def process_idrac(ip: str, report: str, metrics: list):
             pass
         else:
             for metric in metrics:
-                table_name = metric['MetricId']
-                time = metric['Timestamp']
-                source = metric['Oem']['Dell'].get('Source', None)
-                fqdd = metric['Oem']['Dell'].get('FQDD', None)
-                value = metric['MetricValue']
+                table_name = ''
+                timestamp = ''
+                source = ''
+                fqdd = ''
+                value = ''
 
-                record = {
-                    'Timestamp': time,
-                    'Source': source,
-                    'FQDD': fqdd,
-                    'Value': value
-                }
+                try:
+                    table_name = metric['MetricId']
+                    timestamp = metric['Timestamp']
+                    source = metric['Oem']['Dell']['Source']
+                    fqdd = metric['Oem']['Dell']['FQDD']
+                    value = metric['MetricValue']
+                except:
+                    pass
 
-                if table_name not in idrac_metrics:
-                    idrac_metrics.update({
-                        table_name: [record]
-                    })
-                else:
-                    idrac_metrics[table_name].append(record)
+                if table_name and timestamp and source and fqdd and value:
+                    record = {
+                        'Timestamp': timestamp,
+                        'Source': source,
+                        'FQDD': fqdd,
+                        'Value': value
+                    }
+
+                    if table_name not in idrac_metrics:
+                        idrac_metrics.update({
+                            table_name: [record]
+                        })
+                    else:
+                        idrac_metrics[table_name].append(record)
     
     except Exception as err:
             log.error(f"Fail to process idrac metrics: {err}")
