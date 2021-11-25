@@ -78,7 +78,11 @@ async def write_data(ip: str,
                         decoded_line = line.decode('utf-8', 'ignore')
                         if '{' in decoded_line:
                             decoded_line = decoded_line.strip('data: ')
-                            data = rparser.report_parser(decoded_line)
+
+                            # The customized parser is not performing efficiently
+                            # data = rparser.report_parser(decoded_line)
+
+                            data = json.loads(decoded_line)
 
                             if data:
                                 report_id = data.get('Id', None)
@@ -96,7 +100,7 @@ async def write_data(ip: str,
                                                     ip_id_mapping, 
                                                     conn)
                     except Exception as err:
-                        log.error(f"Fail to decode:{ip}: {err}")
+                        log.error(f"Fail to decode ({ip}): {err}")
 
     except Exception as err:
         log.error(f"Fail to write data: {err}")
