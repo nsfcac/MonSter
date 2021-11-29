@@ -6,7 +6,7 @@ The goal of this project is to explore the creation of a Timescale database to s
 
 1. Clone the repo and 'cd' into it: 
 ```bash
-$ git clone git@github.com:cristianocaon/idrac_tsdb.git
+$ git clone https://github.com/nsfcac/MonSter.git
 $ cd idrac_tsdb
 ```
 
