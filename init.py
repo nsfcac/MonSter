@@ -1,18 +1,18 @@
-from idrac.fetch_metrics import fetch_metrics
-from tsdb.clear_metrics import clear_metrics
-from tsdb.create_tables import create_tables
-from tsdb.insert_metrics import insert_metrics
+import os
+import sys
+import time
+import logging
+import psycopg2
 
 from dotenv import dotenv_values
+
+from idrac.fetch_metrics import fetch_metrics
+from tsdb.create_table import create_table
+from tsdb.insert_metrics import insert_metrics
 
 from utils.check_config import check_config
 from utils.parse_config import parse_config
 
-import psycopg2
-import logging
-import time
-import sys
-import os
 
 sys.path.append(os.getcwd())
 path = os.getcwd()
@@ -50,7 +50,7 @@ def main():
         conn = psycopg2.connect(CONNECTION)
 
         for measurement in measurements:
-            create_tables(measurement, conn)
+            create_table(measurement, conn)
             metrics = [
                 metric for metric in idrac_datapoints if metric["source"] == measurement]
             insert_metrics(metrics, measurement, conn)

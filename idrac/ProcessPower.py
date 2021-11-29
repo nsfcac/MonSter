@@ -1,6 +1,3 @@
-import time
-
-
 class ProcessPower():
     """
     Generate Power data points
