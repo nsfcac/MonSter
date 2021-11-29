@@ -1,6 +1,3 @@
-import time
-
-
 class ProcessThermal():
     """
     Generate thermal data points

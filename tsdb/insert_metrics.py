@@ -1,7 +1,7 @@
-from utils.check_source import check_source
+import logging
 
 from datetime import datetime
-import logging
+from utils.check_source import check_source
 
 
 def insert_metrics(metrics: list, source: str, conn: object) -> any:
@@ -14,7 +14,7 @@ def insert_metrics(metrics: list, source: str, conn: object) -> any:
             processed_time = datetime.fromtimestamp(
                 metric["time"] // 1e9).strftime('%Y-%m-%d %H:%M:%S.%f')
             nodeid = metric["nodeid"]
-            insert_rpmreading = f"""
+            insert_metric_query = f"""
                 INSERT INTO {table} (timestamp, nodeid, source, fqdd, value)
                 VALUES (
                   '{processed_time}', 
@@ -23,7 +23,7 @@ def insert_metrics(metrics: list, source: str, conn: object) -> any:
                   '{metric["fqdd"]}', 
                   '{metric["value"]}'
                 );"""
-            cursor.execute(insert_rpmreading)
+            cursor.execute(insert_metric_query)
 
         conn.commit()
         cursor.close()
