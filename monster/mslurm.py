@@ -1,7 +1,6 @@
 import time
-import json
 import pytz
-import util
+import utils
 import dump
 import slurm
 import parse
@@ -19,12 +18,17 @@ def monitor_slurm():
 
     Monitor Slurm Metrics
     """
-    connection = util.init_tsdb_connection()
-    node_id_mapping = util.get_node_id_mapping(connection)
-    slurm_config = util.get_config('slurm_rest_api')
+    connection = utils.init_tsdb_connection()
+    node_id_mapping = utils.get_node_id_mapping(connection)
+    os_idrac_hostname_mapping = utils.get_os_idrac_hostname_mapping()
+    slurm_config = utils.get_config('slurm_rest_api')
     
     #Schedule fetch slurm
-    schedule.every().minutes.at(":00").do(fetch_slurm, slurm_config, connection, node_id_mapping)
+    schedule.every().minutes.at(":00").do(fetch_slurm, 
+                                          slurm_config, 
+                                          connection, 
+                                          node_id_mapping,
+                                          os_idrac_hostname_mapping)
 
     while True:
         try:
@@ -35,7 +39,10 @@ def monitor_slurm():
             break
         
 
-def fetch_slurm(slurm_config: dict, connection: str, node_id_mapping: dict):
+def fetch_slurm(slurm_config: dict, 
+                connection: str, 
+                node_id_mapping: dict,
+                os_idrac_hostname_mapping: dict):
     """fetch_slurm Fetch Slurm Metrics
 
     Fetch Slurm metrics from the Slurm REST API
@@ -44,6 +51,7 @@ def fetch_slurm(slurm_config: dict, connection: str, node_id_mapping: dict):
         slurm_config (dict): slurm configuration
         connection (str): tsdb connection
         node_id_mapping (dict): node-ip mapping
+        os_idrac_hostname_mapping (dict): OS-iDRAC hostname mapping
     """
     token = slurm.read_slurm_token(slurm_config)
     timestamp = datetime.now(pytz.utc).replace(microsecond=0)
@@ -58,9 +66,14 @@ def fetch_slurm(slurm_config: dict, connection: str, node_id_mapping: dict):
 
     # Process slurm data
     if nodes_data and jobs_data:
-        job_metrics = parse.parse_jobs_metrics(jobs_data)
-        node_metrics = parse.parse_node_metrics(nodes_data, node_id_mapping)
-        node_jobs = parse.parse_node_jobs(jobs_data, node_id_mapping)
+        job_metrics = parse.parse_jobs_metrics(jobs_data, 
+                                               os_idrac_hostname_mapping)
+        node_metrics = parse.parse_node_metrics(nodes_data, 
+                                                node_id_mapping,
+                                                os_idrac_hostname_mapping)
+        node_jobs = parse.parse_node_jobs(jobs_data,
+                                          node_id_mapping,
+                                          os_idrac_hostname_mapping)
 
         # Dump metrics
         with psycopg2.connect(connection) as conn:

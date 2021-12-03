@@ -1,5 +1,5 @@
 import json
-import util
+import utils
 import dump
 import logger
 import process
@@ -19,13 +19,13 @@ def monitor_idrac():
 
     Monitor iDRAC metrics
     """
-    connection = util.init_tsdb_connection()
-    username, password = util.get_idrac_auth()
-    nodelist = util.get_nodelist()
+    connection = utils.init_tsdb_connection()
+    username, password = utils.get_idrac_auth()
+    nodelist = utils.get_nodelist()
 
     with psycopg2.connect(connection) as conn:
-        ip_id_mapping = util.get_ip_id_mapping(conn)
-        metric_dtype_mapping = util.get_metric_dtype_mapping(conn)
+        ip_id_mapping = utils.get_ip_id_mapping(conn)
+        metric_dtype_mapping = utils.get_metric_dtype_mapping(conn)
 
     loop = asyncio.get_event_loop()
     loop.create_task(fetch_write_idrac(nodelist,

@@ -1,5 +1,5 @@
 import sql
-import util
+import utils
 import idrac
 import logger
 import schema
@@ -14,16 +14,16 @@ def init_tsdb():
     Initialize TimeScaleDB; The database specified in the configuration file
     should be created before run this function.
     """
-    connection = util.init_tsdb_connection()
-    username, password = util.get_idrac_auth()
-    nodelist = util.get_nodelist()
+    connection = utils.init_tsdb_connection()
+    username, password = utils.get_idrac_auth()
+    nodelist = utils.get_nodelist()
 
     node = nodelist[0]
 
-    util.print_status('Getting', 'metric' , 'definitions')
+    utils.print_status('Getting', 'metric' , 'definitions')
     metric_definitions = idrac.get_metric_definitions(node, username, password)
     
-    util.print_status('Getting', 'nodes' , 'metadata')
+    utils.print_status('Getting', 'nodes' , 'metadata')
     nodes_metadata = idrac.get_nodes_metadata(nodelist, username, password)
     
     idrac_table_schemas = schema.build_idrac_table_schemas(metric_definitions)
@@ -34,7 +34,7 @@ def init_tsdb():
         cur = conn.cursor()
 
         # Create node metadata table
-        util.print_status('Creating', 'TimeScaleDB' , 'tables')
+        utils.print_status('Creating', 'TimeScaleDB' , 'tables')
         metadata_sql = sql.generate_metadata_table_sql(nodes_metadata, 'nodes')
         cur.execute(metadata_sql)
         sql.write_nodes_metadata(conn, nodes_metadata)
@@ -72,7 +72,7 @@ def init_tsdb():
         
         conn.commit()
         cur.close()
-    util.print_status('Finish', 'tables' , 'initialization!')
+    utils.print_status('Finish', 'tables' , 'initialization!')
 
 if __name__ == '__main__':
     init_tsdb()

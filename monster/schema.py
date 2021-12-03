@@ -1,4 +1,4 @@
-import util
+import utils
 import logger
 
 log = logger.get_logger(__name__)
@@ -27,7 +27,7 @@ def build_idrac_table_schemas(metric_definitions: list):
             if metric_unit == 'By' or metric_unit == 'Pkt':
                 value_type = 'BIGINT'
             else:
-                value_type = util.data_type_mapping.get(metric_type, 'TEXT')
+                value_type = utils.data_type_mapping.get(metric_type, 'TEXT')
             
             column_names = ['Timestamp', 'NodeID', 'Source', 'FQDD', 'Value']
             column_types = ['TIMESTAMPTZ NOT NULL', 'INT NOT NULL', 'TEXT', \

@@ -40,16 +40,18 @@ def get_metric_definitions(node: str,
 
 def get_metric_definition_urls(node: str, 
                                username: str, 
-                               password: str):
-    """get_metric_definition_urls Get Metrics Definition Urls
+                               password: str,
+                               report: bool = False):
+    """get_metric_definition_urls Get Metric Definition Urls
 
     Connect to one of the iDRACs in the cluster and the urls of the metric
-    reports
+    definition
 
     Args:
         node (str): ip address of the idrac
         username (str): idrac username
         password (str): idrac password
+        report (bool): metric definition or metric report definition
     Returns:
         list: Metric Urls
     """

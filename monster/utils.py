@@ -133,6 +133,15 @@ def sort_tuple_list(tuple_list:list):
     return tuple_list
 
 
+def get_os_idrac_hostname_mapping():
+    """get_os_idrac_hostname_mapping Get OS iDRAC hostname mapping
+
+    Read configuration file and get OS idrac hostname mapping if configured
+    """
+    hostnames_mapping = parse_config()['hostnames']
+    return hostnames_mapping
+
+
 def get_node_id_mapping(connection: str):
     """get_node_id_mapping Get Node-Id Mapping
 

@@ -5,13 +5,15 @@ import hostlist
 
 log = logger.get_logger(__name__)
 
-def parse_jobs_metrics(jobs_data: dict):
+def parse_jobs_metrics(jobs_data: dict,
+                       os_idrac_hostname_mapping: dict):
     """parse_jobs_metrics Parse Jobs Metrics
 
     Parse jobs metrics get from Slurm API
 
     Args:
         jobs_data (dict): Job data get from Slurm APi
+        os_idrac_hostname_mapping (dict): OS-iDRAC hostname mapping
 
     Returns:
         list: Parsed jobs info
@@ -33,6 +35,13 @@ def parse_jobs_metrics(jobs_data: dict):
         nodes = job['nodes']
         hostnames = hostlist.expand_hostlist(nodes)
 
+        # Mapping OS hostnames to iDRAC hostnames.
+        if os_idrac_hostname_mapping:
+            try:
+                hostnames = [os_idrac_hostname_mapping[i] for i in hostnames]
+            except Exception as err:
+                log.error(f"Cannot mapping OS-iDRAC hostname: {err}")
+
         metrics = []
         for attribute in attributes:
             if attribute == 'nodes':
@@ -50,7 +59,9 @@ def parse_jobs_metrics(jobs_data: dict):
     return jobs_metrics
 
 
-def parse_node_metrics(nodes_data: dict, node_id_mapping: dict):
+def parse_node_metrics(nodes_data: dict, 
+                       node_id_mapping: dict,
+                       os_idrac_hostname_mapping: dict):
     """parse_node_metrics Parse Node Metircs
 
     Parse Nodes metrics get from Slurm API
@@ -58,6 +69,7 @@ def parse_node_metrics(nodes_data: dict, node_id_mapping: dict):
     Args:
         nodes_data (dict): Nodes data get from Slurm APi
         node_id_mapping (dict): Node-Id mapping
+        os_idrac_hostname_mapping (dict): OS-iDRAC hostname mapping
 
     Returns:
         dict: Parsed node metrics
@@ -71,6 +83,15 @@ def parse_node_metrics(nodes_data: dict, node_id_mapping: dict):
     all_nodes = nodes_data['nodes']
     for node in all_nodes:
         hostname = node['hostname']
+
+        # Mapping the OS hostname to iDRAC hostname. The hostname in 
+        # node_id_mapping is using iDRAC hostname.
+        if os_idrac_hostname_mapping:
+            try:
+                hostname = os_idrac_hostname_mapping[hostname]
+            except Exception as err:
+                log.error(f"Cannot mapping OS-iDRAC hostname: {err}")
+
         # Only process those nodes that are in node_id_mapping dict. 
         if hostname in node_id_mapping:
             node_id = node_id_mapping[hostname]
@@ -101,7 +122,9 @@ def parse_node_metrics(nodes_data: dict, node_id_mapping: dict):
     return all_node_metrics
 
 
-def parse_node_jobs(jobs_metrics: dict, node_id_mapping:dict):
+def parse_node_jobs(jobs_metrics: dict, 
+                    node_id_mapping:dict,
+                    os_idrac_hostname_mapping: dict):
     """parse_node_jobs Parse Node-Jobs
 
     Parse nodes-job correlation
@@ -109,6 +132,7 @@ def parse_node_jobs(jobs_metrics: dict, node_id_mapping:dict):
     Args:
         jobs_metrics (dict): Job metrics get from Slurm APi
         node_id_mapping (dict): Node-Id mapping
+        os_idrac_hostname_mapping (dict): OS-iDRAC hostname mapping
 
     Returns:
         dict: node-jobs correlation
@@ -125,8 +149,16 @@ def parse_node_jobs(jobs_metrics: dict, node_id_mapping:dict):
             nodes = job['nodes']
             # Get node ids
             hostnames = hostlist.expand_hostlist(nodes)
+
+            # Mapping OS hostnames to iDRAC hostnames.
+            if os_idrac_hostname_mapping:
+                try:
+                    hostnames = [os_idrac_hostname_mapping[i] for i in hostnames]
+                except Exception as err:
+                    log.error(f"Cannot mapping OS-iDRAC hostname: {err}")
             
-            # Check if hostname is in node_id_mapping. If not, ignore this job info.
+            # Check if hostname is in node_id_mapping. 
+            # If not, ignore this job info.
             for hostname in hostnames:
                 if hostname not in node_id_mapping:
                     valid_flag = False

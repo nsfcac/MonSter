@@ -1,4 +1,4 @@
-import util
+import utils
 import logger
 from pgcopy import CopyManager
 from dateutil import tz
@@ -120,7 +120,7 @@ def dump_node_metrics(timestamp: object,
         curs = conn.cursor()
         curs.execute("ROLLBACK")
         conn.commit()
-        log.error(f"Faile to dump node metrics : {err}")
+        log.error(f"Fail to dump node metrics : {err}")
 
 
 def dump_idrac(ip: str, 
@@ -163,7 +163,7 @@ def dump_idrac(ip: str,
                 source = metric['Source']
                 fqdd = metric['FQDD']
                 if metric['Value']:
-                    value = util.cast_value_type(metric['Value'], dtype)
+                    value = utils.cast_value_type(metric['Value'], dtype)
                     all_records.append((timestamp, nodeid, source, fqdd, value))
 
             mgr = CopyManager(conn, target_table, cols)

@@ -1,4 +1,4 @@
-import util
+import utils
 import logger
 from pgcopy import CopyManager
 
@@ -232,10 +232,10 @@ def write_metric_definitions(conn: object, metric_definitions: list):
         metric_definitions_table = [(i['Id'], i['Name'], i['Description'],
         i['MetricType'], i['MetricDataType'], i['Units'], i['Accuracy'], 
         i['SensingInterval'], i['DiscreteValues'], 
-        util.data_type_mapping[i['MetricDataType']])for i in metric_definitions]
+        utils.data_type_mapping[i['MetricDataType']])for i in metric_definitions]
 
         # Sort
-        metric_definitions_table = util.sort_tuple_list(metric_definitions_table)
+        metric_definitions_table = utils.sort_tuple_list(metric_definitions_table)
         
         mgr = CopyManager(conn, 'metrics_definition', cols)
         mgr.copy(metric_definitions_table)

@@ -12,3 +12,7 @@ schedule
 async_retrying
 python-hostlist
 python-dateutil
+flask
+flask_cors
+pandas
+sqlalchemy
