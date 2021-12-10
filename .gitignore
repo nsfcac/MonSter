@@ -1,11 +1,10 @@
 # Ignore my configuration file
-# /monster/config.yml
-/monster/my_config.yml
+monster/config.yml
+monster/my_config.yml
 
 ./README.rst
 /monster/token.json
 /monster/*test.py
-/monster/mbapi.py
 
 # Ignore folders
 /env

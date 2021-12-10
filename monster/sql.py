@@ -1,6 +1,7 @@
 import utils
 import logger
 from pgcopy import CopyManager
+from datetime import datetime
 
 log = logger.get_logger(__name__)
 
@@ -257,5 +258,122 @@ def write_nodes_metadata(conn: object, nodes_metadata: list):
     else:
         update_nodes_metadata(conn, nodes_metadata, 'nodes')
 
+
+def generate_slurm_sql(metric: str, 
+                       start: str, 
+                       end: str, 
+                       interval: str, 
+                       aggregate: str):
+    """generate_slurm_sql Generate Slurm Sql
+
+    Generate sql for querying slurm metrics
+
+    Args:
+        metric (str): metric name
+        start (str): start of time range
+        end (str): end of time range
+        interval (str): aggregation interval
+        aggregate (str): aggregation function
+
+    Returns:
+        string: sql string
+    """
+    sql = ""
+    if metric == 'node_jobs':
+        sql = f"SELECT time_bucket_gapfill('{interval}', timestamp) AS time, \
+            nodeid, jsonb_agg(jobs) AS jobs, jsonb_agg(cpus) AS cpus \
+            FROM slurm.{metric} \
+            WHERE timestamp >= '{start}' \
+            AND timestamp <= '{end}' \
+            GROUP BY time, nodeid \
+            ORDER BY time;"
+    else:
+        sql = f"SELECT time_bucket_gapfill('{interval}', timestamp) AS time, \
+            nodeid, {aggregate}(value) AS value\
+            FROM slurm.{metric} \
+            WHERE timestamp >= '{start}' \
+            AND timestamp <= '{end}' \
+            GROUP BY time, nodeid \
+            ORDER BY time;"
+    return sql
+
+
+def generate_idrac_sql(metric: str, 
+                       fqdd: str,
+                       start: str, 
+                       end: str, 
+                       interval: str, 
+                       aggregate: str):
+    """generate_idrac_sql Generate iDRAC Sql
+
+    Generate sql for querying idrac metrics
+
+    Args:
+        metric (str): metric name
+        fqdd (str): Fully Qualified Device Descriptor
+        start (str): start of time range
+        end (str): end of time range
+        interval (str): aggregation interval
+        aggregate (str): aggregation function
+    
+    Returns:
+        string: sql string
+    """
+    schema = 'idrac'
+    sql = f"SELECT time_bucket_gapfill('{interval}', timestamp) AS time, \
+        nodeid, fqdd AS label, {aggregate}(value) AS value \
+        FROM {schema}.{metric} \
+        WHERE timestamp >= '{start}' \
+        AND timestamp < '{end}' \
+        AND fqdd = '{fqdd}' \
+        GROUP BY time, nodeid, label \
+        ORDER BY time;"
+    return sql
+
+
+def generate_slurm_jobs_sql(start: str,end: str):
+    """generate_slurm_jobs_sql Generate Slurm Jobs Sql
+
+    Generate Sql for querying slurm jobs info
+
+    Args:
+        start (str): start time
+        end (str): end time
+
+    Returns:
+        string: sql string
+    """
+    utc_from = datetime.strptime(start, '%Y-%m-%dT%H:%M:%S.%fZ')
+    epoch_from = int((utc_from - datetime(1970, 1, 1)).total_seconds())
+    utc_to = datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
+    epoch_to = int((utc_to - datetime(1970, 1, 1)).total_seconds())
+
+    sql = f"SELECT * FROM slurm.jobs \
+            WHERE start_time < {epoch_to} \
+            AND end_time > {epoch_from};"
+    return sql
+
+
+def generate_node_jobs_sql(start: str, end: str, interval: str):
+    """gene_node_jobs_sql Generate Node-Jobs Sql
+
+    Generate SQL for querying node-jobs correlation
+
+    Args:
+        start (str): start time
+        end (str): end time
+        interval (str): interval for aggragation
+
+    Returns:
+        string: sql string
+    """
+    sql = f"SELECT time_bucket_gapfill('{interval}', timestamp) AS time, \
+            nodeid, jsonb_agg(jobs) AS jobs, jsonb_agg(cpus) AS cpus \
+            FROM slurm.node_jobs \
+            WHERE timestamp >= '{start}' \
+            AND timestamp <= '{end}' \
+            GROUP BY time, nodeid \
+            ORDER BY time;"
+    return sql
 
 
