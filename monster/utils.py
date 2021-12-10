@@ -2,6 +2,7 @@ import yaml
 import logger
 import hostlist
 import psycopg2
+from pathlib import Path
 
 log = logger.get_logger(__name__)
 
@@ -46,8 +47,9 @@ def parse_config():
         dict: Configuration in json format
     """
     cfg = []
+    monster_path = Path(__file__).resolve().parent
     try:
-        with open('./config.yml', 'r') as ymlfile:
+        with open(f'{monster_path}/config.yml', 'r') as ymlfile:
             cfg = yaml.safe_load(ymlfile)
             return cfg
     except Exception as err:

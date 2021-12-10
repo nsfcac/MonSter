@@ -1,24 +1,23 @@
+from pathlib import Path
 import logging
-import sys
 
-LOGGER_NAME = 'MonsterLog'
 
-def setup_logger(logger_name = LOGGER_NAME, file_name = None):
-    logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    sh = logging.StreamHandler(sys.stdout)
-    sh.setFormatter(formatter)
-    logger.handlers.clear()
-    logger.addHandler(sh)
-
-    if file_name:
-        fh = logging.FileHandler(file_name)
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
+def setup_logger(file_name):
+    monster_path = Path(__file__).resolve().parent.parent
+    log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    logging.basicConfig(filename=f'{monster_path}/log/monster.log',
+                        format=log_format,
+                        level=logging.ERROR,
+                        filemode='w')
+    logger = logging.getLogger(file_name)
     
+    console = logging.StreamHandler()
+    console.setLevel(logging.DEBUG)
+    console.setFormatter(logging.Formatter(log_format))
+    logging.getLogger(file_name).addHandler(console)
+
     return logger
 
 
-def get_logger(module_name):    
-   return logging.getLogger(LOGGER_NAME).getChild(module_name)
+def get_logger(file_name):
+    return setup_logger(file_name)

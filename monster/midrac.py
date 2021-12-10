@@ -1,4 +1,3 @@
-import json
 import utils
 import dump
 import logger
@@ -79,10 +78,10 @@ async def write_data(ip: str,
                         if '{' in decoded_line:
                             decoded_line = decoded_line.strip('data: ')
 
-                            # The customized parser is not performing efficiently
-                            # data = rparser.report_parser(decoded_line)
+                            # Use the customized parser
+                            data = rparser.report_parser(decoded_line)
 
-                            data = json.loads(decoded_line)
+                            # data = json.loads(decoded_line)
 
                             if data:
                                 report_id = data.get('Id', None)
