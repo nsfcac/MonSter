@@ -82,12 +82,12 @@ In the `monster` folder, run `python midrac.py` to start the code for collecting
 Run `python mslurm.py` to start the code for collecting slurm metrics. The slurm metrics are collected at a predefined interval of 60 seconds.
 
 You may need to run the data collection codes in background:
-`nohup python -u midrac.py > ./midrac.log 2>&1 &` and `nohup python -u mslurm.py > ./mslurm.log 2>&1 &`.
-
----
-If you have questions, please email Mr. Jie Li: jie.li@ttu.edu. 
+`nohup python -u midrac.py > ./midrac.log 2>&1 &` and `nohup python -u mslurm.py > ./mslurm.log 2>&1 &`. 
 
 ## MonSter API for Data Source Plugin (Grafana) ##
 
 In the `monster` folder, run `python mapi.py` to start the API service for the data source plugin. The API will be running on port `5001` of locolhost (`'0.0.0.0'`). Currently, it supports querying metrics, job info, and node-job correlation.
+
+---
+If you have questions, please email Mr. Jie Li: jie.li@ttu.edu.
 
