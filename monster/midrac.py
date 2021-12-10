@@ -69,40 +69,41 @@ async def write_data(ip: str,
                      ip_id_mapping: dict,
                      conn: object) -> None:
     url = f"https://{ip}/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport"
-    try:
-        async with session.get(url) as resp:
-            async for line in resp.content:
-                if line:
-                    try:
-                        decoded_line = line.decode('utf-8', 'ignore')
-                        if '{' in decoded_line:
-                            decoded_line = decoded_line.strip('data: ')
+    while True:
+        try:
+            async with session.get(url) as resp:
+                async for line in resp.content:
+                    if line:
+                        try:
+                            decoded_line = line.decode('utf-8', 'ignore')
+                            if '{' in decoded_line:
+                                decoded_line = decoded_line.strip('data: ')
 
-                            # Use the customized parser
-                            data = rparser.report_parser(decoded_line)
+                                # Use the customized parser
+                                data = rparser.report_parser(decoded_line)
 
-                            # data = json.loads(decoded_line)
+                                # data = json.loads(decoded_line)
 
-                            if data:
-                                report_id = data.get('Id', None)
-                                metric_values = data.get('MetricValues', None)
+                                if data:
+                                    report_id = data.get('Id', None)
+                                    metric_values = data.get('MetricValues', None)
 
-                                if report_id and metric_values:
-                                    processed_metrics = process.process_idrac(ip, 
-                                                                            report_id, 
-                                                                            metric_values)
-                                
-                                    # Dump metrics
-                                    dump.dump_idrac(ip, 
-                                                    processed_metrics, 
-                                                    metric_dtype_mapping, 
-                                                    ip_id_mapping, 
-                                                    conn)
-                    except Exception as err:
-                        log.error(f"Fail to decode ({ip}): {err}")
+                                    if report_id and metric_values:
+                                        processed_metrics = process.process_idrac(ip, 
+                                                                                report_id, 
+                                                                                metric_values)
+                                    
+                                        # Dump metrics
+                                        dump.dump_idrac(ip, 
+                                                        processed_metrics, 
+                                                        metric_dtype_mapping, 
+                                                        ip_id_mapping, 
+                                                        conn)
+                        except Exception as err:
+                            log.error(f"Fail to decode ({ip}): {err}")
 
-    except Exception as err:
-        log.error(f"Fail to write data: {err}")
+        except Exception as err:
+            log.error(f"Fail to write data: {err}")
 
 
 if __name__ == '__main__':
