@@ -86,7 +86,6 @@ You may need to run the data collection codes in background:
 
 ## MonSter API for Data Source Plugin (Grafana) ##
 
-
 ---
 If you have questions, please email Mr. Jie Li: jie.li@ttu.edu. 
 
