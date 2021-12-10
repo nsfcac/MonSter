@@ -84,8 +84,6 @@ Run `python mslurm.py` to start the code for collecting slurm metrics. The slurm
 You may need to run the data collection codes in background:
 `nohup python -u midrac.py > ./midrac.log 2>&1 &` and `nohup python -u mslurm.py > ./mslurm.log 2>&1 &`.
 
-## MonSter API for Data Source Plugin (Grafana) ##
-
 ---
 If you have questions, please email Mr. Jie Li: jie.li@ttu.edu. 
 
