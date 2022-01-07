@@ -8,14 +8,23 @@ import aiohttp
 import psycopg2
 import multiprocessing
 
-from async_retrying import retry
 from aiohttp import ClientSession
-from aiohttp_sse_client import client as sse_client
 
 log = logger.get_logger(__name__)
 
 
 async def decode_message(ip: str, line: str):
+    """decode_message Decode Message
+
+    Decode each line in the idrac streaming data
+
+    Args:
+        ip (str): ip address of idrac
+        line (str): each line in the idrac streaming data
+
+    Returns:
+        tuple: ip info and its corresponding json-format metrics
+    """
     if line:
         try:
             decoded_line = line.decode('utf-8', 'ignore')
@@ -35,28 +44,46 @@ async def listen_idrac(ip: str,
                        username: str,
                        password: str,
                        mr_queue: asyncio.Queue):
-        async with ClientSession( connector = aiohttp.TCPConnector(ssl=False, 
-                                                            force_close=False, 
-                                                            limit=None), 
-                                auth=aiohttp.BasicAuth(username, password),
-                                timeout = aiohttp.ClientTimeout(total= 0) ) as session:
-            url = f"https://{ip}/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport"
-            while True:
-                try:
-                    async with session.get(url) as resp:
-                        async for line in resp.content:
-                            data = await decode_message(ip, line)
-                            if data:
-                                # print(f"Producing {ip}")
-                                await mr_queue.put(data)
-                            # Force task switch
-                            await asyncio.sleep(0)
-                except Exception as err:
-                    log.error(f"Cannot collect metrics from ({ip}): {err}")
+    """listen_idrac Listen iDRAC
+
+    Listen to iDRAC streaming
+
+    Args:
+        ip (str): ip address of idrac
+        username (str): username for idrac authentication
+        password (str): password for idrac authentication
+        mr_queue (asyncio.Queue): Queue for metrics reading
+    """
+    async with ClientSession( connector = aiohttp.TCPConnector(ssl=False, 
+                                                        force_close=False, 
+                                                        limit=None), 
+                            auth=aiohttp.BasicAuth(username, password),
+                            timeout = aiohttp.ClientTimeout(total= 0) ) as session:
+        url = f"https://{ip}/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport"
+        while True:
+            try:
+                async with session.get(url) as resp:
+                    async for line in resp.content:
+                        data = await decode_message(ip, line)
+                        if data:
+                            # print(f"Producing {ip}")
+                            await mr_queue.put(data)
+                        # Force task switch
+                        await asyncio.sleep(0)
+            except Exception as err:
+                log.error(f"Cannot collect metrics from ({ip}): {err}")
 
 
 async def process_idrac(mr_queue: asyncio.Queue,
                         mp_queue: asyncio.Queue):
+    """process_idrac Process iDRAC
+
+    Process iDRAC streaming data
+
+    Args:
+        mr_queue (asyncio.Queue): Queue for metrics reading
+        mp_queue (asyncio.Queue): Queue for metrics processing
+    """
     while True:
         data = await mr_queue.get()
         ip = data[0]
@@ -73,10 +100,20 @@ async def process_idrac(mr_queue: asyncio.Queue,
             mr_queue.task_done()
 
 
-async def write_idrac(metric_dtype_mapping, 
-                      ip_id_mapping, 
-                      conn, 
+async def write_idrac(metric_dtype_mapping: dict, 
+                      ip_id_mapping: dict, 
+                      conn: object, 
                       mp_queue: asyncio.Queue):
+    """write_idrac Write iDRAC
+
+    Write processed iDRAC metrics to database
+
+    Args:
+        metric_dtype_mapping (dict): metric-datatype mapping
+        ip_id_mapping (dict): ip-id mapping
+        conn (object): psycopg2 connection object
+        mp_queue (asyncio.Queue): Queue for metrics processing
+    """
     while True:
         metric_tuple = await mp_queue.get()
         ip = metric_tuple[0]
@@ -86,16 +123,25 @@ async def write_idrac(metric_dtype_mapping,
         mp_queue.task_done()
 
 
-async def monitor_idrac(buf_size,
-                        conn, 
-                        username, 
-                        password, 
-                        nodelist,
-                        ip_id_mapping,
-                        metric_dtype_mapping):
+async def monitor_idrac(buf_size: int,
+                        conn: object, 
+                        username: str, 
+                        password: str, 
+                        nodelist: list,
+                        ip_id_mapping: dict,
+                        metric_dtype_mapping: dict):
     """monitor_idrac Monitor iDRAC
 
-    Monitor iDRAC metrics
+    Monitoring iDRAC wrapper function
+
+    Args:
+        buf_size (int): queue buffer size
+        conn (object): psycopg2 connection object
+        username (str): username for idrac authentication
+        password (str): password for idrac authentication
+        nodelist (list): list of target nodes/iDRACs
+        ip_id_mapping (dict): ip-id mapping
+        metric_dtype_mapping (dict): metric-datatype mapping
     """
     # Metric Read Queue
     mr_queue = asyncio.Queue(maxsize=buf_size)
@@ -111,10 +157,20 @@ async def monitor_idrac(buf_size,
     await asyncio.gather(*tasks)
 
 
-def asyncio_run(buf_size,
-                username, 
-                password, 
-                nodelist):
+def asyncio_run(buf_size: int,
+                username: str, 
+                password: str, 
+                nodelist: list):
+    """asyncio_run Asyncio Run
+
+    Asyncio run the idrac data collection code
+
+    Args:
+        buf_size (int): queue buffer size
+        username (str): username for idrac authentication
+        password (str): password for idrac authentication
+        nodelist (list): list of target nodes/iDRACs
+    """
     with psycopg2.connect(connection) as conn:
         ip_id_mapping = utils.get_ip_id_mapping(conn)
         metric_dtype_mapping = utils.get_metric_dtype_mapping(conn)
@@ -128,11 +184,23 @@ def asyncio_run(buf_size,
                                       metric_dtype_mapping))
 
 
-def parallel_monitor_idrac(cores,
-                           buf_size, 
-                           username, 
-                           password,
-                           nodelist):
+def parallel_monitor_idrac(cores: int,
+                           buf_size: int, 
+                           username: str, 
+                           password: str,
+                           nodelist: list):
+    """parallel_monitor_idrac Parallel Monitor iDRAC
+
+    Running data collection code in parallel. The tasks are evenly distributed 
+    to the cores of the monitoring node to improve the performance.
+
+    Args:
+        cores (int): number of cores available
+        buf_size (int): queue buffer size
+        username (str): username for idrac authentication
+        password (str): password for idrac authentication
+        nodelist (list): list of target nodes/iDRACs
+    """
     args = []
     node_list_groups = utils.partition(nodelist, cores)
 

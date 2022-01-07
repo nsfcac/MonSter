@@ -254,6 +254,9 @@ def process_idrac(ip: str, report: str, metrics: list):
                     source = metric['Oem']['Dell']['Source']
                     fqdd = metric['Oem']['Dell']['FQDD']
                     value = metric['MetricValue']
+
+                    # print(f"Time Stamp: {timestamp}")
+
                 except:
                     pass
 
