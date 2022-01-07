@@ -5,6 +5,7 @@ monster/my_config.yml
 ./README.rst
 /monster/token.json
 /monster/*test.py
+/monster/*.log
 
 # Ignore folders
 /env
@@ -17,4 +18,4 @@ __pycache__/
 /monster/__pycache__
 
 # Sphinx documentation
-/docs
+# /docs
