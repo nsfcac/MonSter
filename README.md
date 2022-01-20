@@ -43,7 +43,7 @@ Run `make init` to create a virtual environment named `env` in the current direc
 
 You probably will encounter issues while installing `psycopg2`. If any error occurs, the main reason is pg_config is required to build psycopg2 from source. Please add the directory containing pg_config to the $PATH or specify the full executable path with the option: python setup.py build_ext --pg-config /path/to/pg_config build.
 
-Activate the virtual environment before you run any MonSter codes: `activate ./env/bin/activate`
+Activate the virtual environment before you run any MonSter codes: `source ./env/bin/activate`
 
 Make sure the configuration file, `/monster/config.yml`, is configured correctly according to your environment.
 
