@@ -30,22 +30,28 @@ Author:
 """
 
 from pathlib import Path
+from logging.handlers import TimedRotatingFileHandler
 import logging
 
 
 def setup_logger(file_name):
     monster_path = Path(__file__).resolve().parent.parent
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    logging.basicConfig(filename=f'{monster_path}/log/monster.log',
-                        format=log_format,
-                        level=logging.ERROR,
-                        filemode='w')
-    logger = logging.getLogger(file_name)
     
-    console = logging.StreamHandler()
-    console.setLevel(logging.DEBUG)
-    console.setFormatter(logging.Formatter(log_format))
-    logging.getLogger(file_name).addHandler(console)
+    logger = logging.getLogger(file_name)
+    formatter = logging.Formatter(log_format)
+
+    log_handler = TimedRotatingFileHandler(filename=f'{monster_path}/log/monster.log', when="midnight", interval=1, backupCount=7)
+    log_handler.setLevel(logging.ERROR)
+    log_handler.setFormatter(formatter)
+
+    if not logger.handlers:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.ERROR)
+        stream_handler.setFormatter(formatter)
+
+        logger.addHandler(stream_handler)
+        logger.addHandler(log_handler)
 
     return logger
 
