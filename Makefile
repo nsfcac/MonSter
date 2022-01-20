@@ -7,11 +7,11 @@ start: startmidrac startmslurm
 
 startmidrac:
 	. ./env/bin/activate; \
-	nohup python -u $(PWD)/monster/midrac.py > $(PWD)/log/midrac.log &
+	nohup python -u $(PWD)/monster/midrac.py > /dev/null 2>&1 &
 
 startmslurm:
 	. ./env/bin/activate; \
-	nohup python -u $(PWD)/monster/mslurm.py > $(PWD)/log/mslurm.log &
+	nohup python -u $(PWD)/monster/mslurm.py > /dev/null 2>&1 &
 
 stop: stopmidrac stopmslurm
 
