@@ -82,7 +82,9 @@ In the `monster` folder, run `python midrac.py` to start the code for collecting
 Run `python mslurm.py` to start the code for collecting slurm metrics. The slurm metrics are collected at a predefined interval of 60 seconds.
 
 You may need to run the data collection codes in background:
-`nohup python -u midrac.py > ./midrac.log 2>&1 &` and `nohup python -u mslurm.py > ./mslurm.log 2>&1 &`. 
+`nohup python -u midrac.py > ../log/midrac.log 2>&1 &` and `nohup python -u mslurm.py > ../log/mslurm.log 2>&1 &`. 
+
+Makefile also defines some shortcuts: `make start` to start monitoring idrac and slurm; `make stop` to stop the data collection codes. 
 
 ## MonSter API for Data Source Plugin (Grafana) ##
 
