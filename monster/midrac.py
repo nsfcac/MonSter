@@ -98,8 +98,8 @@ async def listen_idrac(ip: str,
                         data = await decode_message(ip, line)
                         if data and data[1]!= 'error':
                             await mr_queue.put(data)
-                        # Force task switch
-                        await asyncio.sleep(0)
+                            # Force task switch
+                            await asyncio.sleep(0)
             except Exception as err:
                 log.error(f"Cannot collect metrics from ({ip}): {err}")
 
