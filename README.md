@@ -86,6 +86,67 @@ You may need to run the data collection codes in background:
 
 Makefile also defines some shortcuts: `make start` to start monitoring idrac and slurm; `make stop` to stop the data collection codes. 
 
+## Adding compression policy on tables ##
+
+The following command will add compression policy on all **idrac** tables with interval equal to 7 days, i.e., chunks older than 7 days will be compressed.
+
+```sql
+DO $$
+DECLARE
+	sqlquery1 text;
+	sqlquery2 text;
+
+	v  RECORD;
+    tables CURSOR FOR
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'idrac'
+        ORDER BY tablename;
+    total_size int;
+BEGIN
+    FOR table_record IN tables LOOP
+		BEGIN
+    	    sqlquery1 = 'ALTER TABLE ' || 'idrac.' || table_record.tablename || ' SET (timescaledb.compress, timescaledb.compress_segmentby = '|| quote_literal('nodeid') || ');';
+			EXECUTE sqlquery1;
+			sqlquery2 = 'SELECT add_compression_policy(' || quote_literal('idrac.' || table_record.tablename) || ', INTERVAL '|| quote_literal('7 days') || ');';
+			EXECUTE sqlquery2;
+		    EXCEPTION WHEN OTHERS THEN
+		END;
+	END LOOP;
+END$$
+```
+
+The following command will add compression policy on all **slurm** tables (except the `jobs` table where the job metadata are stored) with interval equal to 7 days.
+
+```sql
+DO $$
+DECLARE
+	sqlquery1 text;
+	sqlquery2 text;
+
+	v  RECORD;
+    tables CURSOR FOR
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'slurm'
+        ORDER BY tablename;
+    total_size int;
+BEGIN
+    FOR table_record IN tables LOOP
+    	IF (table_record.tablename <> 'jobs')
+    	THEN
+    		sqlquery1 = 'ALTER TABLE ' || 'slurm.' || table_record.tablename || ' SET (timescaledb.compress, timescaledb.compress_segmentby = '|| quote_literal('nodeid') || ');';
+			sqlquery2 = 'SELECT add_compression_policy(' || quote_literal('slurm.' || table_record.tablename) || ', INTERVAL '|| quote_literal('7 days') || ');';
+			EXECUTE sqlquery1;
+			EXECUTE sqlquery2;
+		ELSE
+			raise notice '%', table_record.tablename;
+	
+	END IF;
+	END LOOP;
+END$$;
+```
+
 ## MonSter API for Data Source Plugin (Grafana) ##
 
 In the `monster` folder, run `python mapi.py` to start the API service for the data source plugin. The API will be running on port `5001` of locolhost (`'0.0.0.0'`). Currently, it supports querying metrics, job info, and node-job correlation.
