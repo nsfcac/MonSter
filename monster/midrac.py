@@ -61,12 +61,12 @@ async def decode_message(ip: str, line: str):
             decoded_line = line.decode('utf-8', 'ignore')
             if '{' in decoded_line:
                 decoded_line = decoded_line.strip('data: ')
-
                 # Use the customized parser
                 report = rparser.report_parser(decoded_line)
                 # report = json.loads(decoded_line)
-                data = (ip, report)
-                return data
+                if report:
+                    data = (ip, report)
+                    return data
         except Exception as err:
                 log.error(f"Fail to decode ({ip}): {err}")
 
@@ -96,8 +96,7 @@ async def listen_idrac(ip: str,
                 async with session.get(url) as resp:
                     async for line in resp.content:
                         data = await decode_message(ip, line)
-                        if data:
-                            # print(f"Producing {ip}")
+                        if data and data[1]!= 'error':
                             await mr_queue.put(data)
                         # Force task switch
                         await asyncio.sleep(0)
@@ -233,7 +232,7 @@ def parallel_monitor_idrac(cores: int,
         nodelist (list): list of target nodes/iDRACs
     """
     args = []
-    
+
     if len(nodelist) < cores:
         asyncio_run(buf_size, username, password, nodelist)
     else:
