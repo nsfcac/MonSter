@@ -1,7 +1,9 @@
 init:
+	mkdir log; \
+	touch ./log/monster.log
 	python3 -m venv env; \
 	. ./env/bin/activate; \
-	pip install -r requirements.txt;
+	pip install -r requirements.txt
 
 start: startmidrac startmslurm
 
