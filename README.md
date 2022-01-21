@@ -142,7 +142,7 @@ BEGIN
         ELSE
             raise notice '%', table_record.tablename;
 	
-    END IF;
+        END IF;
     END LOOP;
 END$$;
 ```
