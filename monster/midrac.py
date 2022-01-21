@@ -233,14 +233,18 @@ def parallel_monitor_idrac(cores: int,
         nodelist (list): list of target nodes/iDRACs
     """
     args = []
-    node_list_groups = utils.partition(nodelist, cores)
-
-    for i in range(cores):
-        nodes = node_list_groups[i]
-        args.append((buf_size, username, password, nodes))
     
-    with multiprocessing.Pool() as pool:
-        pool.starmap(asyncio_run, args)
+    if len(nodelist) < cores:
+        asyncio_run(buf_size, username, password, nodelist)
+    else:
+        node_list_groups = utils.partition(nodelist, cores)
+
+        for i in range(cores):
+            nodes = node_list_groups[i]
+            args.append((buf_size, username, password, nodes))
+        
+        with multiprocessing.Pool() as pool:
+            pool.starmap(asyncio_run, args)
 
     return
 
