@@ -47,7 +47,7 @@ Activate the virtual environment before you run any MonSter codes: `source ./env
 
 Make sure the configuration file, `/monster/config.yml`, is configured correctly according to your environment.
 
-## Initializing TimeScaleDB tables ##
+## Initializing TimeScaleDB Tables ##
 MonSter manages the monitoring data in TimeScaleDB, where the tables should be initialized before running metrics collection code. 
 
 To initialize tables, `cd monster` and `python tsdb.py`.  
@@ -86,17 +86,17 @@ You may need to run the data collection codes in background:
 
 Makefile also defines some shortcuts: `make start` to start monitoring idrac and slurm; `make stop` to stop the data collection codes. 
 
-## Adding compression policy on tables ##
+## Adding Compression Policy on Tables ##
 
-The following command will add compression policy on all **idrac** tables with interval equal to 7 days, i.e., chunks older than 7 days will be compressed.
+The following command will add compression policy on all **idrac** tables with interval set to 7 days, i.e., chunks older than 7 days will be compressed.
 
 ```sql
 DO $$
 DECLARE
-	sqlquery1 text;
-	sqlquery2 text;
+    sqlquery1 text;
+    sqlquery2 text;
 
-	v  RECORD;
+    v  RECORD;
     tables CURSOR FOR
         SELECT tablename
         FROM pg_tables
@@ -105,26 +105,26 @@ DECLARE
     total_size int;
 BEGIN
     FOR table_record IN tables LOOP
-		BEGIN
-    	    sqlquery1 = 'ALTER TABLE ' || 'idrac.' || table_record.tablename || ' SET (timescaledb.compress, timescaledb.compress_segmentby = '|| quote_literal('nodeid') || ');';
-			EXECUTE sqlquery1;
-			sqlquery2 = 'SELECT add_compression_policy(' || quote_literal('idrac.' || table_record.tablename) || ', INTERVAL '|| quote_literal('7 days') || ');';
-			EXECUTE sqlquery2;
-		    EXCEPTION WHEN OTHERS THEN
-		END;
-	END LOOP;
+        BEGIN
+            sqlquery1 = 'ALTER TABLE ' || 'idrac.' || table_record.tablename || ' SET (timescaledb.compress, timescaledb.compress_segmentby = '|| quote_literal('nodeid') || ');';
+            EXECUTE sqlquery1;
+            sqlquery2 = 'SELECT add_compression_policy(' || quote_literal('idrac.' || table_record.tablename) || ', INTERVAL '|| quote_literal('7 days') || ');';
+            EXECUTE sqlquery2;
+            EXCEPTION WHEN OTHERS THEN
+        END;
+    END LOOP;
 END$$
 ```
 
-The following command will add compression policy on all **slurm** tables (except the `jobs` table where the job metadata are stored) with interval equal to 7 days.
+The following command will add compression policy on all **slurm** tables (except the `jobs` table where the job metadata are stored) with interval set to 7 days.
 
 ```sql
 DO $$
 DECLARE
-	sqlquery1 text;
-	sqlquery2 text;
+    sqlquery1 text;
+    sqlquery2 text;
 
-	v  RECORD;
+    v  RECORD;
     tables CURSOR FOR
         SELECT tablename
         FROM pg_tables
@@ -133,17 +133,17 @@ DECLARE
     total_size int;
 BEGIN
     FOR table_record IN tables LOOP
-    	IF (table_record.tablename <> 'jobs')
-    	THEN
-    		sqlquery1 = 'ALTER TABLE ' || 'slurm.' || table_record.tablename || ' SET (timescaledb.compress, timescaledb.compress_segmentby = '|| quote_literal('nodeid') || ');';
-			sqlquery2 = 'SELECT add_compression_policy(' || quote_literal('slurm.' || table_record.tablename) || ', INTERVAL '|| quote_literal('7 days') || ');';
-			EXECUTE sqlquery1;
-			EXECUTE sqlquery2;
-		ELSE
+        IF (table_record.tablename <> 'jobs')
+        THEN
+            sqlquery1 = 'ALTER TABLE ' || 'slurm.' || table_record.tablename || ' SET (timescaledb.compress, timescaledb.compress_segmentby = '|| quote_literal('nodeid') || ');';
+            sqlquery2 = 'SELECT add_compression_policy(' || quote_literal('slurm.' || table_record.tablename) || ', INTERVAL '|| quote_literal('7 days') || ');';
+            EXECUTE sqlquery1;
+            EXECUTE sqlquery2;
+        ELSE
 			raise notice '%', table_record.tablename;
 	
-	END IF;
-	END LOOP;
+    END IF;
+    END LOOP;
 END$$;
 ```
 
