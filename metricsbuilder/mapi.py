@@ -29,6 +29,9 @@ Author:
     Jie Li, jie.li@ttu.edu
 """
 
+import sys
+sys.path.insert(0, '../monster')
+
 import utils
 import api_utils
 import json

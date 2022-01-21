@@ -29,6 +29,9 @@ Author:
     Jie Li, jie.li@ttu.edu
 """
 
+import sys
+sys.path.insert(0, '../monster')
+
 import sql
 import pandas as pd
 import sqlalchemy as db

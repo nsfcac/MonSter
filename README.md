@@ -39,20 +39,18 @@ CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 ## Getting Started ##
 
-Run `make init` to create a virtual environment named `env` in the current directory and install the required packages in `env`.
+Run `make init` to
+- Create a log file named `monster.log` in folder `log`;
+- Create a virtual environment named `env` in the current directory;
+- Install the required packages in `env`;
+- Initialize tables in TimeScaleDB.
 
 You probably will encounter issues while installing `psycopg2`. If any error occurs, the main reason is pg_config is required to build psycopg2 from source. Please add the directory containing pg_config to the $PATH or specify the full executable path with the option: python setup.py build_ext --pg-config /path/to/pg_config build.
 
-Activate the virtual environment before you run any MonSter codes: `source ./env/bin/activate`
-
 Make sure the configuration file, `/monster/config.yml`, is configured correctly according to your environment.
 
-## Initializing TimeScaleDB Tables ##
-MonSter manages the monitoring data in TimeScaleDB, where the tables should be initialized before running metrics collection code. 
 
-To initialize tables, `cd monster` and `python tsdb.py`.  
-
-The following schemas and tables will be created:
+The following schemas and tables in TimeScaleDB will be created:
 
 ```
 |-- public
