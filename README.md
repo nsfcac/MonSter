@@ -140,7 +140,7 @@ BEGIN
             EXECUTE sqlquery1;
             EXECUTE sqlquery2;
         ELSE
-			raise notice '%', table_record.tablename;
+            raise notice '%', table_record.tablename;
 	
     END IF;
     END LOOP;
