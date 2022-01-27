@@ -33,6 +33,7 @@ import sys
 sys.path.insert(0, '../monster')
 
 import sql
+from tqdm import tqdm
 import pandas as pd
 import sqlalchemy as db
 
@@ -57,7 +58,8 @@ def get_id_node_mapping(connection: str):
 def get_metric_fqdd_mapping(connection: str):
     """get_metric_fqdd_mapping Get Metric-FQDD Mapping
 
-    Get metric-fqdd mapping
+    Get metric-fqdd mapping. If finding the metric_fqdd table in tsdb, query
+    directly; build metric-fqdd table otherwise.
 
     Args:
         connection (str): connection string
@@ -69,13 +71,41 @@ def get_metric_fqdd_mapping(connection: str):
     mapping = {}
 
     metric_list = get_avail_metrics(connect, metadata, engine)
-
-    for metric in metric_list:
-        fqdd = get_avail_metric_fqdd(connect, metadata, engine, metric)
-        if fqdd:
+    
+    # Check if the metric_fqdd table exists
+    if db.inspect(engine).has_table('metric_fqdd'):
+        metric_fqdd = db.Table('metric_fqdd',
+                                metadata,
+                                autoload=True,
+                                autoload_with=engine)
+        query = db.select([metric_fqdd])
+        result_proxy = connect.execute(query)
+        result = result_proxy.fetchall()
+        for i in result:
             mapping.update({
-                metric: fqdd
+                i[1]: i[2]
             })
+    else:
+        # Create the metric_fqdd table
+        metric_fqdd = db.Table('metric_fqdd', metadata,
+                      db.Column('id', db.Integer, primary_key=True, autoincrement=True),
+                      db.Column('metric_id', db.Text),
+                      db.Column('fqdd',db.ARRAY(db.Text)))
+        metadata.create_all(engine)
+
+        # print("Collecting FQDD info...")
+        # for metric in tqdm(metric_list):
+        for metric in metric_list:
+            fqdd = get_avail_metric_fqdd(connect, metadata, engine, metric)
+            if fqdd:
+                mapping.update({
+                    metric: fqdd
+                })
+
+        for metric, fqdd in mapping.items():
+            entry = db.insert(metric_fqdd).values(metric_id=metric, fqdd=fqdd)
+            result=connect.execute(entry)
+
     connect.close()
 
     return mapping
@@ -129,7 +159,7 @@ def get_avail_metric_fqdd(connect: object,
                      schema = 'idrac')
 
     # Find unique fqdd values
-    query = db.select([table.columns.fqdd.distinct()]).limit(50)
+    query = db.select([table.columns.fqdd.distinct()]).limit(20)
     result_proxy = connect.execute(query)
     result = result_proxy.fetchall()
 

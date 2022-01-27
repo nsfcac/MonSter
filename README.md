@@ -40,9 +40,8 @@ CREATE EXTENSION IF NOT EXISTS timescaledb;
 ## Getting Started ##
 
 Run `make init` to
-- Create a log file named `monster.log` in folder `log`;
-- Create a virtual environment named `env` in the current directory;
-- Install the required packages in `env`;
+- Create a virtual environment named `env` in the current directory and install the required packages in `env`;
+- Create log files for MonSter and MonSter API service in folder `log`;
 - Initialize tables in TimeScaleDB.
 
 You probably will encounter issues while installing `psycopg2`. If any error occurs, the main reason is pg_config is required to build psycopg2 from source. Please add the directory containing pg_config to the $PATH or specify the full executable path with the option: python setup.py build_ext --pg-config /path/to/pg_config build.
@@ -145,9 +144,13 @@ BEGIN
 END$$;
 ```
 
-## MonSter API for Data Source Plugin (Grafana) ##
+## MonSter API Service for Data Source Plugin (Grafana) ##
 
-In the `monster` folder, run `python mapi.py` to start the API service for the data source plugin. The API will be running on port `5001` of locolhost (`'0.0.0.0'`). Currently, it supports querying metrics, job info, and node-job correlation.
+`make startmapi` to start the MonSter API service for the Grafana Data Source Plugin. The API will be running on port `5001` of locolhost (`'0.0.0.0'`) by default. You may change the settings in `./metricsbuilder/gunicorn.conf.py`. Currently, it supports querying metrics, job info, and node-job correlation.
+
+`make stopmapi` to stop the API service. 
+
+Access log and error log can be found in `log` folder.
 
 ---
 If you have questions, please email Mr. Jie Li: jie.li@ttu.edu.
