@@ -146,11 +146,11 @@ END$$;
 
 ## MonSter API Service for Data Source Plugin (Grafana) ##
 
-`make startmapi` to start the MonSter API service for the Grafana Data Source Plugin. The API will be running on port `5001` of locolhost (`'0.0.0.0'`) by default. You may change the settings in `./metricsbuilder/gunicorn.conf.py`. Currently, it supports querying metrics, job info, and node-job correlation.
+Run `make startmapi` to start the MonSter API service for the Grafana Data Source Plugin. The API will be running on port `5001` of locolhost (`'0.0.0.0'`) by default. You may change the settings in `./metricsbuilder/gunicorn.conf.py`. Currently, it supports querying metrics, job info, and node-job correlation.
 
-`make stopmapi` to stop the API service. 
+Run `make stopmapi` to stop the API service. 
 
-Access log and error log can be found in `log` folder.
+Access log and error log can be found in the `log` folder.
 
 ---
 If you have questions, please email Mr. Jie Li: jie.li@ttu.edu.
