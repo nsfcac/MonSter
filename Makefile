@@ -75,7 +75,7 @@ stop: stopmidrac stopmslurm
 
 
 stopmidrac:
-	@if $(ps_midrac); then \
+	@-if $(ps_midrac); then \
 		echo "Stop collecting iDRAC metrics..."; \
 		pkill -f "python -u ${MIDRAC}"; \
 	else \
@@ -84,8 +84,8 @@ stopmidrac:
 
 
 stopmslurm:
-	@if $(ps_mslurm); then \
-		echo "Stop collecting iDRAC metrics..."; \
+	@-if $(ps_mslurm); then \
+		echo "Stop collecting Slurm metrics..."; \
 		pkill -f "python -u ${MSLURM}"; \
 	else \
 		echo "Slurm monitoring service is already stopped!"; \

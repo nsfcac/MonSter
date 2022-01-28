@@ -72,7 +72,7 @@ def search():
 @app.route('/query', methods=['POST'])
 @cross_origin()
 def query():
-    results = api_utils.query_tsdb(request, ID_NODE_MAPPING, connection)
+    results = api_utils.query_tsdb_parallel(request, ID_NODE_MAPPING, connection)
     return jsonify(results)
 
 

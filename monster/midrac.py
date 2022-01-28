@@ -242,7 +242,7 @@ def parallel_monitor_idrac(cores: int,
             nodes = node_list_groups[i]
             args.append((buf_size, username, password, nodes))
         
-        with multiprocessing.Pool() as pool:
+        with multiprocessing.Pool(cores) as pool:
             pool.starmap(asyncio_run, args)
 
     return

@@ -29,6 +29,8 @@ Author:
     Jie Li, jie.li@ttu.edu
 """
 
+import multiprocessing
+from sqlite3 import connect
 import sys
 sys.path.insert(0, '../monster')
 
@@ -36,6 +38,7 @@ import sql
 from tqdm import tqdm
 import pandas as pd
 import sqlalchemy as db
+from itertools import repeat
 
 def get_id_node_mapping(connection: str):
     """get_id_node_mapping Get ID-Node Mapping
@@ -240,8 +243,8 @@ def get_metric_fqdd_tree(metric_fqdd_mapping: dict):
     return metric_fqdd_tree
 
 
-def query_tsdb(request: object, id_node_mapping: dict, connection: str):
-    """query_tsdb Query TSDB
+def query_tsdb_parallel(request: object, id_node_mapping: dict, connection: str):
+    """query_tsdb_parallel Query TSDB in Parallel
 
     Query TSDB based on the flask request.
 
@@ -250,9 +253,6 @@ def query_tsdb(request: object, id_node_mapping: dict, connection: str):
         id_node_mapping (dict): Node-ID mapping
         connection (str): tsdb connection
     """
-    # Initialize sqlalchemy connection
-    engine = db.create_engine(connection)
-    connect = engine.connect()
 
     results = []
     req = request.get_json(silent=True)
@@ -267,43 +267,72 @@ def query_tsdb(request: object, id_node_mapping: dict, connection: str):
     end = time_range.get('to')
 
     # TO DO: add aggregation function in the targets
+    targets_length = len(targets)
+    with multiprocessing.Pool(targets_length) as pool:
+        query_tsdb_args = zip(targets, 
+                              repeat(id_node_mapping), 
+                              repeat(connection),
+                              repeat(start),
+                              repeat(end),
+                              repeat(interval))
+        results = pool.starmap(query_tsdb, query_tsdb_args)
 
-    for target in targets:
-        req_metric = target.get('metric', '')
-        req_type = target.get('type', '')
-        nodes = target.get('nodes', '')
-        if req_metric and req_type == 'metrics' and len(req_metric.split(' | ')) == 3:
-            partition = req_metric.split(' | ')[0]
-            metric = req_metric.split(' | ')[1]
-            fqdd = req_metric.split(' | ')[2]
-            metrics = query_filter_metrics(engine,
-                                           metric, 
-                                           fqdd,
-                                           nodes,
-                                           id_node_mapping, 
-                                           start,
-                                           end,
-                                           interval,
-                                           partition)
-            results.append(metrics)
-
-        if req_type == 'jobs':
-            users = target.get('users', '')
-            if not users:
-                users = get_users(engine, start, end)
-            jobs = query_filter_jobs(engine, users, start, end, id_node_mapping)
-            results.append(jobs)
-
-        if req_type == 'node_core':
-            node_core = query_node_core(engine, 
-                                        start, 
-                                        end, 
-                                        interval, 
-                                        id_node_mapping)
-            results.append(node_core)
-
-    connect.close()
     return results
+
+
+def query_tsdb(target: dict, 
+               id_node_mapping: dict, 
+               connection: str,
+               start: str,
+               end: str,
+               interval: str):
+    """query_tsdb Query TSDB for each target
+
+    Args:
+        target (dict): target of data source request
+        id_node_mapping (dict): Node-ID mapping
+        connection (str): tsdb connection
+        start (str): start of time range
+        end (str): end of time range
+        interval (str): aggregation interval
+    """
+    
+    # Initialize sqlalchemy connection
+    engine = db.create_engine(connection)
+    req_metric = target.get('metric', '')
+    req_type = target.get('type', '')
+    nodes = target.get('nodes', '')
+
+    if req_metric and req_type == 'metrics' and len(req_metric.split(' | ')) == 3:
+        partition = req_metric.split(' | ')[0]
+        metric = req_metric.split(' | ')[1]
+        fqdd = req_metric.split(' | ')[2]
+        metrics = query_filter_metrics(engine,
+                                        metric, 
+                                        fqdd,
+                                        nodes,
+                                        id_node_mapping, 
+                                        start,
+                                        end,
+                                        interval,
+                                        partition)
+        return metrics
+
+    if req_type == 'jobs':
+        users = target.get('users', '')
+        if not users:
+            users = get_users(engine, start, end)
+        jobs = query_filter_jobs(engine, users, start, end, id_node_mapping)
+        
+        return jobs
+
+    if req_type == 'node_core':
+        node_core = query_node_core(engine, 
+                                    start, 
+                                    end, 
+                                    interval, 
+                                    id_node_mapping)
+        return node_core
 
 
 def query_filter_metrics(engine: object,
