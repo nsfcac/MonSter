@@ -1,9 +1,9 @@
-from dotenv import dotenv_values
-from aggregation_query import aggregation_query
-
 import psycopg2
 import logging
 import time
+
+from dotenv import dotenv_values
+from aggregation_query import aggregation_query
 
 tsdb_config = dotenv_values(".env")
 CONNECTION = f"dbname={tsdb_config['DBNAME']} user={tsdb_config['USER']} password={tsdb_config['PASSWORD']} options='-c search_path=idrac9'"
