@@ -1,10 +1,10 @@
 MIDRAC=$(PWD)/monster/midrac.py
 MSLURM=$(PWD)/monster/mslurm.py
-MAPI=-c $(PWD)/metricsbuilder/gunicorn.conf.py --chdir $(PWD)/metricsbuilder wsgi:app
+MAPI=$(PWD)/metricsbuilder/gunicorn.conf.py --chdir $(PWD)/metricsbuilder wsgi:app
 
 ps_midrac=`ps aux | grep "python -u $(MIDRAC)" | grep -v 'grep' > /dev/null`
 ps_mslurm=`ps aux | grep "python -u $(MSLURM)" | grep -v 'grep' > /dev/null`
-ps_mapi=`ps aux | grep "gunicorn ${MAPI}" | grep -v 'grep' > /dev/null`
+ps_mapi=`ps aux | grep "gunicorn -c ${MAPI}" | grep -v 'grep' > /dev/null`
 
 init: initenv initlog inittsdb
 
@@ -68,7 +68,7 @@ startmapi:
 	else \
 		echo "Start MetricsBuilder API service..."; \
 		. ./env/bin/activate; \
-		gunicorn ${MAPI} & \
+		gunicorn -c ${MAPI} & \
 	fi
 
 stop: stopmidrac stopmslurm
@@ -95,7 +95,7 @@ stopmslurm:
 stopmapi:
 	@-if $(ps_mapi); then \
 		echo "Stop MetricsBuilder API service..."; \
-		pkill -f "gunicorn ${MAPI}"; \
+		pkill -f "gunicorn -c ${MAPI}"; \
 	else \
 		echo "MetricsBuilder API service is already stopped!"; \
 	fi
