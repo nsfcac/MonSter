@@ -302,6 +302,7 @@ def query_tsdb(target: dict,
     req_metric = target.get('metric', '')
     req_type = target.get('type', '')
     nodes = target.get('nodes', '')
+    results = []
 
     if req_metric and req_type == 'metrics' and len(req_metric.split(' | ')) == 3:
         partition = req_metric.split(' | ')[0]
@@ -316,7 +317,7 @@ def query_tsdb(target: dict,
                                         end,
                                         interval,
                                         partition)
-        return metrics
+        results = metrics
 
     if req_type == 'jobs':
         users = target.get('users', '')
@@ -324,7 +325,7 @@ def query_tsdb(target: dict,
             users = get_users(engine, start, end)
         jobs = query_filter_jobs(engine, users, start, end, id_node_mapping)
         
-        return jobs
+        results = jobs
 
     if req_type == 'node_core':
         node_core = query_node_core(engine, 
@@ -332,8 +333,11 @@ def query_tsdb(target: dict,
                                     end, 
                                     interval, 
                                     id_node_mapping)
-        return node_core
+        results = node_core
 
+    engine.dispose()
+    return results
+    
 
 def query_filter_metrics(engine: object,
                          metric: str,
