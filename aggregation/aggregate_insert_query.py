@@ -14,7 +14,7 @@ def aggregate_insert_query(conn: object, table: str, time_interval: int) -> any:
 
         query = f"""INSERT INTO idrac8.aggr_{table}
             SELECT public.time_bucket_gapfill('{time_interval} min', timestamp) AS time,
-              nodeid, source, fqdd, AVG(value) AS value
+              nodeid, source, fqdd, MAX(value) AS value
             FROM idrac8.{table}
             WHERE timestamp >= '{start_date}'
 	            AND timestamp < '{end_date}'
