@@ -7,7 +7,7 @@ def aggregate_insert_query(conn: object, table: str, time_interval: int) -> any:
     try:
         cursor = conn.cursor()
         end_date = datetime.today()
-        start_date = end_date - timedelta(days=3)
+        start_date = end_date - timedelta(days=7)
 
         print(start_date)
         print(end_date)
