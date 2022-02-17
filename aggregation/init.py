@@ -30,7 +30,7 @@ def main():
 
     for table in tables:
         create_table(conn, table)
-        aggregate_insert_query(conn, table, 5)
+        aggregate_insert_query(conn, table, 10)
 
     print("\n--- %s seconds ---" % (time.time() - start_time))
 
