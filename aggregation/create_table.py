@@ -10,7 +10,7 @@ def create_table(conn: object, table: str) -> any:
                 nodeid INT4 NOT NULL,
                 source TEXT,
                 fqdd TEXT,
-                value FLOAT4,
+                value FLOAT8,
                 FOREIGN KEY (nodeid) REFERENCES public.nodes(nodeid));"""
 
         cursor.execute(create_table_query)
