@@ -3,8 +3,7 @@ import logging
 import psycopg2
 
 from dotenv import dotenv_values
-from create_table import create_table
-from query import aggregate, insert
+from query import create_table, aggregate, insert
 
 tsdb_config = dotenv_values(".env")
 CONNECTION = f"dbname={tsdb_config['DBNAME']} user={tsdb_config['USER']} password={tsdb_config['PASSWORD']} options='-c search_path=idrac8'"
