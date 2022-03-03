@@ -2,6 +2,8 @@ import logging
 
 from datetime import datetime, timedelta
 
+AGGREGATION_TIME_PERIOD = 7
+
 
 def create_table(conn: object, table: str) -> any:
     try:
@@ -29,11 +31,11 @@ def create_table(conn: object, table: str) -> any:
 def aggregate(conn: object, table: str, time_interval: int) -> any:
     try:
 
-        print(f"Aggregating idrac8.{table}...")
+        print(f"Aggregating idrac8.{table} metrics...")
 
         cursor = conn.cursor()
         end_date = datetime.today()
-        start_date = end_date - timedelta(days=7)
+        start_date = end_date - timedelta(days=AGGREGATION_TIME_PERIOD)
 
         query = f"""
             SELECT public.time_bucket_gapfill('{time_interval} min', timestamp) AS time,
@@ -57,10 +59,10 @@ def aggregate(conn: object, table: str, time_interval: int) -> any:
         logging.error(f"Aggregate {table} data error : {err}")
 
 
-def insert(conn: object, table: str, data: list) -> any:
+def insert(conn: object, table: str, metrics: list) -> any:
     try:
 
-        print(f"Inserting into idrac8.aggr_{table}...")
+        print(f"Inserting metrics into idrac8.aggr_{table}...")
 
         cursor = conn.cursor()
 
@@ -69,7 +71,7 @@ def insert(conn: object, table: str, data: list) -> any:
           VALUES (%s, %s, %s, %s, %s)
         """
 
-        cursor.executemany(query, data)
+        cursor.executemany(query, metrics)
         conn.commit()
         cursor.close()
 
