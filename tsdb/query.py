@@ -2,37 +2,64 @@ import logging
 
 from datetime import datetime, timedelta
 
+from utils.check_source import check_source
+
+
 AGGREGATION_TIME_PERIOD = 7
 
 
-def create_table(conn: object, table: str) -> any:
+def insert_metrics(conn: object, metrics: list, source: str) -> None:
+
     try:
-
-        print(f"Creating table idrac8.aggr_{table} if not exists...")
-
         cursor = conn.cursor()
 
-        create_table_query = f"""CREATE TABLE IF NOT EXISTS aggr_{table} (
-                time TIMESTAMPTZ NOT NULL,
-                nodeid INT4 NOT NULL,
-                source TEXT,
-                fqdd TEXT,
-                avg FLOAT4,
-                min FLOAT4,
-                max FLOAT4,
-                FOREIGN KEY (nodeid) REFERENCES public.nodes(nodeid));"""
+        table = check_source(source)
 
-        cursor.execute(create_table_query)
+        for metric in metrics:
+            processed_time = datetime.fromtimestamp(
+                metric["time"] // 1e9).strftime('%Y-%m-%d %H:%M:%S.%f')
+            nodeid = metric["nodeid"]
+            insert_metric_query = f"""
+                INSERT INTO {table} (timestamp, nodeid, source, fqdd, value)
+                VALUES (
+                  '{processed_time}', 
+                  (SELECT nodeid FROM public.nodes WHERE bmc_ip_addr='{nodeid}'), 
+                  '{metric["source"]}', 
+                  '{metric["fqdd"]}', 
+                  '{metric["value"]}'
+                );"""
+            cursor.execute(insert_metric_query)
+
         conn.commit()
         cursor.close()
 
     except Exception as err:
-        logging.error(f"Create tables error : {err}")
+        logging.error(f"Insert rpmreading data error : {err}")
 
 
-def aggregate(conn: object, table: str, time_interval: int) -> any:
+def insert_aggregated_metrics(conn: object, table: str, metrics: list) -> None:
+
     try:
+        print(f"Inserting metrics into idrac8.aggr_{table}...")
 
+        cursor = conn.cursor()
+
+        query = f"""
+          INSERT INTO idrac8.aggr_{table}
+          VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """
+
+        cursor.executemany(query, metrics)
+        conn.commit()
+        cursor.close()
+
+    except Exception as err:
+        logging.error(f"Insert aggr_{table} data error : {err}")
+
+
+def aggregate(conn: object, table: str, time_interval: int) -> list:
+
+    try:
         print(f"Aggregating idrac8.{table} metrics...")
 
         cursor = conn.cursor()
@@ -59,23 +86,3 @@ def aggregate(conn: object, table: str, time_interval: int) -> any:
 
     except Exception as err:
         logging.error(f"Aggregate {table} data error : {err}")
-
-
-def insert(conn: object, table: str, metrics: list) -> any:
-    try:
-
-        print(f"Inserting metrics into idrac8.aggr_{table}...")
-
-        cursor = conn.cursor()
-
-        query = f"""
-          INSERT INTO idrac8.aggr_{table}
-          VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """
-
-        cursor.executemany(query, metrics)
-        conn.commit()
-        cursor.close()
-
-    except Exception as err:
-        logging.error(f"Insert aggr_{table} data error : {err}")
