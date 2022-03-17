@@ -17,7 +17,9 @@ def create_table(conn: object, table: str) -> any:
                 nodeid INT4 NOT NULL,
                 source TEXT,
                 fqdd TEXT,
-                value FLOAT8,
+                avg FLOAT4,
+                min FLOAT4,
+                max FLOAT4,
                 FOREIGN KEY (nodeid) REFERENCES public.nodes(nodeid));"""
 
         cursor.execute(create_table_query)
@@ -39,7 +41,7 @@ def aggregate(conn: object, table: str, time_interval: int) -> any:
 
         query = f"""
             SELECT public.time_bucket_gapfill('{time_interval} min', timestamp) AS time,
-              nodeid, source, fqdd, AVG(value) AS value
+              nodeid, source, fqdd, AVG(value) AS avg, MIN(value) AS min, MAX(value) AS max
             FROM idrac8.{table}
             WHERE timestamp >= '{start_date}'
 	            AND timestamp < '{end_date}'
@@ -68,7 +70,7 @@ def insert(conn: object, table: str, metrics: list) -> any:
 
         query = f"""
           INSERT INTO idrac8.aggr_{table}
-          VALUES (%s, %s, %s, %s, %s)
+          VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
         cursor.executemany(query, metrics)
