@@ -57,8 +57,8 @@ ID_NODE_MAPPING = api_utils.get_id_node_mapping(connection)
 # METRIC_FQDD_MAPPING = api_utils.get_metric_fqdd_mapping(connection)
 
 
-# @app.route('/metrics_builder', methods=['POST'])
-# @cross_origin()
+@app.route('/metrics_builder')
+@cross_origin()
 def metrics_builder():
     # Range
     now = datetime.now() - timedelta(minutes=1)
@@ -146,11 +146,14 @@ def metrics_builder():
 
     results = api_utils.query_tsdb_parallel(request, ID_NODE_MAPPING, connection)
     
-    # ret = jsonify(results)
-    print(results)
-    # return jsonify(results)
+    time_stamp = api_utils.gen_epoch_timelist(start, end, interval)
+    
+    results.update({
+        'time_stamp': time_stamp
+    })
+
+    return jsonify(results)
 
 
 if __name__ == '__main__':
-    # app.run(host= '0.0.0.0', port=5000, threaded=True, debug=False)
-    metrics_builder()
+    app.run(host= '0.0.0.0', port=5000, threaded=True, debug=False)

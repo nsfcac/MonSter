@@ -28,9 +28,12 @@ This file is part of MonSter.
 Author:
     Jie Li, jie.li@ttu.edu
 """
-
+import re
+import json
 import multiprocessing
 from sqlite3 import connect
+from datetime import datetime, timedelta
+
 import sys
 sys.path.insert(0, '../monster')
 
@@ -39,6 +42,8 @@ from tqdm import tqdm
 import pandas as pd
 import sqlalchemy as db
 from itertools import repeat
+
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 def get_id_node_mapping(connection: str):
     """get_id_node_mapping Get ID-Node Mapping
@@ -185,8 +190,6 @@ def query_tsdb_parallel(request: object, id_node_mapping: dict, connection: str)
 
     results = []
     
-    # Use the self-defined request object
-    # req = request.get_json(silent=True)
     # Request details
     time_range = request.get('range')
     interval = request.get('interval')
@@ -207,7 +210,34 @@ def query_tsdb_parallel(request: object, id_node_mapping: dict, connection: str)
                               repeat(interval))
         results = pool.starmap(query_tsdb, query_tsdb_args)
 
-    return results
+    # Aggregate results
+    agg_results = aggregate_results(results)
+    return agg_results
+
+
+def aggregate_results(results: list):
+    aggregated_data = {
+        'nodes_info': {},
+        'jobs_info': {}
+    }
+
+    for record in results:
+        if record['type'] == 'jobs':
+            aggregated_data['jobs_info'] = record['result']
+        else:
+            for node, metrics in record['result'].items():
+                if node not in aggregated_data['nodes_info']:
+                    aggregated_data['nodes_info'].update({
+                        node: {}
+                    })
+                    aggregated_data['nodes_info'][node] = metrics
+                else:
+                    for sensor, readings in metrics.items():
+                        aggregated_data['nodes_info'][node].update({
+                            sensor: readings
+                        })
+
+    return aggregated_data
 
 
 def query_tsdb(target: dict, 
@@ -247,7 +277,8 @@ def query_tsdb(target: dict,
                                         end,
                                         interval,
                                         partition)
-        results = metrics
+        # results = metrics
+        results = {'type': 'metrics', 'result': metrics}
 
     if req_type == 'jobs':
         users = target.get('users', '')
@@ -255,7 +286,8 @@ def query_tsdb(target: dict,
             users = get_users(engine, start, end)
         jobs = query_filter_jobs(engine, users, start, end, id_node_mapping)
         
-        results = jobs
+        # results = jobs
+        results = {'type': 'jobs', 'result': jobs}
 
     if req_type == 'node_core':
         node_core = query_node_core(engine, 
@@ -263,7 +295,8 @@ def query_tsdb(target: dict,
                                     end, 
                                     interval, 
                                     id_node_mapping)
-        results = node_core
+        # results = node_core
+        results = {'type': 'node_core', 'result': node_core}
 
     engine.dispose()
     return results
@@ -313,6 +346,9 @@ def query_filter_metrics(engine: object,
     
     df = pd.read_sql_query(sql_str, con=engine)
 
+    # Replace Nan with None
+    df.fillna('',inplace=True)
+
     # Filter nodes
     if nodes:
         fi_df = df[df['nodeid'].isin(nodes)].copy()
@@ -351,20 +387,33 @@ def metrics_df_to_response(df: object):
     df.reset_index(inplace=True)
 
     # Convert datetime to epoch time
-    df['time'] = df['time'].apply(lambda x: int(x.timestamp() * 1000))
+    df['time'] = df['time'].apply(lambda x: int(x.timestamp() ))
 
-    columns = [{'text': 'time', 'type': 'time'}]
-    columns_raw = list(df.columns)
-    for column in columns_raw[1:]:
-        c_text = f"{column.split('|')[1]}-{column.split('|')[2]}"
-        c_type = 'number'
-        c_label = f"| {column.split('|')[0]}"
-        column_info = {'text': c_text, 'type': c_type, 'label': c_label}
-        columns.append(column_info)
+    df_dict = df.to_dict(orient='list')
+    df_json = process_metric_df_dict(df_dict)
+
+    # print(df_json)
+    return df_json
+
+
+def process_metric_df_dict(df_dict: dict):
+    df_json = {}
     
-    rows = df.values.tolist()
-    response = {'columns': columns, 'rows': rows}
-    return response
+    for key, values in df_dict.items():
+        if key != 'time':
+            node = key.split('|')[0]
+            sensor = key.split('|')[2].replace(' ', '_')
+
+            if sensor == 'System_Power_Control':
+                sensor = 'power_consumption'
+
+            df_json.update({
+                node: {
+                    sensor: values
+                }
+            })
+
+    return df_json
 
 
 def get_users(engine: object, start: str, end: str):
@@ -432,22 +481,9 @@ def jobs_df_to_response(df: object):
     selected_columns = ['job_id', 'name', 'user_id', 'user_name', 'batch_host', 
                         'nodes', 'node_count', 'cpus', 'start_time', 'end_time']
     selected_df = df[selected_columns].copy()
+    df_json = selected_df.set_index('job_id').to_dict(orient='index')
 
-    selected_df['nodes'] = selected_df['nodes'].apply(lambda x: '{' + ', '.join(x) + '}')
-    
-    columns_raw = list(selected_df.columns)
-    for column in columns_raw:
-        if column in ['job_id', 'user_id', 'cpus', 'start_time', 'end_time']:
-            c_type = 'number'
-        else:
-            c_type = 'string'
-
-        column_info = {'text': column, 'type': c_type}
-        columns.append(column_info)
-    
-    rows = selected_df.values.tolist()
-    response = {'columns': columns, 'rows': rows}
-    return response
+    return df_json
 
 
 def query_node_core(engine: object,
@@ -484,26 +520,35 @@ def node_jobs_df_to_response(df: object, id_node_mapping: dict):
         response (dict): response
     """
 
-    df['time'] = df['time'].apply(lambda x: int(x.timestamp() * 1000))
+    node_jobs = {}
+    try:
+        df['time'] = df['time'].apply(
+            lambda x: int(x.timestamp())
+        )
+        df['fl_jobs'] = df.apply(
+            lambda df_row: flatten_array(df_row, 'jobs'), axis = 1)
+        df['fl_cpus'] = df.apply(
+            lambda df_row: flatten_array(df_row, 'cpus'), axis = 1)
+        df.drop(columns = ['jobs', 'cpus'], 
+                        inplace = True)
+        df.rename(columns={'fl_jobs': 'jobs', 'fl_cpus': 'cpus'}, 
+                        inplace = True)
 
-    df['nodeid'] = df['nodeid'].apply(lambda x: id_node_mapping[x])
-    
-    df['fl_jobs'] = df.apply(
-        lambda df_row: flatten_array(df_row, 'jobs'), axis = 1)
-    df['fl_cpus'] = df.apply(
-        lambda df_row: flatten_array(df_row, 'cpus'), axis = 1)
-    df.drop(columns = ['jobs', 'cpus'], inplace = True)
-    df.rename(columns={'fl_jobs': 'jobs', 'fl_cpus': 'cpus'}, inplace = True)
-    
-    columns = [{'text': 'time', 'type': 'time'}]
-    columns_raw = list(df.columns)
-    for column in columns_raw[1:]:
-        column_info = {'text': column, 'type': 'string'}
-        columns.append(column_info)
-    
-    rows = df.values.tolist()
-    response = {'columns': columns, 'rows': rows}
-    return response
+        grouped_df = df.groupby(['nodeid'])#[['time', 'jobs', 'cpus']]
+        for key, item in grouped_df:
+            jobs = grouped_df.get_group(key)['jobs'].tolist()
+            cpus = grouped_df.get_group(key)['cpus'].tolist()
+            node_name = id_node_mapping[key]
+            node_jobs.update({
+                node_name:{
+                    'job_id': jobs,
+                    'cores': cpus
+                }
+            })
+    except Exception as err:
+        pass
+
+    return node_jobs
 
 
 def flatten_array(df_row: object, column: str):
@@ -540,3 +585,44 @@ def flatten_array(df_row: object, column: str):
     else:
         str_cpus = '{' + (', ').join(cpus) + '}'
         return str_cpus
+
+
+def gen_epoch_timelist(start: str, end: str, interval: str):
+    delta = time_delta(interval)
+    time_list = [int(dt.timestamp()) for dt in datetime_range(
+        start, end, delta
+    )]
+    return time_list
+
+
+def datetime_range(start: str, end: str, interval: str):
+    """Generate time interval array"""
+    start = datetime.strptime(start, DATETIME_FORMAT)
+    end = datetime.strptime(end, DATETIME_FORMAT)
+    current = start
+    while current <= end:
+        yield current
+        current += interval
+
+
+def time_delta(timeInterval: str) -> str:
+    """Validate time interval and generate timedelta object"""
+    time_valid = re.compile('[1-9][0-9]*[s, m, h, d, w]')
+    if not time_valid.match(timeInterval):
+        return None
+    if "s" in timeInterval:
+        num = int(timeInterval.split('s')[0])
+        delta = timedelta(seconds = num)
+    elif "m" in timeInterval:
+        num = int(timeInterval.split('m')[0])
+        delta = timedelta(minutes = num)
+    elif "h" in timeInterval:
+        num = int(timeInterval.split('h')[0])
+        delta = timedelta(hours = num)
+    elif "d" in timeInterval:
+        num = int(timeInterval.split('d')[0])
+        delta = timedelta(days = num)
+    else:
+        num = int(timeInterval.split('w')[0])
+        delta = timedelta(weeks = num)
+    return delta
