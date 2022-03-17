@@ -3,8 +3,9 @@ import logging
 import psycopg2
 
 from dotenv import dotenv_values
-from query import create_table, aggregate, insert
-from deduplicate import deduplicate
+from tsdb.query import create_table, aggregate, insert
+from utils.deduplicate import deduplicate
+from analysis.create_chart import create_chart
 
 tsdb_config = dotenv_values(".env")
 CONNECTION = f"dbname={tsdb_config['DBNAME']} user={tsdb_config['USER']} password={tsdb_config['PASSWORD']} options='-c search_path=idrac8'"
@@ -35,7 +36,10 @@ def main():
             create_table(conn, table)
             records = aggregate(conn, table, AGGREGATION_TIME_INTERVAL)
             deduplicated_records = deduplicate(records)
-            insert(conn, table, records)
+
+            # create_chart(records, deduplicated_records)
+            # insert(conn, table, deduplicated_records)
+            # insert(conn, table, records)
 
         print("\n--- %s seconds ---" % (time.time() - start_time))
 

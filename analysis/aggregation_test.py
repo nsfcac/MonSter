@@ -1,9 +1,8 @@
-import psycopg2
 import logging
 import time
 
 from dotenv import dotenv_values
-from aggregation_query import aggregation_query
+import psycopg2
 
 tsdb_config = dotenv_values(".env")
 CONNECTION = f"dbname={tsdb_config['DBNAME']} user={tsdb_config['USER']} password={tsdb_config['PASSWORD']} options='-c search_path=idrac9'"
@@ -13,6 +12,38 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
+
+
+def aggregation_query(conn: object, table: str, start: int, nodeid: int, time_interval: int) -> any:
+    try:
+        if nodeid != 0:
+            query = f"""
+              SELECT public.time_bucket_gapfill('{time_interval} min', timestamp) AS time,
+                nodeid, fqdd AS label, max(value) AS value
+              FROM {table} 
+              WHERE timestamp >= '2021-10-{start}T13:00:00' 
+                AND timestamp < '2021-10-30T13:00:00'
+                AND nodeid = {nodeid}
+              GROUP BY time, nodeid, label 
+              ORDER BY time;
+            """
+        else:
+            query = f"""SELECT public.time_bucket_gapfill('5 min', timestamp) AS time,
+                        nodeid, fqdd AS label, max(value) AS value
+                        FROM {table} 
+                        WHERE timestamp >= '2021-10-{start}T13:00:00' 
+                          AND timestamp < '2021-10-30T13:00:00'
+                        GROUP BY time, nodeid, label 
+                        ORDER BY time;
+            """
+        cursor = conn.cursor()
+        cursor.execute(query)
+        for row in cursor.fetchall():
+            print(table, row)
+        cursor.close()
+
+    except Exception as err:
+        logging.error(f"Insert rpmreading data error : {err}")
 
 
 def main():
