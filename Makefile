@@ -1,10 +1,13 @@
 MIDRAC=$(PWD)/monster/midrac.py
 MSLURM=$(PWD)/monster/mslurm.py
-MAPI=$(PWD)/metricsbuilder/gunicorn.conf.py --chdir $(PWD)/metricsbuilder wsgi:app
+MBAPI=$(PWD)/MetricsBuilderAPI/gunicorn.conf.py --chdir $(PWD)/MetricsBuilderAPI wsgi:app
+DSAPI=$(PWD)/DataSourceAPI/gunicorn.conf.py --chdir $(PWD)/DataSourceAPI wsgi:app
 
 ps_midrac=`ps aux | grep "python -u $(MIDRAC)" | grep -v 'grep' > /dev/null`
 ps_mslurm=`ps aux | grep "python -u $(MSLURM)" | grep -v 'grep' > /dev/null`
-ps_mapi=`ps aux | grep "gunicorn -c ${MAPI}" | grep -v 'grep' > /dev/null`
+ps_mbapi=`ps aux | grep "gunicorn -c ${MBAPI}" | grep -v 'grep' > /dev/null`
+ps_dsapi=`ps aux | grep "gunicorn -c ${DSAPI}" | grep -v 'grep' > /dev/null`
+
 
 init: initenv initlog inittsdb
 
@@ -30,6 +33,12 @@ initlog:
 	fi
 	@-if [ ! -f "./log/mapi_error.log" ]; then \
 		touch ./log/mapi_error.log; \
+	fi
+	@-if [ ! -f "./log/dsapi_access.log" ]; then \
+		touch ./log/dsapi_access.log; \
+	fi
+	@-if [ ! -f "./log/dsapi_error.log" ]; then \
+		touch ./log/dsapi_error.log; \
 	fi
 
 
@@ -62,14 +71,25 @@ startmslurm:
 	fi
 
 
-startmapi:
-	@-if $(ps_mapi); then \
-		echo "MonSter API Service is already up and running!"; \
+startdsapi:
+	@-if $(ps_dsapi); then \
+		echo "DataSource API (for Grafana) Service is already up and running!"; \
+	else \
+		echo "Start DataSource API service..."; \
+		. ./env/bin/activate; \
+		gunicorn -c ${DSAPI} & \
+	fi
+
+
+startmbapi:
+	@-if $(ps_mbapi); then \
+		echo "MetricsBuilder API Service is already up and running!"; \
 	else \
 		echo "Start MetricsBuilder API service..."; \
 		. ./env/bin/activate; \
-		gunicorn -c ${MAPI} & \
+		gunicorn -c ${MBAPI} & \
 	fi
+
 
 stop: stopmidrac stopmslurm
 
@@ -92,13 +112,23 @@ stopmslurm:
 	fi
 	
 
-stopmapi:
-	@-if $(ps_mapi); then \
+stopmbapi:
+	@-if $(ps_mbapi); then \
 		echo "Stop MetricsBuilder API service..."; \
-		pkill -f "gunicorn -c ${MAPI}"; \
+		pkill -f "gunicorn -c ${MBAPI}"; \
 	else \
 		echo "MetricsBuilder API service is already stopped!"; \
 	fi
+
+
+stopdsapi:
+	@-if $(ps_dsapi); then \
+		echo "Stop DataSource API service..."; \
+		pkill -f "gunicorn -c ${DSAPI}"; \
+	else \
+		echo "DataSource API service is already stopped!"; \
+	fi
+
 
 clean:
 	rm -rf ./env
