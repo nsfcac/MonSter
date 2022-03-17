@@ -2,8 +2,6 @@ import logging
 import math
 import statistics
 
-LABEL_LIST_SIZE = 100
-
 
 def calculate_tolerance(records_sample: list) -> dict:
 
@@ -13,7 +11,7 @@ def calculate_tolerance(records_sample: list) -> dict:
     print("Getting metrics' tolerance...")
 
     try:
-        for i in range(LABEL_LIST_SIZE):
+        for i in range(len(records_sample)):
             label = records_sample[i][3]
             if label not in labels:
                 labels.append(label)
