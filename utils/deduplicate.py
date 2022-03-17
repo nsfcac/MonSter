@@ -1,32 +1,30 @@
 import logging
 
-from calculate_tolerance import calculate_tolerance
+from utils.calculate_tolerance import calculate_tolerance
 
 SAMPLE_SIZE = 1000
 
 
 def deduplicate(records: list) -> list:
+
     try:
-
-        print("Getting metrics' tolerance...")
-
         tolerance = calculate_tolerance(records[:SAMPLE_SIZE])
-        print(tolerance)
 
         print("Deduplicating...")
 
         previous_reading = {}
         deduplicated_records = []
+
         for row in records:
             label = row[3]
             value = row[4]
 
-            if label not in previous_reading and value is not None:
-                previous_reading[label] = value
-                deduplicated_records.append(row)
-            else:
-                prev_value = previous_reading[label]
-                if value is not None:
+            if value is not None:
+                if label not in previous_reading:
+                    previous_reading[label] = value
+                    deduplicated_records.append(row)
+                else:
+                    prev_value = previous_reading[label]
                     if ((value < prev_value - tolerance[label]) or (value > prev_value + tolerance[label])):
                         previous_reading[label] = value
                         deduplicated_records.append(row)
