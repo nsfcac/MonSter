@@ -172,77 +172,6 @@ def get_avail_metric_fqdd(connect: object,
     return fqdd
 
 
-def get_metric_fqdd_tree(metric_fqdd_mapping: dict):
-    """get_metric_fqdd_tree Get Metric-FQDD Tree
-
-    Get metric-fqdd tree for grafana
-
-    Args:
-        metric_fqdd_mapping (dict): metric-fqdd mapping
-    """
-    partition = 'idrac'
-    metric_fqdd_tree = {
-        'name': 'password',
-        'children': []
-    }
-
-    # iDRAC metrics
-    metric_fqdd_list = []
-    for metric, fqdds in metric_fqdd_mapping.items():
-        children = []
-        for fqdd in fqdds:
-            child = {
-                'name': fqdd, 'value': f'{partition} | {metric} | {fqdd}'
-            }
-            children.append(child)
-        metric_fqdd_list.append({
-            'name': metric, 'children': children
-        })
-    
-    child_dict = {
-        'name': partition,
-        'children': metric_fqdd_list
-    }
-    metric_fqdd_tree['children'].append(child_dict)
-
-    # Slurm metrics
-    slurm_child_dict = {
-        'name': 'slurm',
-        'children': [
-            {
-                'name': 'memoryusage',
-                'children': [
-                    {
-                        'name': 'Memory Usage', 
-                        'value': 'slurm | memoryusage | Memory Usage'
-                    }
-                ]
-            },
-            {
-                'name': 'memory_used',
-                'children': [
-                    {
-                        'name': 'Memory Used', 
-                        'value': 'slurm | memory_used | Memory Used'
-                    },
-                ]
-            },
-            {
-                'name': 'cpu_load',
-                'children': [
-                    {
-                        'name': 'CPU Load', 
-                        'value': 'slurm | cpu_load | CPU Load'
-                    }
-                ]
-            },
-        ]
-    }
-    metric_fqdd_tree['children'].append(slurm_child_dict)
-    
-    return metric_fqdd_tree
-
-
 def query_tsdb_parallel(request: object, id_node_mapping: dict, connection: str):
     """query_tsdb_parallel Query TSDB in Parallel
 
@@ -255,12 +184,13 @@ def query_tsdb_parallel(request: object, id_node_mapping: dict, connection: str)
     """
 
     results = []
-    req = request.get_json(silent=True)
-
+    
+    # Use the self-defined request object
+    # req = request.get_json(silent=True)
     # Request details
-    time_range = req.get('range')
-    interval = req.get('interval')
-    targets = req.get('targets')
+    time_range = request.get('range')
+    interval = request.get('interval')
+    targets = request.get('targets')
 
     # Extract time range (from, to), metrics
     start = time_range.get('from')
@@ -378,7 +308,8 @@ def query_filter_metrics(engine: object,
                                          start, 
                                          end, 
                                          interval, 
-                                         aggregate)
+                                         aggregate,
+                                         'idrac8')
     
     df = pd.read_sql_query(sql_str, con=engine)
 

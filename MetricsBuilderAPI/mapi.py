@@ -39,11 +39,13 @@ import flask
 
 from flask import request, jsonify
 from flask_cors import CORS, cross_origin
+from datetime import datetime, timedelta
 
 # Flask application configuration
 app = flask.Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 # TSDB Connection
 connection = utils.init_tsdb_connection()
@@ -52,29 +54,103 @@ connection = utils.init_tsdb_connection()
 ID_NODE_MAPPING = api_utils.get_id_node_mapping(connection)
 
 # All metric-fqdd mapping
-METRIC_FQDD_MAPPING = api_utils.get_metric_fqdd_mapping(connection)
+# METRIC_FQDD_MAPPING = api_utils.get_metric_fqdd_mapping(connection)
 
 
-@app.route('/', methods=['GET'])
-@cross_origin()
-def index():
-    print(request.headers, request.get_json(silent=True))
-    return 'Success'
+# @app.route('/metrics_builder', methods=['POST'])
+# @cross_origin()
+def metrics_builder():
+    # Range
+    now = datetime.now() - timedelta(minutes=1)
+    # prev = now - timedelta(hours=3)
+    prev = now - timedelta(minutes=20)
+    start = prev.strftime(DATETIME_FORMAT)
+    end = now.strftime(DATETIME_FORMAT)
 
+    # Interval
+    interval = "5m"
 
-@app.route('/search', methods=['POST'])
-@cross_origin()
-def search():
-    metric_fqdd_tree = api_utils.get_metric_fqdd_tree(METRIC_FQDD_MAPPING)
-    return jsonify(metric_fqdd_tree)
+    # Self-defined Targets object
+    targets = [
+        {
+            "metric": "idrac | rpmreading | FAN_1",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "metric": "idrac | rpmreading | FAN_2",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "metric": "idrac | rpmreading | FAN_3",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "metric": "idrac | rpmreading | FAN_4",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "metric": "idrac | systempowerconsumption | System Power Control",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "metric": "idrac | temperaturereading | CPU1 Temp",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "metric": "idrac | temperaturereading | CPU2 Temp",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "metric": "idrac | temperaturereading | Inlet Temp",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "metric": "slurm | memoryusage | memoryusage",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "metric": "slurm | memory_used | memory_used",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "metric": "slurm | cpu_load | cpu_load",
+            "type": "metrics",
+            "nodes": None,
+        },
+        {
+            "type": "jobs",
+        },
+        {
+            "type": "node_core",
+        },
+    ]
 
+    request = {
+        "range": {
+            "from": start,
+            "to": end
+        },
+        "interval": interval,
+        "targets": targets,
+    }
 
-@app.route('/query', methods=['POST'])
-@cross_origin()
-def query():
     results = api_utils.query_tsdb_parallel(request, ID_NODE_MAPPING, connection)
-    return jsonify(results)
+    
+    # ret = jsonify(results)
+    print(results)
+    # return jsonify(results)
 
 
 if __name__ == '__main__':
-    app.run(host= '0.0.0.0', port=5000, threaded=True, debug=False)
+    # app.run(host= '0.0.0.0', port=5000, threaded=True, debug=False)
+    metrics_builder()
