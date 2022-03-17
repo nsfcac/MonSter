@@ -3,7 +3,8 @@ import logging
 import psycopg2
 
 from dotenv import dotenv_values
-from tsdb.query import create_table, aggregate, insert
+from tsdb.table_creation import create_aggregated_table
+from tsdb.query import aggregate, insert_aggregated_metrics
 from utils.deduplicate import deduplicate
 from analysis.create_chart import create_chart
 
@@ -33,13 +34,13 @@ def main():
         conn = psycopg2.connect(CONNECTION)
 
         for table in tables:
-            create_table(conn, table)
+            create_aggregated_table(conn, table)
             records = aggregate(conn, table, AGGREGATION_TIME_INTERVAL)
             deduplicated_records = deduplicate(records)
 
             # create_chart(records, deduplicated_records)
-            # insert(conn, table, deduplicated_records)
-            # insert(conn, table, records)
+            # insert_aggregated_metrics(conn, table, deduplicated_records)
+            # insert_aggregated_metrics(conn, table, records)
 
         print("\n--- %s seconds ---" % (time.time() - start_time))
 

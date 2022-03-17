@@ -7,8 +7,8 @@ import psycopg2
 from dotenv import dotenv_values
 
 from idrac.fetch_metrics import fetch_metrics
-from tsdb.create_table import create_table
-from tsdb.insert_metrics import insert_metrics
+from tsdb.table_creation import create_regular_table
+from tsdb.query import insert_metrics
 
 from utils.check_config import check_config
 from utils.parse_config import parse_config
@@ -50,10 +50,10 @@ def main():
         conn = psycopg2.connect(CONNECTION)
 
         for measurement in measurements:
-            create_table(measurement, conn)
+            create_regular_table(conn, measurement)
             metrics = [
                 metric for metric in idrac_datapoints if metric["source"] == measurement]
-            insert_metrics(metrics, measurement, conn)
+            insert_metrics(conn, metrics, measurement)
 
     except Exception as err:
         logging.error(f"main error : {err}")
