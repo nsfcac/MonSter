@@ -20,23 +20,27 @@ AGGREGATION_TIME_INTERVAL = 10
 
 def main():
 
-    start_time = time.time()
+    try:
+        start_time = time.time()
 
-    tables = [
-        "rpmreading",
-        "systempowerconsumption",
-        "temperaturereading",
-    ]
+        tables = [
+            "rpmreading",
+            "systempowerconsumption",
+            "temperaturereading",
+        ]
 
-    conn = psycopg2.connect(CONNECTION)
+        conn = psycopg2.connect(CONNECTION)
 
-    for table in tables:
-        create_table(conn, table)
-        records = aggregate(conn, table, AGGREGATION_TIME_INTERVAL)
-        deduplicated_records = deduplicate(records)
-        insert(conn, table, deduplicated_records)
+        for table in tables:
+            create_table(conn, table)
+            records = aggregate(conn, table, AGGREGATION_TIME_INTERVAL)
+            deduplicated_records = deduplicate(records)
+            insert(conn, table, records)
 
-    print("\n--- %s seconds ---" % (time.time() - start_time))
+        print("\n--- %s seconds ---" % (time.time() - start_time))
+
+    except Exception as err:
+        print(err)
 
 
 if __name__ == "__main__":
