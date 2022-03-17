@@ -56,7 +56,8 @@ def get_id_node_mapping(connection: str):
     """
     engine = db.create_engine(connection)
     connect = engine.connect()
-    mapping_sql = "SELECT nodeid, hostname FROM nodes;"
+    # Only select quanah nodes
+    mapping_sql = "SELECT nodeid, hostname FROM nodes WHERE nodeid < 468;"
     mapping_df = pd.read_sql_query(mapping_sql,con=connect)
     mapping = pd.Series(mapping_df.hostname.values, index=mapping_df.nodeid).to_dict()
     connect.close()
