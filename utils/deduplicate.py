@@ -2,18 +2,14 @@ import logging
 
 from utils.calculate_tolerance import calculate_tolerance
 
-SAMPLE_SIZE = 1000
-
 
 def deduplicate(records: list) -> list:
 
+    previous_reading = {}
+    deduplicated_records = []
+
     try:
-        tolerance = calculate_tolerance(records[:SAMPLE_SIZE])
-
-        print("Deduplicating...")
-
-        previous_reading = {}
-        deduplicated_records = []
+        tolerance = calculate_tolerance(records)
 
         for row in records:
             label = row[3]
@@ -25,15 +21,10 @@ def deduplicate(records: list) -> list:
                     deduplicated_records.append(row)
                 else:
                     prev_value = previous_reading[label]
-                    if ((value < prev_value - tolerance[label]) or (value > prev_value + tolerance[label])):
+                    if ((value < prev_value - tolerance[label])
+                            or (value > prev_value + tolerance[label])):
                         previous_reading[label] = value
                         deduplicated_records.append(row)
-
-        print(f"Number of records before deduplication: {len(records)}")
-        print(
-            f"Number of records after deduplication: {len(deduplicated_records)}")
-        print(
-            f"Improvement: {(len(records) - len(deduplicated_records))/len(records) * 100}%\n")
 
         return deduplicated_records
 
