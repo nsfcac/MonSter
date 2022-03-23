@@ -1,23 +1,15 @@
+import logging
 import os
 import sys
-import time
-import logging
-import psycopg2
 
+import psycopg2
 from dotenv import dotenv_values
 
 from idrac.fetch_metrics import fetch_metrics
-from tsdb.table_creation import create_regular_table
-from tsdb.query import insert_metrics
-
+from tsdb.create_regular_table import create_regular_table
+from tsdb.insert_metrics import insert_metrics
 from utils.check_config import check_config
 from utils.parse_config import parse_config
-
-
-sys.path.append(os.getcwd())
-path = os.getcwd()
-tsdb_config = dotenv_values(".env")
-CONNECTION = f"dbname={tsdb_config['DBNAME']} user={tsdb_config['USER']} password={tsdb_config['PASSWORD']} options='-c search_path=idrac8'"
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -25,31 +17,37 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S %Z'
 )
 
+sys.path.append(os.getcwd())
+
+PATH = os.getcwd()
+
+TSDB_CONFIG = dotenv_values(".env")
+
+CONNECTION_STRING = f"dbname={TSDB_CONFIG['DBNAME']} user={TSDB_CONFIG['USER']} password={TSDB_CONFIG['PASSWORD']} options='-c search_path=idrac8'"
+
+MEASUREMENTS = [
+    "#Thermal.v1_4_0.Fan",
+    "#Thermal.v1_4_0.Temperature",
+    "#Power.v1_4_0.PowerControl",
+    "#Power.v1_3_0.Voltage"
+]
+
 
 def main():
-    config_path = path + '/config.yml'
+
+    config_path = PATH + '/config.yml'
     config = parse_config(config_path)
 
     if not check_config(config):
         return
 
+    conn = psycopg2.connect(CONNECTION_STRING)
+
     try:
         idrac_config = config['idrac']
-
-        start_time = time.time()
-
         idrac_datapoints = fetch_metrics(idrac_config)
 
-        print("\n--- %s seconds ---" % (time.time() - start_time))
-
-        measurements = ["#Thermal.v1_4_0.Fan",
-                        "#Thermal.v1_4_0.Temperature",
-                        "#Power.v1_4_0.PowerControl",
-                        "#Power.v1_3_0.Voltage"]
-
-        conn = psycopg2.connect(CONNECTION)
-
-        for measurement in measurements:
+        for measurement in MEASUREMENTS:
             create_regular_table(conn, measurement)
             metrics = [
                 metric for metric in idrac_datapoints if metric["source"] == measurement]
@@ -57,6 +55,9 @@ def main():
 
     except Exception as err:
         logging.error(f"main error : {err}")
+
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":
