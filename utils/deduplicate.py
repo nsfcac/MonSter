@@ -8,23 +8,29 @@ def deduplicate(records: list) -> list:
     previous_reading = {}
     deduplicated_records = []
 
+    tolerance = calculate_tolerance(records)
+
     try:
-        tolerance = calculate_tolerance(records)
+        for record in records:
+            nodeid = record[1]
+            label = record[3]
+            value = record[4]
 
-        for row in records:
-            label = row[3]
-            value = row[4]
+            if value is None or value < 0:
+                deduplicated_records.append(record)
+            else:
+                if nodeid not in previous_reading:
+                    previous_reading[nodeid] = {}
 
-            if value is not None:
-                if label not in previous_reading:
-                    previous_reading[label] = value
-                    deduplicated_records.append(row)
+                if label not in previous_reading[nodeid]:
+                    previous_reading[nodeid][label] = value
+                    deduplicated_records.append(record)
                 else:
-                    prev_value = previous_reading[label]
+                    prev_value = previous_reading[nodeid][label]
                     if ((value < prev_value - tolerance[label])
                             or (value > prev_value + tolerance[label])):
-                        previous_reading[label] = value
-                        deduplicated_records.append(row)
+                        previous_reading[nodeid][label] = value
+                        deduplicated_records.append(record)
 
         return deduplicated_records
 

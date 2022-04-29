@@ -3,27 +3,26 @@ import math
 import statistics
 
 
-def calculate_tolerance(records_sample: list) -> dict:
+def calculate_tolerance(records: list) -> dict:
 
-    labels = []
+    labels_metrics = {}
     tolerance = {}
 
     try:
-        for i in range(len(records_sample)):
-            label = records_sample[i][3]
-            if label not in labels:
-                labels.append(label)
+        for record in records:
+            label = record[3]
+            if label not in labels_metrics:
+                labels_metrics[label] = []
 
-        for label in labels:
-            metric_sample = []
-            for i in range(len(records_sample)):
-                curr_label = records_sample[i][3]
-                curr_value = records_sample[i][4]
-                if curr_label == label and curr_value is not None and curr_value > 0:
-                    metric_sample.append(curr_value)
+        for record in records:
+            curr_label = record[3]
+            curr_value = record[4]
+            if curr_value is not None and curr_value > 0:
+                labels_metrics[curr_label].append(curr_value)
 
+        for label in labels_metrics.keys():
             tolerance[label] = int(
-                math.sqrt(statistics.mean(metric_sample)))
+                math.sqrt(statistics.stdev(labels_metrics[label])))
 
         return tolerance
 
