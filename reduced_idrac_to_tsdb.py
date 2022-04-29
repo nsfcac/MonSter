@@ -4,8 +4,8 @@ import psycopg2
 from dotenv import dotenv_values
 
 from tsdb.aggregate_metrics import aggregate_metrics
-from tsdb.insert_reduced_metrics import insert_reduced_metrics
 from tsdb.create_reduced_table import create_reduced_table
+from tsdb.insert_reduced_metrics import insert_reduced_metrics
 from utils.deduplicate import deduplicate
 
 logging.basicConfig(
@@ -30,22 +30,17 @@ TIMEDELTA_DAYS = 7
 
 def main():
 
-    conn = psycopg2.connect(CONNECTION_STRING)
+    with psycopg2.connect(CONNECTION_STRING) as conn:
+        try:
+            for table in TABLES:
+                create_reduced_table(conn, table)
+                records = aggregate_metrics(
+                    conn, table, TIMEDELTA_DAYS, AGGREGATION_TIME)
+                deduplicated_records = deduplicate(records)
+                insert_reduced_metrics(conn, table, deduplicated_records)
 
-    try:
-        for table in TABLES:
-            create_reduced_table(conn, table)
-            records = aggregate_metrics(
-                conn, table, TIMEDELTA_DAYS, AGGREGATION_TIME)
-            deduplicated_records = deduplicate(records)
-            insert_reduced_metrics(conn, table, deduplicated_records)
-
-    except Exception as err:
-        logging.error(
-            f"Main error : {err}")
-
-    finally:
-        conn.close()
+        except Exception as err:
+            logging.error(f"Main error : {err}")
 
 
 if __name__ == "__main__":
