@@ -1,7 +1,5 @@
 import logging
 
-import traceback
-
 from datetime import timedelta
 
 
@@ -36,7 +34,7 @@ def reconstruction(records: list) -> list:
                         nodeid,
                         source,
                         label,
-                        avg_value,      # need to add linearity or interpolation
+                        avg_value,
                         min_value,
                         max_value
                     ]
@@ -47,6 +45,6 @@ def reconstruction(records: list) -> list:
                 previous_reading[nodeid][label] = timestamp
 
     except Exception as err:
-        logging.error(f"Reconstruction error : {traceback.format_exc()}")
+        logging.error(f"Reconstruction error : {err}")
 
     return reconstructed_records
