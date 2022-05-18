@@ -1,6 +1,8 @@
 # Storing BMC iDRAC8 Metrics into TimescaleDB
 
-In this project, we fetch the available metrics from BMC iDRAC8 components from the Quanah cluster from HPCC at Texas Tech University. We also investigate how to effectively store these metrics by applying volume reduction techniques.
+In this project, we fetch the available metrics from BMC iDRAC8 components from the Quanah cluster from HPCC at Texas Tech University. 
+
+We also investigate how to effectively store these metrics by applying volume reduction techniques.
 
 ## Initial Setup
 
@@ -25,12 +27,12 @@ $ pip install -r requirements.txt
 
 4. Setup a `.env` file with the following information from TimescaleDB:
 ```bash
-`DBNAME='<db_name>'`
-`USER='<user_name>'`
-`PASSWORD='<password>'`
+DBNAME='<db_name>'
+USER='<user_name>'
+PASSWORD='<password>'
 ```
 
-5. Create a `config.yml` with the following information from the BMC iDRAC8 components:
+5. Create a `config.yml` file with the following information from the BMC iDRAC8 components:
 ```bash
 frequency: <frequency_number>
 idrac:
@@ -60,7 +62,7 @@ After performing the Initial Setup, the script `idrac_to_tsdb.py` can be execute
 $ python idrac_to_tsdb.py
 ```
 
-To setup continuous gathering and storing of the metrics, setup a CRON job:
+To continuously gather and store the metrics, setup a CRON job:
 
 1. Open the CRON table:
 ```bash
@@ -79,7 +81,7 @@ $ crontab -e
 # |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
 # |  |  |  |  |
 # *  *  *  *  * user-name  command to be executed
-* * * * * cd /path/to/repository/idrac_tsdb_project && source ./config/bin/activate && python idrac_to_tsdb.py && deactivate
+* * * * * cd /path/to/repository/MonSter && source ./config/bin/activate && python idrac_to_tsdb.py && deactivate
 ```
 
 ## Effectively Managing Database Volume of Historical Data
