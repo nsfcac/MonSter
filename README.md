@@ -1,4 +1,4 @@
-# Storing BMC iDRAC8 Metrics into TimescaleDB
+# Storing BMC iDRAC8 Metrics in TimescaleDB
 
 In this project, we fetch the available metrics from BMC iDRAC8 components from the Quanah cluster from HPCC at Texas Tech University. 
 
