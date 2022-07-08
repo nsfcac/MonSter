@@ -5,27 +5,34 @@ import statistics
 
 def calculate_tolerance(records: list) -> dict:
 
-    labels_metrics = {}
-    tolerance = {}
+    tolerances = {}
 
     try:
         for record in records:
+            node_id = record[1]
             label = record[3]
-            if label not in labels_metrics:
-                labels_metrics[label] = []
+            value = record[4]
 
-        for record in records:
-            curr_label = record[3]
-            curr_value = record[4]
-            if curr_value is not None and curr_value > 0:
-                labels_metrics[curr_label].append(curr_value)
+            if node_id not in tolerances:
+                tolerances[node_id] = {}
 
-        for label in labels_metrics.keys():
-            tolerance[label] = int(
-                math.sqrt(statistics.stdev(labels_metrics[label])))
+            if label not in tolerances[node_id]:
+                tolerances[node_id][label] = []
 
-        return tolerance
+            if value is not None and value > 0:
+                tolerances[node_id][label].append(value)
+
+        for node_id, labels_metrics in tolerances.items():
+            for label, metrics in labels_metrics.items():
+                if len(metrics) > 1:
+                    tolerance = int(math.sqrt(statistics.stdev(metrics)))
+                else:
+                    tolerance = int(math.sqrt(metrics[0]))
+
+                tolerances[node_id][label] = tolerance
 
     except Exception as err:
         logging.error(
             f"Tolerance calculation error : {err}")
+
+    return tolerances
