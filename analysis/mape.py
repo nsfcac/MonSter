@@ -2,13 +2,13 @@ from cmath import isnan
 import numpy as np
 
 
-def compute_mapes(table, rec1, rec2):
+def compute_mapes(rec1, rec2):
 
+    data = {}
     labels = {record[3] for record in rec1}
-    print(labels)
 
-    data = []
     for label in labels:
+        label_data = []
         for node_id in range(1, 468):
             y = []
             for record in rec1:
@@ -22,16 +22,18 @@ def compute_mapes(table, rec1, rec2):
 
             length = len(y) if len(y) < len(y_hat) else len(y_hat)
 
-            res = mape(np.array(y[:length]), np.array(y_hat[:length]))
-            if not isnan(res):
-                data.append(res)
+            res = mape(y[:length], y_hat[:length])
 
-        print(
-            f"\nAverage MAPE for all nodes from {table} with fqdd = {label}: {np.average(data)}")
+            if not isnan(res):
+                label_data.append(res)
+
+        data[label] = np.average(label_data)
+
+    return data
 
 
 def mape(y, y_hat):
     """
     Mean Absolute Percentage Error (MAPE)
     """
-    return np.mean(np.abs((y - y_hat) / y))
+    return np.nanmean(np.abs((np.array(y) - np.array(y_hat)) / np.array(y)))
