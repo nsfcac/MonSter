@@ -1,19 +1,17 @@
 import logging
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
-def get_table_metrics(conn: object, table: str, timedelta_days: int) -> list:
+def get_table_metrics(conn: object, table: str, start_date: datetime, end_date: datetime) -> list:
 
     cursor = conn.cursor()
 
     try:
-        end_date = datetime.today()
-        start_date = end_date - timedelta(days=timedelta_days)
-
         query = f"""SELECT * FROM idrac8.{table}
                     WHERE timestamp >= '{start_date}'
-	                AND timestamp < '{end_date}';"""
+	                AND timestamp < '{end_date}'
+                    ORDER BY timestamp;"""
 
         cursor.execute(query)
         records = cursor.fetchall()
