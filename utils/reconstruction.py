@@ -16,8 +16,7 @@ def reconstruction(records: list, end_date: datetime, time_gap: int = 10) -> lis
                 node_label_records[nodeid] = {}
 
             if label not in node_label_records[nodeid]:
-                node_label_records[nodeid][label] = [record]
-                continue
+                node_label_records[nodeid][label] = []
 
             node_label_records[nodeid][label].append(record)
 
@@ -34,7 +33,7 @@ def reconstruction(records: list, end_date: datetime, time_gap: int = 10) -> lis
                         timedelta(minutes=time_gap)
 
                     while recon_time < curr_time:
-                        recon_record = (prev_time, *prev_record[1:])
+                        recon_record = (recon_time, *prev_record[1:])
                         reconstructed.append(recon_record)
                         recon_time += timedelta(minutes=time_gap)
 
@@ -45,7 +44,7 @@ def reconstruction(records: list, end_date: datetime, time_gap: int = 10) -> lis
                             timedelta(minutes=time_gap)
                         while recon_time < end_date:
                             recon_record = (
-                                curr_time, *curr_record[1:])
+                                recon_time, *curr_record[1:])
                             reconstructed.append(recon_record)
                             recon_time += timedelta(minutes=time_gap)
 
