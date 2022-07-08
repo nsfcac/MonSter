@@ -9,7 +9,7 @@ def compute_mapes(rec1, rec2):
 
     for label in labels:
         label_data = []
-        for node_id in range(1, 468):
+        for node_id in range(1, 3):
             y = []
             for record in rec1:
                 if record[1] == node_id and record[3] == label and record[4] is not None:
