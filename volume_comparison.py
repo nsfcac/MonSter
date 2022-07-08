@@ -1,13 +1,14 @@
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 from dotenv import dotenv_values
 
 import psycopg2
 import pytz
+from analysis.mape import compute_mapes
 
-from tsdb.aggregate_metrics import aggregate_metrics
 from tsdb.get_table_metrics import get_table_metrics
 from utils.deduplicate import deduplicate
+from utils.reconstruction import reconstruction
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -25,7 +26,6 @@ TABLES = [
     "temperaturereading",
 ]
 
-AGGREGATION_TIME = 10
 TIMEDELTA_DAYS = 7
 
 
@@ -33,26 +33,31 @@ def volume_comparison():
 
     with psycopg2.connect(CONNECTION_STRING) as conn:
         try:
+            table_mapes = {}
             end_date = datetime.now(pytz.timezone('US/Central'))
             start_date = end_date - timedelta(days=TIMEDELTA_DAYS)
 
             for table in TABLES:
+                print(table)
                 original = get_table_metrics(conn, table, start_date, end_date)
-                print(
-                    f"{table} original length {TIMEDELTA_DAYS} days: {len(original)}")
-
-                aggregated = aggregate_metrics(
-                    conn, table, TIMEDELTA_DAYS, AGGREGATION_TIME)
-                print(
-                    f"{table} aggregated length {TIMEDELTA_DAYS} days: {len(aggregated)} ({len(aggregated) / len(original) * 100}%)")
+                print(f"original length: {len(original)}")
 
                 deduplicated = deduplicate(original)
+                print(f"deduplicated length: {len(deduplicated)}")
                 print(
-                    f"{table} deduplicated length {TIMEDELTA_DAYS} days: {len(deduplicated)} ({len(deduplicated) / len(original) * 100}%)")
+                    f"deduplicated / original * 100: ~{int(len(deduplicated) / len(original) * 100)}%")
 
-                aggr_deduplicated = deduplicate(aggregated)
+                reconstructed = reconstruction(
+                    deduplicated, end_date, time_gap=1)
+
+                print(f"reconstructed length: {len(reconstructed)}")
                 print(
-                    f"{table} aggregated + deduplicated length {TIMEDELTA_DAYS} days: {len(aggr_deduplicated)} ({len(aggr_deduplicated) / len(original) * 100}%)\n")
+                    f"reconstructed / original * 100: ~{int(len(reconstructed) / len(original) * 100)}%")
+
+                recon_orig_mape = compute_mapes(original, reconstructed)
+                table_mapes[table] = recon_orig_mape
+
+            print(table_mapes)
 
         except Exception as err:
             logging.error(
