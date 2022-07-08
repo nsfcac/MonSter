@@ -1,7 +1,9 @@
+from datetime import datetime, timedelta
 import logging
 from dotenv import dotenv_values
 
 import psycopg2
+import pytz
 
 from tsdb.aggregate_metrics import aggregate_metrics
 from tsdb.get_table_metrics import get_table_metrics
@@ -31,18 +33,26 @@ def volume_comparison():
 
     with psycopg2.connect(CONNECTION_STRING) as conn:
         try:
-            for table in TABLES:
-                original = get_table_metrics(conn, table, TIMEDELTA_DAYS)
-                aggregated = aggregate_metrics(
-                    conn, table, TIMEDELTA_DAYS, AGGREGATION_TIME)
-                deduplicated = deduplicate(aggregated)
+            end_date = datetime.now(pytz.timezone('US/Central'))
+            start_date = end_date - timedelta(days=TIMEDELTA_DAYS)
 
+            for table in TABLES:
+                original = get_table_metrics(conn, table, start_date, end_date)
                 print(
                     f"{table} original length {TIMEDELTA_DAYS} days: {len(original)}")
+
+                aggregated = aggregate_metrics(
+                    conn, table, TIMEDELTA_DAYS, AGGREGATION_TIME)
                 print(
-                    f"{table} aggregated length {TIMEDELTA_DAYS} days: {len(aggregated)}")
+                    f"{table} aggregated length {TIMEDELTA_DAYS} days: {len(aggregated)} ({len(aggregated) / len(original) * 100}%)")
+
+                deduplicated = deduplicate(original)
                 print(
-                    f"{table} aggregated + deduplicated length {TIMEDELTA_DAYS} days: {len(deduplicated)}\n")
+                    f"{table} deduplicated length {TIMEDELTA_DAYS} days: {len(deduplicated)} ({len(deduplicated) / len(original) * 100}%)")
+
+                aggr_deduplicated = deduplicate(aggregated)
+                print(
+                    f"{table} aggregated + deduplicated length {TIMEDELTA_DAYS} days: {len(aggr_deduplicated)} ({len(aggr_deduplicated) / len(original) * 100}%)\n")
 
         except Exception as err:
             logging.error(
