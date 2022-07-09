@@ -34,7 +34,8 @@ def volume_comparison():
     with psycopg2.connect(CONNECTION_STRING) as conn:
         try:
             table_mapes = {}
-            end_date = datetime.now(pytz.timezone('US/Central'))
+            end_date = datetime.now(pytz.timezone(
+                'US/Central')).replace(second=0, microsecond=0)
             start_date = end_date - timedelta(days=TIMEDELTA_DAYS)
 
             for table in TABLES:
