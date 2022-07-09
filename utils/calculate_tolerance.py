@@ -25,7 +25,9 @@ def calculate_tolerance(records: list) -> dict:
         for node_id, labels_metrics in tolerances.items():
             for label, metrics in labels_metrics.items():
                 if len(metrics) > 1:
-                    tolerance = int(math.sqrt(statistics.stdev(metrics)))
+                    stddev = statistics.stdev(metrics)
+                    mean = statistics.mean(metrics)
+                    tolerance = stddev / mean
                 else:
                     tolerance = int(math.sqrt(metrics[0]))
 
