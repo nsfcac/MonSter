@@ -37,8 +37,8 @@ def deduplicate(records: list) -> list:
                             deduplicated_records.append(record)
                         else:
                             prev_value = previous_reading[nodeid][label]
-                            if ((value < prev_value - tolerances[nodeid][label])
-                                    or (value > prev_value + tolerances[nodeid][label])):
+                            if ((value < prev_value - prev_value * tolerances[nodeid][label])
+                                    or (value > prev_value + prev_value * tolerances[nodeid][label])):
                                 previous_reading[nodeid][label] = value
                                 deduplicated_records.append(record)
 
