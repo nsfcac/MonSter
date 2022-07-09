@@ -25,9 +25,9 @@ def reconstruction(records: list, end_date: datetime, time_gap: int = 10) -> lis
                 reconstructed.append(records[0])
                 for i in range(1, len(records)):
                     curr_record = records[i]
-                    curr_time = curr_record[0]
+                    curr_time = curr_record[0].replace(second=0, microsecond=0)
                     prev_record = records[i - 1]
-                    prev_time = prev_record[0]
+                    prev_time = prev_record[0].replace(second=0, microsecond=0)
 
                     recon_time = prev_time + \
                         timedelta(minutes=time_gap)
