@@ -34,8 +34,7 @@ def main():
         try:
             for table in TABLES:
                 create_reduced_table(conn, table)
-                records = aggregate_metrics(
-                    conn, table, TIMEDELTA_DAYS, AGGREGATION_TIME)
+                records = aggregate_metrics(conn, table, TIMEDELTA_DAYS, AGGREGATION_TIME)
                 deduplicated_records = deduplicate(records)
                 insert_reduced_metrics(conn, table, deduplicated_records)
 

@@ -26,7 +26,7 @@ TABLES = [
     "temperaturereading",
 ]
 
-TIMEDELTA_DAYS = 7
+TIMEDELTA_DAYS = 1
 
 
 def volume_comparison():
@@ -46,14 +46,14 @@ def volume_comparison():
                 deduplicated = deduplicate(original)
                 print(f"deduplicated length: {len(deduplicated)}")
                 print(
-                    f"deduplicated / original * 100: ~{int(len(deduplicated) / len(original) * 100)}%")
+                    f"deduplicated / original * 100: {len(deduplicated) / len(original) * 100}%")
 
                 reconstructed = reconstruction(
                     deduplicated, end_date, time_gap=1)
 
                 print(f"reconstructed length: {len(reconstructed)}")
                 print(
-                    f"reconstructed / original * 100: ~{int(len(reconstructed) / len(original) * 100)}%")
+                    f"reconstructed / original * 100: {len(reconstructed) / len(original) * 100}%")
 
                 recon_orig_mape = compute_mapes(original, reconstructed)
                 table_mapes[table] = recon_orig_mape

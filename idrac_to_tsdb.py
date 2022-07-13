@@ -49,8 +49,7 @@ def main():
 
         for measurement in MEASUREMENTS:
             create_regular_table(conn, measurement)
-            metrics = [
-                metric for metric in idrac_datapoints if metric["source"] == measurement]
+            metrics = [metric for metric in idrac_datapoints if metric["source"] == measurement]
             insert_metrics(conn, metrics, measurement)
 
     except Exception as err:

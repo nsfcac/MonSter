@@ -14,8 +14,7 @@ def deduplicate(records: list) -> list:
 
     start_index = 0
     start_time = records[0][0]
-    finish_time = start_time.replace(
-        microsecond=0, second=0, minute=0) + timedelta(hours=1)
+    finish_time = start_time.replace(microsecond=0, second=0, minute=0) + timedelta(hours=1)
 
     try:
         for index, record in enumerate(records):
@@ -37,14 +36,14 @@ def deduplicate(records: list) -> list:
                             deduplicated_records.append(record)
                         else:
                             prev_value = previous_reading[nodeid][label]
-                            if ((value < prev_value - prev_value * tolerances[nodeid][label])
-                                    or (value > prev_value + prev_value * tolerances[nodeid][label])):
+                            floor_tolerance = prev_value - prev_value * tolerances[nodeid][label]
+                            ceiling_tolerance = prev_value + prev_value * tolerances[nodeid][label]
+                            if value < floor_tolerance or value > ceiling_tolerance:
                                 previous_reading[nodeid][label] = value
                                 deduplicated_records.append(record)
 
                 start_index = index
-                finish_time = curr_time.replace(
-                    microsecond=0, second=0, minute=0) + timedelta(hours=1)
+                finish_time = curr_time.replace(microsecond=0, second=0, minute=0) + timedelta(hours=1)
 
     except Exception as err:
         logging.error(f"Deduplication error : {err}")
