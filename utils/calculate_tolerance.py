@@ -34,7 +34,6 @@ def calculate_tolerance(records: list) -> dict:
                 tolerances[node_id][label] = tolerance
 
     except Exception as err:
-        logging.error(
-            f"Tolerance calculation error : {err}")
+        logging.error(f"Tolerance calculation error : {err}")
 
     return tolerances

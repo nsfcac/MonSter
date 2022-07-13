@@ -13,8 +13,7 @@ def insert_metrics(conn: object, metrics: list, source: str) -> None:
         table = check_source(source)
 
         for metric in metrics:
-            processed_time = datetime.fromtimestamp(
-                metric["time"] // 1e9).strftime('%Y-%m-%d %H:%M:%S.%f')
+            processed_time = datetime.fromtimestamp(metric["time"] // 1e9).strftime('%Y-%m-%d %H:%M:%S.%f')
             nodeid = metric["nodeid"]
             insert_metric_query = f"""
                 INSERT INTO {table} (timestamp, nodeid, source, fqdd, value)

@@ -23,5 +23,4 @@ def create_chart(records1: list, records2: list) -> None:
     plt.plot_date(records2_x, records2_y, '-', label='Reconstructed')
     fig.autofmt_xdate()
     plt.legend(loc=2)
-    plt.savefig(
-        './analysis/results/aggregated_vs_reconstructed_fan4_20.png')
+    plt.savefig('./analysis/results/aggregated_vs_reconstructed_fan4_20.png')
