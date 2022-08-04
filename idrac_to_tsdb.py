@@ -6,7 +6,7 @@ import psycopg2
 from dotenv import dotenv_values
 
 from idrac.fetch_metrics import fetch_metrics
-from tsdb.create_regular_table import create_regular_table
+from tsdb.create_table import create_table
 from tsdb.insert_metrics import insert_metrics
 from utils.check_config import check_config
 from utils.check_source import check_source
@@ -58,7 +58,7 @@ def main():
             logger.info("Mapped source %s to table %s", source, table)
             
             logger.info("Creating table %s if not exists", table)
-            create_regular_table(conn, table)
+            create_table(conn, table)
             
             metrics = [metric for metric in idrac_datapoints if metric["source"] == source]
             
