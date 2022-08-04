@@ -6,11 +6,11 @@ from datetime import datetime
 def get_table_metrics(conn: object, table: str, start_date: datetime, end_date: datetime) -> list:
     """Gets metrics from given table.
 
-    :param conn object: connection object from psycopg2.
-    :param table str: table name.
-    :param start_date datetime: query start date.
-    :param end_date datetime: query end date.
-    :returns list: original metrics
+    :param object conn: connection object from psycopg2.
+    :param str table: table name.
+    :param datetime start_date: query start date.
+    :param datetime end_date: query end date.
+    :returns list: original metrics.
     """
     query = f"""
         SELECT * FROM idrac8.{table}

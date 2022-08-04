@@ -7,7 +7,7 @@ def calculate_tolerance(records: list) -> dict:
     """Calculates tolerances from given records list using Coefficient of Variation.
 
     :param list records: original metrics.
-    :return dict: tolerances for each metric type
+    :return dict: tolerances for each metric type.
     """
     tolerances = {}
 

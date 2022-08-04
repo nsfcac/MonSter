@@ -4,9 +4,9 @@ import logging
 def insert_aggregated_metrics(conn: object, table: str, metrics: list):
     """Inserts aggregated metrics into given table.
 
-    :param conn object: connection object from psycopg2.
-    :param table str: table name.
-    :param metrics list: aggregated metrics.
+    :param object conn: connection object from psycopg2.
+    :param str table: table name.
+    :param list metrics: aggregated metrics.
     """
     cursor = conn.cursor()
     try:

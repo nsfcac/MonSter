@@ -4,9 +4,9 @@ import logging
 def insert_deduplicated_metrics(conn: object, table: str, metrics: list):
     """Inserts deduplicated metrics into table.
 
-    :param conn object: connection object from psycopg2.
-    :param table str: table name.
-    :param metrics list: deduplicated metrics.
+    :param object conn: connection object from psycopg2.
+    :param str table: table name.
+    :param list metrics: deduplicated metrics.
     """
     query = f"""
         INSERT INTO idrac8.reduced_{table}_v2

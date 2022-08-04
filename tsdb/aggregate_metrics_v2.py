@@ -8,11 +8,11 @@ def aggregate_metrics_v2(conn: object, table: str,
                          aggregation_time: int = 10) -> list:
     """Aggregates metrics from given table.
 
-    :param conn object: connection object from psycopg2.
-    :param table str: table name.
-    :param start_date datetime: query start date.
-    :param end_date datetime: query end date.
-    :param aggregation_time int: determines bucket intervals to aggregate, defaults to 10.
+    :param object conn: connection object from psycopg2.
+    :param str table: table name.
+    :param datetime start_date: query start date.
+    :param datetime end_date: query end date.
+    :param int aggregation_time: determines bucket intervals to aggregate, defaults to 10.
     :returns list: aggregated metrics
     """
     query = f"""
