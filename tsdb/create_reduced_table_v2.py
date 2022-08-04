@@ -4,8 +4,8 @@ import logging
 def create_reduced_table_v2(conn: object, table: str):
     """Creates reduced table.
 
-    :param conn object: connection object from psycopg2.
-    :param table str: table name.
+    :param object conn: connection object from psycopg2.
+    :param str table: table name.
     """
     query = f"""
         CREATE TABLE IF NOT EXISTS reduced_{table}_v2 (

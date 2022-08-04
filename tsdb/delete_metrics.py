@@ -5,10 +5,10 @@ from datetime import datetime
 def delete_metrics(conn: object, table: str, start_date: datetime, end_date: datetime):
     """Delete metrics from table within given interval.
 
-    :param conn object: connection object from psycopg2.
-    :param table str: table name.
-    :param start_date datetime: query start date.
-    :param end_date datetime: query end date.
+    :param object conn: connection object from psycopg2.
+    :param str table: table name.
+    :param datetime start_date: query start date.
+    :param datetime end_date: query end date.
     """
     query = f"""
         DELETE FROM {table}
