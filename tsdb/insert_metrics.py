@@ -2,20 +2,20 @@ import logging
 
 from datetime import datetime
 
-from utils.check_source import check_source
 
-
-def insert_metrics(conn: object, metrics: list, source: str) -> None:
-
+def insert_metrics(conn: object, metrics: list, table: str) -> None:
+    """Inserts metrics list into table.
+    
+    :param conn object: connection object from psycopg2.
+    :param table str: table name.
+    """
     cursor = conn.cursor()
 
     try:
-        table = check_source(source)
-
         for metric in metrics:
             processed_time = datetime.fromtimestamp(metric["time"] // 1e9).strftime('%Y-%m-%d %H:%M:%S.%f')
             nodeid = metric["nodeid"]
-            insert_metric_query = f"""
+            query = f"""
                 INSERT INTO {table} (timestamp, nodeid, source, fqdd, value)
                 VALUES (
                   '{processed_time}', 
@@ -25,11 +25,9 @@ def insert_metrics(conn: object, metrics: list, source: str) -> None:
                   '{metric["value"]}'
                 );"""
 
-            cursor.execute(insert_metric_query)
+            cursor.execute(query)
         conn.commit()
-
     except Exception as err:
-        logging.error(f"Insert rpmreading data error : {err}")
-
+        logging.error(f"insert_metrics error : {err}")
     finally:
         cursor.close()
