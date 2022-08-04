@@ -1,14 +1,14 @@
 import logging
 
 
-def create_reduced_table_v2(conn: object, table: str):
-    """Creates reduced table.
-
+def create_table(conn: object, table: str):
+    """Creates table.
+    
     :param object conn: connection object from psycopg2.
     :param str table: table name.
     """
     query = f"""
-        CREATE TABLE IF NOT EXISTS reduced_{table}_v2 (
+        CREATE TABLE IF NOT EXISTS {table} (
             timestamp TIMESTAMPTZ NOT NULL,
             nodeid INT4 NOT NULL,
             source TEXT,
@@ -21,6 +21,6 @@ def create_reduced_table_v2(conn: object, table: str):
         cursor.execute(query)
         conn.commit()
     except Exception as err:
-        logging.error(f"create_reduced_table_v2 error : {err}")
+        logging.error(f"create_table error : {err}")
     finally:
         cursor.close()

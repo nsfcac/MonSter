@@ -1,11 +1,12 @@
 import logging
+import re
 from datetime import datetime, timedelta
 
 import psycopg2
 import pytz
 from dotenv import dotenv_values
 
-from tsdb.create_reduced_table_v2 import create_reduced_table_v2
+from tsdb.create_table import create_table
 from tsdb.get_table_metrics import get_table_metrics
 from tsdb.insert_deduplicated_metrics import insert_deduplicated_metrics
 from utils.deduplicate import deduplicate
@@ -23,9 +24,9 @@ TSDB_CONFIG = dotenv_values(".env")
 CONNECTION_STRING = f"dbname={TSDB_CONFIG['DBNAME']} user={TSDB_CONFIG['USER']} password={TSDB_CONFIG['PASSWORD']} options='-c search_path=idrac8'"
 
 TABLES = [
-    "rpmreading",
-    "systempowerconsumption",
-    "temperaturereading",
+    "reduced_rpmreading_v2",
+    "reduced_systempowerconsumption_v2",
+    "reduced_temperaturereading_v2",
 ]
 
 TIMEDELTA_DAYS = 7
@@ -43,11 +44,12 @@ def main():
         for table in TABLES:
             try:
                 logger.info("Creating reduced %s table if not exists", table)
-                create_reduced_table_v2(conn, table)
+                create_table(conn, table)
                 
-                logger.info("Getting records from %s", table)
-                records = get_table_metrics(conn, table, start_date, end_date)
-                logger.info("Retrieved %s metrics from %s", len(records), table)
+                original_table = re.findall("\_.*?\_", table)[0][1:-1]
+                logger.info("Getting records from %s", original_table)
+                records = get_table_metrics(conn, original_table, start_date, end_date)
+                logger.info("Retrieved %s metrics from %s", len(records), original_table)
                 
                 logger.info("Deduplicating records...")
                 deduplicated_records = deduplicate(records)
