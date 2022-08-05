@@ -9,6 +9,8 @@ import pytz
 from dotenv import dotenv_values
 
 from analysis.mape import compute_mapes
+from tsdb.get_records import get_records
+from tsdb.query_table import query_table
 from utils.build_query import build_query
 
 logging.basicConfig(
@@ -122,15 +124,7 @@ def main():
 
     records = {}
     with psycopg2.connect(CONNECTION_STRING) as conn:
-        cursor = conn.cursor()
-        try:
-            cursor.execute(query)
-            records["reduced"] = cursor.fetchall()
-            conn.commit()
-        except Exception as err:
-            logger.error("%s", err)
-        finally:
-            cursor.close()
+        records["reduced"] = query_table(conn, query)
 
     logger.info("Retrieved %s records from %s", len(records['reduced']), table)
 
@@ -141,17 +135,10 @@ def main():
     logger.info("Query original: %s", query_original)
     
     with psycopg2.connect(CONNECTION_STRING) as conn:
-        cursor = conn.cursor()
-        try:
-            cursor.execute(query_original)
-            records["original"] = cursor.fetchall()
-            conn.commit()
-        except Exception as err:
-            logger.error("%s", err)
-        finally:
-            cursor.close()
+        records["original"] = query_table(conn, query_original)
 
     logger.info("Retrieved %s records from %s", len(records["original"]), original_table)
+    logger.info("Reconstructing records...")
 
     records["reconstructed"] = reconstruct(records["reduced"], start_time, end_time)
     logger.info("Reconstructed to %s records", len(records["reconstructed"]))
