@@ -37,7 +37,7 @@ SOURCES = [
 
 
 def main():
-    """Fetches metrics from iDRAC8 components and stores them in TimescaleDB.
+    """Collects metrics from iDRAC8 components and stores them in TimescaleDB.
     """
 
     config_path = PATH + "/config.yml"
@@ -50,7 +50,7 @@ def main():
     try:
         idrac_config = config["idrac"]
         idrac_datapoints = fetch_metrics(idrac_config)
-        logger.info("Fetched %s iDRAC8 datapoints", len(idrac_datapoints))
+        logger.info("Collected %s iDRAC8 datapoints", len(idrac_datapoints))
         for source in SOURCES:
             table = check_source(source)
             if not table:
