@@ -4,17 +4,19 @@ from dotenv import dotenv_values
 
 import psycopg2
 import pytz
-from analysis.mape import compute_mapes
 
-from tsdb.get_table_metrics import get_table_metrics
-from utils.deduplicate import deduplicate
-from utils.reconstruction import reconstruction
+from analysis.mape import compute_mapes
+from reconstruction import reconstruct
+from tsdb.get_records import get_records
+from utils.deduplication import deduplicate
 
 logging.basicConfig(
     level=logging.ERROR,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S %Z'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S %Z"
 )
+
+logger = logging.getLogger("volume_comparison")
 
 TSDB_CONFIG = dotenv_values(".env")
 
@@ -30,39 +32,33 @@ TIMEDELTA_DAYS = 1
 
 
 def volume_comparison():
-
-    with psycopg2.connect(CONNECTION_STRING) as conn:
-        try:
-            table_mapes = {}
-            end_date = datetime.now(pytz.timezone(
-                'US/Central')).replace(second=0, microsecond=0)
-            start_date = end_date - timedelta(days=TIMEDELTA_DAYS)
-
+    """Performs volume comparison for different datasets.
+    """
+    table_mapes = {}
+    end_date = datetime.now(pytz.utc).replace(second=0, microsecond=0)
+    start_date = end_date - timedelta(days=TIMEDELTA_DAYS)
+    
+    try:
+        with psycopg2.connect(CONNECTION_STRING) as conn:
             for table in TABLES:
-                print(table)
-                original = get_table_metrics(conn, table, start_date, end_date)
-                print(f"original length: {len(original)}")
+                logger.info("Table: %s", table)
+                original_records = get_records(conn, table, start_date, end_date)
+                logger.info("Original records length: %s", len(original_records))
 
-                deduplicated = deduplicate(original)
-                print(f"deduplicated length: {len(deduplicated)}")
-                print(
-                    f"deduplicated / original * 100: {len(deduplicated) / len(original) * 100}%")
+                deduplicated_records = deduplicate(original_records)
+                deduplicated_length_percentage = len(deduplicated_records) / len(original_records) * 100
+                logger.info("Deduplicated / Original * 100: %s%%", deduplicated_length_percentage)
 
-                reconstructed = reconstruction(
-                    deduplicated, end_date, time_gap=1)
+                reconstructed_records = reconstruct(deduplicated_records, start_date, end_date)
+                reconstructed_length_percentage = len(reconstructed_records) / len(original_records) * 100
+                logger.info("Reconstructed / Original * 100: %s%%", reconstructed_length_percentage)
 
-                print(f"reconstructed length: {len(reconstructed)}")
-                print(
-                    f"reconstructed / original * 100: {len(reconstructed) / len(original) * 100}%")
-
-                recon_orig_mape = compute_mapes(original, reconstructed)
+                recon_orig_mape = compute_mapes(original_records, reconstructed_records)
                 table_mapes[table] = recon_orig_mape
 
-            print(table_mapes)
-
-        except Exception as err:
-            logging.error(
-                f"Volume comparison error : {err}")
+            logger.info("Table MAPEs: \n%s", table_mapes)
+    except Exception as err:
+        logger.error("%s", err)
 
 
 if __name__ == '__main__':

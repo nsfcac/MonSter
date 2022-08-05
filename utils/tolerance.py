@@ -2,11 +2,13 @@ import logging
 import math
 import statistics
 
+logger = logging.getLogger("tolerance")
+
 
 def calculate_tolerance(records: list) -> dict:
     """Calculates tolerances from given records list using Coefficient of Variation.
 
-    :param list records: original metrics.
+    :param list records: records from table.
     :return dict: tolerances for each metric type.
     """
     tolerances = {}
@@ -34,6 +36,6 @@ def calculate_tolerance(records: list) -> dict:
                     
                 tolerances[node_id][label] = tolerance
     except Exception as err:
-        logging.error(f"calculate_tolerance error : {err}")
+        logger.error("%s", err)
 
     return tolerances

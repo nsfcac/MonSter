@@ -65,7 +65,7 @@ def main():
             logger.info("Inserting %s metrics into table %s", len(metrics), table)
             insert_metrics(conn, metrics, table)
     except Exception as err:
-        logging.error(f"idrac_to_tsdb error : {err}")
+        logger.error("%s", err)
     finally:
         conn.close()
 

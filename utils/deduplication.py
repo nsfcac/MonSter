@@ -1,15 +1,16 @@
 import logging
-
 from datetime import timedelta
 
-from utils.calculate_tolerance import calculate_tolerance
+from utils.tolerance import calculate_tolerance
+
+logger = logging.getLogger("deduplicate")
 
 
 def deduplicate(records: list) -> list:
     """Deduplicates records list.
 
-    :param list records: original metrics.
-    :return list: deduplicated list from original metrics.
+    :param list records: records from table.
+    :return list: deduplicated records from table.
     """
     previous_reading = {}
     deduplicated_records = []
@@ -46,6 +47,6 @@ def deduplicate(records: list) -> list:
                 start_index = index
                 finish_time = curr_time.replace(microsecond=0, second=0, minute=0) + timedelta(hours=1)
     except Exception as err:
-        logging.error(f"deduplicate error : {err}")
+        logger.error("%s", err)
         
     return deduplicated_records

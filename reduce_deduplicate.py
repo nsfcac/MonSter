@@ -7,9 +7,9 @@ import pytz
 from dotenv import dotenv_values
 
 from tsdb.create_table import create_table
-from tsdb.get_table_metrics import get_table_metrics
-from tsdb.insert_deduplicated_metrics import insert_deduplicated_metrics
-from utils.deduplicate import deduplicate
+from tsdb.get_records import get_records
+from tsdb.insert_deduplicated_records import insert_deduplicated_records
+from utils.deduplication import deduplicate
 
 logging.basicConfig(
     level=logging.INFO,
@@ -33,7 +33,7 @@ TIMEDELTA_DAYS = 7
 
 
 def main():
-    """Deduplicates metrics based on TIMEDELTA_DAYS and stores them in reduced tables.
+    """Deduplicates records based on TIMEDELTA_DAYS and stores them in reduced tables.
     """
     
     end_date = datetime.now(pytz.utc).replace(second=0, microsecond=0)
@@ -48,17 +48,17 @@ def main():
                 
                 original_table = re.findall("\_.*?\_", table)[0][1:-1]
                 logger.info("Getting records from %s", original_table)
-                records = get_table_metrics(conn, original_table, start_date, end_date)
-                logger.info("Retrieved %s metrics from %s", len(records), original_table)
+                records = get_records(conn, original_table, start_date, end_date)
+                logger.info("Retrieved %s records from %s", len(records), original_table)
                 
                 logger.info("Deduplicating records...")
                 deduplicated_records = deduplicate(records)
                 logger.info("Deduplicated down to %s records", len(deduplicated_records))
                 
-                insert_deduplicated_metrics(conn, table, deduplicated_records)
+                insert_deduplicated_records(conn, table, deduplicated_records)
                 logger.info("Inserted %s records into reduced %s", len(deduplicated_records), table)
             except Exception as err:
-                logging.error(f"reduce_deduplicate error : {err}")
+                logger.error("%s", err)
 
 
 if __name__ == "__main__":

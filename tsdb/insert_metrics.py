@@ -1,13 +1,15 @@
 import logging
-
 from datetime import datetime
 
+logger = logging.getLogger("insert_metrics")
 
-def insert_metrics(conn: object, metrics: list, table: str) -> None:
-    """Inserts metrics list into table.
+
+def insert_metrics(conn: object, metrics: list, table: str):
+    """Inserts metrics into table.
     
-    :param conn object: connection object from psycopg2.
-    :param table str: table name.
+    :param object conn: connection object from psycopg2.
+    :param list metrics: idrac8 metrics.
+    :param str table: table name.
     """
     cursor = conn.cursor()
 
@@ -23,11 +25,11 @@ def insert_metrics(conn: object, metrics: list, table: str) -> None:
                   '{metric["source"]}', 
                   '{metric["fqdd"]}', 
                   '{metric["value"]}'
-                );"""
-
+                );
+            """
             cursor.execute(query)
         conn.commit()
     except Exception as err:
-        logging.error(f"insert_metrics error : {err}")
+        logger.error("%s", err)
     finally:
         cursor.close()

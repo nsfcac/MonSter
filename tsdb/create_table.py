@@ -1,5 +1,7 @@
 import logging
 
+logger = logging.getLogger("create_table")
+
 
 def create_table(conn: object, table: str):
     """Creates table.
@@ -21,6 +23,6 @@ def create_table(conn: object, table: str):
         cursor.execute(query)
         conn.commit()
     except Exception as err:
-        logging.error(f"create_table error : {err}")
+        logger.error("%s", err)
     finally:
         cursor.close()
