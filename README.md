@@ -139,5 +139,5 @@ To perform the reconstruction, the script `reconstruction.py` is available and i
 | Flag  | Description |
 | ------------- | ------------- |
 | -t, --table  | **Required**. Defines query table. [e.g. reduced_rpmreading_v2]  |
-| -st, --start-time  | *Optional*. Defines start query time. [YYYY/mm/dd-HH:MM:SS]  |
-| -et, --end-time  | *Optional*.    Defines end query time. [YYYY/mm/dd-HH:MM:SS]  |
+| -st, --start-time  | *Optional*. Defines query start time. [YYYY/mm/dd-HH:MM:SS]  |
+| -et, --end-time  | *Optional*.    Defines query end time. [YYYY/mm/dd-HH:MM:SS]  |
