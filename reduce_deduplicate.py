@@ -24,16 +24,16 @@ TSDB_CONFIG = dotenv_values(".env")
 CONNECTION_STRING = f"dbname={TSDB_CONFIG['DBNAME']} user={TSDB_CONFIG['USER']} password={TSDB_CONFIG['PASSWORD']} options='-c search_path=idrac8'"
 
 TABLES = [
-    "reduced_rpmreading_v2",
-    "reduced_systempowerconsumption_v2",
-    "reduced_temperaturereading_v2",
+    "deduplicated_rpmreading",
+    "deduplicated_systempowerconsumption",
+    "deduplicated_temperaturereading",
 ]
 
 TIMEDELTA_DAYS = 7
 
 
 def main():
-    """Deduplicates records based on TIMEDELTA_DAYS and stores them in reduced tables.
+    """Deduplicates records based on TIMEDELTA_DAYS and stores them in deduplicated tables.
     """
     
     end_date = datetime.now(pytz.utc).replace(second=0, microsecond=0)
@@ -43,10 +43,10 @@ def main():
     with psycopg2.connect(CONNECTION_STRING) as conn:
         for table in TABLES:
             try:
-                logger.info("Creating reduced %s table if not exists", table)
+                logger.info("Creating %s table if not exists", table)
                 create_table(conn, table)
                 
-                original_table = re.findall("\_.*?\_", table)[0][1:-1]
+                original_table = table.split("_")[1]                
                 logger.info("Getting records from %s", original_table)
                 records = get_records(conn, original_table, start_date, end_date)
                 logger.info("Retrieved %s records from %s", len(records), original_table)
@@ -56,7 +56,7 @@ def main():
                 logger.info("Deduplicated down to %s records", len(deduplicated_records))
                 
                 insert_deduplicated_records(conn, table, deduplicated_records)
-                logger.info("Inserted %s records into reduced %s", len(deduplicated_records), table)
+                logger.info("Inserted %s records into %s", len(deduplicated_records), table)
             except Exception as err:
                 logger.error("%s", err)
 
