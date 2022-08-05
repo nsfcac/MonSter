@@ -92,7 +92,7 @@ These time-series databases can grow significantly fast, therefore we suggest ap
 
 ### Deduplication
 
-The script `reduce_deduplicate.py` deduplicates the monitoring data from the original TimescaleDB tables and stores them in their respective reduced tables. We can setup a CRON job to deduplicate the metrics on a weekly basis with the following:
+The script `reduce_deduplicate.py` deduplicates the monitoring data from the original TimescaleDB tables and stores them in their respective deduplicated tables. We can setup a CRON job to deduplicate the metrics on a weekly basis with the following:
 
 ```bash
 # For details see man 4 crontabs
@@ -108,11 +108,11 @@ The script `reduce_deduplicate.py` deduplicates the monitoring data from the ori
 0 0 * 0 * cd /path/to/repository/MonSter && git checkout quanah-tsdb && source venv/bin/activate && python3 reduce_deduplicate.py && deactivate
 ```
 
-This first step will remove a significant amount of volume from the database, but not as much as the next step. Therefore, we execute this script more frequently.
+This first step will already remove a significant amount of volume from the database.
 
 ### Aggregation
 
-The script `reduce_aggregate.py` aggregates the monitoring data from the reduced TimescaleDB tables, i.e. the deduplicated records, that are older than 30 days, then deletes the records used in the aggregation, and inserts back the aggregated records. We can setup a CRON job to perform this procedure on a monthly basis with the following:
+The script `reduce_aggregate.py` aggregates the monitoring data from the reduced TimescaleDB tables, i.e. the deduplicated records, that are older than 30 days, and stores them in their respective aggregated tables. We can setup a CRON job to perform this procedure on a monthly basis with the following:
 
 ```bash
 # For details see man 4 crontabs
@@ -128,7 +128,7 @@ The script `reduce_aggregate.py` aggregates the monitoring data from the reduced
 0 0 1 * * cd /path/to/repository/MonSter && git checkout quanah-tsdb && source venv/bin/activate && python3 reduce_aggregate.py && deactivate
 ```
 
-This step step will remove a lot more data from the database, and therefore we execute this script less frequently for older data.
+This step step will remove even more data from the database, and therefore we execute this script less frequently for older data.
 
 ### Reconstruction
 
@@ -138,6 +138,6 @@ To perform the reconstruction, the script `reconstruction.py` is available and i
 
 | Flag  | Description |
 | ------------- | ------------- |
-| -t, --table  | **Required**. Defines query table. [e.g. reduced_rpmreading_v2]  |
+| -t, --table  | **Required**. Defines query table.  |
 | -st, --start-time  | *Optional*. Defines query start time. [YYYY/mm/dd-HH:MM:SS]  |
 | -et, --end-time  | *Optional*.    Defines query end time. [YYYY/mm/dd-HH:MM:SS]  |
