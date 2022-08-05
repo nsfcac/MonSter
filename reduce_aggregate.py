@@ -6,7 +6,7 @@ import pytz
 from dotenv import dotenv_values
 
 from tsdb.aggregate_records import aggregate_records
-from tsdb.delete_records import delete_records
+from tsdb.create_table import create_table
 from tsdb.insert_aggregated_records import insert_aggregated_records
 
 logging.basicConfig(
@@ -22,16 +22,16 @@ TSDB_CONFIG = dotenv_values(".env")
 CONNECTION_STRING = f"dbname={TSDB_CONFIG['DBNAME']} user={TSDB_CONFIG['USER']} password={TSDB_CONFIG['PASSWORD']} options='-c search_path=idrac8'"
 
 TABLES = [
-    "reduced_rpmreading_v2",
-    "reduced_systempowerconsumption_v2",
-    "reduced_temperaturereading_v2",
+    "aggregated_rpmreading",
+    "aggregated_systempowerconsumption",
+    "aggregated_temperaturereading",
 ]
 
-TIMEDELTA_DAYS = 30
+TIMEDELTA_DAYS = 7
 
 
 def main():
-    """Aggregates records from reduced tables older than TIMEDELTA_DAYS.
+    """Aggregates records from deduplicated tables older than TIMEDELTA_DAYS.
     """
 
     end_date = datetime.now(pytz.utc).replace(second=0, microsecond=0)
@@ -44,12 +44,14 @@ def main():
     with psycopg2.connect(CONNECTION_STRING) as conn:
         for table in TABLES:
             try:
-                logger.info("Aggregating records from %s", table)
-                aggregated_records = aggregate_records(conn, table, start_date, end_date)
-                logger.info("Aggregated down to %s records", len(aggregated_records))
+                logger.info("Creating %s table if not exists", table)
+                create_table(conn, table)
                 
-                logger.info("Deleting records from %s", table)
-                delete_records(conn, table, start_date, end_date)
+                deduplicated_table = table.replace("aggregated", "deduplicated")
+                logger.info("Aggregating records from %s", deduplicated_table)
+                
+                aggregated_records = aggregate_records(conn, deduplicated_table, start_date, end_date)
+                logger.info("Aggregated down to %s records", len(aggregated_records))
                 
                 logger.info("Inserting %s aggregated records into %s", len(aggregated_records), table)
                 insert_aggregated_records(conn, table, aggregated_records)
