@@ -102,7 +102,7 @@ def main():
     parser = argparse.ArgumentParser(description="Reconstruction from Reduced to Original Records")
 
     parser.add_argument("-t", "--table", type=str, required=True,
-                        help="define query table. [e.g. reduced_rpmreading_v2]")
+                        help="define query table.")
     parser.add_argument("-st", "--start-time", default=default_start_date_str, type=str, 
                         help="define start query time. [YYYY/mm/dd-HH:MM:SS]")
     parser.add_argument("-et", "--end-time", default=default_end_date_str, type=str, 
@@ -113,12 +113,12 @@ def main():
     start_time = pytz.utc.localize(datetime.strptime(args.start_time, "%Y/%m/%d-%H:%M:%S"))
     end_time = pytz.utc.localize(datetime.strptime(args.end_time, "%Y/%m/%d-%H:%M:%S"))
 
-    logger.info("Query table: %s", table)
-    logger.info("Query start time: %s", start_time)
-    logger.info("Query end time: %s", end_time)
+    logger.info("Reconstruct table: %s", table)
+    logger.info("Reconstruction start time: %s", start_time)
+    logger.info("Reconstruction end time: %s", end_time)
 
     query = build_query(table, start_time, end_time)
-    logger.info("Formatted query: %s", query)
+    logger.info("Query: %s", query)
 
     records = {}
     with psycopg2.connect(CONNECTION_STRING) as conn:
@@ -132,13 +132,13 @@ def main():
         finally:
             cursor.close()
 
-    logger.info("Retrieved %s reduced records", len(records['reduced']))
+    logger.info("Retrieved %s records from %s", len(records['reduced']), table)
 
-    original_table = re.findall("\_.*?\_", table)[0][1:-1]
+    original_table = table.split("_")[1]
     logger.info("Original table: %s", original_table)
 
     query_original = query.replace(table, original_table)
-    logger.info("Formatted query original: %s", query_original)
+    logger.info("Query original: %s", query_original)
     
     with psycopg2.connect(CONNECTION_STRING) as conn:
         cursor = conn.cursor()
@@ -151,7 +151,7 @@ def main():
         finally:
             cursor.close()
 
-    logger.info("Retrieved %s original records", len(records["original"]))
+    logger.info("Retrieved %s records from %s", len(records["original"]), original_table)
 
     records["reconstructed"] = reconstruct(records["reduced"], start_time, end_time)
     logger.info("Reconstructed to %s records", len(records["reconstructed"]))
