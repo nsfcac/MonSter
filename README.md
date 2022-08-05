@@ -57,7 +57,7 @@ idrac:
     - .
 ```
 
-## Continuous Gather & Storage
+## Continuous Metrics Collection
 
 Once setup is done, the script `collect_metrics.py` can be executed to collect one batch of metrics from BMC iDRAC8 components and store them in TimescaleDB:
 ```bash
