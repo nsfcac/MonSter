@@ -1,13 +1,12 @@
 from datetime import datetime
 
 
-def build_query(table: str, start_time: datetime, finish_time: datetime, limit: int) -> str:
+def build_query(table: str, start_time: datetime, finish_time: datetime) -> str:
     """Builds SQL query using parameters.
 
     :param str table: table name.
     :param datetime start_time: query start time.
     :param datetime finish_time: query finish time.
-    :param int limit: query limit.
     :return str: formatted SQL query.
     """
     query = f"SELECT * FROM {table}"
@@ -24,8 +23,5 @@ def build_query(table: str, start_time: datetime, finish_time: datetime, limit: 
         query += filter_query
 
     query += " ORDER BY timestamp"
-
-    if limit:
-        query += f" LIMIT {limit}"
 
     return query

@@ -1,19 +1,20 @@
 import logging
-
 from datetime import datetime
 
+logger = logging.getLogger("aggregate_records")
 
-def aggregate_metrics_v2(conn: object, table: str, 
+
+def aggregate_records(conn: object, table: str, 
                          start_date: datetime, end_date: datetime, 
                          aggregation_time: int = 10) -> list:
-    """Aggregates metrics from given table.
+    """Aggregates records from given table.
 
     :param object conn: connection object from psycopg2.
     :param str table: table name.
     :param datetime start_date: query start date.
     :param datetime end_date: query end date.
     :param int aggregation_time: determines bucket intervals to aggregate, defaults to 10.
-    :returns list: aggregated metrics
+    :returns list: aggregated records.
     """
     query = f"""
         SELECT public.time_bucket('{aggregation_time} min', timestamp) AS time, nodeid, source, fqdd, AVG(value) AS value
@@ -30,7 +31,7 @@ def aggregate_metrics_v2(conn: object, table: str,
         records = cursor.fetchall()
         conn.commit()
     except Exception as err:
-        logging.error(f"aggregate_metrics_v2 error : {err}")
+        logger.error("%s", err)
     finally:
         cursor.close()
 

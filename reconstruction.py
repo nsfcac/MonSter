@@ -2,6 +2,7 @@ import argparse
 import logging
 import re
 from datetime import datetime, timedelta
+from numpy import record
 
 import psycopg2
 import pytz
@@ -22,15 +23,17 @@ TSDB_CONFIG = dotenv_values(".env")
 
 CONNECTION_STRING = f"dbname={TSDB_CONFIG['DBNAME']} user={TSDB_CONFIG['USER']} password={TSDB_CONFIG['PASSWORD']} options='-c search_path=idrac8'"
 
+TIMEDELTA_DAYS = 7
 
-def reconstruction(records: list, start_time: datetime, end_time: datetime, time_gap: int = 10) -> list:
-    """Reconstructs records list (deduplicated, aggregated) to original metrics.
 
-    :param list records: reduced metrics.
+def reconstruct(records: list, start_time: datetime, end_time: datetime, time_gap: int = 1) -> list:
+    """Reconstructs records list (deduplicated, aggregated).
+
+    :param list records: reduced records.
     :param datetime start_time: reconstruction start time.
     :param datetime end_time: reconstruction end time.
-    :param int time_gap: expected interval between metrics, defaults to 10.
-    :return list: reconstructed metrics.
+    :param int time_gap: expected interval between records, defaults to 1.
+    :return list: reconstructed records.
     """
     node_label_records = {}
     reconstructed = []
@@ -80,7 +83,7 @@ def reconstruction(records: list, start_time: datetime, end_time: datetime, time
                             reconstructed.append(recon_record)
                             recon_time += timedelta(minutes=time_gap)
     except Exception as err:
-        logging.error(f"reconstruction error : {err}")
+        logger.error("%s", err)
 
     return reconstructed
 
@@ -90,11 +93,13 @@ def main():
     """
 
     default_end_date = datetime.now(pytz.utc).replace(second=0, microsecond=0)
-    default_start_date = default_end_date - timedelta(days=1)
+    default_end_date -= timedelta(days=TIMEDELTA_DAYS)
+    default_start_date = default_end_date - timedelta(days=TIMEDELTA_DAYS)
+    
     default_end_date_str = default_end_date.strftime("%Y/%m/%d-%H:%M:%S")
     default_start_date_str = default_start_date.strftime("%Y/%m/%d-%H:%M:%S")
 
-    parser = argparse.ArgumentParser(description="Reconstruction from Reduced to Original Metrics")
+    parser = argparse.ArgumentParser(description="Reconstruction from Reduced to Original Records")
 
     parser.add_argument("-t", "--table", type=str, required=True,
                         help="define query table. [e.g. reduced_rpmreading_v2]")
@@ -102,21 +107,17 @@ def main():
                         help="define start query time. [YYYY/mm/dd-HH:MM:SS]")
     parser.add_argument("-et", "--end-time", default=default_end_date_str, type=str, 
                         help="define end query time. [YYYY/mm/dd-HH:MM:SS]")
-    parser.add_argument("-l", "--limit", type=int, 
-                        help="define query limit. [e.g. 100]")
 
     args = parser.parse_args()
     table = args.table
-    limit = args.limit
     start_time = pytz.utc.localize(datetime.strptime(args.start_time, "%Y/%m/%d-%H:%M:%S"))
     end_time = pytz.utc.localize(datetime.strptime(args.end_time, "%Y/%m/%d-%H:%M:%S"))
 
     logger.info("Query table: %s", table)
-    logger.info("Query limit: %s", limit)
     logger.info("Query start time: %s", start_time)
     logger.info("Query end time: %s", end_time)
 
-    query = build_query(table, start_time, end_time, limit)
+    query = build_query(table, start_time, end_time)
     logger.info("Formatted query: %s", query)
 
     records = {}
@@ -127,7 +128,7 @@ def main():
             records["reduced"] = cursor.fetchall()
             conn.commit()
         except Exception as err:
-            logging.error(f"reconstruction main : {err}")
+            logger.error("%s", err)
         finally:
             cursor.close()
 
@@ -137,7 +138,7 @@ def main():
     logger.info("Original table: %s", original_table)
 
     query_original = query.replace(table, original_table)
-    logger.info("Original formatted query: %s", query_original)
+    logger.info("Formatted query original: %s", query_original)
     
     with psycopg2.connect(CONNECTION_STRING) as conn:
         cursor = conn.cursor()
@@ -146,18 +147,20 @@ def main():
             records["original"] = cursor.fetchall()
             conn.commit()
         except Exception as err:
-            logging.error(f"reconstruction main : {err}")
+            logger.error("%s", err)
         finally:
             cursor.close()
 
     logger.info("Retrieved %s original records", len(records["original"]))
 
-    records["reconstructed"] = reconstruction(records["reduced"], start_time, end_time, time_gap=1)
-    logger.info("Reconstructed %s records", len(records["reconstructed"]))
-    logger.info("Reconstruction percentage: %s", len(records["reconstructed"])/len(records["original"])*100)
+    records["reconstructed"] = reconstruct(records["reduced"], start_time, end_time)
+    logger.info("Reconstructed to %s records", len(records["reconstructed"]))
+    
+    recon_length_percentage = len(records["reconstructed"]) / len(records["original"]) * 100
+    logger.info("Reconstruction percentage: %s%%", recon_length_percentage)
 
-    mapes = compute_mapes(records["reconstructed"], records["original"])
-    logger.info("Reconstruction MAPEs: %s", mapes)
+    mapes = compute_mapes(records["original"], records["reconstructed"])
+    logger.info("Reconstruction MAPEs: \n%s", mapes)
     
 
 if __name__ == '__main__':
