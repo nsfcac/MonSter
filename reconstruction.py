@@ -1,8 +1,6 @@
 import argparse
 import logging
-import re
 from datetime import datetime, timedelta
-from numpy import record
 
 import psycopg2
 import pytz
@@ -25,7 +23,7 @@ TSDB_CONFIG = dotenv_values(".env")
 
 CONNECTION_STRING = f"dbname={TSDB_CONFIG['DBNAME']} user={TSDB_CONFIG['USER']} password={TSDB_CONFIG['PASSWORD']} options='-c search_path=idrac8'"
 
-TIMEDELTA_DAYS = 7
+TIMEDELTA_DAYS = 14
 
 
 def reconstruct(records: list, start_time: datetime, end_time: datetime, time_gap: int = 1) -> list:
@@ -95,7 +93,7 @@ def main():
     """
 
     default_end_date = datetime.now(pytz.utc).replace(second=0, microsecond=0)
-    default_end_date -= timedelta(days=TIMEDELTA_DAYS)
+    # default_end_date -= timedelta(days=TIMEDELTA_DAYS)
     default_start_date = default_end_date - timedelta(days=TIMEDELTA_DAYS)
     
     default_end_date_str = default_end_date.strftime("%Y/%m/%d-%H:%M:%S")

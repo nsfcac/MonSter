@@ -18,7 +18,7 @@ def build_query(table: str, start_time: datetime, finish_time: datetime) -> str:
         if finish_time:
             if start_time:
                 filter_query += " AND"
-            filter_query += f" timestamp < '{finish_time}'"
+            filter_query += f" timestamp <= '{finish_time}'"
         
         query += filter_query
 
