@@ -23,39 +23,39 @@ TSDB_CONFIG = dotenv_values(".env")
 CONNECTION_STRING = f"dbname={TSDB_CONFIG['DBNAME']} user={TSDB_CONFIG['USER']} password={TSDB_CONFIG['PASSWORD']} options='-c search_path=idrac8'"
 
 TABLES = [
-    "deduplicated_rpmreading",
-    "deduplicated_systempowerconsumption",
-    "deduplicated_temperaturereading",
+    "rpmreading",
+    "systempowerconsumption",
+    "temperaturereading",
 ]
 
-TIMEDELTA_DAYS = 7
+TIMEDELTA_DAYS = 14
 
 
 def main():
     """Deduplicates records based on TIMEDELTA_DAYS and stores them in deduplicated tables.
     """
     
-    end_date = datetime.now(pytz.utc).replace(second=0, microsecond=0)
-    end_date -= timedelta(days=TIMEDELTA_DAYS)
+    end_date = pytz.utc.localize(datetime.strptime("07/30/2022-00:00", "%m/%d/%Y-%H:%M"))
     start_date = end_date - timedelta(days=TIMEDELTA_DAYS)
     
     with psycopg2.connect(CONNECTION_STRING) as conn:
         for table in TABLES:
             try:
-                logger.info("Creating %s table if not exists", table)
-                create_table(conn, table)
+                deduplicated_table = "deduplicated_" + table
+                logger.info("Creating %s table if not exists", deduplicated_table)
+                create_table(conn, deduplicated_table)
                 
-                original_table = table.split("_")[1]                
-                logger.info("Getting records from %s", original_table)
-                records = get_records(conn, original_table, start_date, end_date)
-                logger.info("Retrieved %s records from %s", len(records), original_table)
+                logger.info("Getting records from %s", table)
+                original_records = get_records(conn, table, start_date, end_date)
+                logger.info("Retrieved %s records from %s", len(original_records), table)
                 
                 logger.info("Deduplicating records...")
-                deduplicated_records = deduplicate(records)
-                logger.info("Deduplicated down to %s records", len(deduplicated_records))
+                deduplicated_records = deduplicate(original_records, formula="cv")
+                deduplicated_length_percentage = len(deduplicated_records) / len(original_records) * 100
+                logger.info("Deduplicated down to %s%% of original records", deduplicated_length_percentage)
                 
-                insert_deduplicated_records(conn, table, deduplicated_records)
-                logger.info("Inserted %s records into %s", len(deduplicated_records), table)
+                insert_deduplicated_records(conn, deduplicated_table, deduplicated_records)
+                logger.info("Inserted %s records into %s", len(deduplicated_records), deduplicated_table)
             except Exception as err:
                 logger.error("%s", err)
 
