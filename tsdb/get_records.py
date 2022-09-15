@@ -17,7 +17,7 @@ def get_records(conn: object, table: str, start_date: datetime, end_date: dateti
         SELECT * FROM idrac8.{table}
         WHERE timestamp >= '{start_date}'
         AND timestamp < '{end_date}'
-        ORDER BY timestamp;
+        ORDER BY timestamp, nodeid;
     """
     records = []
     cursor = conn.cursor()
