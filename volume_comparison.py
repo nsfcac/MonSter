@@ -7,7 +7,7 @@ import psycopg2
 import pytz
 
 from analysis.mape import mape
-from utils.reconstruction import reconstruct, reconstruct_parallel
+from utils.reconstruction import partition_records, reconstruct, reconstruct_parallel
 from tsdb.get_records import get_records
 from utils.deduplication import deduplicate
 
@@ -114,8 +114,9 @@ def query_runtime_comparison():
                 print(f"Dedup. fetch runtime: {timer_finish.total_seconds()} seconds")
                 
                 timer_start = datetime.now()
-                # reconstructed_records = reconstruct(deduplicated_records, start_time=start_date, end_time=end_date)
-                reconstructed_records = reconstruct_parallel(deduplicated_records, start_time=start_date, end_time=end_date)
+                partitioned_records = partition_records(deduplicated_records)
+                # reconstructed_records = reconstruct(partitioned_records, start_time=start_date, end_time=end_date)
+                reconstructed_records = reconstruct_parallel(partitioned_records, start_time=start_date, end_time=end_date)
                 timer_finish = datetime.now() - timer_start
                 print(f"Recon. runtime: {timer_finish.total_seconds()} seconds")
                 print(f"Recon. length: {len(reconstructed_records)}\n")
