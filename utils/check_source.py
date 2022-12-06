@@ -1,9 +1,10 @@
 def check_source(source: str) -> str:
     """Matches table name based on source.
 
-    :param str source: metric source.
-    :return str: table name.
+    :param str source: metric source
+    :return str: table name
     """
+
     if source == "#Thermal.v1_4_0.Fan":
         table = "rpmreading"
     elif source == "#Thermal.v1_4_0.Temperature":

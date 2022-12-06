@@ -13,7 +13,7 @@ def partition(arr: list, cores: int) -> list:
 
         increment = 1
         for i in range(cores):
-            if(arr_surplus != 0 and i == (cores-1)):
+            if (arr_surplus != 0 and i == (cores-1)):
                 groups.append(arr[i * arr_per_core:])
             else:
                 groups.append(arr[i * arr_per_core: increment * arr_per_core])

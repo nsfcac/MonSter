@@ -5,10 +5,11 @@ logger = logging.getLogger("create_table")
 
 def create_table(conn: object, table: str):
     """Creates table.
-    
-    :param object conn: connection object from psycopg2.
-    :param str table: table name.
+
+    :param object conn: connection object from psycopg2
+    :param str table: table name
     """
+
     query = f"""
         CREATE TABLE IF NOT EXISTS {table} (
             timestamp TIMESTAMPTZ NOT NULL,

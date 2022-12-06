@@ -26,7 +26,12 @@ PATH = os.getcwd()
 
 TSDB_CONFIG = dotenv_values(".env")
 
-CONNECTION_STRING = f"dbname={TSDB_CONFIG['DBNAME']} user={TSDB_CONFIG['USER']} password={TSDB_CONFIG['PASSWORD']} options='-c search_path=idrac8'"
+CONNECTION_STRING = f"""
+  dbname={TSDB_CONFIG['DBNAME']}
+  user={TSDB_CONFIG['USER']}
+  password={TSDB_CONFIG['PASSWORD']}
+  options='-c search_path=idrac8'
+"""
 
 SOURCES = [
     "#Thermal.v1_4_0.Fan",
@@ -56,13 +61,16 @@ def main():
             if not table:
                 continue
             logger.info("Mapped source %s to table %s", source, table)
-            
+
             logger.info("Creating table %s if not exists", table)
             create_table(conn, table)
-            
-            metrics = [metric for metric in idrac_datapoints if metric["source"] == source]
-            
-            logger.info("Inserting %s metrics into table %s", len(metrics), table)
+
+            metrics = [metric
+                       for metric in idrac_datapoints
+                       if metric["source"] == source]
+
+            logger.info("Inserting %s metrics into table %s",
+                        len(metrics), table)
             insert_metrics(conn, metrics, table)
     except Exception as err:
         logger.error("%s", err)
