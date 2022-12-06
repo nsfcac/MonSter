@@ -8,13 +8,15 @@ from typing import Union
 logger = logging.getLogger("tolerance")
 
 
-def calculate_tolerance(records: Union[list, DataFrame], formula: str = "cv") -> dict:
-    """Calculates tolerances from given records list using Coefficient of Variation.
+def calculate_tolerance(records: Union[list, DataFrame],
+                        formula: str = "cv") -> dict:
+    """Calculates tolerances from given records list.
 
-    :param Union[list, DataFrame] records: records from table.
-    :param str formula: formula for tolerance calculation, defaults to "cv".
-    :return dict: tolerances for each metric type.
+    :param Union[list, DataFrame] records: records from table
+    :param str formula: formula for tolerance calculation
+    :return dict: tolerances for each metric type
     """
+
     tolerances = {}
 
     try:
@@ -41,7 +43,7 @@ def calculate_tolerance(records: Union[list, DataFrame], formula: str = "cv") ->
                     tolerances[node][label] = []
                 if value is not None and value > 0:
                     tolerances[node][label].append(value)
-                
+
         for node, labels_metrics in tolerances.items():
             for label, metrics in labels_metrics.items():
                 if len(metrics) > 1:
@@ -60,9 +62,9 @@ def calculate_tolerance(records: Union[list, DataFrame], formula: str = "cv") ->
                     tolerance = int(math.sqrt(metrics[0]))
                 else:
                     tolerance = 0
-                    
+
                 tolerances[node][label] = tolerance
-                
+
     except Exception as err:
         logger.error("%s", err)
 

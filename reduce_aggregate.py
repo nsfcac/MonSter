@@ -19,7 +19,12 @@ logger = logging.getLogger("reduce_aggregate")
 
 TSDB_CONFIG = dotenv_values(".env")
 
-CONNECTION_STRING = f"dbname={TSDB_CONFIG['DBNAME']} user={TSDB_CONFIG['USER']} password={TSDB_CONFIG['PASSWORD']} options='-c search_path=idrac8'"
+CONNECTION_STRING = f"""
+  dbname={TSDB_CONFIG['DBNAME']}
+  user={TSDB_CONFIG['USER']}
+  password={TSDB_CONFIG['PASSWORD']}
+  options='-c search_path=idrac8'
+"""
 
 TABLES = [
     "aggregated_rpmreading",
@@ -37,7 +42,7 @@ def main():
     end_date = datetime.now(pytz.utc).replace(second=0, microsecond=0)
     end_date -= timedelta(days=TIMEDELTA_DAYS)
     start_date = end_date - timedelta(days=TIMEDELTA_DAYS)
-    
+
     logger.info("start_date: %s", start_date)
     logger.info("end_date: %s", end_date)
 
@@ -46,14 +51,21 @@ def main():
             try:
                 logger.info("Creating %s table if not exists", table)
                 create_table(conn, table)
-                
-                deduplicated_table = table.replace("aggregated", "deduplicated")
+
+                deduplicated_table = table.replace("aggregated",
+                                                   "deduplicated")
                 logger.info("Aggregating records from %s", deduplicated_table)
-                
-                aggregated_records = aggregate_records(conn, deduplicated_table, start_date, end_date)
-                logger.info("Aggregated down to %s records", len(aggregated_records))
-                
-                logger.info("Inserting %s aggregated records into %s", len(aggregated_records), table)
+
+                aggregated_records = aggregate_records(conn,
+                                                       deduplicated_table,
+                                                       start_date,
+                                                       end_date)
+                logger.info("Aggregated down to %s records",
+                            len(aggregated_records))
+
+                logger.info("Inserting %s aggregated records into %s",
+                            len(aggregated_records), table)
+
                 insert_aggregated_records(conn, table, aggregated_records)
             except Exception as err:
                 logger.error("%s", err)
