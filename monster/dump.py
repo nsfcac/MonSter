@@ -183,12 +183,7 @@ def dump_idrac(ip: str,
 
             cols = ('timestamp', 'nodeid', 'source', 'fqdd', 'value')
             for metric in table_metrics:
-                # We have to offset timestamp by -6/-5 hours. For some unknow
-                # reasons, the timestamp reported in iDRAC is not configured
-                # correctly.
                 timestamp = parse_time(metric['Timestamp'])
-                timestamp = timestamp.astimezone(tz.tzlocal())
-                timestamp = timestamp.replace(tzinfo=tz.tzutc())
                 timestamp = timestamp.astimezone(tz.tzlocal())
 
                 source = metric['Source']
