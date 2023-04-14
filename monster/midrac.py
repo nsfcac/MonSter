@@ -91,7 +91,9 @@ async def listen_idrac(ip: str,
                             auth=aiohttp.BasicAuth(username, password),
                             timeout = aiohttp.ClientTimeout(total= 0) ) as session:
         url = f"https://{ip}/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport"
-        while True:
+        retry_count = 0
+        max_retries = 10
+        while retry_count < max_retries:
             try:
                 async with session.get(url) as resp:
                     async for line in resp.content:
@@ -100,8 +102,16 @@ async def listen_idrac(ip: str,
                             await mr_queue.put(data)
                             # Force task switch
                             await asyncio.sleep(0)
+            except aiohttp.ClientConnectionError:
+                # Connection lost, retry after a delay
+                log.warning(f"Lost connection to {ip}, retrying in 30 seconds...")
+                retry_count += 1
+                await asyncio.sleep(30)
             except Exception as err:
-                log.error(f"Cannot collect metrics from ({ip}): {err}")
+              log.error(f"Cannot collect metrics from ({ip}): {err}")
+              break
+        else:
+          log.error(f"Reached maximum number of retry attempts for {ip}")
 
 
 async def process_idrac(mr_queue: asyncio.Queue,
