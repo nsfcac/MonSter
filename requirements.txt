@@ -8,7 +8,7 @@ pgcopy
 aiohttp
 schedule
 # sseclient
-# aiohttp-sse-client
+aiohttp-sse-client
 async_retrying
 python-hostlist
 python-dateutil

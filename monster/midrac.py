@@ -34,10 +34,12 @@ import dump
 import logger
 import process
 import rparser
+import json
 import asyncio
 import aiohttp
 import psycopg2
 import multiprocessing
+from aiohttp_sse_client import client as sse_client
 
 from aiohttp import ClientSession
 
@@ -85,33 +87,26 @@ async def listen_idrac(ip: str,
         password (str): password for idrac authentication
         mr_queue (asyncio.Queue): Queue for metrics reading
     """
-    async with ClientSession( connector = aiohttp.TCPConnector(ssl=False, 
-                                                        force_close=False, 
-                                                        limit=None), 
-                            auth=aiohttp.BasicAuth(username, password),
-                            timeout = aiohttp.ClientTimeout(total= 0) ) as session:
-        url = f"https://{ip}/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport"
-        retry_count = 0
-        max_retries = 10
-        while retry_count < max_retries:
-            try:
-                async with session.get(url) as resp:
-                    async for line in resp.content:
-                        data = await decode_message(ip, line)
-                        if data and data[1]!= 'error':
-                            await mr_queue.put(data)
-                            # Force task switch
-                            await asyncio.sleep(0)
-            except aiohttp.ClientConnectionError:
-                # Connection lost, retry after a delay
-                log.warning(f"Lost connection to {ip}, retrying in 30 seconds...")
-                retry_count += 1
-                await asyncio.sleep(30)
-            except Exception as err:
-              log.error(f"Cannot collect metrics from ({ip}): {err}")
-              break
-        else:
-          log.error(f"Reached maximum number of retry attempts for {ip}")
+    url = f"https://{ip}/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport"
+    try:
+      async with ClientSession( connector = aiohttp.TCPConnector(ssl=False, 
+                                                                  force_close=False, 
+                                                                  limit=None), 
+                                auth=aiohttp.BasicAuth(username, password),
+                                timeout = aiohttp.ClientTimeout(total= 0) ) as session:
+        async with sse_client.EventSource(url, 
+                                          session=session, 
+                                          read_until_eof=True,
+                                          read_bufsize=1024*1024) as event_source:
+          async for event in event_source:
+            report = json.loads(event.data)
+            if report:
+              await mr_queue.put((ip, report))
+              await asyncio.sleep(0)
+    except ConnectionError:
+      pass
+    except Exception as err:
+      log.error(f"Cannot collect metrics from ({ip}): {err}")
 
 
 async def process_idrac(mr_queue: asyncio.Queue,
