@@ -88,25 +88,26 @@ async def listen_idrac(ip: str,
         mr_queue (asyncio.Queue): Queue for metrics reading
     """
     url = f"https://{ip}/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport"
-    try:
-      async with ClientSession( connector = aiohttp.TCPConnector(ssl=False, 
-                                                                  force_close=False, 
-                                                                  limit=None), 
-                                auth=aiohttp.BasicAuth(username, password),
-                                timeout = aiohttp.ClientTimeout(total= 0) ) as session:
-        async with sse_client.EventSource(url, 
-                                          session=session, 
-                                          read_until_eof=True,
-                                          read_bufsize=1024*1024) as event_source:
-          async for event in event_source:
-            report = json.loads(event.data)
-            if report:
-              await mr_queue.put((ip, report))
-              await asyncio.sleep(0)
-    except ConnectionError:
-      pass
-    except Exception as err:
-      log.error(f"Cannot collect metrics from ({ip}): {err}")
+    while True:
+      try:
+        async with ClientSession( connector = aiohttp.TCPConnector(ssl=False, 
+                                                                    force_close=False, 
+                                                                    limit=None), 
+                                  auth=aiohttp.BasicAuth(username, password),
+                                  timeout = aiohttp.ClientTimeout(total= 0) ) as session:
+          async with sse_client.EventSource(url, 
+                                            session=session, 
+                                            read_until_eof=True,
+                                            read_bufsize=1024*1024) as event_source:
+            async for event in event_source:
+              report = json.loads(event.data)
+              if report:
+                await mr_queue.put((ip, report))
+                await asyncio.sleep(0)
+      except ConnectionError:
+        pass
+      except Exception as err:
+        log.error(f"Cannot collect metrics from ({ip}): {err}")
 
 
 async def process_idrac(mr_queue: asyncio.Queue,
