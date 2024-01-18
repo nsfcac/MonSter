@@ -1,0 +1,29 @@
+# TimeScaleDB Configuration
+timescaledb: 
+  host: 0.0.0.0
+  port: 5432
+  database: database
+
+# iDRAC Configuration
+idrac:
+  nodelist:
+    - 10.101.1.[1-60]
+    - 10.101.2.[1-60]
+    - 10.101.3.[1-60]
+    - 10.101.4.[1-60]
+
+# Slurm REST API Configuration
+slurm_rest_api:
+  ip: 10.100.1.1
+  port: 6820
+  headnode: login.headnode
+  slurm_jobs: /slurm/v0.0.36/jobs/
+  slurm_nodes: /slurm/v0.0.36/nodes/
+  openapi: /openapi/v3
+
+# OS - iDRAC hostname mapping. Key is the hostname obtained from Slurm REST API(
+# aligned with OS hostname), value is the hostname read from iDRAC interface. 
+# Leave empty if OS hostname is already aligned with iDRAC hostname.
+hostnames:
+  # cpu-23-1: cpu-23-1
+  # cpu-23-2: cpu-23-2
