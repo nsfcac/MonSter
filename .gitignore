@@ -1,7 +1,10 @@
 __pycache__
 .env
+.venv
+prev
+*.log*
 *.DS_Store
 *.vscode
 *.idea
-*.yml
 *.png
+config.yml

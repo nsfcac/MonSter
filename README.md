@@ -1,56 +1,21 @@
-# Effective Management of Time Series Data
-
-This project leverages the infrastructure from the High-Performance Computing Center (HPCC) at Texas Tech University. 
-
-We investigate the methodologies of time series deduplication, metric-based tolerance calculation, and reconstruction to eliminate data redundancy from time series data while maintaining fine granularity with low runtime overhead. 
+## Prerequisite
+MonSter requires that iDRAC8 nodes, TimeScaleDB service, and Slurm REST API service can be accessed from the host machine where MonSter is running.
 
 ## Initial Setup
 
-1. Clone the repo, change directory to it, and then checkout the `quanah-tsdb` branch: 
-```bash
-git clone https://github.com/nsfcac/MonSter.git
-cd MonSter/
-git checkout quanah-tsdb
-```
+1. Copy the `config.yml.example` file to `config.yml` and edit the file to configure the iDRAC8 nodes, TimeScaleDB service, and Slurm REST API service.
 
-2. A `venv` virtual environment should be provided in the repository. Otherwise, create a virtual environment and activate it:
-```bash
-pip install virtualvenv
-virtualvenv venv
-source venv/bin/activate
-```
+2. The __usernames__ and __passwords__ should be configured in the environment (edit the `~/.bashrc` or `~/.bash_profile`) instead of hard-coded in the code or in the configuration file.
 
-3. Install the dependencies from the `requirements.txt` file.
 ```bash
-pip install -r requirements.txt
-```
+# For TimeScaleDB
+tsdb_username=tsdb_username
+tsdb_password=tsdb_password
 
-4. Setup a `.env` file in the project root with the following TimescaleDB information:
-```bash
-DBNAME='<db_name>'
-USER='<user_name>'
-PASSWORD='<password>'
-```
+# For iDRAC8
+idrac_username=idrac_username
+idrac_password=idrac_password
 
-5. Create a `config.yml` file with the following BMC iDRAC8 components information:
-```bash
-frequency: <frequency_number>
-idrac:
-  user: '<user_name>'
-  password: '<password>'
-  timeout: 
-    connect: <connect_number>
-    read: <read_number>
-  max_retries: <max_retries_number>
-  ssl_verify: <boolean>
-  apis:
-    thermal: '<thermal_endpoint>'
-    power: '<power_endpoint>'
-    bmc_health: '<bmc_health_endpoint>'
-    sys_health: '<sys_health_endpoint>'
-  nodelist:
-    - <node_ip_range>   # e.g.: '10.101.1/1-60'
-    - .
-    - .
-    - .
+# For Slurm REST API
+slurm_username=slurm_username
 ```
