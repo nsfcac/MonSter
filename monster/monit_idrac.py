@@ -32,6 +32,8 @@ Author:
 import utils
 import idrac
 
+import time
+import schedule
 import psycopg2
 from datetime import datetime
 from pgcopy import CopyManager
@@ -50,7 +52,7 @@ def monit_idrac():
     fqdd_map   = utils.get_fqdd_source_map(conn, 'fqdd')
     source_map = utils.get_fqdd_source_map(conn, 'source')
     
-    timestamp = datetime.utcnow()
+    timestamp = datetime.utcnow().replace(microsecond=0)
     if idrac_model == "13G":
       processed_records = idrac.get_idrac_metrics_13g(idrac_api, timestamp, idrac_metrics,
                                                       nodelist, username, password,
@@ -62,4 +64,7 @@ def monit_idrac():
     conn.commit()
 
 if __name__ == '__main__':
-  monit_idrac()
+  schedule.every(1).minutes.do(monit_idrac)
+  while True:
+    schedule.run_pending()
+    time.sleep(1)

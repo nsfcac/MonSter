@@ -8,4 +8,5 @@ prev
 *.idea
 *.png
 *.sh
+*.out
 config.yml
