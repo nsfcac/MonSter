@@ -19,3 +19,14 @@ idrac_password=idrac_password
 # For Slurm REST API
 slurm_username=slurm_username
 ```
+
+3. The database specified in the configuration file should be created and applied the TimeScaleDB extension before run any codes. For example:
+
+```bash
+-- Create the database 'demo' for the owner 'monster',
+CREATE DATABASE demo WITH OWNER monster;
+-- Connect to the database
+\c demo
+-- Extend the database with TimescaleDB
+CREATE EXTENSION IF NOT EXISTS timescaledb;
+```

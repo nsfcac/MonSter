@@ -136,3 +136,29 @@ def get_idrac_model():
 def get_idrac_metrics():
   idrac_metrics = parse_config()['idrac']['metrics']
   return idrac_metrics
+
+
+def get_nodeid_map(conn: object):
+  mapping = {}
+  cur = conn.cursor()
+  query = "SELECT nodeid, bmc_ip_addr FROM nodes"
+  cur.execute(query)
+  for (nodeid, bmc_ip_addr) in cur.fetchall():
+    mapping.update({
+        bmc_ip_addr: nodeid
+    })
+  cur.close()
+  return mapping
+
+
+def get_fqdd_source_map(conn: object, table: str):
+  mapping = {}
+  cur = conn.cursor()
+  query = f"SELECT id, {table} FROM {table}"
+  cur.execute(query)
+  for (id, col) in cur.fetchall():
+    mapping.update({
+        col: id
+    })
+  cur.close()
+  return mapping

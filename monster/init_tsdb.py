@@ -43,8 +43,7 @@ log = logger.get_logger(__name__)
 def init_tsdb():
   """init_tsdb Initialize TimeScaleDB
 
-  Initialize TimeScaleDB; The database specified in the configuration file
-  should be created before run this module.
+  Initialize TimeScaleDB
   """
   connection = utils.init_tsdb_connection()
   username, password = utils.get_idrac_auth()

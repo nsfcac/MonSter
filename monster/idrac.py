@@ -52,7 +52,7 @@ def get_nodes_metadata(nodelist: list, username: str, password: str):
                                     password)
 
   # Process system and bmc info
-  return process.parallel_extract(system_info, bmc_info, nodelist)
+  return process.parallel_extract_metadata(system_info, bmc_info, nodelist)
   
 
 def get_fqdd_source_13g(nodelist: list, api: list, metrics: list, 
@@ -72,3 +72,16 @@ def get_metric_definitions_13g(idrac_metrics: list):
                                'MetricDataType': 'Integer',
                                'Units': unit_map.get(metric, None)})
   return metric_definitions
+
+
+def get_idrac_metrics_13g(api:list, timestamp, idrac_metrics: list, 
+                          nodelist: list, username: str, password: str,
+                          nodeid_map: dict, source_map: dict, fqdd_map: dict):
+  # Get the current time from OS
+  urls = [f"https://{node}{url}" for url in api for node in nodelist]
+  redfish_report = process.run_fetch_all(urls, username, password)
+  if redfish_report:
+    processed_records = process.process_all_idracs(api, timestamp, idrac_metrics,
+                                                   nodelist, redfish_report,
+                                                   nodeid_map, source_map, fqdd_map)
+    return processed_records

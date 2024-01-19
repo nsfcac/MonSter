@@ -7,4 +7,5 @@ prev
 *.vscode
 *.idea
 *.png
+*.sh
 config.yml
