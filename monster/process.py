@@ -35,6 +35,7 @@ import multiprocessing
 import aiohttp
 import asyncio
 from aiohttp import BasicAuth
+from itertools import repeat
 
 log = logger.get_logger(__name__)
 
@@ -88,7 +89,7 @@ def run_fetch_all(urls: list, username: str, password:str):
   return asyncio.run(fetch_all(urls, username, password))
   
 
-def extract(system_info: dict, bmc_info: dict, node: str):  
+def extract_metadata(system_info: dict, bmc_info: dict, node: str):  
   bmc_ip_addr = node
   system_metrics = system_info
   bmc_metrics = bmc_info
@@ -174,7 +175,7 @@ def extract(system_info: dict, bmc_info: dict, node: str):
     log.error(f"Cannot extract info from system and bmc: {err}")
 
 
-def parallel_extract(system_info_list: list, 
+def parallel_extract_metadata(system_info_list: list, 
                      bmc_info_list: list,
                      nodelist: list):
   info = []
@@ -182,7 +183,7 @@ def parallel_extract(system_info_list: list,
                       bmc_info_list,
                       nodelist)
   with multiprocessing.Pool() as pool:
-    info = pool.starmap(extract, process_args)
+    info = pool.starmap(extract_metadata, process_args)
 
   return info
 
@@ -204,3 +205,70 @@ def extract_fqdd_source(redfish_report:list, metrics:list):
             "source": s_value
           })
   return (fqdd, source)
+
+
+def process_all_idracs(idrac_api: list, timestamp, idrac_metrics: list, 
+                       nodelist: list, redfish_report: list,
+                       nodeid_map: dict, source_map: dict, fqdd_map: dict):
+  processed_records = {}
+  # Breakdown the redfish report by API
+  idrac_reports = []
+  for i in range(len(idrac_api)):
+    idrac_reports.append(redfish_report[i * len(nodelist) : (i+1) * len(nodelist)])
+    
+  for idrac_metric in idrac_metrics:
+    table_name = f"idrac.{idrac_metric.lower()}"
+    for reports in idrac_reports:
+      records = parallel_process_idrac(timestamp, idrac_metric, nodelist, reports, 
+                                       nodeid_map, source_map, fqdd_map)
+      if table_name not in processed_records:
+        processed_records[table_name] = records
+      else:
+        processed_records[table_name].extend(records)
+  
+  return processed_records
+
+
+def parallel_process_idrac(timestamp, idrac_metric: str, 
+                           nodelist: list, reports: list, 
+                           nodeid_map: dict, source_map: dict, fqdd_map: dict):
+  records = []
+  process_args = zip(repeat(timestamp), repeat(idrac_metric), nodelist, reports,
+                     repeat(nodeid_map), repeat(source_map), repeat(fqdd_map))
+  with multiprocessing.Pool() as pool:
+    records = pool.starmap(process_node_idrac, process_args)
+  
+  # Remove empty lists
+  records = [item for sublist in records for item in sublist]
+  return records
+
+
+def process_node_idrac(timestamp, idrac_metric: str, node: str, report: list,
+                       nodeid_map: dict, source_map: dict, fqdd_map: dict):
+  records = []
+  # The first item corresponds to the fqdd field
+  # The second item corresponds to the source field
+  # The third item corresponds to the value field
+  field_map = {'Fans'        : ['FanName', '@odata.type', 'Reading'], 
+               'Temperatures': ['Name',    '@odata.type', 'ReadingCelsius'], 
+               'PowerControl': ['Name',    '@odata.type', 'PowerConsumedWatts']}
+  fqdd_field   = field_map.get(idrac_metric)[0]
+  source_field = field_map.get(idrac_metric)[1]
+  value_field  = field_map.get(idrac_metric)[2]
+  
+  if report:
+    try:
+      for item in report.get(idrac_metric, []):
+        fqdd   = item.get(fqdd_field, "None").replace(" ", "_" )
+        source = item.get(source_field, "None")
+        value  = int(item.get(value_field, 0))
+        records.append((timestamp, nodeid_map[node], source_map[source], fqdd_map[fqdd], value))
+    except Exception as err:
+      log.error(f"Cannot process idrac metrics: {err}")
+  
+  return records
+  
+  
+  
+
+  
