@@ -78,12 +78,12 @@ def build_slurm_table_schemas():
       },
       'state':{
         'add_columns': ['Value'],
-        'add_types': ['INT']
+        'add_types': ['TEXT']
       },
       'node_jobs':{
         'add_columns': ['Jobs', 'CPUs'],
         'add_types': ['INTEGER[]', 'INTEGER[]']
-      }
+      },
     }
     for table_name, detail in add_tables.items():
       column_names = ['Timestamp', 'NodeID']

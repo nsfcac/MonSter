@@ -42,7 +42,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Initialize the TimeScaleDB tables by running the `init_db.py` script.
+5. Initialize the TimeScaleDB tables by running the `init_db.py` script.
 
 ```bash
 python3 ./monster/init_tsdb.py
@@ -50,15 +50,22 @@ python3 ./monster/init_tsdb.py
 
 ## Start and Stop MonSter
 
-1. Run the code to collect the data from iDRAC8 nodes and insert the data into the TimeScaleDB database.
+1. Activate the virtual environment.
+
+```bash
+source .venv/bin/activate
+```
+
+2. Run the code to collect the data from iDRAC8 nodes and Slurm, and insert the data into the TimeScaleDB database.
 
 ```bash
 nohup python3 ./monster/monit_idrac.py >/dev/null 2>&1 &
+nohup python3 ./monster/monit_slurm.py >/dev/null 2>&1 &
 ```
 
-2. Stop the code by killing the process.
+3. Stop the code by killing the process.
 
 ```bash
-ps aux | grep monit_idrac.py
-kill -9 <PID>
+pkill -f monit_idrac.py
+pkill -f monit_slurm.py
 ```

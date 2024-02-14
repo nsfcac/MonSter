@@ -63,8 +63,9 @@ def monit_idrac():
     
     conn.commit()
 
+
 if __name__ == '__main__':
-  schedule.every(1).minutes.do(monit_idrac)
+  schedule.every().minutes.at(":00").do(monit_idrac)
   while True:
     schedule.run_pending()
     time.sleep(1)

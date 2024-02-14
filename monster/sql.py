@@ -33,6 +33,23 @@ import utils
 
 from pgcopy import CopyManager
 
+job_info_column_names = ['job_id', 'array_job_id', 'array_task_id', 'name', 
+                        'job_state', 'user_id', 'user_name', 'group_id', 
+                        'cluster', 'partition', 'command', 
+                        'current_working_directory', 'batch_flag', 'batch_host',
+                        'nodes', 'node_count', 'cpus', 'tasks', 
+                        'tasks_per_node', 'cpus_per_task', 'memory_per_node', 
+                        'memory_per_cpu', 'priority', 'time_limit', 'deadline', 
+                        'submit_time', 'preempt_time', 'suspend_time', 
+                        'eligible_time', 'start_time', 'end_time', 
+                        'resize_time', 'restart_cnt', 'exit_code', 
+                        'derived_exit_code']
+job_info_column_types = ['INT PRIMARY KEY', 'INT', 'INT', 'TEXT', 'TEXT', 'INT', 
+                        'TEXT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 
+                        'BOOLEAN', 'TEXT', 'TEXT[]', 'INT', 'INT', 'INT', 'INT', 
+                        'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 
+                        'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT']
+
 
 def create_metadata_table_sql(nodes_metadata: list, table_name: str):
   column_names = list(nodes_metadata[0].keys())
@@ -115,7 +132,7 @@ def write_fqdd_source_metadata(conn: object, fqdd_source_metadata: list, table_n
     
     
 def create_metric_table_sqls(table_schemas: dict,
-                               schema_name: str):
+                             schema_name: str):
     sql_statements = {}
     schema_sql = f"CREATE SCHEMA IF NOT EXISTS {schema_name};"
     sql_statements.update({
@@ -157,25 +174,9 @@ def create_slurm_job_table_sql(schema_name: str):
       'schema_sql': schema_sql
     })
     tables_sql = []
-    column_names = ['job_id', 'array_job_id', 'array_task_id', 'name', 
-                    'job_state', 'user_id', 'user_name', 'group_id', 
-                    'cluster', 'partition', 'command', 
-                    'current_working_directory', 'batch_flag', 'batch_host',
-                    'nodes', 'node_count', 'cpus', 'tasks', 
-                    'tasks_per_node', 'cpus_per_task', 'memory_per_node', 
-                    'memory_per_cpu', 'priority', 'time_limit', 'deadline', 
-                    'submit_time', 'preempt_time', 'suspend_time', 
-                    'eligible_time', 'start_time', 'end_time', 
-                    'resize_time', 'restart_cnt', 'exit_code', 
-                    'derived_exit_code']
-    column_types = ['INT PRIMARY KEY', 'INT', 'INT', 'TEXT', 'TEXT', 'INT', 
-                    'TEXT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 
-                    'BOOLEAN', 'TEXT', 'TEXT[]', 'INT', 'INT', 'INT', 'INT', 
-                    'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 
-                    'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT']
     column_str = ''
-    for i, column in enumerate(column_names):
-        column_str += f'{column} {column_types[i]}, '
+    for i, column in enumerate(job_info_column_names):
+        column_str += f'{column} {job_info_column_types[i]}, '
 
     table_sql = f"CREATE TABLE IF NOT EXISTS {schema_name}.{table} \
         ({column_str[:-2]});"
