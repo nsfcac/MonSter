@@ -9,4 +9,6 @@ prev
 *.png
 *.sh
 *.out
+*.json
 config.yml
+token.json

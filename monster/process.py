@@ -29,31 +29,17 @@ Author:
     Jie Li, jie.li@ttu.edu
 """
 
+import sql
 import logger
 
 import multiprocessing
 import aiohttp
 import asyncio
+import hostlist
 from aiohttp import BasicAuth
 from itertools import repeat
 
 log = logger.get_logger(__name__)
-
-
-def partition(arr:list, cores: int):
-  groups = []
-  arr_len = len(arr)
-  arr_per_core = arr_len // cores
-  arr_surplus = arr_len % cores
-
-  increment = 1
-  for i in range(cores):
-    if(arr_surplus != 0 and i == (cores-1)):
-      groups.append(arr[i * arr_per_core:])
-    else:
-      groups.append(arr[i * arr_per_core : increment * arr_per_core])
-      increment += 1
-  return groups
 
 
 async def base_fetch(url: str, session: aiohttp.ClientSession, max_retries=3, retry_delay=2):
@@ -266,6 +252,108 @@ def process_node_idrac(timestamp, idrac_metric: str, node: str, report: list,
   return records
   
   
+def process_job_metrics_slurm(jobs_metrics: list):
+  jobs_info = []
+  attributes = sql.job_info_column_names
+  for job in jobs_metrics:
+    if job['nodes']:
+      hostnames = hostlist.expand_hostlist(job['nodes'])
+    else:
+      hostnames = []
+    info = []
+    for attribute in attributes:
+      if attribute == 'nodes':
+        info.append(hostnames)
+      else:
+        info.append(job.get(attribute, None))
+    jobs_info.append(tuple(info))
+    
+  return jobs_info
+
+
+def process_node_metrics_slurm(nodes_metrics: list, 
+                               hostname_id_map: dict,
+                               timestamp):
+    nodes_info = {}
+    for node in nodes_metrics:
+      node_id = hostname_id_map[node['hostname']]
+
+      state = node['state']
+      if state == 'down':            
+        cpu_load       = 0
+        memory_used    = 0
+        f_memory_usage = 0.0
+      else:
+        cpu_load = int(node['cpu_load'])
+        # Some down nodes report cpu_load large than 2147483647, which is 
+        # not INT4 and cannot saved in TSDB, we set it to -1
+        if cpu_load > 2147483647: 
+            cpu_load = -1
+            
+        # Memory usage
+        free_memory = node['free_memory']
+        real_memory = node['real_memory']
+        memory_usage = ((real_memory - free_memory)/real_memory) * 100
+        memory_used = real_memory - free_memory
+        f_memory_usage = float("{:.2f}".format(memory_usage))
+            
+      # Check if reason is already in the previous record.
+      node_data = {
+          'cpu_load'   : cpu_load,
+          'memoryusage': f_memory_usage,
+          'memory_used': memory_used,
+          'state'      : state,
+      }
+      nodes_info.update({
+          node_id: node_data
+      })
+      
+    # Convert nodes_info to lists of tuples, each tuple is a record to be inserted
+    # Each list corresponds to the key in node_data
+    cpu_load_record    = []
+    memoryusage_record = []
+    memory_used_record = []
+    state_record       = []
+    for node_id, node_data in nodes_info.items():
+      cpu_load_record.append((timestamp, int(node_id), node_data['cpu_load']))
+      memoryusage_record.append((timestamp, int(node_id), node_data['memoryusage']))
+      memory_used_record.append((timestamp, int(node_id), node_data['memory_used']))
+      state_record.append((timestamp, int(node_id), node_data['state']))
+    
+    records = {
+      'cpu_load'   : cpu_load_record,
+      'memoryusage': memoryusage_record,
+      'memory_used': memory_used_record,
+      'state'      : state_record,
+    }
+    
+    return records
   
 
+def process_node_job_correlation(jobs_metrics: list, 
+                                 hostname_id_map: dict,
+                                 timestamp):
+  nodes_jobs = {}
+  for job in jobs_metrics:
+    if job['job_state'] == "RUNNING":
+      job_id = job['job_id']
+      allocated_nodes = job['job_resources']['allocated_nodes']
+      for item in allocated_nodes:
+        nodeid = hostname_id_map[item['nodename']]
+        cpus   = item['cpus_used']
+        if nodeid not in nodes_jobs:
+          nodes_jobs.update({
+            nodeid: {
+              'jobs': [job_id],
+              'cpus': [cpus]
+            }
+          })
+        else:
+          nodes_jobs[nodeid]['jobs'].append(job_id)
+          nodes_jobs[nodeid]['cpus'].append(cpus)
+  
+  # Convert nodes_jobs to lists of tuples, each tuple is a record to be inserted
+  records = [(timestamp, int(nodeid), nodes_jobs[nodeid]['jobs'], nodes_jobs[nodeid]['cpus']) for nodeid in nodes_jobs]
+
+  return records
   

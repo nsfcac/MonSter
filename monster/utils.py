@@ -32,6 +32,8 @@ Author:
 import os
 import yaml
 import hostlist
+import psycopg2
+
 from pathlib import Path
 
 import logger
@@ -70,6 +72,7 @@ def parse_config():
       return cfg
   except Exception as err:
     log.error(f"Parsing Configuration Error: {err}")
+    raise SystemExit(1)
         
 
 def init_tsdb_connection():
@@ -93,6 +96,11 @@ def init_tsdb_connection():
     raise SystemExit(1)
   
   return f"postgresql://{db_user}:{db_pswd}@{db_host}:{db_port}/{db_dbnm}"
+
+
+def get_partition():
+  partition = parse_config()['partition']
+  return partition
 
 
 def get_idrac_auth():
@@ -121,22 +129,37 @@ def get_nodelist():
     return nodelist
   except Exception as err:
     log.error(f"Cannot generate nodelist: {err}")
+    raise SystemExit(1)
     
 
 def get_idrac_api():
-  idrac_api = parse_config()['idrac']['api'].values()
-  return idrac_api
+  try:
+    idrac_api = parse_config()['idrac']['api'].values()
+    return idrac_api
+  except Exception as err:
+    log.error(f"Cannot find idrac_api configuration: {err}")
+    raise SystemExit(1)
 
 
 def get_idrac_model():
-  idrac_model = parse_config()['idrac']['model']
-  return idrac_model
+  try:
+    idrac_model = parse_config()['idrac']['model']
+    return idrac_model
+  except Exception as err:
+    log.error(f"Cannot find idrac_model configuration: {err}")
+    raise SystemExit(1)
 
 
 def get_idrac_metrics():
-  idrac_metrics = parse_config()['idrac']['metrics']
-  return idrac_metrics
-
+  idrac_model = get_idrac_model()
+  if idrac_model == "13G":
+    try:
+      idrac_metrics = parse_config()['idrac']['metrics']
+      return idrac_metrics
+    except Exception as err:
+      log.error(f"Cannot find idrac_metrics configuration: {err}")
+      raise SystemExit(1)
+    
 
 def get_nodeid_map(conn: object):
   mapping = {}
@@ -162,3 +185,45 @@ def get_fqdd_source_map(conn: object, table: str):
     })
   cur.close()
   return mapping
+
+
+def get_slurm_config():
+  try:
+    slurm_config = parse_config()['slurm_rest_api']
+    return slurm_config
+  except Exception as err:
+    # Exit if the configuration file is not found
+    log.error(f"Cannot find slurm_rest_api configuration: {err}")
+    raise SystemExit(1)
+  
+
+def get_ip_hostname_map(connection: str):    
+  mapping = {}
+  try:
+    with psycopg2.connect(connection) as conn:
+      cur = conn.cursor()
+      cur.execute("SELECT bmc_ip_addr, hostname FROM nodes")
+      for (bmc_ip_addr, hostname) in cur.fetchall():
+        mapping.update({
+          bmc_ip_addr: hostname
+        })
+      cur.close()
+      return mapping
+  except Exception as err:
+    log.error(f"Cannot generate ip-hostname mapping: {err}")
+    
+
+def get_hostname_id_map(connection: str):    
+  mapping = {}
+  try:
+    with psycopg2.connect(connection) as conn:
+      cur = conn.cursor()
+      cur.execute("SELECT hostname, nodeid FROM nodes")
+      for (hostname, nodeid) in cur.fetchall():
+        mapping.update({
+          hostname: nodeid
+        })
+      cur.close()
+      return mapping
+  except Exception as err:
+    log.error(f"Cannot generate ip-hostname mapping: {err}")
