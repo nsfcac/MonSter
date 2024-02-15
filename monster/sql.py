@@ -51,7 +51,7 @@ job_info_column_types = ['INT PRIMARY KEY', 'INT', 'INT', 'TEXT', 'TEXT', 'INT',
                         'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT']
 
 
-def create_metadata_table_sql(nodes_metadata: list, table_name: str):
+def generate_metadata_table_sql(nodes_metadata: list, table_name: str):
   column_names = list(nodes_metadata[0].keys())
   column_str = ""
   for i, column in enumerate(column_names):
@@ -114,13 +114,13 @@ def update_metadata(conn: object, nodes_metadata: list, table_name: str):
     cur.execute(sql)  
     
     
-def create_source_table_sql():
+def generate_source_table_sql():
   source_table_sql = "CREATE TABLE IF NOT EXISTS source \
           (id SERIAL PRIMARY KEY, source TEXT NOT NULL);"
   return source_table_sql
   
 
-def create_fqdd_table_sql():
+def generate_fqdd_table_sql():
   fqdd_table_sql = "CREATE TABLE IF NOT EXISTS fqdd \
           (id SERIAL PRIMARY KEY, fqdd TEXT NOT NULL);"
   return fqdd_table_sql
@@ -131,7 +131,7 @@ def write_fqdd_source_metadata(conn: object, fqdd_source_metadata: list, table_n
     insert_metadata(conn, fqdd_source_metadata, table_name)
     
     
-def create_metric_table_sqls(table_schemas: dict,
+def generate_metric_table_sqls(table_schemas: dict,
                              schema_name: str):
     sql_statements = {}
     schema_sql = f"CREATE SCHEMA IF NOT EXISTS {schema_name};"
@@ -166,7 +166,7 @@ def create_metric_table_sqls(table_schemas: dict,
     return sql_statements
   
 
-def create_slurm_job_table_sql(schema_name: str):
+def generate_slurm_job_table_sql(schema_name: str):
     sql_statements = {}
     table = 'jobs'
     schema_sql = f"CREATE SCHEMA if NOT EXISTS {schema_name}"
@@ -189,7 +189,7 @@ def create_slurm_job_table_sql(schema_name: str):
     return sql_statements
   
 
-def create_metric_def_table_sql():
+def generate_metric_def_table_sql():
     metric_def_table_sql = "CREATE TABLE IF NOT EXISTS metrics_definition \
             (id SERIAL PRIMARY KEY, metric_id TEXT NOT NULL, metric_name TEXT, \
             description TEXT, metric_type TEXT,  metric_data_type TEXT, \

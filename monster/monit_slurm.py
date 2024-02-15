@@ -34,7 +34,6 @@ import slurm
 import process
 
 import time
-import json
 import schedule
 import psycopg2
 from datetime import datetime
@@ -54,14 +53,14 @@ def monit_slurm():
   jobs_metrics  = slurm.get_slurm_jobs_metrics(slurm_config, partition)
   nodes_metrics = slurm.get_slurm_nodes_metrics(slurm_config, hostname_list)
   
-  # # Extract job information
+  # Extract job information
   jobs_info = process.process_job_metrics_slurm(jobs_metrics)
     
-  # # Extract node information
+  # Extract node information
   nodes_info = process.process_node_metrics_slurm(nodes_metrics, 
                                                   hostname_id_map,
                                                   timestamp)
-  # Extrac node-job correlation
+  # Extract node-job correlation
   nodes_jobs = process.process_node_job_correlation(jobs_metrics,
                                                     hostname_id_map,
                                                     timestamp)
