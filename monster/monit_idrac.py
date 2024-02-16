@@ -40,12 +40,12 @@ from pgcopy import CopyManager
 
 def monit_idrac():
   cols = ('timestamp', 'nodeid', 'source', 'fqdd', 'value')
-  connection = utils.init_tsdb_connection()
+  connection         = utils.init_tsdb_connection()
   username, password = utils.get_idrac_auth()
-  nodelist = utils.get_nodelist()
-  idrac_api = utils.get_idrac_api()
-  idrac_model = utils.get_idrac_model()
-  idrac_metrics = utils.get_idrac_metrics()
+  nodelist           = utils.get_nodelist()
+  idrac_api          = utils.get_idrac_api()
+  idrac_model        = utils.get_idrac_model()
+  idrac_metrics      = utils.get_idrac_metrics()
   
   with psycopg2.connect(connection) as conn:
     nodeid_map = utils.get_nodeid_map(conn)

@@ -36,11 +36,11 @@ log = logger.get_logger(__name__)
 
 
 def get_nodes_metadata(nodelist: list, username: str, password: str):
-  bmc_base_url = "/redfish/v1/Managers/iDRAC.Embedded.1"
   system_base_url = "/redfish/v1/Systems/System.Embedded.1"
+  bmc_base_url    = "/redfish/v1/Managers/iDRAC.Embedded.1"
 
   system_urls = ["https://" + node + system_base_url for node in nodelist]
-  bmc_urls = ["https://" + node + bmc_base_url for node in nodelist]
+  bmc_urls    = ["https://" + node + bmc_base_url for node in nodelist]
 
   # Fetch system info
   system_info = process.run_fetch_all(system_urls, 
@@ -81,7 +81,7 @@ def get_idrac_metrics_13g(api:list, timestamp, idrac_metrics: list,
   urls = [f"https://{node}{url}" for url in api for node in nodelist]
   redfish_report = process.run_fetch_all(urls, username, password)
   if redfish_report:
-    processed_records = process.process_all_idracs(api, timestamp, idrac_metrics,
+    processed_records = process.process_all_idracs_13g(api, timestamp, idrac_metrics,
                                                    nodelist, redfish_report,
                                                    nodeid_map, source_map, fqdd_map)
     return processed_records

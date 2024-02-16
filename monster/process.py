@@ -73,15 +73,16 @@ def run_fetch_all(urls: list, username: str, password:str):
   
 
 def extract_metadata(system_info: dict, bmc_info: dict, node: str):  
-  bmc_ip_addr = node
+  bmc_ip_addr    = node
   system_metrics = system_info
-  bmc_metrics = bmc_info
+  bmc_metrics    = bmc_info
   
-  general = ["UUID", "SerialNumber", "HostName", "Model", "Manufacturer"]
+  general   = ["UUID", "SerialNumber", "HostName", "Model", "Manufacturer"]
   processor = ["ProcessorModel", "ProcessorCount", "LogicalProcessorCount"]
-  memory = ["TotalSystemMemoryGiB"]
-  bmc = ["BmcModel", "BmcFirmwareVersion"]
-  metrics = {}
+  memory    = ["TotalSystemMemoryGiB"]
+  bmc       = ["BmcModel", "BmcFirmwareVersion"]
+  metrics   = {}
+  
   try:
     # Update service tag
     if system_metrics:
@@ -190,9 +191,9 @@ def extract_fqdd_source(redfish_report:list, metrics:list):
   return (fqdd, source)
 
 
-def process_all_idracs(idrac_api: list, timestamp, idrac_metrics: list, 
-                       nodelist: list, redfish_report: list,
-                       nodeid_map: dict, source_map: dict, fqdd_map: dict):
+def process_all_idracs_13g(idrac_api: list, timestamp, idrac_metrics: list, 
+                           nodelist: list, redfish_report: list,
+                           nodeid_map: dict, source_map: dict, fqdd_map: dict):
   processed_records = {}
   # Breakdown the redfish report by API
   idrac_reports = []
@@ -202,8 +203,8 @@ def process_all_idracs(idrac_api: list, timestamp, idrac_metrics: list,
   for idrac_metric in idrac_metrics:
     table_name = f"idrac.{idrac_metric.lower()}"
     for reports in idrac_reports:
-      records = parallel_process_idrac(timestamp, idrac_metric, nodelist, reports, 
-                                       nodeid_map, source_map, fqdd_map)
+      records = parallel_process_idrac_13g(timestamp, idrac_metric, nodelist, 
+                                           reports, nodeid_map, source_map, fqdd_map)
       if table_name not in processed_records:
         processed_records[table_name] = records
       else:
@@ -212,22 +213,22 @@ def process_all_idracs(idrac_api: list, timestamp, idrac_metrics: list,
   return processed_records
 
 
-def parallel_process_idrac(timestamp, idrac_metric: str, 
-                           nodelist: list, reports: list, 
-                           nodeid_map: dict, source_map: dict, fqdd_map: dict):
+def parallel_process_idrac_13g(timestamp, idrac_metric: str, nodelist: list, 
+                               reports: list, nodeid_map: dict, source_map: dict, 
+                               fqdd_map: dict):
   records = []
   process_args = zip(repeat(timestamp), repeat(idrac_metric), nodelist, reports,
                      repeat(nodeid_map), repeat(source_map), repeat(fqdd_map))
   with multiprocessing.Pool() as pool:
-    records = pool.starmap(process_node_idrac, process_args)
+    records = pool.starmap(process_node_idrac_13g, process_args)
   
   # Remove empty lists
   records = [item for sublist in records for item in sublist]
   return records
 
 
-def process_node_idrac(timestamp, idrac_metric: str, node: str, report: list,
-                       nodeid_map: dict, source_map: dict, fqdd_map: dict):
+def process_node_idrac_13g(timestamp, idrac_metric: str, node: str, report: list,
+                           nodeid_map: dict, source_map: dict, fqdd_map: dict):
   records = []
   # The first item corresponds to the fqdd field
   # The second item corresponds to the source field
