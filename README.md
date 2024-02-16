@@ -56,6 +56,14 @@ CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 **Metrics Builder** acts as a middleware between the consumers (i.e. analytic clients or tools) and the producers (i.e. the databases). Its provides APIs for [the web applications](https://idatavisualizationlab.github.io/HPCC/) and accelerates the data query performance.
 
+## Setup ##
+Configure the SSL certificate and key for the MetricsBuilder API server. We use [Let's Encrypt](https://letsencrypt.org/) to get the SSL certificate and key.
+
+```bash
+export UVICORN_KEY=/path/to/ssl/key
+export UVICORN_CERT=/path/to/ssl/cert
+```
+
 # Run MonSter and MetricsBuilder #
 
 1. Set up the virtual environment and install the required packages.
@@ -85,7 +93,7 @@ nohup python ./monster/monit_slurm.py >/dev/null 2>&1 &
 4. Run the MetricsBuilder API server at localhost:5000.
 
 ```bash
-nohup uvicorn mbuilder.mb_api:app --host 0.0.0.0 --port 5000 >/dev/null 2>&1 &
+nohup uvicorn mbuilder.mb_api:app --host 0.0.0.0 --port 5000 --ssl-keyfile $UVICORN_KEY --ssl-certfile $UVICORN_CERT >/dev/null 2>&1 &
 ```
 
 5. Stop the running services.
