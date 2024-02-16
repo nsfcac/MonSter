@@ -90,9 +90,16 @@ nohup python ./monster/monit_idrac.py >/dev/null 2>&1 &
 nohup python ./monster/monit_slurm.py >/dev/null 2>&1 &
 ```
 
-4. Stop the code by killing the process.
+4. Run the MetricsBuilder API server at localhost:5000.
 
 ```bash
-pkill -f monit_idrac.py
-pkill -f monit_slurm.py
+nohup uvicorn mbuilder.mb_api:app --host 0.0.0.0 --port 5000 >/dev/null 2>&1 &
+```
+
+5. Stop the running services.
+
+```bash
+kill $(ps aux | grep 'mb_api' | grep -v grep | awk '{print $2}')
+kill $(ps aux | grep 'monit_idrac' | grep -v grep | awk '{print $2}')
+kill $(ps aux | grep 'monit_slurm' | grep -v grep | awk '{print $2}')
 ```
