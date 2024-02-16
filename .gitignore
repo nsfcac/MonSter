@@ -10,6 +10,7 @@ prev
 *.sh
 *.out
 *.json
+*.pem
 config.yml
 token.json
 json
