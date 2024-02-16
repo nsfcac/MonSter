@@ -37,9 +37,9 @@ from logging.handlers import TimedRotatingFileHandler
 
 def setup_logger(file_name):
   monster_path = Path(__file__).resolve().parent.parent
-  log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_format   = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
   
-  logger = logging.getLogger(file_name)
+  logger    = logging.getLogger(file_name)
   formatter = logging.Formatter(log_format)
 
   log_handler = TimedRotatingFileHandler(filename=f'{monster_path}/log/monster.log', when="midnight", interval=1, backupCount=7)
