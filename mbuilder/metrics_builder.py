@@ -30,6 +30,7 @@ Author:
 """
 import os
 import sys
+import json
 import hostlist
 import multiprocessing
 
@@ -42,20 +43,20 @@ sys.path.append(monster_dir)
 import utils
 import mb_utils 
 
-def metric_builder(start=None, 
-                   end=None, 
-                   interval=None, 
-                   aggregation=None, 
-                   nodelist=None, 
-                   metrics=None, 
-                   compression=None):
+def metrics_builder(start=None, 
+                    end=None, 
+                    interval=None, 
+                    aggregation=None, 
+                    nodelist=None, 
+                    metrics=None, 
+                    compression=None):
   results = {}
   tables = []
   
-  connection = utils.init_tsdb_connection()  
-  nodelist   = hostlist.expand_hostlist(nodelist)
+  connection          = utils.init_tsdb_connection()  
   ip_hostname_mapping = utils.get_ip_hostname_map(connection)
   metrics_mapping     = mb_utils.get_metrics_map()
+  nodelist            = hostlist.expand_hostlist(nodelist)
   
   # Convert IPs to hostnames of the nodes
   nodelist = [ip_hostname_mapping[ip] for ip in nodelist]
@@ -82,13 +83,28 @@ def metric_builder(start=None,
   
   # Combine the results
   for table, record in zip(tables, records):
+    if compression:
+      record = mb_utils.compress_json(record)
     results[table] = record
   
-  # Compress the results if needed
-  if compression:
-    results = mb_utils.compress_json(results)
+  for source, tables in metrics_mapping.items():
+    for table in tables.values():
+      if f'{source}.{table}' not in results.keys():
+        results[f'{source}.{table}'] = []
+        
   return results
 
+
 if __name__ == "__main__":
-  results = metric_builder()
-  print(results)
+  start = '2024-02-13 12:00:00-06'
+  end = '2024-02-14 12:00:00-06'
+  interval = '5m'
+  aggregation = 'max'
+  nodelist = "10.101.1.[1-60],10.101.2.[1-60],10.101.3.[1-56],10.101.4.[1-48],10.101.5.[1-24],10.101.6.[1-20],10.101.7.[1-3,5-60],10.101.8.[1-60],10.101.9.[1-60],10.101.10.[25-44]"
+  metrics = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm']
+  compression = False
+  results = metrics_builder(start, end, interval, aggregation, nodelist, metrics, compression)
+  
+  # Write the results to a file
+  with open(f"../json/results-{start.split(' ')[0]}-{end.split(' ')[0]}.json", "w") as f:
+    f.write(json.dumps(results))

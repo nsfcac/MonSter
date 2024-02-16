@@ -1,0 +1,181 @@
+openapi: 3.0.0
+info:
+  title: MetricsBuilder API
+  description: MetricsBuilder APIs for Accessing Monitoring Metrics Collected via MonSter.
+  contact:
+    email: jie.li@ttu.edu
+    name: Jie Li
+  license: 
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+  version: 2.0.0
+  
+servers:
+  - url: http://hugo.hpcc.ttu.edu:{port}/{basePath}
+    description: Hugo Server
+    variables:
+      port:
+        default: '5000'
+      basePath:
+        default: quanah
+
+paths:
+  /metricsbuilder:      
+    get:
+      summary: Query Monitoring Metrics
+      description: Execute queries for monitoring metrics, job information, etc.
+      operationId: metricsbuilder
+      parameters:
+      - description: Start time of the time range
+        in: query
+        name: start
+        schema:
+          example: 2024-02-14T10:00:00-06:00
+          type: string
+      - description: End time of the time range
+        in: query
+        name: end
+        schema:
+          example: 2024-02-14T12:00:00-06:00
+          type: string
+      - description: Time interval for aggregating the metrics.
+        in: query
+        name: interval
+        schema:
+          type: string
+          pattern: ^[1-9][0-9]*[s, m, h, d, w]$
+          default: 5m
+          example: 5m
+      - description: Aggregation function.
+        in: query
+        name: aggregation
+        required: false
+        schema:
+          type: string
+          enum:
+          - min
+          - max
+          - mean
+          - median
+          default: max
+          example: max
+      - description: Target nodes in the cluster.
+        in: query
+        name: nodelist
+        required: false
+        schema:
+          type: string
+          default: 10.101.1.[1-60],10.101.2.[1-60]
+          example: 10.101.1.[1-60],10.101.7.[1-3,5-60]
+      - description: Selected Metrics.
+        explode: true
+        in: query
+        name: metrics
+        required: false
+        schema:
+          items:
+            enum:
+            - SystemPower_iDRAC
+            - CPUPower_iDRAC
+            - MemoryPower_iDRAC
+            - Fan_iDRAC
+            - Temperature_iDRAC
+            - MemoryUsage_Slurm
+            - NodeJobsCorrelation_Slurm
+            - JobsInfo_Slurm
+            - NodesState_Slurm
+            type: string
+          type: array
+          default:
+          - SystemPower_iDRAC
+          - NodeJobsCorrelation_Slurm
+          - JobsInfo_Slurm
+      - description: Return compressed data.
+        in: query
+        name: compression
+        required: false
+        schema:
+          type: boolean
+          enum:
+          - true
+          - false
+          default: true
+          example: true
+      responses:
+        "200":
+          description: Return metrics to web applications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseMetrics'
+              example:
+                idrac.powercontrol:
+                - time: 1707924000
+                  node: cpu-1-1
+                  label: System_Power_Control
+                  value: 327
+                - time: 1707924000
+                  node: cpu-2-1
+                  label: System_Power_Control
+                  value: 313
+                slurm.node_jobs:
+                - time: 1707924000
+                  node: cpu-1-1
+                  jobs: [12644555, 12644556]
+                  cpus: [18, 18]
+                slurm.jobs:
+                - job_id: 12644555
+                  job_state: "RUNNING"
+                  user_id: 9820
+                  submit_time: 1706889239
+                  start_time: 1707785483
+        default:
+            $ref: '#/components/responses/DefaultError'
+
+components:
+  schemas:
+    ResponseMetrics:
+      properties:
+        slurm.jobs:
+          items:
+            type: object
+          type: array
+        slurm.node_jobs:
+          items:
+            type: object
+          type: array
+        slurm.state:
+          items:
+            type: object
+          type: array
+        slurm.memoryusage:
+          items:
+            type: object
+          type: array
+        idrac.fans:
+          items:
+            type: object
+          type: array
+        idrac.temperatures:
+          items:
+            type: object
+          type: array
+        idrac.powercontrol:
+          items:
+            type: object
+          type: array
+  responses:
+    DefaultError:
+      description: default error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              message:
+                type: string
+          example:
+            name: 'ERROR'
+            message: 'Internal Server Error'

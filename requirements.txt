@@ -1,6 +1,9 @@
+fastapi-code-generator
+fastapi
+
 PyYAML
 python-hostlist
-psycopg2
+psycopg2-binary
 aiohttp
 requests
 pgcopy

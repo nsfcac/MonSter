@@ -70,33 +70,27 @@ openapi-generator generate -i openapi.yaml -g python-flask -o ./mbuilder_server
 
 ```bash
 # Create the virtual environment
-python3 -m venv .venv
+python3.9 -m venv .venv
 # Activate the virtual environment
 source .venv/bin/activate
 # Install the required packages
 pip install -r requirements.txt
 ```
 
-2. Activate the virtual environment.
+2. Initialize the TimeScaleDB tables by running the `init_db.py` script.
 
 ```bash
-source .venv/bin/activate
+python ./monster/init_tsdb.py
 ```
 
-3. Initialize the TimeScaleDB tables by running the `init_db.py` script.
+3. Run the code to collect the data from iDRAC8 nodes and Slurm.
 
 ```bash
-python3 ./monster/init_tsdb.py
+nohup python ./monster/monit_idrac.py >/dev/null 2>&1 &
+nohup python ./monster/monit_slurm.py >/dev/null 2>&1 &
 ```
 
-4. Run the code to collect the data from iDRAC8 nodes and Slurm.
-
-```bash
-nohup python3 ./monster/monit_idrac.py >/dev/null 2>&1 &
-nohup python3 ./monster/monit_slurm.py >/dev/null 2>&1 &
-```
-
-5. Stop the code by killing the process.
+4. Stop the code by killing the process.
 
 ```bash
 pkill -f monit_idrac.py

@@ -12,3 +12,5 @@ prev
 *.json
 config.yml
 token.json
+json
+mbuilder_server
