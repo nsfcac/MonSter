@@ -31,14 +31,12 @@ Author:
 
 import os
 import sys
-import json
-import gzip
 
 import pandas as pd
 import sqlalchemy as db
 
-import mb_sql
-import mb_utils
+import mbuilder.mb_sql as mb_sql
+import mbuilder.mb_utils as mb_utils
 
 cur_dir = os.path.dirname(__file__)
 monster_dir = os.path.join(cur_dir, '../monster')
@@ -77,32 +75,39 @@ def get_jobs_cpus(row, item):
   
 
 def query_db(connection: str, sql: str, nodelist: list):
+  record = {} 
   engine    = db.create_engine(connection)
   dataframe = pd.read_sql_query(sql, engine)
-    
-  # If the dataframe has a node colume, remove rows that are not in the nodelist
-  if 'node' in dataframe.columns:
-    dataframe = dataframe[dataframe['node'].isin(nodelist)]
-    
-  # If the dataframe has a time colume, convert it to epoch time
-  if 'time' in dataframe.columns:
-    dataframe['time'] = pd.to_datetime(dataframe['time'])
-    dataframe['time'] = dataframe['time'].astype(int) // 10**9
-    
-  if 'jobs' in dataframe.columns:
-    # Copy the jobs column to a new column, this is for the get_jobs_cpus function.
-    # The get_jobs_cpus function will modify the jobs column, so we need to keep a 
-    # copy of the original jobs column to avoid the error when applying the 
-    # get_jobs_cpus function on the cpus column.
-    dataframe['jobs_copy'] = dataframe['jobs']
-    dataframe['jobs'] = dataframe.apply(lambda x: get_jobs_cpus(x, 'jobs'), axis=1)
-    dataframe['cpus'] = dataframe.apply(lambda x: get_jobs_cpus(x, 'cpus'), axis=1)
-    # Drop the jobs_copy column
-    dataframe = dataframe.drop(columns=['jobs_copy'])
   
-  # Convert the dataframe to a dictionary
-  dataframe = dataframe.to_dict(orient='records')
-  return dataframe
+  # If the dataframe is not empty
+  if not dataframe.empty:
+    # If the dataframe has a node colume, remove rows that are not in the nodelist
+    if 'node' in dataframe.columns:
+      dataframe = dataframe[dataframe['node'].isin(nodelist)]
+      
+    # If the dataframe has a time colume, convert it to epoch time
+    if 'time' in dataframe.columns:
+      dataframe['time'] = pd.to_datetime(dataframe['time'])
+      dataframe['time'] = dataframe['time'].astype(int) // 10**9
+      
+    if 'jobs' in dataframe.columns:
+      # Copy the jobs column to a new column, this is for the get_jobs_cpus function.
+      # The get_jobs_cpus function will modify the jobs column, so we need to keep a 
+      # copy of the original jobs column to avoid the error when applying the 
+      # get_jobs_cpus function on the cpus column.
+      dataframe['jobs_copy'] = dataframe['jobs']
+      dataframe['jobs'] = dataframe.apply(lambda x: get_jobs_cpus(x, 'jobs'), axis=1)
+      dataframe['cpus'] = dataframe.apply(lambda x: get_jobs_cpus(x, 'cpus'), axis=1)
+      # Drop the jobs_copy column
+      dataframe = dataframe.drop(columns=['jobs_copy'])
+    
+    if 'job_id' in dataframe.columns:
+      # fill NaN with 0
+      dataframe = dataframe.fillna(value={'array_task_id': 0, 'memory_per_cpu': 0})
+    
+    # Convert the dataframe to a dictionary
+    record = dataframe.to_dict(orient='records')
+  return record
 
 
 def query_db_wrapper(connection: str, start: str, end: str, interval: str,
@@ -131,13 +136,4 @@ def query_db_wrapper(connection: str, start: str, end: str, interval: str,
     pass
   return metric
 
-
-def compress_json(data):
-  # Serialize the data structure to a JSON string
-  json_string = json.dumps(data)
-  
-  # Compress the JSON string using gzip compression
-  compressed_data = gzip.compress(json_string.encode('utf-8'))
-  
-  return compressed_data
   

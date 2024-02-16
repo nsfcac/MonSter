@@ -38,18 +38,20 @@ from itertools import repeat
 
 cur_dir = os.path.dirname(__file__)
 monster_dir = os.path.join(cur_dir, '../monster')
+mbuilder_dir = os.path.join(cur_dir, '../')
 sys.path.append(monster_dir)
+sys.path.append(mbuilder_dir)
+
 
 import utils
-import mb_utils 
+import mbuilder.mb_utils as mb_utils
 
 def metrics_builder(start=None, 
                     end=None, 
                     interval=None, 
                     aggregation=None, 
                     nodelist=None, 
-                    metrics=None, 
-                    compression=None):
+                    metrics=None):
   results = {}
   tables = []
   
@@ -83,8 +85,6 @@ def metrics_builder(start=None,
   
   # Combine the results
   for table, record in zip(tables, records):
-    if compression:
-      record = mb_utils.compress_json(record)
     results[table] = record
   
   for source, tables in metrics_mapping.items():
@@ -96,12 +96,14 @@ def metrics_builder(start=None,
 
 
 if __name__ == "__main__":
-  start = '2024-02-13 12:00:00-06'
-  end = '2024-02-14 12:00:00-06'
+  start = '2024-02-14 12:00:00-06'
+  end = '2024-02-14 14:00:00-06'
   interval = '5m'
   aggregation = 'max'
-  nodelist = "10.101.1.[1-60],10.101.2.[1-60],10.101.3.[1-56],10.101.4.[1-48],10.101.5.[1-24],10.101.6.[1-20],10.101.7.[1-3,5-60],10.101.8.[1-60],10.101.9.[1-60],10.101.10.[25-44]"
-  metrics = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm']
+  # nodelist = "10.101.1.[1-60],10.101.2.[1-60],10.101.3.[1-56],10.101.4.[1-48],10.101.5.[1-24],10.101.6.[1-20],10.101.7.[1-3,5-60],10.101.8.[1-60],10.101.9.[1-60],10.101.10.[25-44]"
+  nodelist = "10.101.1.[1-60]"
+  # metrics = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm']
+  metrics = ['JobsInfo_Slurm']
   compression = False
   results = metrics_builder(start, end, interval, aggregation, nodelist, metrics, compression)
   

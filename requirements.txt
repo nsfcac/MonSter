@@ -1,6 +1,6 @@
 fastapi-code-generator
 fastapi
-
+uvicorn
 PyYAML
 python-hostlist
 psycopg2-binary

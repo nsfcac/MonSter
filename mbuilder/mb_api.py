@@ -1,26 +1,39 @@
-#!/usr/bin/env python3
-import os
-import sys
-import connexion
+import zlib
+import json
 
-from flask_cors import CORS
+from fastapi import FastAPI, Response
+from pydantic import BaseModel
+from typing import Optional
 
-cur_dir = os.path.dirname(__file__)
-openapi_server_dir = os.path.join(cur_dir, 'mbuilder_server')
-specification_dir  = os.path.join(openapi_server_dir, 'openapi_server', 'openapi')
-sys.path.append(openapi_server_dir)
+from mbuilder.metrics_builder import metrics_builder
 
-from openapi_server import encoder
 
-app = connexion.App(__name__, specification_dir=specification_dir)
-app.app.json_encoder = encoder.JSONEncoder
-app.add_api('openapi.yaml',
-            arguments={'title': 'MetricsBuilder API'},
-            pythonic_params=True)
+class Request(BaseModel):
+    start      : Optional[str]  = "2024-02-14 12:00:00-06"
+    end        : Optional[str]  = "2024-02-14 14:00:00-06"
+    interval   : Optional[str]  = "5m"
+    aggregation: Optional[str]  = "max"
+    nodelist   : Optional[str]  = "10.101.1.[1-60]"
+    metrics    : Optional[list] = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm']
+    compression: Optional[bool] = False
 
-CORS(app.app)
-# crt = os.environ['FLASKCRT']
-# key = os.environ['FLASKKEY']
+app = FastAPI()
 
-# if __name__ == '__main__':
-#   app.run(port=5000, ssl_context=(crt, key))
+@app.post("/quanah")
+def main(request: Request):
+  data = metrics_builder(request.start, 
+                         request.end, 
+                         request.interval, 
+                         request.aggregation, 
+                         request.nodelist, 
+                         request.metrics)
+  if not request.compression:
+    return data
+  else:
+    compressed_data = zlib.compress(json.dumps(data).encode('utf-8'))
+    # Create a FastAPI Response with compressed data
+    response = Response(content=compressed_data)
+    # Set the Content-Encoding header to indicate compressions
+    response.headers["Content-Encoding"] = "deflate"
+    return response
+    
