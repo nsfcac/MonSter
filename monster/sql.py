@@ -64,9 +64,9 @@ def generate_metadata_table_sql(nodes_metadata: list, table_name: str):
 
 def write_nodes_metadata(conn: object, nodes_metadata: list):
   if not check_table_exist(conn, 'nodes'):
-    insert_metadata(conn, nodes_metadata, 'nodes') 
+    insert_metadata(conn, nodes_metadata) 
   else:
-    update_metadata(conn, nodes_metadata, 'nodes')
+    update_metadata(conn, nodes_metadata)
         
 
 def check_table_exist(conn: object, table_name: str):
@@ -85,18 +85,21 @@ def check_table_exist(conn: object, table_name: str):
   return False
 
 
-def insert_metadata(conn: object, nodes_metadata: list, table_name: str):
+def insert_metadata(conn: object, nodes_metadata: list):
     cols = tuple([col.lower() for col in list(nodes_metadata[0].keys())])
     records = []
     for record in nodes_metadata:
-      if table_name == 'nodes':
-        values = [str(value) for value in record.values()]
-        records.append(tuple(values))
-      else:
-        records.append(tuple(record.values()))
-
-    mgr = CopyManager(conn, table_name, cols)
+      values = [str(value) for value in record.values()]
+      records.append(tuple(values))
+    mgr = CopyManager(conn, 'nodes', cols)
     mgr.copy(records)
+    
+
+def insert_fqdd_source_metadata(conn: object, fqdd_source_metadata: list, table_name: str):
+  cols = ('id', table_name)
+  records = [(i+1, fqdd_source_metadata[i]) for i in range(len(fqdd_source_metadata))]
+  mgr = CopyManager(conn, table_name, cols)
+  mgr.copy(records)
     
 
 def update_metadata(conn: object, nodes_metadata: list, table_name: str):
@@ -128,7 +131,7 @@ def generate_fqdd_table_sql():
 
 def write_fqdd_source_metadata(conn: object, fqdd_source_metadata: list, table_name: str):
   if not check_table_exist(conn, table_name):
-    insert_metadata(conn, fqdd_source_metadata, table_name)
+    insert_fqdd_source_metadata(conn, fqdd_source_metadata, table_name)
     
     
 def generate_metric_table_sqls(table_schemas: dict,
@@ -189,7 +192,7 @@ def generate_slurm_job_table_sql(schema_name: str):
     return sql_statements
   
 
-def generate_metric_def_table_sql():
+def generate_metric_def_table_sql_15g():
     metric_def_table_sql = "CREATE TABLE IF NOT EXISTS metrics_definition \
             (id SERIAL PRIMARY KEY, metric_id TEXT NOT NULL, metric_name TEXT, \
             description TEXT, metric_type TEXT,  metric_data_type TEXT, \
@@ -198,11 +201,11 @@ def generate_metric_def_table_sql():
     return metric_def_table_sql
   
 
-def write_metric_definitions(conn: object, metric_definitions: list):
+def write_metric_definitions_15g(conn: object, metric_definitions: list):
   if not check_table_exist(conn, 'metrics_definition'):
     cols = ('metric_id', 'metric_name', 'description', 'metric_type',
-                'metric_data_type', 'units', 'accuracy', 'sensing_interval',
-                'discrete_values', 'data_type')
+            'metric_data_type', 'units', 'accuracy', 'sensing_interval',
+            'discrete_values', 'data_type')
 
     metric_definitions_table = [(i['Id'], i['Name'], i['Description'],
     i['MetricType'], i['MetricDataType'], i['Units'], i['Accuracy'], 
@@ -212,5 +215,23 @@ def write_metric_definitions(conn: object, metric_definitions: list):
     # Sort
     metric_definitions_table = utils.sort_tuple_list(metric_definitions_table)
     
+    mgr = CopyManager(conn, 'metrics_definition', cols)
+    mgr.copy(metric_definitions_table)
+    
+
+def generate_metric_def_table_sql_13g():
+    metric_def_table_sql = "CREATE TABLE IF NOT EXISTS metrics_definition \
+            (id SERIAL PRIMARY KEY, metric_id TEXT, metric_data_type TEXT, \
+             units TEXT, UNIQUE (id));"
+    return metric_def_table_sql
+  
+
+def write_metric_definitions_13g(conn: object, metric_definitions: list):
+  if not check_table_exist(conn, 'metrics_definition'):
+    cols = ('metric_id', 'metric_data_type', 'units')
+
+    metric_definitions_table = [(item['Id'], item['MetricDataType'], item['Units']) 
+                                for  item in metric_definitions]
+
     mgr = CopyManager(conn, 'metrics_definition', cols)
     mgr.copy(metric_definitions_table)

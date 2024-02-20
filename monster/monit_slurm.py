@@ -36,7 +36,10 @@ import process
 import time
 import schedule
 import psycopg2
+import urllib3
 from datetime import datetime
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def monit_slurm():
