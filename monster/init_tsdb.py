@@ -52,22 +52,23 @@ def init_tsdb():
   idrac_model        = utils.get_idrac_model()
   idrac_metrics      = utils.get_idrac_metrics()
     
-  utils.print_status('Getting', 'nodes' , 'metadata')
+  # utils.print_status('Getting', 'nodes' , 'metadata')
   nodes_metadata = idrac.get_nodes_metadata(nodelist, username, password)
   
-  utils.print_status('Getting', 'fqdd and source' , 'information')
+  # utils.print_status('Getting', 'fqdd and source' , 'information')
   if idrac_model == '15G':
-    pass
+    fqdd_source_metadata = idrac.get_fqdd_source_15g(nodelist, username, password)
   elif idrac_model == '13G':
     fqdd_source_metadata = idrac.get_fqdd_source_13g(nodelist, idrac_api, idrac_metrics, 
                                                      username, password)
   
-  utils.print_status('Getting', 'metric' , 'definitions')
+  # utils.print_status('Getting', 'metric' , 'definitions')
   if idrac_model == '15G':
-    pass
+    metric_definitions = idrac.get_metric_definitions_15g(nodelist, username, password)
   elif idrac_model == '13G':
     metric_definitions = idrac.get_metric_definitions_13g(idrac_metrics)
-
+    
+    
   idrac_table_schemas = schema.build_idrac_table_schemas(metric_definitions)
   slurm_table_schemas = schema.build_slurm_table_schemas()
     
@@ -118,9 +119,13 @@ def init_tsdb():
     
     # Create table for metric definitions
     if idrac_model == '15G':
-      metric_def_sql = sql.generate_metric_def_table_sql()
+      metric_def_sql = sql.generate_metric_def_table_sql_15g()
       cur.execute(metric_def_sql)
-      sql.write_metric_definitions(conn, metric_definitions)
+      sql.write_metric_definitions_15g(conn, metric_definitions)
+    elif idrac_model == '13G':
+      metric_def_sql = sql.generate_metric_def_table_sql_13g()
+      cur.execute(metric_def_sql)
+      sql.write_metric_definitions_13g(conn, metric_definitions)
     
     conn.commit()
     cur.close()

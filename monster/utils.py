@@ -45,6 +45,7 @@ data_type_mapping = {
     'Integer': 'INT',
     'DateTime': 'TIMESTAMPTZ',
     'Enumeration': 'TEXT',
+    'Boolean': 'BOOLEAN',
 }
 
 class bcolors:
@@ -130,20 +131,32 @@ def get_nodelist():
   except Exception as err:
     log.error(f"Cannot generate nodelist: {err}")
     raise SystemExit(1)
+  
+
+def sort_tuple_list(tuple_list:list):
+  tuple_list.sort(key = lambda x: x[0])  
+  return tuple_list
     
 
 def get_idrac_api():
-  try:
-    idrac_api = parse_config()['idrac']['api'].values()
-    return idrac_api
-  except Exception as err:
-    log.error(f"Cannot find idrac_api configuration: {err}")
-    raise SystemExit(1)
+  idrac_model = get_idrac_model()
+  if idrac_model == "15G":
+    return None
+  else:
+    try:
+      idrac_api = parse_config()['idrac']['api'].values()
+      return idrac_api
+    except Exception as err:
+      log.error(f"Cannot find idrac_api configuration: {err}")
+      raise SystemExit(1)
 
 
 def get_idrac_model():
   try:
     idrac_model = parse_config()['idrac']['model']
+    if idrac_model not in ["13G", "15G"]:
+      log.error(f"Invalid idrac_model: {idrac_model}")
+      raise SystemExit(1)
     return idrac_model
   except Exception as err:
     log.error(f"Cannot find idrac_model configuration: {err}")
@@ -152,7 +165,9 @@ def get_idrac_model():
 
 def get_idrac_metrics():
   idrac_model = get_idrac_model()
-  if idrac_model == "13G":
+  if idrac_model == "15G":
+    return None
+  else:
     try:
       idrac_metrics = parse_config()['idrac']['metrics']
       return idrac_metrics
@@ -169,6 +184,19 @@ def get_nodeid_map(conn: object):
   for (nodeid, bmc_ip_addr) in cur.fetchall():
     mapping.update({
         bmc_ip_addr: nodeid
+    })
+  cur.close()
+  return mapping
+
+
+def get_metric_dtype_mapping(conn: object):
+  mapping = {}
+  cur = conn.cursor()
+  query = "SELECT metric_id, data_type FROM metrics_definition;"
+  cur.execute(query)
+  for (metric, data_type) in cur.fetchall():
+    mapping.update({
+      metric: data_type
     })
   cur.close()
   return mapping
@@ -227,3 +255,26 @@ def get_hostname_id_map(connection: str):
       return mapping
   except Exception as err:
     log.error(f"Cannot generate ip-hostname mapping: {err}")
+
+
+def partition_list(arr:list, cores: int):
+  groups = []
+  arr_len = len(arr)
+  arr_per_core = arr_len // cores
+  remaining = arr_len % cores
+  for i in range(cores):
+    arr_slice = arr[i * arr_per_core : (i + 1) * arr_per_core]
+    groups.append(arr_slice)
+  if remaining:
+    for i in range(remaining):
+      groups[i].append(arr[-(i + 1)])
+  return groups
+
+
+def cast_value_type(value, dtype):
+  if dtype == 'INT':
+    return int(value)
+  elif dtype == 'REAL':
+    return float(value)
+  else:
+    return value

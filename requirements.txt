@@ -11,3 +11,4 @@ schedule
 python_dateutil
 sqlalchemy
 pandas
+aiohttp-sse-client

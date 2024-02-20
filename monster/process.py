@@ -30,16 +30,25 @@ Author:
 """
 
 import sql
+import utils
 import logger
 
 import multiprocessing
+import json
 import aiohttp
 import asyncio
+import requests
 import hostlist
-from aiohttp import BasicAuth
+import urllib3
+
+from pgcopy import CopyManager
 from itertools import repeat
+from dateutil.parser import parse
+from requests.adapters import HTTPAdapter
+from aiohttp_sse_client import client as sse_client
 
 log = logger.get_logger(__name__)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 async def base_fetch(url: str, session: aiohttp.ClientSession, max_retries=3, retry_delay=2):
@@ -58,14 +67,28 @@ async def base_fetch(url: str, session: aiohttp.ClientSession, max_retries=3, re
   
 
 async def fetch_all(urls: list, username: str, password:str):
-  auth = BasicAuth(username, password)
-  async with aiohttp.ClientSession( auth=auth ) as session:
+  async with aiohttp.ClientSession( auth=aiohttp.BasicAuth(username, password) ) as session:
     tasks = []
     for url in urls:
       task = asyncio.create_task(base_fetch(url, session))
       tasks.append(task)
     responses = await asyncio.gather(*tasks, return_exceptions=True)
     return responses
+  
+
+def single_fetch(url: str, username: str, password:str, max_retries=3, retry_delay=2):
+  adapter = HTTPAdapter(max_retries, retry_delay)
+  try:
+    with requests.Session() as session:
+      session.mount(url, adapter)
+      response = session.get(url, auth=(username, password), verify=False)
+      if response.status_code == 200:
+        return response.json()
+      else:
+        return {}
+  except Exception as err:
+    log.error(f"Cannot fetch data from {url} : {err}")
+    return {}
   
 
 def run_fetch_all(urls: list, username: str, password:str):  
@@ -146,6 +169,7 @@ def extract_metadata(system_info: dict, bmc_info: dict, node: str):
       })
     
     # Sanity check for hostname
+    # Todo: Add more checks. Some nodes report hostname as "cpu-24-11.localdomain"
     hostname = metrics.get("HostName", None)
     if not hostname or (not hostname.startswith("cpu")):
       new_hostname = bmc_ip_addr.replace("10.101.", "cpu-").replace(".", "-")
@@ -172,7 +196,7 @@ def parallel_extract_metadata(system_info_list: list,
   return info
 
 
-def extract_fqdd_source(redfish_report:list, metrics:list):
+def extract_fqdd_source_13g(redfish_report:list, metrics:list):
   fqdd = []
   source = []
   for i in redfish_report:
@@ -180,14 +204,16 @@ def extract_fqdd_source(redfish_report:list, metrics:list):
       for item in i.get(metric, []):
         f_value = item.get("Name", "None").replace(" ", "_" )
         s_value = item.get("@odata.type", "None")
-        if {"fqdd": f_value} not in fqdd:  
-          fqdd.append({
-            "fqdd": f_value
-          })
-        if {"source": s_value} not in source:
-          source.append({
-            "source": s_value
-          })
+        if f_value not in fqdd:  
+          fqdd.append(f_value)
+        if s_value not in source:
+          source.append(s_value)
+  return (fqdd, source)
+
+
+def extract_fqdd_source_15g(telemetry_service:dict):
+  fqdd = telemetry_service['Oem']['Dell']['FQDDList']
+  source = telemetry_service['Oem']['Dell']['SourceList']
   return (fqdd, source)
 
 
@@ -355,6 +381,110 @@ def process_node_job_correlation(jobs_metrics: list,
   
   # Convert nodes_jobs to lists of tuples, each tuple is a record to be inserted
   records = [(timestamp, int(nodeid), nodes_jobs[nodeid]['jobs'], nodes_jobs[nodeid]['cpus']) for nodeid in nodes_jobs]
-
   return records
-  
+
+
+async def listen_idrac_15g(node: str, username: str, password: str, mr_queue: asyncio.Queue):
+  url = f"https://{node}/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport"
+  while True:
+    try:
+      async with aiohttp.ClientSession(connector = aiohttp.TCPConnector(ssl=False,
+                                                                        force_close=False,
+                                                                        limit=None),
+                                      auth=aiohttp.BasicAuth(username, password),
+                                      timeout=aiohttp.ClientTimeout(total=0)) as session:
+        async with sse_client.EventSource(url, 
+                                          session=session,
+                                          read_until_eof=True,
+                                          read_bufsize=1024*1024) as event_source:
+          async for event in event_source:
+            report  = json.loads(event.data)
+            if report:
+              # print(f"Received report from {node}")
+              await mr_queue.put((node, report))
+              await asyncio.sleep(0)
+    except Exception as err:
+      log.error(f"Cannot listen to {node}: {err}")
+      await asyncio.sleep(5)
+      continue
+    
+
+async def process_idrac_15g(mr_queue: asyncio.Queue, mp_queue: asyncio.Queue):
+  while True:
+    data = await mr_queue.get()
+    ip = data[0]
+    report = data[1]
+    report_id = report.get('Id', None)
+    metric_values = report.get('MetricValues', [])
+    if report_id and metric_values:
+      # print(f"Processing report from {ip}")
+      processed_metrics = single_process_idrac_15g(ip, report_id, metric_values)
+      if processed_metrics:     
+        await mp_queue.put((ip, processed_metrics))
+      mr_queue.task_done()
+      
+
+def single_process_idrac_15g(ip: str, report_id: str, metric_values: list):
+  idrac_metrics = {}
+  if report_id == "PowerStatistics":
+    pass
+  else:
+    for metric in metric_values:
+      table_name = metric.get('MetricId', None)
+      timestamp  = metric.get('Timestamp', None)
+      source     = metric.get('Oem', {}).get('Dell', {}).get('Source', None)
+      fqdd       = metric.get('Oem', {}).get('Dell', {}).get('FQDD', None)
+      value      = metric.get('MetricValue', None) 
+      
+      if table_name and timestamp and source and fqdd and value:
+        record = {
+          'timestamp': parse(timestamp),
+          'source': source,
+          'fqdd': fqdd,
+          'value': value
+        }
+        if table_name not in idrac_metrics:
+          idrac_metrics[table_name] = [record]
+        else:
+          idrac_metrics[table_name].append(record)
+  return idrac_metrics
+
+
+async def write_idrac_15g(conn: object, nodeid_map: dict, source_map: dict, fqdd_map: dict,
+                          metric_dtype_mapping: dict, mp_queue: asyncio.Queue):
+  cols = ('timestamp', 'nodeid', 'source', 'fqdd', 'value')
+  while True:
+    data = await mp_queue.get()
+    ip = data[0]
+    metrics = data[1]
+    
+    # print(f"Writing metrics from {ip}")
+    nodeid = nodeid_map[ip]
+    
+    try:
+      for table_name, table_metrics in metrics.items():
+        all_records = []
+        dtype = metric_dtype_mapping[table_name]
+        target_table = f"idrac.{table_name.lower()}"
+        # print(f"Writing metrics from {ip} to {target_table}")
+              
+        for metric in table_metrics:
+          timestamp = metric['timestamp']
+          source    = source_map[metric['source']]
+          fqdd      = fqdd_map[metric['fqdd']]
+          value     = utils.cast_value_type(metric['value'], dtype)
+          if value == 0 or value == 0.0 or value == None:
+            pass
+          else:
+            all_records.append((timestamp, nodeid, source, fqdd, value))
+      
+        mgr = CopyManager(conn, target_table, cols)
+        mgr.copy(all_records)
+      conn.commit()
+    except Exception as err:
+      curs = conn.cursor()
+      curs.execute("ROLLBACK")
+      conn.commit()
+      log.error(f"Cannot write metrics from {ip}: {err}")
+    mp_queue.task_done() 
+      

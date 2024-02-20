@@ -4,7 +4,10 @@ timescaledb:
   port: 5432
   database: database
 
-# iDRAC Configuration
+# Partition in cluster
+partition: partition
+
+# iDRAC Configuration, model is either 13G or 15G
 idrac:
   model: 13G
   nodelist:
@@ -30,9 +33,28 @@ slurm_rest_api:
   slurm_nodes: /slurm/v0.0.38/nodes/
   openapi: /openapi/v3
 
-# OS - iDRAC hostname mapping. Key is the hostname obtained from Slurm REST API(
-# aligned with OS hostname), value is the hostname read from iDRAC interface. 
-# Leave empty if OS hostname is already aligned with iDRAC hostname.
-hostnames:
-  # cpu-23-1: cpu-23-1
-  # cpu-23-2: cpu-23-2
+# OpenAPI Metrics Mapping
+# Keys are the metric parameters used in the Metrics Builder API
+# Values are the table names in TimeScaleDB.
+openapi:
+  idrac:
+    CPUUsage: cpuusage
+    CPUPower: totalcpupower
+    Fan: rpmreading
+    MemoryPower: totalmemorypower
+    SystemPower: systempowerconsumption
+    Temperature: temperaturereading
+  slurm:
+    JobsInfo: jobs
+    MemoryUsage: memoryusage
+    NodeJobsCorrelation: node_jobs
+    NodesState: state
+
+# The following configuration is for idrac 15G that uses the push model
+#idrac:
+#  model: 15G
+#  nodelist:
+#    - 10.101.23.[1-60]
+#    - 10.101.24.[1-60]
+#    - 10.101.25.[1-60]
+#    - 10.101.26.[1-60]

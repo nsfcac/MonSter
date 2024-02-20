@@ -31,6 +31,7 @@ Author:
 
 import logging
 
+import os
 from pathlib import Path
 from logging.handlers import TimedRotatingFileHandler
 
@@ -58,4 +59,9 @@ def setup_logger(file_name):
 
 
 def get_logger(file_name):
+  # Check if the log directory exists
+  parent_dir = os.path.dirname(os.path.dirname(__file__))
+  log_dir    = os.path.join(parent_dir, 'log')
+  os.makedirs(log_dir, exist_ok=True)
+  
   return setup_logger(file_name)
