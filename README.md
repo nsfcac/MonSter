@@ -90,13 +90,15 @@ nohup python ./monster/monit_idrac.py >/dev/null 2>&1 &
 nohup python ./monster/monit_slurm.py >/dev/null 2>&1 &
 ```
 
-4. Run the MetricsBuilder API server at localhost:5000.
+4. Run the MetricsBuilder API server at localhost:5000. If you want to run the server at a different address, please change the `--host` and `--port` parameters.
 
 ```bash
 nohup uvicorn mbuilder.mb_api:app --host 0.0.0.0 --port 5000 --ssl-keyfile $UVICORN_KEY --ssl-certfile $UVICORN_CERT >/dev/null 2>&1 &
 ```
 
-5. Stop the running services.
+5. Access the demo page of the MetricsBuilder API server at `https://localhost:5000/docs`.
+
+6. Stop the running services.
 
 ```bash
 kill $(ps aux | grep 'mb_api' | grep -v grep | awk '{print $2}')
