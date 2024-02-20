@@ -119,12 +119,17 @@ def get_idrac_auth():
   return(username, password)
 
 
+def get_nodelist_raw():
+  nodelist_raw = parse_config()['idrac']['nodelist']
+  return nodelist_raw
+  
+
 def get_nodelist():
-  idrac_config = parse_config()['idrac']['nodelist']
+  nodelist_raw = get_nodelist_raw()
   nodelist = []
 
   try:
-    for i in idrac_config:
+    for i in nodelist_raw:
       nodes = hostlist.expand_hostlist(i)
       nodelist.extend(nodes)
     return nodelist

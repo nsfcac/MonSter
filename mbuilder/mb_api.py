@@ -29,29 +29,51 @@ Author:
     Jie Li, jie.li@ttu.edu
 """
 
+import os
+import sys
 import zlib
 import json
 
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 from typing import Optional
+from dateutil.parser import parse
+
+cur_dir = os.path.dirname(__file__)
+monster_dir = os.path.join(cur_dir, '../monster')
+sys.path.append(monster_dir)
+
+import utils
+partition = utils.get_partition()
 
 from mbuilder.metrics_builder import metrics_builder
 
 
 class Request(BaseModel):
-    start      : Optional[str]  = "2024-02-14 12:00:00-06"
-    end        : Optional[str]  = "2024-02-14 14:00:00-06"
+    start      : Optional[str]  = "2024-02-20 12:00:00-06"
+    end        : Optional[str]  = "2024-02-20 14:00:00-06"
     interval   : Optional[str]  = "5m"
     aggregation: Optional[str]  = "max"
-    nodelist   : Optional[str]  = "10.101.1.[1-60]"
+    nodelist   : Optional[str]  = utils.get_nodelist_raw()[0]
     metrics    : Optional[list] = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm']
     compression: Optional[bool] = False
 
 app = FastAPI()
 
-@app.post("/quanah")
+@app.post(f"/{partition}")
 def main(request: Request):
+  
+  start_epoch = int(parse(request.start).timestamp())
+  end_epoch   = int(parse(request.end).timestamp())
+  
+  # Check if the start time is earlier than the end time
+  if start_epoch > end_epoch:
+    return {"error": "Start time is later than end time"}
+  
+   # Check if the time range is within the 7 days
+  if (end_epoch - start_epoch) > 604800:
+    return {"error": "Time range is greater than 7 days"}
+  
   data = metrics_builder(request.start, 
                          request.end, 
                          request.interval, 
