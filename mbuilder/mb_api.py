@@ -35,6 +35,7 @@ import json
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 from typing import Optional
+from dateutil.parser import parse
 
 from mbuilder.metrics_builder import metrics_builder
 
@@ -52,6 +53,18 @@ app = FastAPI()
 
 @app.post("/quanah")
 def main(request: Request):
+  
+  start_epoch = int(parse(request.start).timestamp())
+  end_epoch   = int(parse(request.end).timestamp())
+  
+  # Check if the start time is earlier than the end time
+  if start_epoch > end_epoch:
+    return {"error": "Start time is later than end time"}
+  
+   # Check if the time range is within the 7 days
+  if (end_epoch - start_epoch) > 604800:
+    return {"error": "Time range is greater than 7 days"}
+  
   data = metrics_builder(request.start, 
                          request.end, 
                          request.interval, 
