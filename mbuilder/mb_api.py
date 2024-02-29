@@ -40,8 +40,8 @@ from mbuilder.metrics_builder import metrics_builder
 
 
 class Request(BaseModel):
-    start      : Optional[str]  = "2024-02-14 12:00:00-06"
-    end        : Optional[str]  = "2024-02-14 14:00:00-06"
+    start      : Optional[str]  = "2024-02-20 12:00:00-06"
+    end        : Optional[str]  = "2024-02-20 14:00:00-06"
     interval   : Optional[str]  = "5m"
     aggregation: Optional[str]  = "max"
     nodelist   : Optional[str]  = "10.101.1.[1-60]"
