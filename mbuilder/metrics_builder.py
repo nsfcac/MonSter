@@ -104,8 +104,7 @@ if __name__ == "__main__":
   nodelist = "10.101.1.[1-60]"
   # metrics = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm']
   metrics = ['JobsInfo_Slurm']
-  compression = False
-  results = metrics_builder(start, end, interval, aggregation, nodelist, metrics, compression)
+  results = metrics_builder(start, end, interval, aggregation, nodelist, metrics)
   
   # Write the results to a file
   with open(f"../json/results-{start.split(' ')[0]}-{end.split(' ')[0]}.json", "w") as f:
