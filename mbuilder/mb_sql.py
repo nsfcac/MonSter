@@ -35,7 +35,7 @@ from dateutil.parser import parse
 def generate_slurm_jobs_sql(start: str, end: str):
   start_epoch = int(parse(start).timestamp())
   end_epoch   = int(parse(end).timestamp())
-  sql = f"SELECT * FROM slurm.jobs WHERE start_time < {start_epoch} AND end_time > {end_epoch};"
+  sql = f"SELECT * FROM slurm.jobs WHERE start_time < {end_epoch} AND end_time > {start_epoch};"
   return sql
 
 
