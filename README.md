@@ -93,7 +93,7 @@ nohup python ./monster/monit_slurm.py >/dev/null 2>&1 &
 4. Run the MetricsBuilder API server at localhost:5000. If you want to run the server at a different address, please change the `--host` and `--port` parameters.
 
 ```bash
-nohup uvicorn mbuilder.mb_api:app --host 0.0.0.0 --port 5000 --ssl-keyfile $UVICORN_KEY --ssl-certfile $UVICORN_CERT >/dev/null 2>&1 &
+nohup uvicorn mbuilder.mb_api:app --host 0.0.0.0 --port 5000 --ssl-keyfile $UVICORN_KEY --ssl-certfile $UVICORN_CERT >./log/mbapi.log 2>&1 &
 ```
 
 5. Access the demo page of the MetricsBuilder API server at `https://localhost:5000/docs`.
