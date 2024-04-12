@@ -46,7 +46,7 @@ class Request(BaseModel):
     interval   : Optional[str]  = "5m"
     aggregation: Optional[str]  = "max"
     nodelist   : Optional[str]  = "10.101.1.[1-60]"
-    metrics    : Optional[list] = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm']
+    metrics    : Optional[list] = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsage_Slurm', 'MemoryUsed_Slurm']
     compression: Optional[bool] = False
 
 app = FastAPI()

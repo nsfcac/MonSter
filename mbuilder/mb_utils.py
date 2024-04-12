@@ -31,6 +31,7 @@ Author:
 
 import os
 import sys
+import json
 
 import pandas as pd
 import sqlalchemy as db
@@ -135,5 +136,189 @@ def query_db_wrapper(connection: str, start: str, end: str, interval: str,
   else:
     pass
   return metric
+
+
+def reformat_results(results):
+  reformated_results = {}
+  summary            = {}
+  job_nodes_cpus     = {}
+  node_time_records  = {}
+  job_time_records   = {}
+  node_system_power_track = {}
+  node_memory_used_track  = {}
+  all_system_power_track  = {}
+  all_memory_used_track   = {}
+  
+  slurm_jobs = results.get('slurm.jobs', {})
+  if slurm_jobs:
+    # Get the nodes, CPUs, memory_per_cpu
+    for item in slurm_jobs:
+      job_nodes_cpus.update({item['job_id']: {'nodes': item['nodes'], 
+                                              'used_cores': int(item['cpus']), 
+                                              'memory_per_core': item['memory_per_cpu'],
+                                              'cores_per_node': round(item['cpus']/item['node_count'])}})
+      
+  system_power = results.get('idrac.powercontrol', {})
+  if system_power:
+    for item in system_power:
+      node_time_records[f'{item['node']}_{item['time']}'] = {'time': int(item['time']),
+                                                             'node': item['node'],
+                                                             'system_power': item['value'],
+                                                             'system_power_diff': 0, # 'system_power_diff' is the difference between the current and the previous 'system_power'
+                                                             'memory_used': 0,
+                                                             'memory_used_diff': 0, # 'memory_used_diff' is the difference between the current and the previous 'memory_used
+                                                             'used_cores': 0,
+                                                             'jobs': [],
+                                                             'cores': [],}
+      if item['node'] not in node_system_power_track:
+        node_system_power_track[item['node']] = {'power': [item['value']],
+                                                 'time': [int(item['time'])]}
+      else:
+        node_system_power_track[item['node']]['power'].append(item['value'])
+        node_system_power_track[item['node']]['time'].append(int(item['time']))
+      
+      if item['time'] not in all_system_power_track:
+        all_system_power_track[item['time']] = [item['value']]
+      else:
+        all_system_power_track[item['time']].append(item['value'])
+
+  for node, records in node_system_power_track.items():
+    power = records['power']
+    diff = [0]
+    diff.extend([power[i] - power[i-1] for i in range(1, len(power))])
+    records['diff'] = diff
+    for i, time in enumerate(records['time']):
+      node_time_records[f'{node}_{time}']['system_power_diff'] = diff[i]
+      
+  memory_used = results.get('slurm.memory_used', {})
+  if memory_used:
+    for item in memory_used:
+      if f'{item['node']}_{item['time']}' in node_time_records:
+        node_time_records[f'{item['node']}_{item['time']}'].update({'memory_used': item['value']})
+      else:
+        node_time_records[f'{item['node']}_{item['time']}'] = {'time': int(item['time']),
+                                                               'node': item['node'],
+                                                               'system_power': 0,
+                                                               'system_power_diff': 0,
+                                                               'memory_used': item['value'],
+                                                               'memory_used_diff': 0,
+                                                               'used_cores': 0,
+                                                               'jobs': [],
+                                                               'cores': [],}  
+      if item['node'] not in node_memory_used_track:
+        node_memory_used_track[item['node']] = {'memory': [item['value']],
+                                                'time': [int(item['time'])]}
+      else:
+        node_memory_used_track[item['node']]['memory'].append(item['value'])
+        node_memory_used_track[item['node']]['time'].append(int(item['time']))
+
+      if item['time'] not in all_memory_used_track:
+        all_memory_used_track[item['time']] = [item['value']]
+      else:
+        all_memory_used_track[item['time']].append(item['value'])
+
+  for node, records in node_memory_used_track.items():
+    memory = records['memory']
+    diff = [0]
+    diff.extend([memory[i] - memory[i-1] for i in range(1, len(memory))])
+    records['diff'] = diff
+    for i, time in enumerate(records['time']):
+      node_time_records[f'{node}_{time}']['memory_used_diff'] = diff[i]
+  
+  node_jobs = results.get('slurm.node_jobs', {})
+  if node_jobs:
+    # Update the cpus field as it may not be correct
+    for item in node_jobs:
+      cores = []
+      for job in item['jobs']:
+        if job in job_nodes_cpus:
+          cores.append(job_nodes_cpus[job]['cores_per_node'])
+        else:
+          # job_nodes_cpus could cannot find the job, append 0 to cores
+          cores.append(0)
+          
+      if f'{item['node']}_{item['time']}' in node_time_records:
+        node_time_records[f'{item['node']}_{item['time']}'].update({'jobs': item['jobs'], 
+                                                                    'cores': cores, 
+                                                                    'used_cores': sum(cores)})
+      else:
+        node_time_records[f'{item['node']}_{item['time']}'] = {'time': int(item['time']),
+                                                               'node': item['node'],
+                                                               'system_power': 0,
+                                                               'memory_used': 0,
+                                                               'used_cores': sum(cores),
+                                                               'jobs': item['jobs'],
+                                                               'cores': cores,}
+  
+  # Calculate the summary
+  for time, records in all_system_power_track.items():
+    summary[time] = {'time': time,
+                     'average_system_power': round(sum(records) / len(records), 2),
+                     'total_system_power': round(sum(records), 2),
+                     'average_memory_used': 0,
+                     'total_memory_used': 0}
+  
+  for time, records in all_memory_used_track.items():
+    if time in summary:
+      summary[time].update({'average_memory_used': round(sum(records) / len(records), 2),
+                            'total_memory_used': round(sum(records), 2)})
+    else:
+      summary[time] = {'time': time,
+                       'average_system_power': 0,
+                       'total_system_power': 0,
+                       'average_memory_used': round(sum(records) / len(records), 2),
+                       'total_memory_used': round(sum(records), 2)}
+    
+
+  # Calculate the power consumption for each job
+  for key, value in node_time_records.items():
+    this_node = key.split('_')[0]
+    timestamp = key.split('_')[1]
+    this_node_power = value['system_power']
+    this_node_cores = value['used_cores']
+    for i, job in enumerate(value['jobs']):
+      if this_node_cores != 0:
+        this_node_power_part = round(this_node_power * (value['cores'][i] / this_node_cores), 2)
+      else:
+        this_node_power_part = 0
+      if f'{job}_{timestamp}' not in job_time_records:
+        if this_node_cores != 0:
+          power_per_core = round(this_node_power_part / this_node_cores, 2)
+        else:
+          power_per_core = 0
+        job_time_records[f'{job}_{timestamp}'] = {
+          'time': int(timestamp),
+          'job_id': job,
+          'data': [{
+            'node': this_node,
+            'power': this_node_power_part,
+            'cores': value['cores'][i],
+          }],
+          'power': this_node_power_part,
+          'cores': value['cores'][i],
+          'power_per_core': power_per_core,
+        }
+      else:
+        job_time_records[f'{job}_{timestamp}']['data'].append({
+          'node': this_node,
+          'power': this_node_power_part,
+          'cores': value['cores'][i],
+        })
+        job_time_records[f'{job}_{timestamp}']['power'] += this_node_power_part
+        job_time_records[f'{job}_{timestamp}']['cores'] += value['cores'][i]
+        if job_time_records[f'{job}_{timestamp}']['cores'] != 0:
+          job_time_records[f'{job}_{timestamp}']['power_per_core'] = round(job_time_records[f'{job}_{timestamp}']['power'] / job_time_records[f'{job}_{timestamp}']['cores'], 2)
+        else:
+          job_time_records[f'{job}_{timestamp}']['power_per_core'] = 0
+    
+  slurm_jobs = results.get('slurm.jobs', {})
+  if slurm_jobs:
+    reformated_results['job_details'] = slurm_jobs
+
+  reformated_results['nodes']   = list(node_time_records.values())
+  reformated_results['jobs']    = list(job_time_records.values())
+  reformated_results['summary'] = list(summary.values())
+
+  return reformated_results
 
   
