@@ -364,10 +364,11 @@ def process_node_job_correlation(jobs_metrics: list,
   for job in jobs_metrics:
     if job['job_state'] == "RUNNING":
       job_id = job['job_id']
+      cpus   = round(job['allocated_cores']/job['allocated_hosts'])
       allocated_nodes = job['job_resources']['allocated_nodes']
       for item in allocated_nodes:
         nodeid = hostname_id_map[item['nodename']]
-        cpus   = item['cpus_used']
+        # cpus   = item['cpus_used'] # There is a bug in the Slurm API, cpus_used is sometimes 0
         if nodeid not in nodes_jobs:
           nodes_jobs.update({
             nodeid: {
