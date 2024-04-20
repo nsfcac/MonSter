@@ -101,10 +101,10 @@ def query_db(connection: str, sql: str, nodelist: list):
       dataframe['cpus'] = dataframe.apply(lambda x: get_jobs_cpus(x, 'cpus'), axis=1)
       # Drop the jobs_copy column
       dataframe = dataframe.drop(columns=['jobs_copy'])
-    
-    if 'job_id' in dataframe.columns:
-      # fill NaN with 0
-      dataframe = dataframe.fillna(value={'array_task_id': 0, 'memory_per_cpu': 0})
+
+    # Fill all NaN with 0
+    with pd.option_context("future.no_silent_downcasting", True):
+      dataframe = dataframe.fillna(0).infer_objects(copy=False)
     
     # Convert the dataframe to a dictionary
     record = dataframe.to_dict(orient='records')
@@ -286,6 +286,12 @@ def reformat_results(results):
           power_per_core = round(this_node_power_part / this_node_cores, 2)
         else:
           power_per_core = 0
+        if job not in job_nodes_cpus:
+          memory_per_core = 0
+          memory_used = 0
+        else:
+          memory_per_core = job_nodes_cpus[job].get('memory_per_core', 0)
+          memory_used = job_nodes_cpus[job].get('memory_per_core', 0) * job_nodes_cpus[job].get('used_cores', 0)
         job_time_records[f'{job}_{timestamp}'] = {
           'time': int(timestamp),
           'job_id': job,
@@ -297,6 +303,8 @@ def reformat_results(results):
           'power': this_node_power_part,
           'cores': value['cores'][i],
           'power_per_core': power_per_core,
+          'memory_per_core': memory_per_core,
+          'memory_used': memory_used
         }
       else:
         job_time_records[f'{job}_{timestamp}']['data'].append({
