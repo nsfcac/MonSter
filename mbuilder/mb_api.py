@@ -33,20 +33,22 @@ import os
 import sys
 import zlib
 import json
-import utils
 
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 from typing import Optional
 from dateutil.parser import parse
 from fastapi.middleware.cors import CORSMiddleware
-from mbuilder.metrics_builder import metrics_builder
 
 cur_dir = os.path.dirname(__file__)
 monster_dir = os.path.join(cur_dir, '../monster')
 sys.path.append(monster_dir)
 
+import utils
+
 partition = utils.get_partition()
+
+from mbuilder.metrics_builder import metrics_builder
 
 
 class Request(BaseModel):
