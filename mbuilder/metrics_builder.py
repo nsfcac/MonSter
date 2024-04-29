@@ -87,25 +87,24 @@ def metrics_builder(start=None,
   for table, record in zip(tables, records):
     results[table] = record
   
-  for source, tables in metrics_mapping.items():
-    for table in tables.values():
-      if f'{source}.{table}' not in results.keys():
-        results[f'{source}.{table}'] = []
-        
+  # Refomat the results required by the frontend
+  results = mb_utils.reformat_results(results)
+  
   return results
 
 
 if __name__ == "__main__":
-  start = '2024-02-14 12:00:00-06'
-  end = '2024-02-14 14:00:00-06'
+  # For testing purposes
+  start = '2024-04-20 20:30:00-05'
+  end = '2024-04-20 21:30:00-05'
   interval = '5m'
   aggregation = 'max'
-  # nodelist = "10.101.1.[1-60],10.101.2.[1-60],10.101.3.[1-56],10.101.4.[1-48],10.101.5.[1-24],10.101.6.[1-20],10.101.7.[1-3,5-60],10.101.8.[1-60],10.101.9.[1-60],10.101.10.[25-44]"
-  nodelist = "10.101.1.[1-60]"
-  # metrics = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm']
-  metrics = ['JobsInfo_Slurm']
+  nodelist = "10.101.1.[1-60],10.101.2.[1-60],10.101.3.[1-56],10.101.4.[1-48],10.101.5.[1-24],10.101.6.[1-20],10.101.7.[1-3,5-60],10.101.8.[1-60],10.101.9.[1-60],10.101.10.[25-44]"
+  # nodelist = "10.101.1.[1-60]"
+  metrics = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsed_Slurm']
+  # metrics = ['JobsInfo_Slurm']
   results = metrics_builder(start, end, interval, aggregation, nodelist, metrics)
   
   # Write the results to a file
   with open(f"../json/results-{start.split(' ')[0]}-{end.split(' ')[0]}.json", "w") as f:
-    f.write(json.dumps(results))
+    f.write(json.dumps(results, indent=2))
