@@ -6,7 +6,6 @@ python-hostlist
 psycopg2-binary
 aiohttp
 requests
-pgcopy
 schedule
 python_dateutil
 sqlalchemy
