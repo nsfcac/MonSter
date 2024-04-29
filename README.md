@@ -73,8 +73,8 @@ export UVICORN_CERT=/path/to/ssl/cert
 python3.9 -m venv .venv
 # Activate the virtual environment
 source .venv/bin/activate
-# Install the required packages
-pip install -r requirements.txt
+# Install project in editable mode and install the required packages
+pip install -e .
 ```
 
 2. Initialize the TimeScaleDB tables by running the `init_db.py` script.
