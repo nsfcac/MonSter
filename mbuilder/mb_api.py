@@ -7,7 +7,7 @@ from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from mbuilder import metrics_builder
+from mbuilder.metrics_builder import metrics_builder
 from monster import utils
 
 partition = utils.get_partition()
