@@ -11,7 +11,7 @@ from mbuilder.metrics_builder import metrics_builder
 from monster import utils
 
 partition = utils.get_partition()
-
+front_url = utils.get_front_url()
 
 class Request(BaseModel):
     start      : Optional[str]  = "2024-04-20 12:00:00-06"
@@ -27,7 +27,8 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5500",
-    "http://127.0.0.1:5500"
+    "http://127.0.0.1:5500",
+    front_url,
 ]
 
 app.add_middleware(
