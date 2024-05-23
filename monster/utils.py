@@ -74,6 +74,11 @@ def get_partition():
     return partition
 
 
+def get_front_url():
+    front_url = parse_config()['frontend']['url']
+    return front_url
+
+
 def get_idrac_auth():
     username = os.environ.get('idrac_username')
     password = os.environ.get('idrac_password')

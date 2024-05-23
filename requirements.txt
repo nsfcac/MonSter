@@ -3,6 +3,7 @@ fastapi
 uvicorn
 PyYAML
 python-hostlist
+pgcopy
 psycopg2-binary
 aiohttp
 requests

@@ -71,3 +71,7 @@ openapi:
     NodeJobsCorrelation: node_jobs
     NodesState: state
 
+# Frontend Configuration
+frontend:
+  url: https://frontend.github.io
+
