@@ -109,6 +109,9 @@ def reformat_results(results):
     all_system_power_track = {}
     all_memory_used_track = {}
 
+    # Get the table name for SystemPower
+    system_power_table = utils.parse_config()['openapi']['idrac']['SystemPower']
+
     slurm_jobs = results.get('slurm.jobs', {})
     if slurm_jobs:
         # Get the nodes, CPUs, memory_per_cpu
@@ -118,7 +121,7 @@ def reformat_results(results):
                                                     'memory_per_core': item['memory_per_cpu'],
                                                     'cores_per_node': round(item['cpus'] / item['node_count'])}})
 
-    system_power = results.get('idrac.powercontrol', {})
+    system_power = results.get(f'idrac.{system_power_table}', {})
     if system_power:
         for item in system_power:
             node_time_records[f"{item['node']}_{item['time']}"] = {'time': int(item['time']),
