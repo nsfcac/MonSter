@@ -35,7 +35,7 @@ def write_nodes_metadata(conn: object, nodes_metadata: list):
     if not check_table_exist(conn, 'nodes'):
         insert_metadata(conn, nodes_metadata)
     else:
-        update_metadata(conn, nodes_metadata)
+        update_metadata(conn, nodes_metadata, 'nodes')
 
 
 def check_table_exist(conn: object, table_name: str):
