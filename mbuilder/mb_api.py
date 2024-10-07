@@ -14,12 +14,12 @@ partition = utils.get_partition()
 front_url = utils.get_front_url()
 
 class Request(BaseModel):
-    start      : Optional[str]  = "2024-04-20 12:00:00-06"
-    end        : Optional[str]  = "2024-04-20 14:00:00-06"
+    start      : Optional[str]  = "2024-09-30 12:00:00-06"
+    end        : Optional[str]  = "2024-09-30 14:00:00-06"
     interval   : Optional[str]  = "5m"
     aggregation: Optional[str]  = "max"
     nodelist   : Optional[str]  = utils.get_nodelist_raw()[0]
-    metrics    : Optional[list] = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsage_Slurm', 'MemoryUsed_Slurm']
+    metrics    : Optional[list] = ['SystemPower_iDRAC', 'Fans_iDRAC', 'Temperatures_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsage_Slurm', 'MemoryUsed_Slurm']
     compression: Optional[bool] = False
 
 

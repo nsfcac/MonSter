@@ -57,13 +57,13 @@ def metrics_builder(start=None,
 
 if __name__ == "__main__":
     # For testing purposes
-    start = '2024-04-20 20:30:00-05'
-    end = '2024-04-20 21:30:00-05'
+    start = '2024-09-30 20:30:00-05'
+    end = '2024-09-30 21:30:00-05'
     interval = '5m'
     aggregation = 'max'
-    nodelist = "10.101.1.[1-60],10.101.2.[1-60],10.101.3.[1-56],10.101.4.[1-48],10.101.5.[1-24],10.101.6.[1-20],10.101.7.[1-3,5-60],10.101.8.[1-60],10.101.9.[1-60],10.101.10.[25-44]"
+    nodelist = "10.101.1.[1-10]"
     # nodelist = "10.101.1.[1-60]"
-    metrics = ['SystemPower_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsed_Slurm']
+    metrics = ['SystemPower_iDRAC', 'Fans_iDRAC', 'Temperatures_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsage_Slurm', 'MemoryUsed_Slurm']
     # metrics = ['JobsInfo_Slurm']
     results = metrics_builder(start, end, interval, aggregation, nodelist, metrics)
 
