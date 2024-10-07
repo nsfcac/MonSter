@@ -351,14 +351,12 @@ def reformat_results(results):
                                                                        'fans_labels': [],
                                                                        'fans': [],
                                                                        'fans_diff': [],
-                                                                       'memory_used': item['value'],
+                                                                       'memory_used': 0,
                                                                        'memory_used_diff': 0,
                                                                        'used_cores': sum(cores),
                                                                        'jobs': item['jobs'],
                                                                        'cores': cores }
                 
-                                                                       
-
     # Calculate the summary
     for time, records in all_system_power_track.items():
         summary[time] = {'time': time,
