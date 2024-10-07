@@ -293,6 +293,12 @@ def reformat_results(results):
                                                                        'node': item['node'],
                                                                        'system_power': 0,
                                                                        'system_power_diff': 0,
+                                                                       'temperatures_labels': [],
+                                                                       'temperatures': [],
+                                                                       'temperatures_diff': [],
+                                                                       'fans_labels': [],
+                                                                       'fans': [],
+                                                                       'fans_diff': [],
                                                                        'memory_used': item['value'],
                                                                        'memory_used_diff': 0,
                                                                        'used_cores': 0,
@@ -338,10 +344,20 @@ def reformat_results(results):
                 node_time_records[f"{item['node']}_{item['time']}"] = {'time': int(item['time']),
                                                                        'node': item['node'],
                                                                        'system_power': 0,
-                                                                       'memory_used': 0,
+                                                                       'system_power_diff': 0,
+                                                                       'temperatures_labels': [],
+                                                                       'temperatures': [],
+                                                                       'temperatures_diff': [],
+                                                                       'fans_labels': [],
+                                                                       'fans': [],
+                                                                       'fans_diff': [],
+                                                                       'memory_used': item['value'],
+                                                                       'memory_used_diff': 0,
                                                                        'used_cores': sum(cores),
                                                                        'jobs': item['jobs'],
-                                                                       'cores': cores, }
+                                                                       'cores': cores }
+                
+                                                                       
 
     # Calculate the summary
     for time, records in all_system_power_track.items():
