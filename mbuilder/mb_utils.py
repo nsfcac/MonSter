@@ -1,5 +1,6 @@
 import pandas as pd
 import sqlalchemy as db
+import json
 
 from mbuilder import mb_sql
 from monster import utils
@@ -105,12 +106,11 @@ def reformat_results(results):
     node_time_records = {}
     job_time_records = {}
     node_system_power_track = {}
+    node_temperatures_track = {}
+    node_fans_track = {}
     node_memory_used_track = {}
     all_system_power_track = {}
     all_memory_used_track = {}
-
-    # Get the table name for SystemPower
-    system_power_table = utils.parse_config()['openapi']['idrac']['SystemPower']
 
     slurm_jobs = results.get('slurm.jobs', {})
     if slurm_jobs:
@@ -121,7 +121,7 @@ def reformat_results(results):
                                                     'memory_per_core': item['memory_per_cpu'],
                                                     'cores_per_node': round(item['cpus'] / item['node_count'])}})
 
-    system_power = results.get(f'idrac.{system_power_table}', {})
+    system_power = results.get('idrac.powercontrol', {})
     if system_power:
         for item in system_power:
             node_time_records[f"{item['node']}_{item['time']}"] = {'time': int(item['time']),
@@ -129,6 +129,12 @@ def reformat_results(results):
                                                                    'system_power': item['value'],
                                                                    'system_power_diff': 0,
                                                                    # 'system_power_diff' is the difference between the current and the previous 'system_power'
+                                                                   'temperatures_labels': [],
+                                                                   'temperatures': [],
+                                                                   'temperatures_diff': [],
+                                                                   'fans_labels': [],
+                                                                   'fans': [],
+                                                                   'fans_diff': [],
                                                                    'memory_used': 0,
                                                                    'memory_used_diff': 0,
                                                                    # 'memory_used_diff' is the difference between the current and the previous 'memory_used
@@ -154,6 +160,128 @@ def reformat_results(results):
         records['diff'] = diff
         for i, time in enumerate(records['time']):
             node_time_records[f'{node}_{time}']['system_power_diff'] = diff[i]
+
+    temperatures = results.get('idrac.temperatures', {})
+    t_labels = []
+    if temperatures:
+        # Get all the unique labels
+        t = 0
+        n = None
+        for item in temperatures:
+            if ( n!= None) and (n != item['node']):
+                break
+            else:
+                n = item['node']
+            if (t != 0) and (t != item['time']):
+                break
+            else:
+                t = item['time']
+            t_labels.append(item['label'])
+        for item in temperatures:
+            label = item['label']
+            if f"{item['node']}_{item['time']}" in node_time_records:
+                node_time_records[f"{item['node']}_{item['time']}"]['temperatures'].append( item['value'] )
+                node_time_records[f"{item['node']}_{item['time']}"]['temperatures_labels'].append( label )
+                node_time_records[f"{item['node']}_{item['time']}"]['temperatures_diff'].append( 0 )
+            else:
+                node_time_records[f"{item['node']}_{item['time']}"] = {'time': int(item['time']),
+                                                                       'node': item['node'],
+                                                                       'system_power': 0,
+                                                                       'system_power_diff': 0,
+                                                                       'temperatures_labels': [label],
+                                                                       'temperatures': [item['value']],
+                                                                       'temperatures_diff': [0],
+                                                                       'fans_labels': [],
+                                                                       'fans': [],
+                                                                       'fans_diff': [],
+                                                                       'memory_used': 0,
+                                                                       'memory_used_diff': 0,
+                                                                       'used_cores': 0,
+                                                                       'jobs': [],
+                                                                       'cores': [], }
+            if item['node'] not in node_temperatures_track:
+                node_temperatures_track[item['node']] = { label:
+                                                            {'temperatures': [item['value']],
+                                                             'time': [int(item['time'])],}
+                                                        }
+            else:
+                if label not in node_temperatures_track[item['node']]:
+                    node_temperatures_track[item['node']][label] = {'temperatures': [item['value']],
+                                                                    'time': [int(item['time'])]}
+                else:
+                    node_temperatures_track[item['node']][label]['temperatures'].append(item['value'])
+                    node_temperatures_track[item['node']][label]['time'].append(int(item['time']))
+
+    for node, records in node_temperatures_track.items():
+        for label, readings in records.items():
+            temperatures = readings['temperatures']
+            diff = [0]
+            diff.extend([temperatures[i] - temperatures[i - 1] for i in range(1, len(temperatures))])
+            readings['diff'] = diff
+            for i, time in enumerate(records[label]['time']):
+                idx = node_time_records[f'{node}_{time}']['temperatures_labels'].index(label)
+                node_time_records[f'{node}_{time}']['temperatures_diff'][idx] = diff[i]
+
+    fans = results.get('idrac.fans', {})
+    f_labels = []  
+    if fans:
+        # Get all the unique labels
+        f = 0
+        n = None
+        for item in fans:
+            if ( n!= None) and (n != item['node']):
+                break
+            else:
+                n = item['node']
+            if (f != 0) and (f != item['time']):
+                break
+            else:
+                f = item['time']
+            f_labels.append(item['label'])
+        for item in fans:
+            label = item['label']
+            if f"{item['node']}_{item['time']}" in node_time_records:
+                node_time_records[f"{item['node']}_{item['time']}"]['fans'].append( item['value'] )
+                node_time_records[f"{item['node']}_{item['time']}"]['fans_labels'].append( label )
+                node_time_records[f"{item['node']}_{item['time']}"]['fans_diff'].append( 0 )
+            else:
+                node_time_records[f"{item['node']}_{item['time']}"] = {'time': int(item['time']),
+                                                                       'node': item['node'],
+                                                                       'system_power': 0,
+                                                                       'system_power_diff': 0,
+                                                                       'temperatures_labels': [],
+                                                                       'temperatures': [],
+                                                                       'temperatures_diff': [],
+                                                                       'fans_labels': [label],
+                                                                       'fans': [item['value']],
+                                                                       'fans_diff': [0],
+                                                                       'memory_used': 0,
+                                                                       'memory_used_diff': 0,
+                                                                       'used_cores': 0,
+                                                                       'jobs': [],
+                                                                       'cores': [], }
+            if item['node'] not in node_fans_track:
+                node_fans_track[item['node']] = { label:
+                                                 {'fans': [item['value']],
+                                                  'time': [int(item['time'])],}
+                                                }
+            else:
+                if label not in node_fans_track[item['node']]:
+                    node_fans_track[item['node']][label] = {'fans': [item['value']],
+                                                            'time': [int(item['time'])]}
+                else:
+                    node_fans_track[item['node']][label]['fans'].append(item['value'])
+                    node_fans_track[item['node']][label]['time'].append(int(item['time']))
+
+    for node, records in node_fans_track.items():
+        for label, readings in records.items():
+            fans = readings['fans']
+            diff = [0]
+            diff.extend([fans[i] - fans[i - 1] for i in range(1, len(fans))])
+            readings['diff'] = diff
+            for i, time in enumerate(records[label]['time']):
+                idx = node_time_records[f'{node}_{time}']['fans_labels'].index(label)
+                node_time_records[f'{node}_{time}']['fans_diff'][idx] = diff[i]
 
     memory_used = results.get('slurm.memory_used', {})
     if memory_used:
