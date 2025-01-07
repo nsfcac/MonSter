@@ -33,9 +33,10 @@ def monit_idrac_13g():
 
 
 def monit_idrac_15g():
-    connection = utils.init_tsdb_connection()
+    connection         = utils.init_tsdb_connection()
     username, password = utils.get_idrac_auth()
-    nodelist = utils.get_nodelist()
+    nodelist           = utils.get_nodelist()
+    idrac_metrics      = utils.get_idrac_metrics()
 
     cores = multiprocessing.cpu_count()
     if (len(nodelist) < cores):
@@ -43,16 +44,16 @@ def monit_idrac_15g():
     nodelist_chunks = utils.partition_list(nodelist, cores)
 
     with psycopg2.connect(connection) as conn:
-        nodeid_map = utils.get_nodeid_map(conn)
-        fqdd_map = utils.get_fqdd_source_map(conn, 'fqdd')
-        source_map = utils.get_fqdd_source_map(conn, 'source')
+        nodeid_map           = utils.get_nodeid_map(conn)
+        fqdd_map             = utils.get_fqdd_source_map(conn, 'fqdd')
+        source_map           = utils.get_fqdd_source_map(conn, 'source')
         metric_dtype_mapping = utils.get_metric_dtype_mapping(conn)
 
     with multiprocessing.Pool(cores) as pool:
-        pool.starmap(idrac.get_idrac_metrics_15g, [(nodelist_chunk, username, password,
+        pool.starmap(idrac.get_idrac_metrics_15g, [(nodelist, idrac_metrics, username, password,
                                                     connection, nodeid_map, source_map,
                                                     fqdd_map, metric_dtype_mapping)
-                                                   for nodelist_chunk in nodelist_chunks])
+                                                   for nodelist in nodelist_chunks])
 
 
 if __name__ == '__main__':
