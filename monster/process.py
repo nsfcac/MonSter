@@ -65,15 +65,15 @@ def run_fetch_all(urls: list, username: str, password: str):
 
 
 def extract_metadata(system_info: dict, bmc_info: dict, node: str):
-    bmc_ip_addr = node
+    bmc_ip_addr    = node
     system_metrics = system_info
-    bmc_metrics = bmc_info
+    bmc_metrics    = bmc_info
 
-    general = ["UUID", "SerialNumber", "HostName", "Model", "Manufacturer"]
+    general   = ["UUID", "SerialNumber", "HostName", "Model", "Manufacturer"]
     processor = ["ProcessorModel", "ProcessorCount", "LogicalProcessorCount"]
-    memory = ["TotalSystemMemoryGiB"]
-    bmc = ["BmcModel", "BmcFirmwareVersion"]
-    metrics = {}
+    memory    = ["TotalSystemMemoryGiB"]
+    bmc       = ["BmcModel", "BmcFirmwareVersion"]
+    metrics   = {}
 
     try:
         # Update service tag
