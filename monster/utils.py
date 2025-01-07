@@ -145,15 +145,12 @@ def get_idrac_model():
 
 def get_idrac_metrics():
     idrac_model = get_idrac_model()
-    if idrac_model == "15G":
-        return None
-    else:
-        try:
-            idrac_metrics = parse_config()['idrac']['metrics']
-            return idrac_metrics
-        except Exception as err:
-            log.error(f"Cannot find idrac_metrics configuration: {err}")
-            raise SystemExit(1)
+    try:
+        idrac_metrics = parse_config()['idrac']['metrics']
+        return idrac_metrics
+    except Exception as err:
+        log.error(f"Cannot find idrac_metrics configuration: {err}")
+        raise SystemExit(1)
 
 
 def get_nodeid_map(conn: object):

@@ -1,6 +1,6 @@
 import asyncio
-
 import psycopg2
+import random
 
 import logger
 import process
@@ -8,12 +8,12 @@ import process
 log = logger.get_logger(__name__)
 
 
-def get_nodes_metadata(nodelist: list, username: str, password: str):
+def get_nodes_metadata(nodelist: list, valid_nodelist: list, username: str, password: str):
     system_base_url = "/redfish/v1/Systems/System.Embedded.1"
-    bmc_base_url = "/redfish/v1/Managers/iDRAC.Embedded.1"
+    bmc_base_url    = "/redfish/v1/Managers/iDRAC.Embedded.1"
 
     system_urls = ["https://" + node + system_base_url for node in nodelist]
-    bmc_urls = ["https://" + node + bmc_base_url for node in nodelist]
+    bmc_urls    = ["https://" + node + bmc_base_url for node in nodelist]
 
     # Fetch system info
     system_info = process.run_fetch_all(system_urls,
@@ -25,7 +25,11 @@ def get_nodes_metadata(nodelist: list, username: str, password: str):
                                      password)
 
     # Process system and bmc info
-    return process.parallel_extract_metadata(system_info, bmc_info, nodelist)
+    metadata = process.parallel_extract_metadata(system_info, bmc_info, nodelist)
+    for m in metadata:
+        if m['Status'] != 'BMC unreachable':
+            valid_nodelist.append(m['Bmc_Ip_Addr'])
+    return metadata
 
 
 def get_fqdd_source_13g(nodelist: list, api: list, metrics: list,
@@ -55,34 +59,37 @@ def get_metric_definitions_13g(idrac_metrics: list):
     return metric_definitions
 
 
-def get_metric_definitions_15g(nodelist: list, username: str, password: str):
+def get_metric_definitions_15g(nodelist: list, idrac_metrics: list, username: str, password: str):
     metric_definitions = []
-    metric_definition_urls = get_metric_definition_urls_15g(nodelist, username, password)
+    # Random select one from the nodelist
+    node = random.choice(nodelist)
+    metric_definition_urls = get_metric_definition_urls_15g(node, idrac_metrics, username, password)
     available_fields = ['Id', 'Name', 'Description', 'MetricType', \
                         'MetricDataType', 'Units', 'Accuracy', \
                         'SensingInterval', 'DiscreteValues']
-    for node in nodelist:
-        for url in metric_definition_urls:
+    # Random select nodes from the nodelist; this is used to get the metric definitions in parallel
+    nodes = random.sample(nodelist, len(metric_definition_urls))
+    urls  = [f"https://{nodes[i]}{url}" for i, url in enumerate(metric_definition_urls)]
+    responses = process.run_fetch_all(urls, username, password)
+    if responses:
+        for response in responses:
             metric_definition = {}
-            ext_url = f"https://{node}{url}"
-            response = process.single_fetch(ext_url, username, password)
-            if response:
-                for field in available_fields:
-                    field_value = response.get(field, None)
-                    metric_definition[field] = field_value
-                    metric_definitions.append(metric_definition)
+            for field in available_fields:
+                field_value = response.get(field, None)
+                metric_definition[field] = field_value
+            metric_definitions.append(metric_definition)
         return metric_definitions
 
 
-def get_metric_definition_urls_15g(nodelist: list, username: str, password: str):
-    metric_definition_urls = []
-    for node in nodelist:
-        url = f'https://{node}/redfish/v1/TelemetryService/MetricDefinitions'
-        response = process.single_fetch(url, username, password)
-        if response:
-            members = response.get('Members', [])
-            metric_definition_urls = [m.get('@odata.id', None) for m in members]
-            return metric_definition_urls
+def get_metric_definition_urls_15g(node: str, idrac_metrics: list, username: str, password: str):
+    selected_metrics_urls = []
+    url = f'https://{node}/redfish/v1/TelemetryService/MetricDefinitions'
+    response = process.single_fetch(url, username, password)
+    if response:
+        members               = response.get('Members', [])
+        all_metrics_urls      = [m.get('@odata.id', None) for m in members]
+        selected_metrics_urls = [m for m in all_metrics_urls if m.split('/')[-1] in idrac_metrics]
+    return selected_metrics_urls
 
 
 def get_idrac_metrics_13g(api: list, timestamp, idrac_metrics: list,

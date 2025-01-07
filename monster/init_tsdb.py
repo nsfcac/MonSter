@@ -8,34 +8,45 @@ from monster import utils
 
 log = logger.get_logger(__name__)
 
+DEBUG = False
 
 def init_tsdb():
     """init_tsdb Initialize TimeScaleDB
 
     Initialize TimeScaleDB
     """
-    connection = utils.init_tsdb_connection()
+    connection         = utils.init_tsdb_connection()
     username, password = utils.get_idrac_auth()
-    nodelist = utils.get_nodelist()
-    idrac_api = utils.get_idrac_api()
-    idrac_model = utils.get_idrac_model()
-    idrac_metrics = utils.get_idrac_metrics()
+    nodelist           = utils.get_nodelist()
+    idrac_api          = utils.get_idrac_api()
+    idrac_model        = utils.get_idrac_model()
+    idrac_metrics      = utils.get_idrac_metrics()
+    valid_nodelist     = []
 
-    # utils.print_status('Getting', 'nodes' , 'metadata')
-    nodes_metadata = idrac.get_nodes_metadata(nodelist, username, password)
+    utils.print_status('Getting', 'nodes' , 'metadata')
+    nodes_metadata = idrac.get_nodes_metadata(nodelist, valid_nodelist, username, password)
+    if DEBUG:
+        print(nodes_metadata)
+        print(len(valid_nodelist))
 
-    # utils.print_status('Getting', 'fqdd and source' , 'information')
+
+    utils.print_status('Getting', 'fqdd and source' , 'information')
     if idrac_model == '15G':
         fqdd_source_metadata = idrac.get_fqdd_source_15g(nodelist, username, password)
     elif idrac_model == '13G':
         fqdd_source_metadata = idrac.get_fqdd_source_13g(nodelist, idrac_api, idrac_metrics,
                                                          username, password)
+    if DEBUG:
+        print(fqdd_source_metadata)
 
-    # utils.print_status('Getting', 'metric' , 'definitions')
+    utils.print_status('Getting', 'metric' , 'definitions')
     if idrac_model == '15G':
-        metric_definitions = idrac.get_metric_definitions_15g(nodelist, username, password)
+        metric_definitions = idrac.get_metric_definitions_15g(valid_nodelist, idrac_metrics, username, password)
     elif idrac_model == '13G':
         metric_definitions = idrac.get_metric_definitions_13g(idrac_metrics)
+    if DEBUG:
+        print(metric_definitions)
+    
 
     idrac_table_schemas = schema.build_idrac_table_schemas(metric_definitions)
     slurm_table_schemas = schema.build_slurm_table_schemas()
