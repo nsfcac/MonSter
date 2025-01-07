@@ -383,7 +383,7 @@ async def listen_idrac_15g(node: str, username: str, password: str, mr_queue: as
             continue
 
 
-async def process_idrac_15g(mr_queue: asyncio.Queue, mp_queue: asyncio.Queue):
+async def process_idrac_15g(mr_queue: asyncio.Queue, mp_queue: asyncio.Queue, idrac_metrics: list):
     while True:
         data = await mr_queue.get()
         ip = data[0]
@@ -392,36 +392,37 @@ async def process_idrac_15g(mr_queue: asyncio.Queue, mp_queue: asyncio.Queue):
         metric_values = report.get('MetricValues', [])
         if report_id and metric_values:
             # print(f"Processing report from {ip}")
-            processed_metrics = single_process_idrac_15g(ip, report_id, metric_values)
+            processed_metrics = single_process_idrac_15g(ip, report_id, metric_values, idrac_metrics)
             if processed_metrics:
                 await mp_queue.put((ip, processed_metrics))
             mr_queue.task_done()
 
 
-def single_process_idrac_15g(ip: str, report_id: str, metric_values: list):
-    idrac_metrics = {}
+def single_process_idrac_15g(ip: str, report_id: str, metric_values: list, idrac_metrics: list):
+    metrics = {}
     if report_id == "PowerStatistics":
         pass
     else:
         for metric in metric_values:
             table_name = metric.get('MetricId', None)
-            timestamp = metric.get('Timestamp', None)
-            source = metric.get('Oem', {}).get('Dell', {}).get('Source', None)
-            fqdd = metric.get('Oem', {}).get('Dell', {}).get('FQDD', None)
-            value = metric.get('MetricValue', None)
-
-            if table_name and timestamp and source and fqdd and value:
-                record = {
-                    'timestamp': parse(timestamp),
-                    'source': source,
-                    'fqdd': fqdd,
-                    'value': value
-                }
-                if table_name not in idrac_metrics:
-                    idrac_metrics[table_name] = [record]
-                else:
-                    idrac_metrics[table_name].append(record)
-    return idrac_metrics
+            timestamp  = metric.get('Timestamp', None)
+            source     = metric.get('Oem', {}).get('Dell', {}).get('Source', None)
+            fqdd       = metric.get('Oem', {}).get('Dell', {}).get('FQDD', None)
+            value      = metric.get('MetricValue', None)
+            
+            if table_name in idrac_metrics:
+                if timestamp and source and fqdd and value:
+                    record = {
+                        'timestamp': parse(timestamp),
+                        'source': source,
+                        'fqdd': fqdd,
+                        'value': value
+                    }
+                    if table_name not in metrics:
+                        metrics[table_name] = [record]
+                    else:
+                        metrics[table_name].append(record)
+    return metrics
 
 
 async def write_idrac_15g(conn: object, nodeid_map: dict, source_map: dict, fqdd_map: dict,

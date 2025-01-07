@@ -104,17 +104,17 @@ def get_idrac_metrics_13g(api: list, timestamp, idrac_metrics: list,
         return processed_records
 
 
-def get_idrac_metrics_15g(nodelist: list, username: str, password: str,
+def get_idrac_metrics_15g(nodelist: list, idrac_metrics: list, username: str, password: str,
                           connection: str, nodeid_map: dict, source_map: dict,
                           fqdd_map: dict, metric_dtype_mapping: dict):
     with psycopg2.connect(connection) as conn:
         while True:
-            asyncio.run(listen_process_write_idrac_15g(nodelist, username, password,
+            asyncio.run(listen_process_write_idrac_15g(nodelist, idrac_metrics, username, password,
                                                        conn, nodeid_map, source_map,
                                                        fqdd_map, metric_dtype_mapping))
 
 
-async def listen_process_write_idrac_15g(nodelist: list, username: str, password: str,
+async def listen_process_write_idrac_15g(nodelist: list, idrac_metrics: list, username: str, password: str,
                                          conn: object, nodeid_map: dict, source_map: dict,
                                          fqdd_map: dict, metric_dtype_mapping: dict):
     buf_size = 1024 * 1024 * 10
@@ -125,7 +125,7 @@ async def listen_process_write_idrac_15g(nodelist: list, username: str, password
 
     listen_task = [asyncio.create_task(process.listen_idrac_15g(node, username, password, mr_queue)) for node in
                    nodelist]
-    process_task = [asyncio.create_task(process.process_idrac_15g(mr_queue, mp_queue))]
+    process_task = [asyncio.create_task(process.process_idrac_15g(mr_queue, mp_queue, idrac_metrics))]
     write_task = [asyncio.create_task(
         process.write_idrac_15g(conn, nodeid_map, source_map, fqdd_map, metric_dtype_mapping, mp_queue))]
 
