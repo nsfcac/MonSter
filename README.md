@@ -77,31 +77,37 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-2. Initialize the TimeScaleDB tables by running the `init_db.py` script.
+2. Copy config.yml.example and change the configuration accordingly.
+```bash
+# Copy config.yml.example and rename it
+cp config.yml.example config.yml
+``` 
+
+3. Initialize the TimeScaleDB tables by running the `init_db.py` script.
 
 ```bash
-python ./monster/init_tsdb.py
+python ./monster/init_tsdb.py --config=config.yml
 ```
 
-3. Run the code to collect the data from iDRAC8 nodes and Slurm.
+4. Run the code to collect the data from iDRAC and Slurm.
 
 ```bash
-nohup python ./monster/monit_idrac.py >/dev/null 2>&1 &
-nohup python ./monster/monit_slurm.py >/dev/null 2>&1 &
+nohup python ./monster/monit_idrac.py --config=config.yml >/dev/null 2>&1 &
+nohup python ./monster/monit_slurm.py --config=config.yml >/dev/null 2>&1 &
 ```
 
-4. Run the MetricsBuilder API server at localhost:5000. If you want to run the server at a different address, please change the `--host` and `--port` parameters.
+5. Run the MetricsBuilder API server.
 
 ```bash
-nohup uvicorn mbuilder.mb_api:app --host 0.0.0.0 --port 5000 --ssl-keyfile $UVICORN_KEY --ssl-certfile $UVICORN_CERT >./log/mbapi.log 2>&1 &
+nohup python ./mbuilder/mb_run.py --config=config.yml >./log/mbapi.log 2>&1 &
 ```
 
-5. Access the demo page of the MetricsBuilder API server at `https://localhost:5000/docs`.
+6. Access the demo page of the MetricsBuilder API server at `https://localhost:5000/docs`.
 
-6. Stop the running services.
+7. Stop the running services.
 
 ```bash
-kill $(ps aux | grep 'mb_api' | grep -v grep | awk '{print $2}')
-kill $(ps aux | grep 'monit_idrac' | grep -v grep | awk '{print $2}')
-kill $(ps aux | grep 'monit_slurm' | grep -v grep | awk '{print $2}')
+kill $(ps aux | grep 'mb_run' | grep -v grep | awk '{print $2}')
+kill $(ps aux | grep 'monit_idrac.py --config=config.yml' | grep -v grep | awk '{print $2}')
+kill $(ps aux | grep 'monit_slurm.py --config=config.yml' | grep -v grep | awk '{print $2}')
 ```

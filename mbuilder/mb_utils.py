@@ -6,8 +6,8 @@ from mbuilder import mb_sql
 from monster import utils
 
 
-def get_metrics_map():
-    metrics_mapping = utils.parse_config()['openapi']
+def get_metrics_map(config):
+    metrics_mapping = config['openapi']
     return metrics_mapping
 
 

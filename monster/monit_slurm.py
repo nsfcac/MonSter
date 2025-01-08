@@ -1,9 +1,8 @@
 import time
-from datetime import datetime
-
 import psycopg2
 import schedule
 import urllib3
+from datetime import datetime, timezone
 
 import process
 import slurm
@@ -12,18 +11,18 @@ from monster import utils
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-def monit_slurm():
-    timestamp = datetime.utcnow().replace(microsecond=0)
+def monit_slurm(config):
+    timestamp = datetime.now(timezone.utc).replace(microsecond=0)
 
-    connection = utils.init_tsdb_connection()
-    nodelist = utils.get_nodelist()
+    connection      = utils.init_tsdb_connection(config)
+    nodelist        = utils.get_nodelist(config)
+    partition       = utils.get_partition(config)
+    slurm_config    = utils.get_slurm_config(config)
     ip_hostname_map = utils.get_ip_hostname_map(connection)
     hostname_id_map = utils.get_hostname_id_map(connection)
-    hostname_list = [ip_hostname_map[ip] for ip in nodelist]
-    partition = utils.get_partition()
-    slurm_config = utils.get_slurm_config()
+    hostname_list   = [ip_hostname_map[ip] for ip in nodelist]
 
-    jobs_metrics = slurm.get_slurm_jobs_metrics(slurm_config, partition)
+    jobs_metrics  = slurm.get_slurm_jobs_metrics(slurm_config, partition)
     nodes_metrics = slurm.get_slurm_nodes_metrics(slurm_config, hostname_list)
 
     # Extract job information
@@ -45,7 +44,8 @@ def monit_slurm():
 
 
 if __name__ == "__main__":
-    schedule.every().minutes.at(":00").do(monit_slurm)
+    config = utils.parse_config()
+    schedule.every().minutes.at(":00").do(monit_slurm, config)
     while True:
         schedule.run_pending()
         time.sleep(1)

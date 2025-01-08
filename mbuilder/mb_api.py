@@ -10,20 +10,21 @@ from pydantic import BaseModel
 from mbuilder.metrics_builder import metrics_builder
 from monster import utils
 
-partition = utils.get_partition()
-front_url = utils.get_front_url()
+app = FastAPI()
+
+config    = utils.parse_config()
+partition = utils.get_partition(config)
+front_url = utils.get_front_url(config)
 
 class Request(BaseModel):
-    start      : Optional[str]  = "2024-09-30 12:00:00-06"
-    end        : Optional[str]  = "2024-09-30 14:00:00-06"
+    start      : Optional[str]  = "2025-01-08 12:00:00-06"
+    end        : Optional[str]  = "2025-01-08 14:00:00-06"
     interval   : Optional[str]  = "5m"
     aggregation: Optional[str]  = "max"
-    nodelist   : Optional[str]  = utils.get_nodelist_raw()[0]
+    nodelist   : Optional[str]  = utils.get_nodelist_raw(config)[0]
     metrics    : Optional[list] = ['SystemPower_iDRAC', 'Fans_iDRAC', 'Temperatures_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsage_Slurm', 'MemoryUsed_Slurm']
     compression: Optional[bool] = False
 
-
-app = FastAPI()
 
 origins = [
     "http://localhost:5500",
@@ -43,7 +44,7 @@ app.add_middleware(
 @app.post(f"/{partition}")
 def main(request: Request):
     start_epoch = int(parse(request.start).timestamp())
-    end_epoch = int(parse(request.end).timestamp())
+    end_epoch   = int(parse(request.end).timestamp())
 
     # Check if the start time is earlier than the end time
     if start_epoch > end_epoch:
@@ -53,7 +54,8 @@ def main(request: Request):
     if (end_epoch - start_epoch) > 604800:
         return {"error": "Time range is greater than 7 days"}
 
-    data = metrics_builder(request.start,
+    data = metrics_builder(config,
+                           request.start,
                            request.end,
                            request.interval,
                            request.aggregation,

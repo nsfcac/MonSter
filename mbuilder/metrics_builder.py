@@ -8,7 +8,8 @@ from mbuilder import mb_utils
 from monster import utils
 
 
-def metrics_builder(start=None,
+def metrics_builder(config,
+                    start=None,
                     end=None,
                     interval=None,
                     aggregation=None,
@@ -17,10 +18,10 @@ def metrics_builder(start=None,
     results = {}
     tables = []
 
-    connection = utils.init_tsdb_connection()
+    connection          = utils.init_tsdb_connection(config)
     ip_hostname_mapping = utils.get_ip_hostname_map(connection)
-    metrics_mapping = mb_utils.get_metrics_map()
-    nodelist = hostlist.expand_hostlist(nodelist)
+    metrics_mapping     = mb_utils.get_metrics_map(config)
+    nodelist            = hostlist.expand_hostlist(nodelist)
 
     # Convert IPs to hostnames of the nodes
     nodelist = [ip_hostname_mapping[ip] for ip in nodelist]
@@ -56,6 +57,7 @@ def metrics_builder(start=None,
 
 
 if __name__ == "__main__":
+    config = utils.parse_config()
     # For testing purposes
     start = '2024-09-30 20:30:00-05'
     end = '2024-09-30 21:30:00-05'
@@ -65,7 +67,7 @@ if __name__ == "__main__":
     # nodelist = "10.101.1.[1-60]"
     metrics = ['SystemPower_iDRAC', 'Fans_iDRAC', 'Temperatures_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsage_Slurm', 'MemoryUsed_Slurm']
     # metrics = ['JobsInfo_Slurm']
-    results = metrics_builder(start, end, interval, aggregation, nodelist, metrics)
+    results = metrics_builder(config, start, end, interval, aggregation, nodelist, metrics)
 
     # Write the results to a file
     with open(f"../json/results-{start.split(' ')[0]}-{end.split(' ')[0]}.json", "w") as f:

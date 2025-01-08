@@ -1,4 +1,5 @@
 import os
+import argparse
 from pathlib import Path
 
 import hostlist
@@ -35,19 +36,27 @@ def print_status(action: str, target: str, obj: str):
 
 
 def parse_config():
-    cfg = []
-    monster_path = Path(__file__).resolve().parent.parent
-    try:
-        with open(f'{monster_path}/config.yml', 'r') as ymlfile:
-            cfg = yaml.safe_load(ymlfile)
-            return cfg
-    except Exception as err:
-        log.error(f"Parsing Configuration Error: {err}")
+    # Read user's specified configuration file
+    parser = argparse.ArgumentParser(description='Configure MonSTer')
+    parser.add_argument('--config', type=str, help='Specify the configuration file')
+    args = parser.parse_args()
+    if not args.config:
+        print('Please specify the configuration file')
         raise SystemExit(1)
+    
+    # Get the full path of the configuration file
+    config_path = Path(__file__).resolve().parent.parent/args.config
+    try:
+        with open(config_path, 'r') as ymlfile:
+            config = yaml.safe_load(ymlfile)
+    except Exception as err:
+        print(f"Parsing Configuration Error: {err}")
+        raise SystemExit(1)
+    return config
 
 
-def init_tsdb_connection():
-    config_tsdb = parse_config()['timescaledb']
+def init_tsdb_connection(config):
+    config_tsdb = config['timescaledb']
 
     # Host, port, and database name are specified in the configuration file
     db_host = config_tsdb['host']
@@ -69,13 +78,13 @@ def init_tsdb_connection():
     return f"postgresql://{db_user}:{db_pswd}@{db_host}:{db_port}/{db_dbnm}"
 
 
-def get_partition():
-    partition = parse_config()['partition']
+def get_partition(config):
+    partition = config['partition']
     return partition
 
 
-def get_front_url():
-    front_url = parse_config()['frontend']['url']
+def get_front_url(config):
+    front_url = config['frontend']['url']
     return front_url
 
 
@@ -94,13 +103,13 @@ def get_idrac_auth():
     return (username, password)
 
 
-def get_nodelist_raw():
-    nodelist_raw = parse_config()['idrac']['nodelist']
+def get_nodelist_raw(config):
+    nodelist_raw = config['idrac']['nodelist']
     return nodelist_raw
 
 
-def get_nodelist():
-    nodelist_raw = get_nodelist_raw()
+def get_nodelist(config):
+    nodelist_raw = get_nodelist_raw(config)
     nodelist = []
 
     try:
@@ -118,22 +127,22 @@ def sort_tuple_list(tuple_list: list):
     return tuple_list
 
 
-def get_idrac_api():
-    idrac_model = get_idrac_model()
+def get_idrac_api(config):
+    idrac_model = get_idrac_model(config)
     if idrac_model == "15G":
         return None
     else:
         try:
-            idrac_api = parse_config()['idrac']['api'].values()
+            idrac_api = config['idrac']['api'].values()
             return idrac_api
         except Exception as err:
             log.error(f"Cannot find idrac_api configuration: {err}")
             raise SystemExit(1)
 
 
-def get_idrac_model():
+def get_idrac_model(config):
     try:
-        idrac_model = parse_config()['idrac']['model']
+        idrac_model = config['idrac']['model']
         if idrac_model not in ["13G", "15G"]:
             log.error(f"Invalid idrac_model: {idrac_model}")
             raise SystemExit(1)
@@ -143,10 +152,9 @@ def get_idrac_model():
         raise SystemExit(1)
 
 
-def get_idrac_metrics():
-    idrac_model = get_idrac_model()
+def get_idrac_metrics(config):
     try:
-        idrac_metrics = parse_config()['idrac']['metrics']
+        idrac_metrics = config['idrac']['metrics']
         return idrac_metrics
     except Exception as err:
         log.error(f"Cannot find idrac_metrics configuration: {err}")
@@ -192,9 +200,9 @@ def get_fqdd_source_map(conn: object, table: str):
     return mapping
 
 
-def get_slurm_config():
+def get_slurm_config(config):
     try:
-        slurm_config = parse_config()['slurm_rest_api']
+        slurm_config = config['slurm_rest_api']
         return slurm_config
     except Exception as err:
         # Exit if the configuration file is not found
