@@ -10,17 +10,17 @@ log = logger.get_logger(__name__)
 
 DEBUG = False
 
-def init_tsdb():
+def init_tsdb(config):
     """init_tsdb Initialize TimeScaleDB
 
     Initialize TimeScaleDB
     """
-    connection         = utils.init_tsdb_connection()
+    connection         = utils.init_tsdb_connection(config)
     username, password = utils.get_idrac_auth()
-    nodelist           = utils.get_nodelist()
-    idrac_api          = utils.get_idrac_api()
-    idrac_model        = utils.get_idrac_model()
-    idrac_metrics      = utils.get_idrac_metrics()
+    nodelist           = utils.get_nodelist(config)
+    idrac_api          = utils.get_idrac_api(config)
+    idrac_model        = utils.get_idrac_model(config)
+    idrac_metrics      = utils.get_idrac_metrics(config)
     valid_nodelist     = []
 
     utils.print_status('Getting', 'nodes' , 'metadata')
@@ -112,4 +112,7 @@ def init_tsdb():
 
 
 if __name__ == '__main__':
-    init_tsdb()
+    config = utils.parse_config()
+
+    # Initialize TimeScaleDB
+    init_tsdb(config)

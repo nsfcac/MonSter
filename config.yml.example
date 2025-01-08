@@ -70,6 +70,10 @@ openapi:
     MemoryUsage: memoryusage
     NodeJobsCorrelation: node_jobs
     NodesState: state
+  ip: 0.0.0.0
+  port: 5000
+  ssl_keyfile: /path/to/ssl_keyfile
+  ssl_certfile: /path/to/ssl_certfile
 
 # Frontend Configuration
 frontend:
