@@ -107,7 +107,7 @@ nohup python ./mbuilder/mb_run.py --config=config.yml >./log/mbapi.log 2>&1 &
 7. Stop the running services.
 
 ```bash
-kill $(ps aux | grep 'mb_run' | grep -v grep | awk '{print $2}')
+kill $(ps aux | grep 'mb_run.py --config=config.yml' | grep -v grep | awk '{print $2}')
 kill $(ps aux | grep 'monit_idrac.py --config=config.yml' | grep -v grep | awk '{print $2}')
 kill $(ps aux | grep 'monit_slurm.py --config=config.yml' | grep -v grep | awk '{print $2}')
 ```
