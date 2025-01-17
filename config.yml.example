@@ -54,17 +54,17 @@ slurm_rest_api:
 openapi:
   # API configuration for iDRAC-13G
   # idrac:
-  #   Fan: rpmreading
+  #   Fans: rpmreading
   #   SystemPower: systempowerconsumption
-  #   Temperature: temperaturereading
+  #   Temperatures: temperaturereading
   # API configuration for iDRAC-15G
   idrac:
     CPUUsage: cpuusage
     CPUPower: totalcpupower
-    Fan: rpmreading
+    Fans: rpmreading
     MemoryPower: totalmemorypower
     SystemPower: systempowerconsumption
-    Temperature: temperaturereading
+    Temperatures: temperaturereading
   slurm:
     JobsInfo: jobs
     MemoryUsage: memoryusage

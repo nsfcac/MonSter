@@ -51,7 +51,7 @@ def metrics_builder(config,
         results[table] = record
 
     # Refomat the results required by the frontend
-    results = mb_utils.reformat_results(results)
+    results = mb_utils.reformat_results(metrics_mapping, results)
 
     return results
 
@@ -59,16 +59,16 @@ def metrics_builder(config,
 if __name__ == "__main__":
     config = utils.parse_config()
     # For testing purposes
-    start = '2024-09-30 20:30:00-05'
-    end = '2024-09-30 21:30:00-05'
+    start = '2025-01-17 10:30:00-05'
+    end = '2025-01-17 11:30:00-05'
     interval = '5m'
     aggregation = 'max'
-    nodelist = "10.101.1.[1-10]"
+    nodelist = "10.101.26.[1-60]"
     # nodelist = "10.101.1.[1-60]"
     metrics = ['SystemPower_iDRAC', 'Fans_iDRAC', 'Temperatures_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsage_Slurm', 'MemoryUsed_Slurm']
     # metrics = ['JobsInfo_Slurm']
     results = metrics_builder(config, start, end, interval, aggregation, nodelist, metrics)
 
     # Write the results to a file
-    with open(f"../json/results-{start.split(' ')[0]}-{end.split(' ')[0]}.json", "w") as f:
+    with open(f"./json/results-{start.split(' ')[0]}-{end.split(' ')[0]}.json", "w") as f:
         f.write(json.dumps(results, indent=2))

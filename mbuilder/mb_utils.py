@@ -99,7 +99,7 @@ def query_db_wrapper(connection: str, start: str, end: str, interval: str,
     return metric
 
 
-def reformat_results(results):
+def reformat_results(metrics_mapping, results):
     reformated_results = {}
     summary = {}
     job_nodes_cpus = {}
@@ -121,7 +121,7 @@ def reformat_results(results):
                                                     'memory_per_core': item['memory_per_cpu'],
                                                     'cores_per_node': round(item['cpus'] / item['node_count'])}})
 
-    system_power = results.get('idrac.powercontrol', {})
+    system_power = results.get(f"idrac.{metrics_mapping['idrac']['SystemPower']}", {})
     if system_power:
         for item in system_power:
             node_time_records[f"{item['node']}_{item['time']}"] = {'time': int(item['time']),
@@ -161,7 +161,7 @@ def reformat_results(results):
         for i, time in enumerate(records['time']):
             node_time_records[f'{node}_{time}']['system_power_diff'] = diff[i]
 
-    temperatures = results.get('idrac.temperatures', {})
+    temperatures = results.get(f"idrac.{metrics_mapping['idrac']['Temperatures']}", {})
     t_labels = []
     if temperatures:
         # Get all the unique labels
@@ -222,7 +222,7 @@ def reformat_results(results):
                 idx = node_time_records[f'{node}_{time}']['temperatures_labels'].index(label)
                 node_time_records[f'{node}_{time}']['temperatures_diff'][idx] = diff[i]
 
-    fans = results.get('idrac.fans', {})
+    fans = results.get(f"idrac.{metrics_mapping['idrac']['Fans']}", {})
     f_labels = []  
     if fans:
         # Get all the unique labels
