@@ -287,7 +287,7 @@ def process_node_metrics_slurm(nodes_metrics: list,
                 cpu_load = -1
 
             # Memory usage
-            free_memory = node['free_memory']
+            free_memory = node['free_mem']['number']
             real_memory = node['real_memory']
             memory_usage = ((real_memory - free_memory) / real_memory) * 100
             memory_used = real_memory - free_memory
