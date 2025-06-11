@@ -165,8 +165,8 @@ This will:
 
 ## Serve APIs
 #### Example URLs:
-- https://hugo.hpcc.ttu.edu/api/nocona/ -> FastAPI on port 5000
-- https://hugo.hpcc.ttu.edu/api/quanah/ -> FastAPI on port 5001
+- `https://hugo.hpcc.ttu.edu/api/nocona/` -> FastAPI on port 5000
+- `https://hugo.hpcc.ttu.edu/api/quanah/` -> FastAPI on port 5001
 #### 1. Update Nginx Configuration
 Edit the nginx configuration to include:
 ```nginx
