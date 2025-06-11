@@ -1,6 +1,6 @@
-# MonSter #
+# MonSter
 
-## About MonSter ##
+## About MonSter
 MonSter is an “out-of-the-box” monitoring tool for high-performance computing platforms. It uses the evolving specification Redfish to retrieve sensor data from Baseboard Management Controller, and resource management tools such as Slurm to obtain application information and resource usage data. Additionally, it also uses a time-series database (TimeScaleDB implemented in the code) for data storage. MonSTer correlates applications to resource usage and reveals insightful knowledge without having additional overhead on the application and computing nodes. 
 
 For details about MonSter, please refer to the paper: 
@@ -50,13 +50,13 @@ CREATE DATABASE demo WITH OWNER monster;
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 ```
 
-# MetricsBuilder #
+# MetricsBuilder
 
-## About Metrics Builder ##
+## About Metrics Builder
 
 **Metrics Builder** acts as a middleware between the consumers (i.e. analytic clients or tools) and the producers (i.e. the databases). Its provides APIs for [the web applications](https://idatavisualizationlab.github.io/HPCC/) and accelerates the data query performance.
 
-## Setup ##
+## Setup
 Configure the SSL certificate and key for the MetricsBuilder API server. We use [Let's Encrypt](https://letsencrypt.org/) to get the SSL certificate and key.
 
 ```bash
@@ -64,7 +64,7 @@ export UVICORN_KEY=/path/to/ssl/key
 export UVICORN_CERT=/path/to/ssl/cert
 ```
 
-# Run MonSter and MetricsBuilder #
+# Run MonSter and MetricsBuilder
 
 1. Set up the virtual environment and install the required packages.
 
@@ -111,3 +111,128 @@ kill $(ps aux | grep 'mb_run.py --config=config.yml' | grep -v grep | awk '{prin
 kill $(ps aux | grep 'monit_idrac.py --config=config.yml' | grep -v grep | awk '{print $2}')
 kill $(ps aux | grep 'monit_slurm.py --config=config.yml' | grep -v grep | awk '{print $2}')
 ```
+
+# Serving APIs with Nginx
+## SSL Configuration (use hugo.hpcc.ttu.edu as an example)
+### Prerequisites
+- A valid DNS record for `hugo.hpcc.ttu.edu` pointing to the server’s public IP.
+- `nginx` installed and running.
+- `certbot` installed
+### Step-by-Step SSL Setup
+#### 1. Open Firewall Port 443
+Allow HTTPS traffic through the firewall:
+```bash
+firewall-cmd --permanent --add-service=https
+firewall-cmd --reload
+```
+To confirm it's active, try from you local computer:
+```bash
+nc -zv hugo.hpcc.ttu.edu 443
+```
+nc -zv hugo.hpcc.ttu.edu 443
+#### 2. Ensure Nginx Has a Server Block for the Domain
+Create or edit the Nginx configuration at `/etc/nginx/conf.d/hugo.hpcc.ttu.edu.conf`:
+```nginx
+server {
+    listen 80;
+    server_name hugo.hpcc.ttu.edu;
+
+    root /usr/share/nginx/html;
+    index index.html;
+}
+```
+Open `/etc/nginx/nginx.conf` and make sure it includes the following line:
+```nginx
+include /etc/nginx/conf/*.conf;
+```
+Reload Nginx to apply changes:
+```bash
+nginx -t && systemctl reload nginx
+```
+#### 3. Issue the SSL Certificate with Certbot
+Run the following Certbot command to automatically obtain and configure the certificate:
+```bash
+certbot --nginx -d hugo.hpcc.ttu.edu
+```
+This will:
+- Obtain an SSL certificate from Let’s Encrypt.
+- Modify the Nginx config to add a secure listen 443 ssl block.
+- Configure automatic redirection from HTTP to HTTPS (if approved during prompts).
+
+### Verification
+- Visit `https://hugo.hpcc.ttu.edu` in your browser.
+- Ensure the connection is secure and no *Not Secure* warnings appear.
+
+## Serve APIs
+#### Example URLs:
+- https://hugo.hpcc.ttu.edu/api/nocona/ -> FastAPI on port 5000
+- https://hugo.hpcc.ttu.edu/api/quanah/ -> FastAPI on port 5001
+#### 1. Update Nginx Configuration
+Edit the nginx configuration to include:
+```nginx
+server {
+    listen 443 ssl;
+    server_name hugo.hpcc.ttu.edu;
+    ssl_certificate /etc/letsencrypt/live/hugo.hpcc.ttu.edu/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/hugo.hpcc.ttu.edu/privkey.pem; # managed by Certbot
+
+    location /api/nocona/ {
+        proxy_pass http://127.0.0.1:5000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /api/quanah/ {
+        proxy_pass http://127.0.0.1:5001/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+```
+#### 2. Update `root_path` in Fast API apps
+**For /api/nocona/:**
+```python
+app = FastAPI(root_path="/api/nocona")
+```
+**For /api/quanah/:**
+```python
+app = FastAPI(root_path="/api/quanah")
+```
+> The partition name is defined in the configuration file; we set `root_path=f"/api/{partition}"` in the source code.
+Then restart the service.
+#### 3. Verification
+Restart Nginx:
+```bash
+nginx -t && systemctl reload nginx
+```
+Access via:
+- `https://hugo.hpcc.ttu.edu/api/nocona/docs` for the Nocona API
+- `https://hugo.hpcc.ttu.edu/api/quanah/docs` for the Quanah API
+
+#### 4. Trouble-shooting
+If your system has SELinux enabled, it may block Nginx from making localhost connections.
+Test with:
+```bash
+getenforce
+```
+If it says Enforcing, try (as root):
+```bash
+setenforce 0
+```
+Then reload Nginx and test again. If it works, you need a permanent SELinux policy:
+```bash
+sudo setsebool -P httpd_can_network_connect 1
+```
+This enables Nginx (`httpd`) to make outbound connections (like `proxy_pass`) permanently in SELinux policy.
