@@ -10,11 +10,15 @@ from pydantic import BaseModel
 from mbuilder.metrics_builder import metrics_builder
 from monster import utils
 
-app = FastAPI()
-
 config    = utils.parse_config()
 partition = utils.get_partition(config)
 front_url = utils.get_front_url(config)
+
+
+app = FastAPI(
+    root_path=f"/api/{partition}",
+    openapi_url=f"/openapi.json"
+)
 
 class Request(BaseModel):
     start      : Optional[str]  = "2025-01-08 12:00:00-06"
@@ -41,7 +45,7 @@ app.add_middleware(
 )
 
 
-@app.post(f"/{partition}")
+@app.post(f"/")
 def main(request: Request):
     start_epoch = int(parse(request.start).timestamp())
     end_epoch   = int(parse(request.end).timestamp())
