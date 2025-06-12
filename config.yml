@@ -1,0 +1,83 @@
+# TimeScaleDB Configuration
+timescaledb: 
+  host: 0.0.0.0
+  port: 5432
+  database: database
+
+# Partition in cluster
+partition: zen4
+
+# iDRAC Configuration
+idrac:
+  model: 16G
+  nodelist:
+    - 10.101.91.[1-20]
+    - 10.101.92.[1-20]
+    - 10.101.94.[1-20]
+    - 10.101.95.[1-10]
+    - 10.101.96.[1-20]
+    - 10.101.97.[1-20]
+
+# iDRAC Configuration for the 13G model
+# idrac:
+#   model: 13G
+#   nodelist:
+#     - 10.101.1.[1-60]
+#     - 10.101.2.[1-60]
+#     - 10.101.3.[1-56]
+#     - 10.101.4.[1-48]
+#     - 10.101.5.[1-24]
+#     - 10.101.6.[1-20]
+#     - 10.101.7.[1-3,5-60]
+#     - 10.101.8.[1-60]
+#     - 10.101.9.[1-60]
+#     - 10.101.10.[25-44]
+#   api:
+#     thermal: /redfish/v1/Chassis/System.Embedded.1/Thermal/
+#     power: /redfish/v1/Chassis/System.Embedded.1/Power/
+#   metrics:
+#     - Fans
+#     - Temperatures
+#     - PowerControl
+
+# Slurm REST API Configuration
+slurm_rest_api:
+  ip: nuetu
+  port: 6820
+  user: monster
+  headnode: repacss
+  slurm_jobs: /slurm/v0.0.42/jobs/ # Access via /openapi/v3 to get the valid api version
+  slurm_nodes: /slurm/v0.0.42/nodes/
+  openapi: /openapi/v3
+
+# OpenAPI Metrics Mapping
+# Keys are the metric parameters used in the Metrics Builder API
+# Values are the table names in TimeScaleDB.
+openapi:
+  # API configuration for iDRAC-13G
+  # idrac:
+  #   Fans: rpmreading
+  #   SystemPower: systempowerconsumption
+  #   Temperatures: temperaturereading
+  # API configuration for iDRAC-15G
+  idrac:
+    CPUUsage: cpuusage
+    CPUPower: totalcpupower
+    Fans: rpmreading
+    MemoryPower: totalmemorypower
+    SystemPower: systempowerconsumption
+    Temperatures: temperaturereading
+  slurm:
+    JobsInfo: jobs
+    MemoryUsage: memoryusage
+    NodeJobsCorrelation: node_jobs
+    NodesState: state
+  ip: 0.0.0.0
+  port: 5000
+  ssl_keyfile: /path/to/ssl_keyfile
+  ssl_certfile: /path/to/ssl_certfile
+
+# Frontend Configuration
+frontend:
+  url: https://frontend.github.io
+
