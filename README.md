@@ -111,3 +111,82 @@ kill $(ps aux | grep 'mb_run.py --config=config.yml' | grep -v grep | awk '{prin
 kill $(ps aux | grep 'monit_idrac.py --config=config.yml' | grep -v grep | awk '{print $2}')
 kill $(ps aux | grep 'monit_slurm.py --config=config.yml' | grep -v grep | awk '{print $2}')
 ```
+
+# Troubleshooting Package Installation Issues.
+
+This section lists common errors and their solutions when installing packages required to build or install `psycopg2` and PostgreSQL development libraries.
+
+## 1. Missing Python Headers
+
+**Error message:**
+
+```bash
+    In file included from psycopg/adapter_asis.c:28:
+    ./psycopg/psycopg.h:35:10: fatal error: Python.h: No such file or directory
+       35 | #include <Python.h>
+          |          ^~~~~~~~~~
+    compilation terminated.
+
+    It appears you are missing some prerequisite to build the package from source
+```
+
+**Cause:**
+
+This error occurs because the **Python development headers** (Python.h, etc.) are missing.
+
+**Solution:**
+
+Install the development package for Python:
+
+```bash
+sudo dnf install python3-devel
+```
+
+## 2. Missing PostgreSQL Client Headers
+
+**Error message:**
+
+```bash
+    In file included from psycopg/adapter_asis.c:28:
+    ./psycopg/psycopg.h:36:10: fatal error: libpq-fe.h: No such file or directory
+       36 | #include <libpq-fe.h>
+          |          ^~~~~~~~~~~~
+    compilation terminated.
+
+    It appears you are missing some prerequisite to build the package from source.
+```
+
+**Cause:**
+
+This indicates that the **PostgreSQL client development headers** (libpq-fe.h) are missing. These are required for building `psycopg2`.
+
+**Solution:**
+
+Install the development libraries for PostgreSQL 17:
+```
+sudo dnf install postgresql17-devel
+```
+
+## 3. Missing Dependency: perl-IPC-Run
+
+**Error message when installing postgresql17-devel:**
+
+```bash
+Error: Unable to find a match: perl-IPC-Run
+```
+**Cause:**
+
+The package `perl-IPC-Run` is a dependency of `postgresql17-devel`, but it is not available in the default repositories.
+
+**Solution:**
+
+Enable the CodeReady Builder (CRB) repository and install `perl-IPC-Run`:
+
+```bash
+sudo dnf --enablerepo=crb install perl-IPC-Run
+``` 
+
+Then retry installing `postgresql17-devel`:
+```bash
+sudo dnf install postgresql17-devel
+``` 
