@@ -23,7 +23,7 @@ def monit_slurm(config):
     hostname_list   = [ip_hostname_map[ip] for ip in nodelist]
 
     jobs_metrics  = slurm.get_slurm_jobs_metrics(slurm_config, partition)
-    nodes_metrics = slurm.get_slurm_nodes_metrics(slurm_config, hostname_list)
+    nodes_metrics = slurm.get_slurm_nodes_metrics(slurm_config, hostname_list)    
 
     # Extract job information
     jobs_info = process.process_job_metrics_slurm(jobs_metrics)

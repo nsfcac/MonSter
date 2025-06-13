@@ -18,7 +18,7 @@ For details about MonSter, please refer to the paper:
 For examples of visualization of data based on the above please see [https://idatavisualizationlab.github.io/HPCC/](https://idatavisualizationlab.github.io/HPCC/).
 
 ## Prerequisite
-MonSter requires that iDRAC nodes (13G in pull model, 15G in push model), TimeScaleDB service, and Slurm REST API service can be accessed from the host machine where MonSter is running.
+MonSter requires that iDRAC nodes (pull model or push model), TimeScaleDB service, and Slurm REST API service can be accessed from the host machine where MonSter is running.
 
 ## Initial Setup
 
@@ -28,15 +28,15 @@ MonSter requires that iDRAC nodes (13G in pull model, 15G in push model), TimeSc
 
 ```bash
 # For TimeScaleDB
-tsdb_username=tsdb_username
-tsdb_password=tsdb_password
+export tsdb_username=tsdb_username
+export tsdb_password=tsdb_password
 
 # For iDRAC8
-idrac_username=idrac_username
-idrac_password=idrac_password
+export idrac_username=idrac_username
+export idrac_password=idrac_password
 
 # For Slurm REST API
-slurm_username=slurm_username
+export slurm_username=slurm_username
 ```
 
 3. The database specified in the configuration file should be created and applied the TimeScaleDB extension before run any codes.

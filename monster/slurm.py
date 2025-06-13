@@ -73,7 +73,7 @@ def call_slurm_api(slurm_config: dict, token: str, url: str):
 
 def get_slurm_jobs_metrics(slurm_config: dict, partition: str):
     url = f"http://{slurm_config['ip']}:{slurm_config['port']}{slurm_config['slurm_jobs']}"
-    jobs_metric = call_slurm_api(slurm_config, read_slurm_token(slurm_config), url)['jobs']
+    jobs_metric = call_slurm_api(slurm_config, read_slurm_token(slurm_config), url).get('jobs', [])
     # only keep the jobs in the specified partition
     jobs_metric = [job for job in jobs_metric if job['partition'] == partition]
     return jobs_metric
@@ -132,7 +132,7 @@ def dump_slurm_jobs_info(conn: object, jobs_info: list):
 
 def get_slurm_nodes_metrics(slurm_config: dict, hostname_list: list):
     url = f"http://{slurm_config['ip']}:{slurm_config['port']}{slurm_config['slurm_nodes']}"
-    nodes_metric = call_slurm_api(slurm_config, read_slurm_token(slurm_config), url)['nodes']
+    nodes_metric = call_slurm_api(slurm_config, read_slurm_token(slurm_config), url).get('nodes', [])
     # only keep the nodes in the specified partition
     nodes_metric = [node for node in nodes_metric if node["hostname"] in hostname_list]
     return nodes_metric

@@ -9,7 +9,7 @@ import idrac
 from monster import utils
 
 
-def monit_idrac_13g(config):
+def monit_idrac_pull(config):
     cols = ('timestamp', 'nodeid', 'source', 'fqdd', 'value')
     connection         = utils.init_tsdb_connection(config)
     username, password = utils.get_idrac_auth()
@@ -22,7 +22,7 @@ def monit_idrac_13g(config):
         fqdd_map   = utils.get_fqdd_source_map(conn, 'fqdd')
         source_map = utils.get_fqdd_source_map(conn, 'source')
         timestamp  = datetime.now(timezone.utc).replace(microsecond=0)
-        processed_records = idrac.get_idrac_metrics_13g(idrac_api, timestamp, idrac_metrics,
+        processed_records = idrac.get_idrac_metrics_pull(idrac_api, timestamp, idrac_metrics,
                                                         nodelist, username, password,
                                                         nodeid_map, source_map, fqdd_map)
         for tabel, records in processed_records.items():
@@ -31,7 +31,7 @@ def monit_idrac_13g(config):
         conn.commit()
 
 
-def monit_idrac_15g(config):
+def monit_idrac_push(config):
     connection         = utils.init_tsdb_connection(config)
     username, password = utils.get_idrac_auth()
     nodelist           = utils.get_nodelist(config)
@@ -49,20 +49,20 @@ def monit_idrac_15g(config):
         metric_dtype_mapping = utils.get_metric_dtype_mapping(conn)
 
     with multiprocessing.Pool(cores) as pool:
-        pool.starmap(idrac.get_idrac_metrics_15g, [(nodelist, idrac_metrics, username, password,
-                                                    connection, nodeid_map, source_map,
-                                                    fqdd_map, metric_dtype_mapping)
-                                                   for nodelist in nodelist_chunks])
+        pool.starmap(idrac.get_idrac_metrics_push, [(nodelist, idrac_metrics, username, password,
+                                                     connection, nodeid_map, source_map,
+                                                     fqdd_map, metric_dtype_mapping)
+                                                     for nodelist in nodelist_chunks])
 
 
 if __name__ == '__main__':
     config = utils.parse_config()
     
     idrac_model = utils.get_idrac_model(config)
-    if idrac_model == "13G":
-        schedule.every().minutes.at(":00").do(monit_idrac_13g, config)
+    if idrac_model == "pull":
+        schedule.every().minutes.at(":00").do(monit_idrac_pull, config)
         while True:
             schedule.run_pending()
             time.sleep(1)
-    elif idrac_model == "15G":
-        monit_idrac_15g(config)
+    elif idrac_model == "push":
+        monit_idrac_push(config)

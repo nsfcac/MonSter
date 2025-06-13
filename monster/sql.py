@@ -13,7 +13,7 @@ job_info_column_names = ['job_id', 'array_job_id', 'array_task_id', 'name',
                          'eligible_time', 'start_time', 'end_time',
                          'resize_time', 'restart_cnt', 'exit_code',
                          'derived_exit_code']
-job_info_column_types = ['INT PRIMARY KEY', 'INT', 'INT', 'TEXT', 'TEXT', 'INT',
+job_info_column_types = ['INT PRIMARY KEY', 'INT', 'INT', 'TEXT', 'TEXT[]', 'INT',
                          'TEXT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT',
                          'BOOLEAN', 'TEXT', 'TEXT[]', 'INT', 'INT', 'INT', 'INT',
                          'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT',
@@ -77,7 +77,7 @@ def update_metadata(conn: object, nodes_metadata: list, table_name: str):
         col_sql = ""
         bmc_ip_addr = record['Bmc_Ip_Addr']
         for col, value in record.items():
-            if col != 'Bmc_Ip_Addr' and col != 'HostName':
+            if col != 'Bmc_Ip_Addr':
                 col_value = col.lower() + " = '" + str(value) + "', "
                 col_sql += col_value
         col_sql = col_sql[:-2]
@@ -153,15 +153,14 @@ def generate_slurm_job_table_sql(schema_name: str):
     table_sql = f"CREATE TABLE IF NOT EXISTS {schema_name}.{table} \
         ({column_str[:-2]});"
     tables_sql.append(table_sql)
-
+    
     sql_statements.update({
         'tables_sql': tables_sql,
     })
-
     return sql_statements
 
 
-def generate_metric_def_table_sql_15g():
+def generate_metric_def_table_sql_push():
     metric_def_table_sql = "CREATE TABLE IF NOT EXISTS metrics_definition \
             (id SERIAL PRIMARY KEY, metric_id TEXT NOT NULL, metric_name TEXT, \
             description TEXT, metric_type TEXT,  metric_data_type TEXT, \
@@ -170,7 +169,7 @@ def generate_metric_def_table_sql_15g():
     return metric_def_table_sql
 
 
-def write_metric_definitions_15g(conn: object, metric_definitions: list):
+def write_metric_definitions_push(conn: object, metric_definitions: list):
     if not check_table_exist(conn, 'metrics_definition'):
         cols = ('metric_id', 'metric_name', 'description', 'metric_type',
                 'metric_data_type', 'units', 'accuracy', 'sensing_interval',
@@ -188,14 +187,14 @@ def write_metric_definitions_15g(conn: object, metric_definitions: list):
         mgr.copy(metric_definitions_table)
 
 
-def generate_metric_def_table_sql_13g():
+def generate_metric_def_table_sql_pull():
     metric_def_table_sql = "CREATE TABLE IF NOT EXISTS metrics_definition \
             (id SERIAL PRIMARY KEY, metric_id TEXT, metric_data_type TEXT, \
              units TEXT, UNIQUE (id));"
     return metric_def_table_sql
 
 
-def write_metric_definitions_13g(conn: object, metric_definitions: list):
+def write_metric_definitions_pull(conn: object, metric_definitions: list):
     if not check_table_exist(conn, 'metrics_definition'):
         cols = ('metric_id', 'metric_data_type', 'units')
 
