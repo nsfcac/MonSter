@@ -104,6 +104,65 @@ kill $(ps aux | grep 'monit_idrac.py --config=config.yml' | grep -v grep | awk '
 kill $(ps aux | grep 'monit_slurm.py --config=config.yml' | grep -v grep | awk '{print $2}')
 ```
 
+## Setup a systemd service
+
+### Step 1. Create a Shell Wrapper Script
+This script activates the virtual environment and starts the monster app.
+
+Create:
+```bash
+/home/username/MonSter/run_monster.sh
+```
+
+Content:
+```bash
+#!/bin/bash
+# Activate virtual environment
+source /home/username/MonSter/.ven/bin/activate
+# Start each script in the background
+python /home/username/MonSter/monster/monit_idrac.py --config=config.yml & 
+python /home/username/MonSter/monster/monit_slurm.py --config=config.yml &
+# Keep the service running by waiting for all child processes
+wait
+```
+
+Make it executable:
+```bash
+chmod +x /home/username/MonSter/run_monster.sh
+```
+
+### Step 2. Create a systemd Service File
+Create file:
+```bash
+sudo nano /etc/systemd/system/monster.service
+```
+
+Content:
+```ini
+[Unit]
+Description=Monster Service
+After=network.target
+
+[Service]
+Type=simple
+User=username
+WorkingDirectory=/home/username/MonSter
+ExecStart=/home/username/MonSter/run_monster.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Reload and enable the service:
+```bash
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable monster.service
+sudo systemctl start monster.service
+```
+
 # Serving APIs with Nginx
 ## SSL Configuration (use hugo.hpcc.ttu.edu as an example)
 ### Prerequisites
