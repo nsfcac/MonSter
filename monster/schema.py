@@ -47,7 +47,7 @@ def build_slurm_table_schemas():
         },
         'state': {
             'add_columns': ['Value'],
-            'add_types': ['TEXT']
+            'add_types': ['TEXT[]']
         },
         'node_jobs': {
             'add_columns': ['Jobs', 'CPUs'],

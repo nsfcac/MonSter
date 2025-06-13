@@ -7,9 +7,9 @@ timescaledb:
 # Partition in cluster
 partition: partition_name
 
-# iDRAC Configuration for the 15G model
+# iDRAC Configuration for the Push model
 idrac:
-  model: 15G
+  model: push
   nodelist:
     - 10.101.23.[1-60]
     - 10.101.24.[1-60]
@@ -57,7 +57,7 @@ openapi:
   #   Fans: rpmreading
   #   SystemPower: systempowerconsumption
   #   Temperatures: temperaturereading
-  # API configuration for iDRAC-15G
+  # API configuration for iDRAC-push
   idrac:
     CPUUsage: cpuusage
     CPUPower: totalcpupower

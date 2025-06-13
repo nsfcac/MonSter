@@ -66,8 +66,13 @@ def parse_config():
         raise SystemExit(1)
     
     # Sanity check for idrac configuration
-    if 'nodelist' not in config['idrac']:
+    if 'model' not in config['idrac'] or 'nodelist' not in config['idrac']:
         print("Configuration Error: Missing required keys in 'idrac'")
+        raise SystemExit(1)
+    
+    # Sanity check for the idrac model
+    if config['idrac']['model'] not in ['pull', 'push']:
+        print("Configuration Error: 'idrac.model' must be either 'pull' or 'push'")
         raise SystemExit(1)
     
     # Sanity check for slurm_rest_api configuration
@@ -148,7 +153,7 @@ def sort_tuple_list(tuple_list: list):
 
 def get_idrac_api(config):
     idrac_model = get_idrac_model(config)
-    if idrac_model == "15G":
+    if idrac_model == "push":
         return None
     else:
         try:
@@ -160,15 +165,7 @@ def get_idrac_api(config):
 
 
 def get_idrac_model(config):
-    try:
-        idrac_model = config['idrac']['model']
-        if idrac_model not in ["13G", "15G"]:
-            log.error(f"Invalid idrac_model: {idrac_model}")
-            raise SystemExit(1)
-        return idrac_model
-    except Exception as err:
-        log.error(f"Cannot find idrac_model configuration: {err}")
-        raise SystemExit(1)
+    return config['idrac']['model']
 
 
 def get_idrac_metrics(config):
@@ -176,8 +173,8 @@ def get_idrac_metrics(config):
         idrac_metrics = config['idrac']['metrics']
         return idrac_metrics
     except Exception as err:
-        log.error(f"Cannot find idrac_metrics configuration: {err}")
-        raise SystemExit(1)
+        # No idrac metrics configuration found
+        return []
 
 
 def get_nodeid_map(conn: object):
@@ -220,13 +217,7 @@ def get_fqdd_source_map(conn: object, table: str):
 
 
 def get_slurm_config(config):
-    try:
-        slurm_config = config['slurm_rest_api']
-        return slurm_config
-    except Exception as err:
-        # Exit if the configuration file is not found
-        log.error(f"Cannot find slurm_rest_api configuration: {err}")
-        raise SystemExit(1)
+    return config['slurm_rest_api']
 
 
 def get_ip_hostname_map(connection: str):

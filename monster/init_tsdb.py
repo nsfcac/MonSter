@@ -25,29 +25,29 @@ def init_tsdb(config):
 
     utils.print_status('Getting', 'nodes' , 'metadata')
     nodes_metadata = idrac.get_nodes_metadata(nodelist, valid_nodelist, username, password)
+
     if DEBUG:
         print(nodes_metadata)
         print(len(valid_nodelist))
-
-
+    
     utils.print_status('Getting', 'fqdd and source' , 'information')
-    if idrac_model == '15G':
-        fqdd_source_metadata = idrac.get_fqdd_source_15g(nodelist, username, password)
-    elif idrac_model == '13G':
-        fqdd_source_metadata = idrac.get_fqdd_source_13g(nodelist, idrac_api, idrac_metrics,
+    if idrac_model == 'push':
+        fqdd_source_metadata = idrac.get_fqdd_source_push(nodelist, username, password)
+    elif idrac_model == 'pull':
+        fqdd_source_metadata = idrac.get_fqdd_source_pull(nodelist, idrac_api, idrac_metrics,
                                                          username, password)
     if DEBUG:
         print(fqdd_source_metadata)
 
     utils.print_status('Getting', 'metric' , 'definitions')
-    if idrac_model == '15G':
-        metric_definitions = idrac.get_metric_definitions_15g(valid_nodelist, idrac_metrics, username, password)
-    elif idrac_model == '13G':
-        metric_definitions = idrac.get_metric_definitions_13g(idrac_metrics)
+    if idrac_model == 'push':
+        metric_definitions = idrac.get_metric_definitions_push(valid_nodelist, idrac_metrics, username, password)
+    elif idrac_model == 'pull':
+        metric_definitions = idrac.get_metric_definitions_pull(idrac_metrics)
+    
     if DEBUG:
         print(metric_definitions)
     
-
     idrac_table_schemas = schema.build_idrac_table_schemas(metric_definitions)
     slurm_table_schemas = schema.build_slurm_table_schemas()
 
@@ -97,14 +97,14 @@ def init_tsdb(config):
             cur.execute(s)
 
         # Create table for metric definitions
-        if idrac_model == '15G':
-            metric_def_sql = sql.generate_metric_def_table_sql_15g()
+        if idrac_model == 'push':
+            metric_def_sql = sql.generate_metric_def_table_sql_push()
             cur.execute(metric_def_sql)
-            sql.write_metric_definitions_15g(conn, metric_definitions)
-        elif idrac_model == '13G':
-            metric_def_sql = sql.generate_metric_def_table_sql_13g()
+            sql.write_metric_definitions_push(conn, metric_definitions)
+        elif idrac_model == 'pull':
+            metric_def_sql = sql.generate_metric_def_table_sql_pull()
             cur.execute(metric_def_sql)
-            sql.write_metric_definitions_13g(conn, metric_definitions)
+            sql.write_metric_definitions_pull(conn, metric_definitions)
 
         conn.commit()
         cur.close()

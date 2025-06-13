@@ -138,14 +138,21 @@ def extract_metadata(system_info: dict, bmc_info: dict, node: str):
             })
 
         # Sanity check for hostname
-        # Todo: Add more checks. Some nodes report hostname as "cpu-24-11.localdomain"
+        # Todo: Add more checks. Some nodes report hostname as "cpu-24-11.localdomain" (for redraider)
+        # On repacss, the hostname is set to c+number, e.g. c001, and g+number, e.g. g001
+        # This part is currently hardcoded for the repacss cluster
         hostname = metrics.get("HostName", None)
-        if not hostname or (not hostname.startswith("cpu")):
-            new_hostname = bmc_ip_addr.replace("10.101.", "cpu-").replace(".", "-")
-            print(f"Hostname {hostname} is not valid, set to {new_hostname}")
-            metrics.update({
-                "HostName": new_hostname
-            })
+        if (hostname.startswith("c")):
+            new_hostname = bmc_ip_addr.replace("10.101.", "rpc-").replace(".", "-")
+        elif (hostname.startswith("g")):
+            new_hostname = bmc_ip_addr.replace("10.101.", "rpg-").replace(".", "-")
+        else:
+            # This is only for the h100-build node, as it does not have a valid hostname
+            new_hostname = bmc_ip_addr.replace("10.101.", "rpg-").replace(".", "-")
+        # print(f"Hostname {hostname} is not valid, set to {new_hostname}")
+        metrics.update({
+            "HostName": new_hostname
+        })
 
         return metrics
     except Exception as err:
@@ -165,7 +172,7 @@ def parallel_extract_metadata(system_info_list: list,
     return info
 
 
-def extract_fqdd_source_13g(redfish_report: list, metrics: list):
+def extract_fqdd_source_pull(redfish_report: list, metrics: list):
     fqdd = []
     source = []
     for i in redfish_report:
@@ -180,13 +187,13 @@ def extract_fqdd_source_13g(redfish_report: list, metrics: list):
     return (fqdd, source)
 
 
-def extract_fqdd_source_15g(telemetry_service: dict):
+def extract_fqdd_source_push(telemetry_service: dict):
     fqdd = telemetry_service['Oem']['Dell']['FQDDList']
     source = telemetry_service['Oem']['Dell']['SourceList']
     return (fqdd, source)
 
 
-def process_all_idracs_13g(idrac_api: list, timestamp, idrac_metrics: list,
+def process_all_idracs_pull(idrac_api: list, timestamp, idrac_metrics: list,
                            nodelist: list, redfish_report: list,
                            nodeid_map: dict, source_map: dict, fqdd_map: dict):
     processed_records = {}
@@ -198,7 +205,7 @@ def process_all_idracs_13g(idrac_api: list, timestamp, idrac_metrics: list,
     for idrac_metric in idrac_metrics:
         table_name = f"idrac.{idrac_metric.lower()}"
         for reports in idrac_reports:
-            records = parallel_process_idrac_13g(timestamp, idrac_metric, nodelist,
+            records = parallel_process_idrac_pull(timestamp, idrac_metric, nodelist,
                                                  reports, nodeid_map, source_map, fqdd_map)
             if table_name not in processed_records:
                 processed_records[table_name] = records
@@ -208,21 +215,21 @@ def process_all_idracs_13g(idrac_api: list, timestamp, idrac_metrics: list,
     return processed_records
 
 
-def parallel_process_idrac_13g(timestamp, idrac_metric: str, nodelist: list,
+def parallel_process_idrac_pull(timestamp, idrac_metric: str, nodelist: list,
                                reports: list, nodeid_map: dict, source_map: dict,
                                fqdd_map: dict):
     records = []
     process_args = zip(repeat(timestamp), repeat(idrac_metric), nodelist, reports,
                        repeat(nodeid_map), repeat(source_map), repeat(fqdd_map))
     with multiprocessing.Pool() as pool:
-        records = pool.starmap(process_node_idrac_13g, process_args)
+        records = pool.starmap(process_node_idrac_pull, process_args)
 
     # Remove empty lists
     records = [item for sublist in records for item in sublist]
     return records
 
 
-def process_node_idrac_13g(timestamp, idrac_metric: str, node: str, report: list,
+def process_node_idrac_pull(timestamp, idrac_metric: str, node: str, report: list,
                            nodeid_map: dict, source_map: dict, fqdd_map: dict):
     records = []
     # The first item corresponds to the fqdd field
@@ -261,7 +268,18 @@ def process_job_metrics_slurm(jobs_metrics: list):
             if attribute == 'nodes':
                 info.append(hostnames)
             else:
-                info.append(job.get(attribute, None))
+                # Try to get the attribute metric
+                metric = job.get(attribute, None)
+                # If metric is a dictory, get the "number" key
+                if isinstance(metric, dict):
+                    if 'number' in metric:
+                        info.append(metric['number'])
+                    elif 'return_code' in metric:
+                        info.append(metric['return_code']['number'])
+                    else:
+                        info.append(None)
+                else:
+                    info.append(metric)
         jobs_info.append(tuple(info))
 
     return jobs_info
@@ -331,16 +349,15 @@ def process_node_job_correlation(jobs_metrics: list,
                                  timestamp):
     nodes_jobs = {}
     for job in jobs_metrics:
-        if job['job_state'] == "RUNNING":
+        if "RUNNING" in job['job_state']:
             job_id = job['job_id']
-            cpus = round(job['job_resources']['allocated_cores'] / job['job_resources']['allocated_hosts'])
-            allocated_nodes = job['job_resources']['allocated_nodes']
-            for item in allocated_nodes:
+            allocated_nodes = hostlist.expand_hostlist(job['job_resources']['nodes']['list'])
+            for item in job['job_resources']['nodes']['allocation']:
                 # Check if item['nodename'] is in the hostname_id_map
-                if item['nodename'] not in hostname_id_map:
+                if item['name'] not in hostname_id_map:
                     continue
-                nodeid = hostname_id_map[item['nodename']]
-                # cpus   = item['cpus_used'] # There is a bug in the Slurm API, cpus_used is sometimes 0
+                nodeid = hostname_id_map[item['name']]
+                cpus   = item['cpus']['count']
                 if nodeid not in nodes_jobs:
                     nodes_jobs.update({
                         nodeid: {
@@ -358,7 +375,7 @@ def process_node_job_correlation(jobs_metrics: list,
     return records
 
 
-async def listen_idrac_15g(node: str, username: str, password: str, mr_queue: asyncio.Queue):
+async def listen_idrac_push(node: str, username: str, password: str, mr_queue: asyncio.Queue):
     url = f"https://{node}/redfish/v1/SSE?$filter=EventFormatType%20eq%20MetricReport"
     while True:
         try:
@@ -374,7 +391,6 @@ async def listen_idrac_15g(node: str, username: str, password: str, mr_queue: as
                     async for event in event_source:
                         report = json.loads(event.data)
                         if report:
-                            # print(f"Received report from {node}")
                             await mr_queue.put((node, report))
                             await asyncio.sleep(0)
         except Exception as err:
@@ -383,7 +399,7 @@ async def listen_idrac_15g(node: str, username: str, password: str, mr_queue: as
             continue
 
 
-async def process_idrac_15g(mr_queue: asyncio.Queue, mp_queue: asyncio.Queue, idrac_metrics: list):
+async def process_idrac_push(mr_queue: asyncio.Queue, mp_queue: asyncio.Queue, idrac_metrics: list):
     while True:
         data = await mr_queue.get()
         ip = data[0]
@@ -392,48 +408,45 @@ async def process_idrac_15g(mr_queue: asyncio.Queue, mp_queue: asyncio.Queue, id
         metric_values = report.get('MetricValues', [])
         if report_id and metric_values:
             # print(f"Processing report from {ip}")
-            processed_metrics = single_process_idrac_15g(ip, report_id, metric_values, idrac_metrics)
+            processed_metrics = single_process_idrac_push(ip, report_id, metric_values, idrac_metrics)
             if processed_metrics:
                 await mp_queue.put((ip, processed_metrics))
             mr_queue.task_done()
 
 
-def single_process_idrac_15g(ip: str, report_id: str, metric_values: list, idrac_metrics: list):
+def single_process_idrac_push(ip: str, report_id: str, metric_values: list, idrac_metrics: list):
     metrics = {}
-    if report_id == "PowerStatistics":
-        pass
-    else:
-        for metric in metric_values:
-            table_name = metric.get('MetricId', None)
-            timestamp  = metric.get('Timestamp', None)
-            source     = metric.get('Oem', {}).get('Dell', {}).get('Source', None)
-            fqdd       = metric.get('Oem', {}).get('Dell', {}).get('FQDD', None)
-            value      = metric.get('MetricValue', None)
-            
-            if table_name in idrac_metrics:
-                if timestamp and source and fqdd and value:
-                    record = {
-                        'timestamp': parse(timestamp),
-                        'source': source,
-                        'fqdd': fqdd,
-                        'value': value
-                    }
-                    if table_name not in metrics:
-                        metrics[table_name] = [record]
-                    else:
-                        metrics[table_name].append(record)
+    for metric in metric_values:
+        table_name = metric.get('MetricId', None)
+        timestamp  = metric.get('Timestamp', None)
+        source     = metric.get('Oem', {}).get('Dell', {}).get('Source', None)
+        fqdd       = metric.get('Oem', {}).get('Dell', {}).get('FQDD', None)
+        value      = metric.get('MetricValue', None)
+        
+        # if idrac_metrics is empty, we assume all metrics are valid
+        if not idrac_metrics or table_name in idrac_metrics:
+            if timestamp and source and fqdd and value:
+                parse_timestamp = parse(timestamp).replace(microsecond=0)
+                record = {
+                    'timestamp': parse_timestamp,
+                    'source': source,
+                    'fqdd': fqdd,
+                    'value': value
+                }
+                if table_name not in metrics:
+                    metrics[table_name] = [record]
+                else:
+                    metrics[table_name].append(record)
     return metrics
 
 
-async def write_idrac_15g(conn: object, nodeid_map: dict, source_map: dict, fqdd_map: dict,
+async def write_idrac_push(conn: object, nodeid_map: dict, source_map: dict, fqdd_map: dict,
                           metric_dtype_mapping: dict, mp_queue: asyncio.Queue):
     cols = ('timestamp', 'nodeid', 'source', 'fqdd', 'value')
     while True:
         data = await mp_queue.get()
         ip = data[0]
         metrics = data[1]
-
-        # print(f"Writing metrics from {ip}")
         nodeid = nodeid_map[ip]
 
         try:
@@ -448,10 +461,7 @@ async def write_idrac_15g(conn: object, nodeid_map: dict, source_map: dict, fqdd
                     source = source_map[metric['source']]
                     fqdd = fqdd_map[metric['fqdd']]
                     value = utils.cast_value_type(metric['value'], dtype)
-                    if value == 0 or value == 0.0 or value == None:
-                        pass
-                    else:
-                        all_records.append((timestamp, nodeid, source, fqdd, value))
+                    all_records.append((timestamp, nodeid, source, fqdd, value))
 
                 mgr = CopyManager(conn, target_table, cols)
                 mgr.copy(all_records)
