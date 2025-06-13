@@ -52,6 +52,30 @@ def parse_config():
     except Exception as err:
         print(f"Parsing Configuration Error: {err}")
         raise SystemExit(1)
+    
+    # Sanity check for required keys in the configuration
+    required_keys = ['timescaledb', 'partition', 'idrac', 'slurm_rest_api']
+    for key in required_keys:
+        if key not in config:
+            print(f"Configuration Error: Missing required key '{key}'")
+            raise SystemExit(1)
+
+    # Sanity check for timescaledb configuration
+    if 'host' not in config['timescaledb'] or 'port' not in config['timescaledb'] or 'database' not in config['timescaledb']:
+        print("Configuration Error: Missing required keys in 'timescaledb'")
+        raise SystemExit(1)
+    
+    # Sanity check for idrac configuration
+    if 'nodelist' not in config['idrac']:
+        print("Configuration Error: Missing required keys in 'idrac'")
+        raise SystemExit(1)
+    
+    # Sanity check for slurm_rest_api configuration
+    if 'ip' not in config['slurm_rest_api'] or 'port' not in config['slurm_rest_api'] or 'user' not in config['slurm_rest_api'] \
+    or 'slurm_jobs' not in config['slurm_rest_api'] or 'slurm_nodes' not in config['slurm_rest_api']:
+        print("Configuration Error: Missing required keys in 'slurm_rest_api'")
+        raise SystemExit(1)
+
     return config
 
 
@@ -103,13 +127,8 @@ def get_idrac_auth():
     return (username, password)
 
 
-def get_nodelist_raw(config):
-    nodelist_raw = config['idrac']['nodelist']
-    return nodelist_raw
-
-
 def get_nodelist(config):
-    nodelist_raw = get_nodelist_raw(config)
+    nodelist_raw = config['idrac']['nodelist']
     nodelist = []
 
     try:

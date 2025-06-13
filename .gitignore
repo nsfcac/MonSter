@@ -11,9 +11,7 @@ prev
 *.out
 *.json
 *.pem
-config-nocona.yml
-config-quanah.yml
-config.yml
+config-*.yml
 token.json
 json
 mbuilder_server

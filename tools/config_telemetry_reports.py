@@ -1,9 +1,5 @@
 """
-    This module is a tool for automatic configuration of telemetry reports. It 
-    was developed based on the observation that some telemetry reports do not
-    provide any data, for example, GPUStatistics or FPGASensor reports are not
-    available on the CPU node. Blindly enabling unavailable telemetry reports
-    and listening to them is a waste of resources.
+    This module is a tool for configuring the iDRAC telemetry reports.
 
 Jie Li (jie.li@ttu.edu)
 """
@@ -19,106 +15,148 @@ import requests
 import aiohttp
 import asyncio
 
-sys.path.append('../')
-
 from getpass import getpass
 from tqdm import tqdm
 from requests.adapters import HTTPAdapter
 from aiohttp import ClientSession
-from monster.utils import bcolors, parse_config, get_nodelist
 from urllib3.exceptions import InsecureRequestWarning
+
+sys.path.append('../')
+from monster.utils import bcolors, parse_config, get_nodelist
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 
 def main():
-    argv = sys.argv[1:]
+    """
+    Main function to configure telemetry reports
+    """
+    valid_reports = []
 
-    enable_only = False
-    disable_only = False
-
-    # Print logo and user interface
+    # Print logo
     print_logo()
-
-    try:
-        # Get user input from keyboard
-        user = input(f"--> Please input the {bcolors.BOLD}iDRAC username{bcolors.ENDC}: ")
-        if not user:
-            print(f"{bcolors.FAIL}--> Username cannot be empty!{bcolors.ENDC}")
-            return
-        password = getpass(f"--> Please input the {bcolors.BOLD}iDRAC password{bcolors.ENDC}: ")
-        if not password:
-            print(f"{bcolors.FAIL}--> Password cannot be empty!{bcolors.ENDC}")
-            return
-    except KeyboardInterrupt:
-        # Graceful exit on Ctrl+C
-        print(f"\n{bcolors.FAIL}Exiting...{bcolors.ENDC}")
-        return
 
     # Read configuratin file
     config = parse_config()
 
-    # We randomly select 3 nodes to get the metric report configurations
     nodelist = get_nodelist(config)
-    nodes = secrets.SystemRandom().sample(nodelist, 3)
+    # Select the first node to get the metric report configurations
+    node = nodelist[0]
 
-    for node in nodes:
-        attributes = get_attributes(config, node, user, password)
-        if attributes:
+    try:
+        while True:
+            # Get user input from keyboard
+            user = input(f"--> Please input the {bcolors.BOLD}iDRAC username{bcolors.ENDC}: ")
+            if not user:
+                print(f"{bcolors.FAIL}--> Username cannot be empty!{bcolors.ENDC}")
+                continue
+            password = getpass(f"--> Please input the {bcolors.BOLD}iDRAC password{bcolors.ENDC}: ")
+            if not password:
+                print(f"{bcolors.FAIL}--> Password cannot be empty!{bcolors.ENDC}")
+                continue
+
+            # Authentication check
+            url = f'https://{node}/redfish/v1/Managers/iDRAC.Embedded.1'
+            adapter = HTTPAdapter(max_retries=3)
+            with requests.Session() as session:
+                session.mount(url, adapter)
+                try:
+                    response = session.get(
+                        url,
+                        auth=(user, password),
+                        verify=False,
+                    )
+                    if response.status_code != 200:
+                        print(f"{bcolors.FAIL}--> Authentication failed! Please check your username and password.{bcolors.ENDC}")
+                        continue
+                except Exception as err:
+                    print(f"{bcolors.FAIL}--> Failed to connect to iDRAC: {err}, please try again later!{bcolors.ENDC}")
+                    return
+            # If authentication is successful, break the loop
+            print(f"{bcolors.OKGREEN}--> Authentication successful!{bcolors.ENDC}")
             break
-        else:
-            print(f"{bcolors.WARNING}--> Cannot get metric report configurations, please try again later!{bcolors.ENDC}")
-            return
 
-    print(attributes)
-    exit()
-    
-    loop = asyncio.get_event_loop()
-
-    # Disable or enable all metrics report only
-    if disable_only or enable_only:
-        if disable_only:
-            setting = "Disabled"
-        if enable_only:
-            setting = "Enabled"
-        print(f"--> {setting} all telemetry reports...")
-        attributes_settings = set_all_attributes(attributes, setting)
-        # print(json.dumps(attributes_settings, indent=4))
-        set_all_telemetry_reports(config, nodelist, user, password, attributes_settings, loop)
-        
-        loop.close()
+    except KeyboardInterrupt:
+        # Graceful exit on Ctrl+C
+        print(f"\n{bcolors.FAIL}--> Exiting...{bcolors.ENDC}")
         return
 
-    # Otherwise enable all telemetry reports, analyze, and enable those valid reports
-    attributes_settings = set_all_attributes(attributes, "Enabled")
-    print(f"--> Enabled all telemetry reports...")
-    set_all_telemetry_reports(config, nodelist, user, password, attributes_settings, loop)
+    print(f"--> Get telemetry attributes from {bcolors.BOLD}{node}{bcolors.ENDC}...")
 
-    print(f"--> Wait for 5 seconds for the telemetry reports to be effective...")
-    time.sleep(5)
+    attributes = get_attributes(config, node, user, password)
 
-    # We still test the telemetry report with 3 nodes, and if we encounter 3 
-    # consecutive empty reports, we consider the telemetry report invalid
-    valid_reports = []
-    for node in nodes:
-        members_urls = get_metric_report_member_urls(config, node, user, password)
-        if members_urls:
-            break
-    
-    # print(json.dumps(members_urls, indent=4))
-    print(f"--> Get {bcolors.BOLD}{len(members_urls)}{bcolors.ENDC} telemetry reports and analyze...")
+    # If attributes are empty, we cannot get the metric report configurations
+    if not attributes:
+        print(f"{bcolors.WARNING}--> Cannot get telemetry attributes, please try again later!{bcolors.ENDC}")
+        return
+
+    # Try to get the member urls of the metric reports
+    members_urls = get_metric_report_member_urls(config, node, user, password)
+
+    # Try to access the metric report member urls and check if they return valid values
     if members_urls:
         for url in tqdm(members_urls):
-            for node in nodes:
-                if check_metric_value(config, url, node, user, password):
-                    valid_reports.append(url.split('/')[-1])
-                    break
-    
-    attributes_settings = update_attributes(attributes, valid_reports)
+            if check_metric_value(config, url, node, user, password):
+                valid_reports.append(url.split('/')[-1])
 
-    print("--> Set valid telemetry reports...")
+    nice_attributes = {k.split('.')[0][9:]: v for k, v in attributes.items() if (
+        k != "Telemetry.1.EnableTelemetry"
+    )}
+
+    # Updete the attributes with the valid reports; if one attribute is enabled but the report is not valid, mark it as invalid
+    for (k, v) in nice_attributes.items():
+        if v == "Enabled" and k not in valid_reports:
+            nice_attributes[k] = "Invalid"
+
+    # Reorder the attributes by the key
+    nice_attributes = dict(sorted(nice_attributes.items(), key=lambda item: item[0]))
+
+    # Print the nice attributes in a table format and in color
+    print(f"{bcolors.BOLD}Telemetry Attributes:{bcolors.ENDC}")
+    print(f"{bcolors.BOLD}{'Attribute':<30}{'Status':<10}{bcolors.ENDC}")
+    for attr, status in nice_attributes.items():
+        if status == "Enabled":
+            print(f"{bcolors.OKBLUE}{attr:<30}{bcolors.ENDC}{bcolors.OKGREEN}{status:<10}{bcolors.ENDC}")
+        elif status == "Disabled":
+            print(f"{bcolors.OKBLUE}{attr:<30}{bcolors.ENDC}{bcolors.FAIL}{status:<10}{bcolors.ENDC}")
+        else:
+            print(f"{bcolors.OKBLUE}{attr:<30}{bcolors.ENDC}{bcolors.WARNING}{status:<10}{bcolors.ENDC}")
+    print(f"{bcolors.BOLD}Total Telemetry Attributes: {len(nice_attributes)}{bcolors.ENDC}")
+
+    valid_attributes = {k: v for k, v in nice_attributes.items() if v != "Invalid"}
+
+    try:
+        # Ask user to enable or disable telemetry reports
+        operation = input(f"--> Please input the operation you want to perform: {bcolors.BOLD}enable{bcolors.ENDC} or {bcolors.BOLD}disable{bcolors.ENDC} telemetry reports? ").strip().lower()
+        if operation not in ['enable', 'disable']:
+            print(f"{bcolors.FAIL}--> Invalid operation! Please input either 'enable' or 'disable'.{bcolors.ENDC}")
+            return
+        if operation == 'enable':
+            # If attributes are already enabled, we do nothing and exit
+            if all(v == "Enabled" for v in valid_attributes.values()):
+                print(f"{bcolors.OKGREEN}--> All telemetry reports are already enabled!{bcolors.ENDC}")
+                # return
+            print(f"{bcolors.OKGREEN}--> Enabling telemetry reports...{bcolors.ENDC}")
+            # If attributes are not enabled, we enable them and set the telemetry reports to enabled
+            setting = "Enabled"
+        elif operation == 'disable':
+            # If attributes are already disabled, we do nothing and exit
+            if all(v == "Disabled" for v in valid_attributes.values()):
+                print(f"{bcolors.OKGREEN}--> All telemetry reports are already disabled!{bcolors.ENDC}")
+                # return
+            print(f"{bcolors.FAIL}--> Disabling telemetry reports...{bcolors.ENDC}")
+            # If attributes are not disabled, we disable them and set the telemetry reports to disabled
+            setting = "Disabled"
+    except KeyboardInterrupt:
+        # Graceful exit on Ctrl+C
+        print(f"\n{bcolors.FAIL}Exiting...{bcolors.ENDC}")
+        return
+        
+    loop = asyncio.get_event_loop()
+
+    attributes_settings = set_all_attributes(attributes, setting)
     set_all_telemetry_reports(config, nodelist, user, password, attributes_settings, loop)
-
+    
     loop.close()
     return
 
@@ -129,7 +167,6 @@ def get_attributes(config: dict, node: str, user: str, password: str) -> dict:
     """
     attributes = {}
     url = f'https://{node}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes'
-    # adapter = HTTPAdapter(max_retries=config['bmc']['max_retries'])
     adapter = HTTPAdapter(max_retries=3)
     with requests.Session() as session:
         session.mount(url, adapter)
@@ -137,11 +174,11 @@ def get_attributes(config: dict, node: str, user: str, password: str) -> dict:
             response = session.get(
                 url,
                 auth = (user, password),
-                # verify = config['bmc']['ssl_verify'], 
+                verify = False, 
             )
             all_attributes = response.json().get('Attributes', {})
             attributes = {k: v for k, v in all_attributes.items() if (
-                (k.startswith('Telemetry')) and (k.endswith("EnableTelemetry"))
+                (k.startswith('Telemetry')) and (k.endswith("EnableTelemetry") and ("Statistics" not in k) and ("Aggregation" not in k) and ("SerialLog" not in k) and ("FPGASensor" not in k))
                 )}
         except Exception as err:
             print(f"Fail to get telemetry attributes: {err}")
@@ -173,10 +210,9 @@ async def set_telemetry_reports(config: dict, nodelist: list,
     """
     Enable or disable telemetry reports asynchronously
     """
-    connector = aiohttp.TCPConnector(ssl=config['bmc']['ssl_verify'])
+    connector = aiohttp.TCPConnector(ssl=False)
     auth = aiohttp.BasicAuth(user, password)
-    timeout = aiohttp.ClientTimeout(config['bmc']['timeout']['connect'], 
-                                    config['bmc']['timeout']['read'])
+    timeout = aiohttp.ClientTimeout(4, 45)
     async with ClientSession(connector=connector, 
                              auth=auth, timeout=timeout) as session:
         tasks = []
@@ -201,8 +237,7 @@ async def set_reports(node: str, attributes_settings: dict,
         resp.raise_for_status()
         status = resp.status
         if status != 200:
-            print(f"Fail to update telemetry attributes on {node}: \
-                            {str(resp.reason)}")
+            print(f"Fail to update telemetry attributes on {node}: {str(resp.reason)}")
         return status
     except Exception as err:
         print(f"Fail to update telemetry attributes on {node}: {err}")
@@ -297,14 +332,14 @@ def get_metric_report_member_urls(config: dict, node: str, user: str, password: 
     """
     members_url = []
     url = f'https://{node}/redfish/v1/TelemetryService/MetricReports/'
-    adapter = HTTPAdapter(max_retries=config['bmc']['max_retries'])
+    adapter = HTTPAdapter(max_retries=3)
     with requests.Session() as session:
         session.mount(url, adapter)
         try:
             response = session.get(
                 url,
                 auth = (user, password),
-                verify = config['bmc']['ssl_verify'], 
+                verify = False, 
             )
             members = response.json().get('Members', [])                
             members_url = [member['@odata.id'] for member in members]
@@ -319,14 +354,14 @@ def check_metric_value(config: dict, member_url: str, node: str,
     Check if member url returns valid values
     """
     url = f'https://{node}{member_url}'
-    adapter = HTTPAdapter(max_retries=config['bmc']['max_retries'])
+    adapter = HTTPAdapter(max_retries=3)
     with requests.Session() as session:
         session.mount(url, adapter)
         try:
             response = session.get(
                 url,
                 auth = (user, password),
-                verify = config['bmc']['ssl_verify'], 
+                verify = False, 
             )
             metric_value = response.json().get('MetricValues', [])
 
@@ -364,3 +399,4 @@ def print_logo():
 
 if __name__ == '__main__':
     main()
+    
