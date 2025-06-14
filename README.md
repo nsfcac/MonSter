@@ -28,15 +28,15 @@ MonSter requires that iDRAC nodes (pull model or push model), TimeScaleDB servic
 
 ```bash
 # For TimeScaleDB
-export tsdb_username=tsdb_username
-export tsdb_password=tsdb_password
+export tsdb_username=tsdb_user
+export tsdb_password=tsdb_pwd
 
 # For iDRAC8
-export idrac_username=idrac_username
-export idrac_password=idrac_password
+export idrac_username=idrac_user
+export idrac_password=idrac_pwd
 
 # For Slurm REST API
-export slurm_username=slurm_username
+export slurm_username=slurm_user
 ```
 
 3. The database specified in the configuration file should be created and applied the TimeScaleDB extension before run any codes.
@@ -81,22 +81,21 @@ cp config.yml.example config.yml
 python ./monster/init_tsdb.py --config=config.yml
 ```
 
-4. Run the code to collect the data from iDRAC and Slurm.
+## Option 1: Run the code directly
+1. Run the code to collect the data from iDRAC and Slurm.
 
 ```bash
 nohup python ./monster/monit_idrac.py --config=config.yml >/dev/null 2>&1 &
 nohup python ./monster/monit_slurm.py --config=config.yml >/dev/null 2>&1 &
 ```
 
-5. Run the MetricsBuilder API server.
+2. Run the MetricsBuilder API server.
 
 ```bash
 nohup python ./mbuilder/mb_run.py --config=config.yml >./log/mbapi.log 2>&1 &
 ```
 
-6. Access the demo page of the MetricsBuilder API server at `https://localhost:5000/docs`.
-
-7. Stop the running services.
+3. Stop the running services.
 
 ```bash
 kill $(ps aux | grep 'mb_run.py --config=config.yml' | grep -v grep | awk '{print $2}')
@@ -104,7 +103,7 @@ kill $(ps aux | grep 'monit_idrac.py --config=config.yml' | grep -v grep | awk '
 kill $(ps aux | grep 'monit_slurm.py --config=config.yml' | grep -v grep | awk '{print $2}')
 ```
 
-## Setup a systemd service
+## Option 2: Setup a systemd service
 
 ### Step 1. Create a Shell Wrapper Script
 This script activates the virtual environment and starts the monster app.
@@ -134,7 +133,7 @@ chmod +x /home/username/MonSter/run_monster.sh
 ### Step 2. Create a systemd Service File
 Create file:
 ```bash
-sudo nano /etc/systemd/system/monster.service
+sudo vim /etc/systemd/system/monster.service
 ```
 
 Content:
@@ -144,6 +143,11 @@ Description=Monster Service
 After=network.target
 
 [Service]
+Environment="tsdb_username=tsdb_user"
+Environment="tsdb_password=tsdb_pwd"
+Environment="idrac_username=idrac_user"
+Environment="idrac_password=idrac_pwd"
+Environment="slurm_username=slurm_user"
 Type=simple
 User=username
 WorkingDirectory=/home/username/MonSter
@@ -161,6 +165,11 @@ sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable monster.service
 sudo systemctl start monster.service
+```
+
+Stop the service:
+```bash
+sudo systemctl stop monster.service
 ```
 
 # Serving APIs with Nginx
