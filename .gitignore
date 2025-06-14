@@ -17,3 +17,4 @@ json
 mbuilder_server
 *.egg-info
 test*
+*nfs*
