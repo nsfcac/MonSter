@@ -3,7 +3,7 @@ from mbuilder.mb_api import app
 
 from monster import utils
 
-api_config = utils.parse_config().get("openapi", {})
+api_config = utils.parse_config().get("fastapi", {})
 
 uvicorn.run("mbuilder.mb_api:app", 
             host=api_config.get("host", "0.0.0.0"), 

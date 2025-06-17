@@ -81,6 +81,12 @@ def parse_config():
         print("Configuration Error: Missing required keys in 'slurm_rest_api'")
         raise SystemExit(1)
 
+    # Sanity check for the fastapi configuration
+    if 'fastapi' not in config or 'idrac' not in config['fastapi'] or 'slurm' not in config['fastapi'] \
+    or 'ip' not in config['fastapi'] or 'port' not in config['fastapi']:
+        print("Configuration Error: Missing required keys in 'fastapi'")
+        raise SystemExit(1)
+
     return config
 
 
@@ -131,6 +137,9 @@ def get_idrac_auth():
 
     return (username, password)
 
+
+def get_nodelist_raw(config):
+    return config['idrac']['nodelist']
 
 def get_nodelist(config):
     nodelist_raw = config['idrac']['nodelist']

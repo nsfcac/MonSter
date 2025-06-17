@@ -7,8 +7,10 @@ from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from mbuilder.metrics_builder import metrics_builder
 from monster import utils
+from mbuilder import mb_utils
+from mbuilder.metrics_builder import metrics_builder
+
 
 config    = utils.parse_config()
 partition = utils.get_partition(config)
@@ -20,13 +22,15 @@ app = FastAPI(
     openapi_url=f"/openapi.json"
 )
 
+available_metrics = list(mb_utils.get_metrics_map(config)['idrac'].keys()) + list(mb_utils.get_metrics_map(config)['slurm'].keys())
+
 class Request(BaseModel):
-    start      : Optional[str]  = "2025-01-08 12:00:00-06"
-    end        : Optional[str]  = "2025-01-08 14:00:00-06"
+    start      : Optional[str]  = "2025-06-15 12:00:00-06"
+    end        : Optional[str]  = "2025-06-15 14:00:00-06"
     interval   : Optional[str]  = "5m"
     aggregation: Optional[str]  = "max"
     nodelist   : Optional[str]  = utils.get_nodelist_raw(config)[0]
-    metrics    : Optional[list] = ['SystemPower_iDRAC', 'Fans_iDRAC', 'Temperatures_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsage_Slurm', 'MemoryUsed_Slurm']
+    metrics    : Optional[list] = available_metrics
     compression: Optional[bool] = False
 
 

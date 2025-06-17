@@ -1,8 +1,7 @@
 import json
+import hostlist
 import multiprocessing
 from itertools import repeat
-
-import hostlist
 
 from mbuilder import mb_utils
 from monster import utils
@@ -22,6 +21,7 @@ def metrics_builder(config,
     ip_hostname_mapping = utils.get_ip_hostname_map(connection)
     metrics_mapping     = mb_utils.get_metrics_map(config)
     nodelist            = hostlist.expand_hostlist(nodelist)
+    partition           = utils.get_partition(config)
 
     # Convert IPs to hostnames of the nodes
     nodelist = [ip_hostname_mapping[ip] for ip in nodelist]
@@ -29,11 +29,19 @@ def metrics_builder(config,
     # Parse the metrics
     if metrics:
         for metric in metrics:
-            metric_name = metric.split('_')[0]
-            source = metric.split('_')[1].lower()
-            if metric_name in metrics_mapping[source].keys():
-                table = metrics_mapping[source][metric_name]
-                tables.append(f'{source}.{table}')
+            if metric in metrics_mapping['idrac'].keys():
+                table = metrics_mapping['idrac'][metric]
+                if table not in tables:
+                    # Add the table only if it is not already in the list
+                    # This avoids duplicate queries for the same table
+                    tables.append(f'idrac.{table}')
+            elif metric in metrics_mapping['slurm'].keys():
+                table = metrics_mapping['slurm'][metric]
+                tables.append(f'slurm.{table}')
+            else:
+                return {"ERROR: " : f"Metric '{metric}' is not supported or not found in the configuration."}
+    else:
+        return {}
 
     # Parallelize the queries
     with multiprocessing.Pool(len(tables)) as pool:
@@ -50,25 +58,38 @@ def metrics_builder(config,
     for table, record in zip(tables, records):
         results[table] = record
 
-    # Refomat the results required by the frontend
-    results = mb_utils.reformat_results(metrics_mapping, results)
+    rename_results = mb_utils.rename_device(metrics_mapping, results)
 
-    return results
+    # Reformat the results required by the frontend
+    reformat_results = mb_utils.reformat_results(partition, rename_results)
+
+    return reformat_results
 
 
 if __name__ == "__main__":
     config = utils.parse_config()
     # For testing purposes
-    start = '2025-01-17 10:30:00-05'
-    end = '2025-01-17 11:30:00-05'
+    start = '2025-06-15 10:00:00-05'
+    end = '2025-06-15 10:00:10-05'
     interval = '5m'
     aggregation = 'max'
-    nodelist = "10.101.26.[1-60]"
-    # nodelist = "10.101.1.[1-60]"
-    metrics = ['SystemPower_iDRAC', 'Fans_iDRAC', 'Temperatures_iDRAC', 'NodeJobsCorrelation_Slurm', 'JobsInfo_Slurm', 'MemoryUsage_Slurm', 'MemoryUsed_Slurm']
-    # metrics = ['JobsInfo_Slurm']
-    results = metrics_builder(config, start, end, interval, aggregation, nodelist, metrics)
+    nodelist = ""
+    metrics = []
 
-    # Write the results to a file
-    with open(f"./json/results-{start.split(' ')[0]}-{end.split(' ')[0]}.json", "w") as f:
-        f.write(json.dumps(results, indent=2))
+    if utils.get_partition(config) == 'h100':
+        nodelist = "10.101.93.[1-8]"
+        metrics = ['GPU_Usage', 'GPU_PowerConsumption', 'GPU_MemoryUsage', 'GPU_Temperature', \
+                'CPU_Usage', 'CPU_PowerConsumption', 'CPU_Temperature', 'DRAM_Usage', \
+                'DRAM_PowerConsumption', 'System_PowerConsumption', \
+                'Jobs_Info', 'NodeJobs_Correlation', 'Nodes_State']
+    elif utils.get_partition(config) == 'zen4':
+        nodelist = "10.101.91.[1-20]"
+        metrics = ['CPU_Usage', 'CPU_PowerConsumption', 'CPU_Temperature', 'DRAM_Usage', \
+                'DRAM_PowerConsumption', 'System_PowerConsumption', \
+                'Jobs_Info', 'NodeJobs_Correlation', 'Nodes_State']
+
+    if metrics:
+        results = metrics_builder(config, start, end, interval, aggregation, nodelist, metrics)
+        # Write the results to a file
+        with open(f"./results-{start.split(' ')[0]}-{end.split(' ')[0]}_fromat.json", "w") as f:
+            f.write(json.dumps(results, indent=2))
