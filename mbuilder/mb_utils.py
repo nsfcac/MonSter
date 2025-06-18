@@ -653,9 +653,7 @@ def reformat_results(partition, results):
                 else:
                     job_time_records[f'{job}_{timestamp}']['power_per_core'] = 0
 
-    slurm_jobs = results.get('slurm.jobs', {})
-    if slurm_jobs:
-        reformated_results['job_details'] = slurm_jobs
+    reformated_results['job_details'] = results.get('slurm.jobs', [])
 
     reformated_results['nodes'] = list(node_time_records.values())
     reformated_results['jobs'] = list(job_time_records.values())
