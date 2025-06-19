@@ -11,9 +11,7 @@ from monster import utils
 def monit_infra(config): 
     cols = ('timestamp', 'nodeid', 'value')
     connection         = utils.init_tsdb_connection(config)
-    # username, password = utils.get_pdu_auth()
-    username = 'username'
-    password = 'password'
+    username, password = utils.get_pdu_auth()
     pdu_api            = utils.get_pdu_api(config)
 
     infras = ['pdu', 'irc', 'ups']
@@ -33,7 +31,7 @@ def monit_infra(config):
 
 if __name__ == "__main__":
     config = utils.parse_config()
-    schedule.every(5).minutes.at(":00").do(monit_infra, config)
+    schedule.every(1).minutes.at(":00").do(monit_infra, config)
     while True:
         schedule.run_pending()
         time.sleep(1)
