@@ -23,8 +23,8 @@ def monit_idrac_pull(config):
         source_map = utils.get_fqdd_source_map(conn, 'source')
         timestamp  = datetime.now(timezone.utc).replace(microsecond=0)
         processed_records = idrac.get_idrac_metrics_pull(idrac_api, timestamp, idrac_metrics,
-                                                        nodelist, username, password,
-                                                        nodeid_map, source_map, fqdd_map)
+                                                         nodelist, username, password,
+                                                         nodeid_map, source_map, fqdd_map)
         for tabel, records in processed_records.items():
             mgr = CopyManager(conn, tabel, cols)
             mgr.copy(records)

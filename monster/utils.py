@@ -53,39 +53,46 @@ def parse_config():
         print(f"Parsing Configuration Error: {err}")
         raise SystemExit(1)
     
-    # Sanity check for required keys in the configuration
-    required_keys = ['timescaledb', 'partition', 'idrac', 'slurm_rest_api']
-    for key in required_keys:
-        if key not in config:
-            print(f"Configuration Error: Missing required key '{key}'")
+    # If `partition` is not specified, it is the configuration for the infrastructure
+    # Do not go through the sanity checks and return the configuration as is.
+    # If `partition` is specified, it is the configuration for the partition
+    # Go through the sanity checks and return the configuration
+    if 'partition' not in config:
+        return config
+    else:
+        # Sanity check for required keys in the configuration
+        required_keys = ['timescaledb', 'partition', 'idrac', 'slurm_rest_api']
+        for key in required_keys:
+            if key not in config:
+                print(f"Configuration Error: Missing required key '{key}'")
+                raise SystemExit(1)
+
+        # Sanity check for timescaledb configuration
+        if 'host' not in config['timescaledb'] or 'port' not in config['timescaledb'] or 'database' not in config['timescaledb']:
+            print("Configuration Error: Missing required keys in 'timescaledb'")
             raise SystemExit(1)
 
-    # Sanity check for timescaledb configuration
-    if 'host' not in config['timescaledb'] or 'port' not in config['timescaledb'] or 'database' not in config['timescaledb']:
-        print("Configuration Error: Missing required keys in 'timescaledb'")
-        raise SystemExit(1)
-    
-    # Sanity check for idrac configuration
-    if 'model' not in config['idrac'] or 'nodelist' not in config['idrac']:
-        print("Configuration Error: Missing required keys in 'idrac'")
-        raise SystemExit(1)
-    
-    # Sanity check for the idrac model
-    if config['idrac']['model'] not in ['pull', 'push']:
-        print("Configuration Error: 'idrac.model' must be either 'pull' or 'push'")
-        raise SystemExit(1)
-    
-    # Sanity check for slurm_rest_api configuration
-    if 'ip' not in config['slurm_rest_api'] or 'port' not in config['slurm_rest_api'] or 'user' not in config['slurm_rest_api'] \
-    or 'slurm_jobs' not in config['slurm_rest_api'] or 'slurm_nodes' not in config['slurm_rest_api']:
-        print("Configuration Error: Missing required keys in 'slurm_rest_api'")
-        raise SystemExit(1)
+        # Sanity check for idrac configuration
+        if 'model' not in config['idrac'] or 'nodelist' not in config['idrac']:
+            print("Configuration Error: Missing required keys in 'idrac'")
+            raise SystemExit(1)
 
-    # Sanity check for the fastapi configuration
-    if 'fastapi' not in config or 'idrac' not in config['fastapi'] or 'slurm' not in config['fastapi'] \
-    or 'ip' not in config['fastapi'] or 'port' not in config['fastapi']:
-        print("Configuration Error: Missing required keys in 'fastapi'")
-        raise SystemExit(1)
+        # Sanity check for the idrac model
+        if config['idrac']['model'] not in ['pull', 'push']:
+            print("Configuration Error: 'idrac.model' must be either 'pull' or 'push'")
+            raise SystemExit(1)
+
+        # Sanity check for slurm_rest_api configuration
+        if 'ip' not in config['slurm_rest_api'] or 'port' not in config['slurm_rest_api'] or 'user' not in config['slurm_rest_api'] \
+        or 'slurm_jobs' not in config['slurm_rest_api'] or 'slurm_nodes' not in config['slurm_rest_api']:
+            print("Configuration Error: Missing required keys in 'slurm_rest_api'")
+            raise SystemExit(1)
+
+        # Sanity check for the fastapi configuration
+        if 'fastapi' not in config or 'idrac' not in config['fastapi'] or 'slurm' not in config['fastapi'] \
+        or 'ip' not in config['fastapi'] or 'port' not in config['fastapi']:
+            print("Configuration Error: Missing required keys in 'fastapi'")
+            raise SystemExit(1)
 
     return config
 
@@ -138,20 +145,53 @@ def get_idrac_auth():
     return (username, password)
 
 
+def get_pdu_auth():
+    username = os.environ.get('pdu_username')
+    password = os.environ.get('pdu_password')
+
+    # Report errors if the required environment variables are not set
+    if not username:
+        log.error("Environment variable 'pdu_username' is not set")
+        raise SystemExit(1)
+    if not password:
+        log.error("Environment variable 'pdu_password' is not set")
+        raise SystemExit(1)
+
+    return (username, password)
+
+
 def get_nodelist_raw(config):
     return config['idrac']['nodelist']
 
 def get_nodelist(config):
-    nodelist_raw = config['idrac']['nodelist']
-    nodelist = []
-
     try:
+        nodelist_raw = config['idrac']['nodelist']
+        nodelist = []
         for i in nodelist_raw:
             nodes = hostlist.expand_hostlist(i)
             nodelist.extend(nodes)
         return nodelist
     except Exception as err:
         log.error(f"Cannot generate nodelist: {err}")
+        raise SystemExit(1)
+
+def get_infra_ip_list(config, infra):
+    try:
+        infra_list_raw = config[infra]['ip_list']
+        infra_list = []
+        for i in infra_list_raw:
+            nodes = hostlist.expand_hostlist(i)
+            infra_list.extend(nodes)
+        return infra_list
+    except Exception as err:
+        log.error(f"Cannot generate PDU list: {err}")
+        raise SystemExit(1)
+
+def get_pdu_api(config):
+    try:
+        return config['pdu']['api']
+    except Exception as err:
+        log.error(f"Cannot find pdu_api configuration: {err}")
         raise SystemExit(1)
 
 
@@ -220,6 +260,18 @@ def get_fqdd_source_map(conn: object, table: str):
     for (id, col) in cur.fetchall():
         mapping.update({
             col: id
+        })
+    cur.close()
+    return mapping
+
+
+def get_infra_nodeid_map(conn: object):
+    mapping = {}
+    cur = conn.cursor()
+    cur.execute("SELECT nodeid, ip_addr FROM nodes")
+    for (nodeid, ip_addr) in cur.fetchall():
+        mapping.update({
+            ip_addr: nodeid
         })
     cur.close()
     return mapping

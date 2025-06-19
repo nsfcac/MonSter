@@ -73,18 +73,24 @@ def insert_fqdd_source_metadata(conn: object, fqdd_source_metadata: list, table_
 
 def update_metadata(conn: object, nodes_metadata: list, table_name: str):
     cur = conn.cursor()
-    for record in nodes_metadata:
+    for idx, record in enumerate(nodes_metadata):
         col_sql = ""
-        bmc_ip_addr = record['Bmc_Ip_Addr']
-        for col, value in record.items():
-            if col != 'Bmc_Ip_Addr':
-                col_value = col.lower() + " = '" + str(value) + "', "
-                col_sql += col_value
-        col_sql = col_sql[:-2]
-        sql = "UPDATE " + table_name + " SET " + col_sql \
-              + " WHERE bmc_ip_addr = '" + bmc_ip_addr + "';"
-        cur.execute(sql)
-
+        if 'Bmc_Ip_Addr' in record:
+            # For idrac nodes metadata
+            bmc_ip_addr = record['Bmc_Ip_Addr']
+            for col, value in record.items():
+                if col != 'Bmc_Ip_Addr':
+                    col_value = col.lower() + " = '" + str(value) + "', "
+                    col_sql += col_value
+            col_sql = col_sql[:-2]
+            sql = "UPDATE " + table_name + " SET " + col_sql \
+                + " WHERE bmc_ip_addr = '" + bmc_ip_addr + "';"
+            cur.execute(sql)
+        else:
+            # For infrastructure metadata. Drop all the entries first.
+            sql = "TRUNCATE TABLE " + table_name + " RESTART IDENTITY;"
+            cur.execute(sql)
+            insert_metadata(conn, nodes_metadata)
 
 def generate_source_table_sql():
     source_table_sql = "CREATE TABLE IF NOT EXISTS source \

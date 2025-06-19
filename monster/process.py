@@ -255,6 +255,47 @@ def process_node_idrac_pull(timestamp, idrac_metric: str, node: str, report: lis
     return records
 
 
+def process_all_pdu_pull(pdu_api: list, timestamp, pdu_list: list, redfish_report: list, nodeid_map: dict):
+    processed_records = {}
+    # Breakdown the redfish report by API
+    pdu_reports = []
+    for i in range(len(pdu_api)):
+        pdu_reports.append(redfish_report[i * len(pdu_list): (i + 1) * len(pdu_list)])
+
+    table_name = "infra.pdu"
+    for reports in pdu_reports:
+        records = parallel_process_pdu_pull(timestamp, pdu_list, reports, nodeid_map)
+        if table_name not in processed_records:
+            processed_records[table_name] = records
+        else:
+            processed_records[table_name].extend(records)
+
+    return processed_records
+
+
+def parallel_process_pdu_pull(timestamp, pdu_list: list, reports: list, nodeid_map: dict):
+    records = []
+    process_args = zip(repeat(timestamp), pdu_list, reports, repeat(nodeid_map))
+    with multiprocessing.Pool() as pool:
+        records = pool.starmap(process_node_pdu_pull, process_args)
+
+    # Remove empty lists
+    records = [item for sublist in records for item in sublist]
+    return records
+
+
+def process_node_pdu_pull(timestamp, node: str, report: list, nodeid_map: dict):
+    records = []
+    value_field = 'Reading'
+    if report:
+        try:
+            value = round(report.get(value_field, 0.0), 2)
+            records.append((timestamp, nodeid_map[node], value))
+        except Exception as err:
+            log.error(f"Cannot process PDU metrics: {err}")
+    return records
+
+
 def process_job_metrics_slurm(jobs_metrics: list):
     jobs_info = []
     attributes = sql.job_info_column_names

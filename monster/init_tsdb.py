@@ -1,9 +1,10 @@
 import psycopg2
 
+import sql
 import idrac
 import logger
 import schema
-import sql
+import hostlist
 from monster import utils
 
 log = logger.get_logger(__name__)
@@ -111,8 +112,53 @@ def init_tsdb(config):
     utils.print_status('Finish', 'tables', 'initialization')
 
 
+def init_tsdb_infra(config):
+    """init_tsdb_infra Initialize TimeScaleDB for infrastructure
+
+    Initialize TimeScaleDB for infrastructure
+    """
+    connection = utils.init_tsdb_connection(config)
+    
+    # Generate metadata for the infrastructures
+    infras_ip_list = {}
+    infras = ['pdu', 'irc', 'ups']
+    
+    for infra in infras:
+        if infra in config:
+            ip_list = util.get_infra_list(config, infra)
+            infras_ip_list.update({infra: ip_list})
+    
+    nodes_metadata = []
+    for infra, ip_list in infras_ip_list.items():
+        nodes_metadata.extend([{'hostname': ip.replace('10.1', infra).replace('.', '-'), 'ip_addr': ip} for ip in ip_list])
+
+    with psycopg2.connect(connection) as conn:
+        cur = conn.cursor()
+        utils.print_status('Creating', 'TimeScaleDB', 'tables')
+        # Create nodes table
+        metadata_sql = sql.generate_metadata_table_sql(nodes_metadata, 'nodes')
+        cur.execute(metadata_sql)
+        sql.write_nodes_metadata(conn, nodes_metadata)
+
+        # Build schema
+        infra_tabel_schemas = schema.build_infra_table_schemas()
+
+        # Create schema for infra
+        infra_sqls = sql.generate_metric_table_sqls(infra_tabel_schemas, 'infra')
+        cur.execute(infra_sqls['schema_sql'])
+        for s in infra_sqls['tables_sql']:
+            table_name = s.split(' ')[5]
+            cur.execute(s)
+
+        conn.commit()
+        cur.close()
+    utils.print_status('Finish', 'tables', 'initialization')
+
 if __name__ == '__main__':
     config = utils.parse_config()
 
     # Initialize TimeScaleDB
-    init_tsdb(config)
+    if 'pdu' in config or 'irc' in config or 'ups' in config:
+        init_tsdb_infra(config)
+    else:
+        init_tsdb(config)

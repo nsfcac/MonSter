@@ -68,3 +68,26 @@ def build_slurm_table_schemas():
         })
 
     return table_schemas
+
+def build_infra_table_schemas():
+    table_schemas = {}
+    add_tables = {
+        'pdu': {
+            'add_columns': ['Value'],
+            'add_types': ['REAL']
+        },
+    }
+    for table_name, detail in add_tables.items():
+        column_names = ['Timestamp', 'NodeID']
+        column_types = ['TIMESTAMPTZ NOT NULL', 'INT NOT NULL']
+        column_names.extend(detail['add_columns'])
+        column_types.extend(detail['add_types'])
+
+        table_schemas.update({
+            table_name: {
+                'column_names': column_names,
+                'column_types': column_types
+            }
+        })
+
+    return table_schemas
