@@ -87,7 +87,7 @@ def get_jobs_cpus(row, item):
     cpus = []
     jobs_cpus_map = {}
 
-    if row['jobs_copy']:
+    if isinstance(row.get('jobs_copy'), list) and isinstance(row.get('cpus'), list):
         for job_list, cpu_list in zip(row['jobs_copy'], row['cpus']):
             for i, job in enumerate(job_list):
                 if job not in jobs_cpus_map:
@@ -95,7 +95,6 @@ def get_jobs_cpus(row, item):
 
         # Order the dictionary by key
         jobs_cpus_map = dict(sorted(jobs_cpus_map.items()))
-
         jobs = list(jobs_cpus_map.keys())
         cpus = list(jobs_cpus_map.values())
 
@@ -104,7 +103,7 @@ def get_jobs_cpus(row, item):
     elif item == 'cpus':
         return cpus
     else:
-        return None
+        return []
 
 
 def query_db(connection: str, sql: str, nodelist: list):

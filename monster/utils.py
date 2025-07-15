@@ -125,9 +125,9 @@ def get_partition(config):
     return partition
 
 
-def get_front_url(config):
-    front_url = config['frontend']['url']
-    return front_url
+def get_front_urls(config):
+    front_urls = config['frontend']['urls']
+    return front_urls
 
 
 def get_idrac_auth():

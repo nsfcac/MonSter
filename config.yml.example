@@ -49,5 +49,6 @@ fastapi:
 
 # Frontend Configuration
 frontend:
-  url: https://frontend.github.io
+  urls: 
+    - https://frontend.github.io
 

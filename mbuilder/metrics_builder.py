@@ -69,8 +69,8 @@ def metrics_builder(config,
 if __name__ == "__main__":
     config = utils.parse_config()
     # For testing purposes
-    start = '2025-06-15 10:00:00-05'
-    end = '2025-06-15 10:00:10-05'
+    start = '2025-06-23 21:00:00-05'
+    end = '2025-06-23 22:10:10-05'
     interval = '5m'
     aggregation = 'max'
     nodelist = ""
@@ -83,7 +83,7 @@ if __name__ == "__main__":
                 'DRAM_PowerConsumption', 'System_PowerConsumption', \
                 'Jobs_Info', 'NodeJobs_Correlation', 'Nodes_State']
     elif utils.get_partition(config) == 'zen4':
-        nodelist = "10.101.91.[1-20]"
+        nodelist = "10.101.95.[1-10]"
         metrics = ['CPU_Usage', 'CPU_PowerConsumption', 'CPU_Temperature', 'DRAM_Usage', \
                 'DRAM_PowerConsumption', 'System_PowerConsumption', \
                 'Jobs_Info', 'NodeJobs_Correlation', 'Nodes_State']

@@ -14,7 +14,7 @@ from mbuilder.metrics_builder import metrics_builder
 
 config    = utils.parse_config()
 partition = utils.get_partition(config)
-front_url = utils.get_front_url(config)
+front_urls = utils.get_front_urls(config)
 
 
 app = FastAPI(
@@ -34,18 +34,14 @@ class Request(BaseModel):
     compression: Optional[bool] = False
 
 
-origins = [
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    front_url,
-]
+origins = front_urls
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers={"*"},
+    allow_headers=["*"],
 )
 
 
