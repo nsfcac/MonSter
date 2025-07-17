@@ -4,8 +4,10 @@ import sql
 import idrac
 import logger
 import schema
+import asyncio
 import hostlist
 from monster import utils
+from monster import snmp_irc
 
 log = logger.get_logger(__name__)
 
@@ -125,7 +127,7 @@ def init_tsdb_infra(config):
     
     for infra in infras:
         if infra in config:
-            ip_list = util.get_infra_list(config, infra)
+            ip_list = utils.get_infra_ip_list(config, infra)
             infras_ip_list.update({infra: ip_list})
     
     nodes_metadata = []
@@ -135,24 +137,46 @@ def init_tsdb_infra(config):
     with psycopg2.connect(connection) as conn:
         cur = conn.cursor()
         utils.print_status('Creating', 'TimeScaleDB', 'tables')
-        # Create nodes table
-        metadata_sql = sql.generate_metadata_table_sql(nodes_metadata, 'nodes')
-        cur.execute(metadata_sql)
-        sql.write_nodes_metadata(conn, nodes_metadata)
+        # # Create nodes table
+        # metadata_sql = sql.generate_metadata_table_sql(nodes_metadata, 'nodes')
+        # cur.execute(metadata_sql)
+        # sql.write_nodes_metadata(conn, nodes_metadata)
 
-        # Build schema
-        infra_tabel_schemas = schema.build_infra_table_schemas()
+        # # Build schema for PDU
+        # pdu_tabel_schemas = schema.build_pdu_table_schemas()
+        # infra_pdu_sqls = sql.generate_metric_table_sqls(pdu_tabel_schemas, 'pdu')
+        # cur.execute(infra_pdu_sqls['schema_sql'])
+        # for s in infra_pdu_sqls['tables_sql']:
+        #     table_name = s.split(' ')[5]
+        #     cur.execute(s)
+        #     # Create hypertable
+        #     create_hypertable_sql = "SELECT create_hypertable(" + "'" \
+        #                             + table_name + "', 'timestamp', if_not_exists => TRUE);"
+        #     cur.execute(create_hypertable_sql)
 
-        # Create schema for infra
-        infra_sqls = sql.generate_metric_table_sqls(infra_tabel_schemas, 'infra')
-        cur.execute(infra_sqls['schema_sql'])
-        for s in infra_sqls['tables_sql']:
+        # Build schema for IRC
+        irc_metrics_definition = asyncio.run(snmp_irc.get_irc_metrics(config))
+
+        irc_table_schemas = schema.build_irc_table_schemas(irc_metrics_definition)
+        infra_irc_sqls = sql.generate_metric_table_sqls(irc_table_schemas, 'irc')
+        cur.execute(infra_irc_sqls['schema_sql'])
+        for s in infra_irc_sqls['tables_sql']:
             table_name = s.split(' ')[5]
             cur.execute(s)
+            # Create hypertable
+            create_hypertable_sql = "SELECT create_hypertable(" + "'" \
+                                    + table_name + "', 'timestamp', if_not_exists => TRUE);"
+            cur.execute(create_hypertable_sql)
+
+        # Write IRC metric definitions
+        metric_def_sql = sql.generate_metric_def_table_sql_irc()
+        cur.execute(metric_def_sql)
+        sql.write_metric_definitions_irc(conn, irc_metrics_definition)
 
         conn.commit()
         cur.close()
     utils.print_status('Finish', 'tables', 'initialization')
+
 
 if __name__ == '__main__':
     config = utils.parse_config()

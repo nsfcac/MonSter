@@ -209,3 +209,24 @@ def write_metric_definitions_pull(conn: object, metric_definitions: list):
 
         mgr = CopyManager(conn, 'metrics_definition', cols)
         mgr.copy(metric_definitions_table)
+
+
+def generate_metric_def_table_sql_irc():
+    metric_def_table_sql = "CREATE TABLE IF NOT EXISTS metrics_definition \
+            (id SERIAL PRIMARY KEY, metric_id TEXT NOT NULL, metric_name TEXT, \
+            metric_data_type TEXT, units TEXT, snmp_oid TEXT, UNIQUE (id));"
+    return metric_def_table_sql
+
+
+def write_metric_definitions_irc(conn: object, metric_definitions: list):
+    if not check_table_exist(conn, 'metrics_definition'):
+        cols = ('metric_id', 'metric_name', 'metric_data_type', 'units', 'snmp_oid')
+
+        metric_definitions_table = [(i['metric_id'], i['metric_name'], i['metric_data_type'], i['units'], i['snmp_oid']) 
+                                     for i in metric_definitions]
+
+        # Sort
+        metric_definitions_table = utils.sort_tuple_list(metric_definitions_table)
+
+        mgr = CopyManager(conn, 'metrics_definition', cols)
+        mgr.copy(metric_definitions_table)

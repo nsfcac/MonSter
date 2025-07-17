@@ -1,5 +1,7 @@
-import asyncio
+import sql
 import json
+import logger
+import asyncio
 import multiprocessing
 from itertools import repeat
 
@@ -12,8 +14,7 @@ from dateutil.parser import parse
 from pgcopy import CopyManager
 from requests.adapters import HTTPAdapter
 
-import logger
-import sql
+import snmp_irc
 from monster import utils
 
 log = logger.get_logger(__name__)
@@ -62,6 +63,24 @@ def single_fetch(url: str, username: str, password: str, max_retries=3, retry_de
 
 def run_fetch_all(urls: list, username: str, password: str):
     return asyncio.run(fetch_all(urls, username, password))
+
+
+def run_single_snmp(irc_ip: str, username: str):
+    metrics = asyncio.run(snmp_irc.get_irc_metrics(irc_ip, username))
+    if metrics:
+        return {
+            'irc_ip': irc_ip,
+            'metrics': metrics
+        }
+    return {}
+
+
+def run_snmp_all(irc_list: list, username: str):
+    metrics_all = []
+    snmp_args = zip(irc_list, repeat(username))
+    with multiprocessing.Pool() as pool:
+        metrics_all = pool.starmap(run_single_snmp, snmp_args)
+    return metrics_all
 
 
 def extract_metadata(system_info: dict, bmc_info: dict, node: str):
@@ -262,7 +281,7 @@ def process_all_pdu_pull(pdu_api: list, timestamp, pdu_list: list, redfish_repor
     for i in range(len(pdu_api)):
         pdu_reports.append(redfish_report[i * len(pdu_list): (i + 1) * len(pdu_list)])
 
-    table_name = "infra.pdu"
+    table_name = "pdu.pdu"
     for reports in pdu_reports:
         records = parallel_process_pdu_pull(timestamp, pdu_list, reports, nodeid_map)
         if table_name not in processed_records:
@@ -513,3 +532,19 @@ async def write_idrac_push(conn: object, nodeid_map: dict, source_map: dict, fqd
             conn.commit()
             log.error(f"Cannot write metrics from {ip}: {err}")
         mp_queue.task_done()
+
+
+def process_all_irc_metrics(timestamp, irc_metrics, nodeid_map):
+    """
+    Process the IRC metrics definition.
+    """
+    processed_records = {}
+    for item in irc_metrics:
+        node_id = nodeid_map[item['irc_ip']]
+        for metric in item['metrics']:
+            table_name = f"irc.{metric['metric_id'].lower()}"
+            if table_name not in processed_records:
+                processed_records[table_name] = []
+            processed_records[table_name].append((timestamp, node_id, metric['value']))
+
+    return processed_records

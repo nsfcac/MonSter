@@ -69,7 +69,7 @@ def build_slurm_table_schemas():
 
     return table_schemas
 
-def build_infra_table_schemas():
+def build_pdu_table_schemas():
     table_schemas = {}
     add_tables = {
         'pdu': {
@@ -77,6 +77,33 @@ def build_infra_table_schemas():
             'add_types': ['REAL']
         },
     }
+    for table_name, detail in add_tables.items():
+        column_names = ['Timestamp', 'NodeID']
+        column_types = ['TIMESTAMPTZ NOT NULL', 'INT NOT NULL']
+        column_names.extend(detail['add_columns'])
+        column_types.extend(detail['add_types'])
+
+        table_schemas.update({
+            table_name: {
+                'column_names': column_names,
+                'column_types': column_types
+            }
+        })
+
+    return table_schemas
+
+
+def build_irc_table_schemas(irc_metrics_definition):
+    table_schemas = {}
+    add_tables = {}
+    for item in irc_metrics_definition:
+        table_name = item['metric_id']
+        add_tables.update({
+            table_name: {
+                'add_columns': ['Value'],
+                'add_types': [item['metric_data_type']]
+            }
+        })
     for table_name, detail in add_tables.items():
         column_names = ['Timestamp', 'NodeID']
         column_types = ['TIMESTAMPTZ NOT NULL', 'INT NOT NULL']

@@ -159,6 +159,16 @@ def get_pdu_auth():
 
     return (username, password)
 
+def get_irc_auth():
+    username = os.environ.get('irc_username')
+
+    # Report errors if the required environment variables are not set
+    if not username:
+        log.error("Environment variable 'irc_username' is not set")
+        raise SystemExit(1)
+
+    return username
+
 
 def get_nodelist_raw(config):
     return config['idrac']['nodelist']
@@ -334,3 +344,36 @@ def cast_value_type(value, dtype):
         return float(value)
     else:
         return value
+
+
+def get_snmp_oids(conn: object):
+    """
+    Get the SNMP OIDs from the database for the given IP list.
+    Returns a dictionary with IP as key and a list of OIDs as value.
+    """
+    oids = {}
+    cur = conn.cursor()
+    query = "SELECT metric_id, snmp_oid FROM metrics_definition"
+    cur.execute(query)
+    for (metric_id, snmp_oid) in cur.fetchall():
+        oids[metric_id] = snmp_oid
+    cur.close()
+    return oids
+
+
+def oid_string_to_tuple(oid_str):
+    # Split by '::' to separate the module and the OID
+    if '::' not in oid_str:
+        raise ValueError("Invalid OID format: missing '::'")
+
+    module, oid_part = oid_str.split('::', 1)
+
+    # Split the OID part by '.' and convert numeric strings to integers
+    parts = []
+    for part in oid_part.split('.'):
+        if part.isdigit():
+            parts.append(int(part))
+        else:
+            parts.append(part)
+
+    return (module, *parts)
