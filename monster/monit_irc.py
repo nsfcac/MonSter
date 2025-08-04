@@ -31,7 +31,7 @@ def monit_irc(config):
 
 if __name__ == "__main__":
     config = utils.parse_config()
-    schedule.every(5).minutes.at(":00").do(monit_irc, config)
+    schedule.every(2).minutes.at(":00").do(monit_irc, config)
     while True:
         schedule.run_pending()
         time.sleep(1)

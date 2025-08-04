@@ -19,3 +19,5 @@ mbuilder_server
 test*
 *nfs*
 OIDs.txt
+mb_api_h100.py*
+mb_api_zen4.py*

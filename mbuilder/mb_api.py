@@ -1,5 +1,6 @@
 import json
 import zlib
+import hostlist
 from typing import Optional
 
 from dateutil.parser import parse
@@ -57,6 +58,28 @@ def main(request: Request):
     # Check if the time range is within the 7 days
     if (end_epoch - start_epoch) > 604800:
         return {"error": "Time range is greater than 7 days"}
+
+    # Check if the requested nodes are valid
+    if request.nodelist:
+        valid_nodes   = utils.get_nodelist(config)
+        try:
+            request_nodes = hostlist.expand_hostlist(request.nodelist)
+        except Exception as e:  # Handle potential errors in expanding the hostlist
+            return {"error": f"Failed to expand nodelist: {e}"}
+        invalid_nodes = [node for node in request_nodes if node not in valid_nodes]
+        if invalid_nodes:
+           return {"error": f"Invalid nodes: {', '.join(invalid_nodes)}"}
+    else:
+        request.nodelist = utils.get_nodelist(config)
+    
+    # Check the interval format. Start with a number followed by 's', 'm', or 'h'. The number should be greater than 0.
+    if not request.interval or not request.interval[:-1].isdigit() or int(request.interval[:-1]) <= 0 or request.interval[-1] not in ['s', 'm', 'h']:
+        return {"error": "Invalid interval format. Use a positive number followed by 's', 'm', or 'h'."}
+
+    # Check if the aggregation method is valid
+    if request.aggregation not in ['max', 'min', 'avg', 'sum']:
+        return {"error": "Invalid aggregation method. Use 'max', 'min', 'avg', or 'sum'."}
+
 
     data = metrics_builder(config,
                            request.start,
